@@ -5,3 +5,8 @@
 
 # Convenient access to the version number
 from .version import version as __version__
+
+from .general import Hist
+from .named import NamedHist
+
+from . import axis
