@@ -1,0 +1,9 @@
+name: hist
+channels:
+  - conda-forge
+dependencies:
+  - pip>=18
+  - root
+  - pip:
+    - -r requirements.txt
+    - -e .
