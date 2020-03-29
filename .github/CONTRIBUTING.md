@@ -22,5 +22,6 @@ You can also set up a development environment using Conda. With conda, you can s
 ```bash
 $ conda env create -f dev-environment.yml -n hist
 $ conda activate hist
+(hist)$ pip install -r dev-requirements.txt
 (hist)$ python -m ipykernel install --name hist
 ```
