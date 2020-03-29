@@ -9,9 +9,11 @@ You can set up a development environment using PyPI.
 $ python -m venv .env
 $ source .env/bin/activate
 (.env)$ pip install -r requirements.txt
-(.env)$ pip install -e .
+(.env)$ pip install -e .[dev]
 (.env)$ python -m ipykernel install --user --name hist
 ```
+
+- You should have pip 10 or later.
 
 ### Conda
 
