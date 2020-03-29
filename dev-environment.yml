@@ -5,5 +5,5 @@ dependencies:
   - pip>=18
   - root
   - pip:
-    - -r requirements.txt
+    - -r dev-requirements.txt
     - -e .
