@@ -6,4 +6,4 @@ dependencies:
   - root
   - pip:
     - -r dev-requirements.txt
-    - -e .
+    - -e .[dev]
