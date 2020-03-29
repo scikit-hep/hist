@@ -10,4 +10,4 @@ mplhep>=0.1.8
 flatbuffers>=1.8.0
 aghast>=0.2.1
 uproot>=3.11.3
-uproot-methods>=0.7.3  
+uproot-methods>=0.7.3
