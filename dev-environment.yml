@@ -3,7 +3,6 @@ channels:
   - conda-forge
 dependencies:
   - pip >=18
-  - root
+  - root >=6.20.0
   - pip:
-    - -r dev-requirements.txt
-    - -e .[dev]
+    - -e .
