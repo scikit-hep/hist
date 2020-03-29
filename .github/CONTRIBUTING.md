@@ -13,7 +13,7 @@ $ source .env/bin/activate
 (.env)$ python -m ipykernel install --user --name hist
 ```
 
-- You should have pip 10 or later.
+You should have pip 10 or later.
 
 ### Conda
 
