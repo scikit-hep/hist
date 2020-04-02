@@ -8,7 +8,6 @@ You can set up a development environment using PyPI.
 ```bash
 $ python3 -m venv .env
 $ source .env/bin/activate
-(.env)$ pip install -r dev-requirements.txt
 (.env)$ pip install -e .[dev]
 (.env)$ python -m ipykernel install --user --name hist
 ```
