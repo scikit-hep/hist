@@ -7,32 +7,28 @@ class NamedHist(BaseHist):
         """
             Initialize NamedHist object. Axis params must contain the names.
         """
+
         super(BaseHist, self).__init__(*args, **kwargs)
-        names = dict()
+
+        self.names = dict()
         for ax in self.axes:
             if not ax.name:
                 raise Exception(
                     "Each axes in the NamedHist instance should have a name."
                 )
-            elif ax.name in names:
+            elif ax.name in self.names:
                 raise Exception(
                     "NamedHist instance cannot contain axes with duplicated names."
                 )
             else:
-                names[ax.name] = True
+                self.names[ax.name] = True
 
     def fill(self, *args, **kwargs):
         """
             Insert data into the histogram using names and return a \
-            NamedHist object.
+            NamedHist object. NamedHist could only be filled by names.
         """
 
-        # fill by default
-        if len(args):
-            super().fill(*args)
-            return self
-
-        # fill by name
         indices = []
         values = []
         for name, val in kwargs.items():
@@ -40,10 +36,14 @@ class NamedHist(BaseHist):
                 if name == axis.name:
                     indices.append(index)
                     values.append(val)
+                    break
 
         d = dict(zip(indices, values))
         d = sorted(d.items(), key=lambda item: item[0])
         nd = np.asarray(d, dtype=object)
-        super().fill(*(nd.ravel()[1::2]))
+        data = nd.ravel()[1::2]
+        if len(data) != len(self.axes):
+            raise Exception("The axis names could not be found when filling.")
+        super().fill(*data)
 
         return self
