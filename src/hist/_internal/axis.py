@@ -1,13 +1,16 @@
+import re
 import boost_histogram.axis as bha
 
 
 class Regular(bha.Regular):
+    
     def __init__(
         self,
         bins,
         start,
         stop,
         *,
+        name=None,
         title=None,
         underflow=True,
         overflow=True,
@@ -15,7 +18,10 @@ class Regular(bha.Regular):
         circular=False,
         transform=None
     ):
-        metadata = dict(title=title)
+        metadata = dict()
+        if re.match(r"^[0-9a-zA-Z][0-9a-zA-Z_]*$", name): metadata["name"] = name
+        else: raise Exception("Name should be a Python Identifier.")
+        metadata["title"] = title
         super().__init__(
             bins,
             start,
@@ -27,9 +33,28 @@ class Regular(bha.Regular):
             circular=circular,
             transform=transform,
         )
+    
+    def __repr__(self):
+        return "{self.__class__.__name__}({args}{kwargs})".format(
+            self=self, args=self._repr_args(), kwargs=self._repr_kwargs()
+    )
+    
+    @property
+    def name(self):
+        '''
+        Get or set the name for the Regular axis
+        '''
+        return self.metadata["name"]
 
+    @name.setter
+    def name(self, value):
+        self.metadata["name"] = value
+        
     @property
     def title(self):
+        '''
+        Get or set the title for the Regular axis
+        '''
         return self.metadata["title"]
 
     @title.setter
@@ -37,17 +62,265 @@ class Regular(bha.Regular):
         self.metadata["title"] = value
 
 
+        
+class Bool(bha.Regular):
+    def __init__(
+        self,
+        *,
+        name=None,
+        title=None,
+        underflow=False,
+        overflow=False,
+        growth=False,
+        circular=False,
+        transform=None
+    ):
+        metadata = dict()
+        if re.match(r"^[0-9a-zA-Z][0-9a-zA-Z_]*$", name): metadata["name"] = name
+        else: raise Exception("Name should be a Python Identifier.")
+        metadata["title"] = title
+        super().__init__(
+            2, 
+            0, 
+            2,
+            metadata=metadata,
+            underflow=underflow,
+            overflow=overflow,
+            growth=growth,
+            circular=circular,
+            transform=transform,
+        )
+    
+    def __repr__(self):
+        return "{self.__class__.__name__}({args}{kwargs})".format(
+            self=self, args=self._repr_args(), kwargs=self._repr_kwargs()
+        )
+    
+    @property
+    def name(self):
+        '''
+        Get or set the name for the Bool axis
+        '''
+        return self.metadata["name"]
+
+    @name.setter
+    def name(self, value):
+        self.metadata["name"] = value
+        
+    @property
+    def title(self):
+        '''
+        Get or set the title for the Bool axis
+        '''
+        return self.metadata["title"]
+
+    @title.setter
+    def title(self, value):
+        self.metadata["title"] = value
+
+
+
 class Variable(bha.Variable):
-    pass
+    
+    def __init__(
+        self,
+        edges,
+        *,
+        name=None,
+        title=None,
+        underflow=True,
+        overflow=True,
+        growth=False
+    ):
+        metadata = dict()
+        if re.match(r"^[0-9a-zA-Z][0-9a-zA-Z_]*$", name): metadata["name"] = name
+        else: raise Exception("Name should be a Python Identifier.")
+        metadata["title"] = title
+        super().__init__(
+            edges,
+            metadata=metadata,
+            underflow=underflow,
+            overflow=overflow,
+            growth=growth
+        )
+    
+    def __repr__(self):
+        return "{self.__class__.__name__}({args}{kwargs})".format(
+            self=self, args=self._repr_args(), kwargs=self._repr_kwargs()
+    )
+
+    @property
+    def name(self):
+        '''
+        Get or set the name for the Variable axis
+        '''
+        return self.metadata["name"]
+
+    @name.setter
+    def name(self, value):
+        self.metadata["name"] = value
+        
+    @property
+    def title(self):
+        '''
+        Get or set the title for the Variable axis
+        '''
+        return self.metadata["title"]
+
+    @title.setter
+    def title(self, value):
+        self.metadata["title"] = value
+
 
 
 class Integer(bha.Integer):
-    pass
+    
+    def __init__(
+        self,
+        start,
+        stop,
+        *,
+        name=None,
+        title=None,
+        underflow=True,
+        overflow=True,
+        growth=False
+    ):
+        metadata = dict()
+        if re.match(r"^[0-9a-zA-Z][0-9a-zA-Z_]*$", name): metadata["name"] = name
+        else: raise Exception("Name should be a Python Identifier.")
+        metadata["title"] = title
+        super().__init__(
+            start,
+            stop,
+            metadata=metadata,
+            underflow=underflow,
+            overflow=overflow,
+            growth=growth
+        )
+    
+    def __repr__(self):
+        return "{self.__class__.__name__}({args}{kwargs})".format(
+            self=self, args=self._repr_args(), kwargs=self._repr_kwargs()
+    )
+
+    @property
+    def name(self):
+        '''
+        Get or set the name for the Integer axis
+        '''
+        return self.metadata["name"]
+
+    @name.setter
+    def name(self, value):
+        self.metadata["name"] = value
+        
+    @property
+    def title(self):
+        '''
+        Get or set the title for the Integer axis
+        '''
+        return self.metadata["title"]
+
+    @title.setter
+    def title(self, value):
+        self.metadata["title"] = value
+
 
 
 class IntCategory(bha.IntCategory):
-    pass
+    
+    def __init__(
+        self,
+        categories=None,
+        *,
+        name=None,
+        title=None,
+        growth=False
+    ):
+        metadata = dict()
+        if re.match(r"^[0-9a-zA-Z][0-9a-zA-Z_]*$", name): metadata["name"] = name
+        else: raise Exception("Name should be a Python Identifier.")
+        metadata["title"] = title
+        super().__init__(
+            categories,
+            metadata=metadata,
+            growth=growth
+        )
+    
+    def __repr__(self):
+        return "{self.__class__.__name__}({args}{kwargs})".format(
+            self=self, args=self._repr_args(), kwargs=self._repr_kwargs()
+    )
+
+    @property
+    def name(self):
+        '''
+        Get or set the name for the IntCategory axis
+        '''
+        return self.metadata["name"]
+
+    @name.setter
+    def name(self, value):
+        self.metadata["name"] = value
+        
+    @property
+    def title(self):
+        '''
+        Get or set the title for the IntCategory axis
+        '''
+        return self.metadata["title"]
+
+    @title.setter
+    def title(self, value):
+        self.metadata["title"] = value
+
 
 
 class StrCategory(bha.StrCategory):
-    pass
+    
+    def __init__(
+        self,
+        categories=None,
+        *,
+        name=None,
+        title=None,
+        growth=False
+    ):
+        metadata = dict()
+        if re.match(r"^[0-9a-zA-Z][0-9a-zA-Z_]*$", name): metadata["name"] = name
+        else: raise Exception("Name should be a Python Identifier.")
+        metadata["title"] = title
+        super().__init__(
+            categories,
+            metadata=metadata,
+            growth=growth
+        )
+    
+    def __repr__(self):
+        return "{self.__class__.__name__}({args}{kwargs})".format(
+            self=self, args=self._repr_args(), kwargs=self._repr_kwargs()
+    )
+    
+    @property
+    def name(self):
+        '''
+        Get or set the name for the StrCategory axis
+        '''
+        return self.metadata["name"]
+
+    @name.setter
+    def name(self, value):
+        self.metadata["name"] = value
+        
+    @property
+    def title(self):
+        '''
+        Get or set the title for the StrCategory axis
+        '''
+        return self.metadata["title"]
+
+    @title.setter
+    def title(self, value):
+        self.metadata["title"] = value
+    
