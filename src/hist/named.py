@@ -3,6 +3,9 @@ import numpy as np
 
 
 class NamedHist(BaseHist):
+    
+    # ToDo: judge whether have no-named axes when initialization
+    
     def fill(self, *args, **kwargs):
         """
             Insert data into the histogram using names and return a \
