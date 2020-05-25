@@ -25,7 +25,7 @@ class Regular(bha.Regular):
         else:
             raise Exception("Name should be a valid Python identifier.")
         metadata["title"] = title
-        super().__init__(
+        super(bha.Regular, self).__init__(
             bins,
             start,
             stop,
@@ -85,7 +85,7 @@ class Bool(bha.Regular):
         else:
             raise Exception("Name should be a valid Python identifier.")
         metadata["title"] = title
-        super().__init__(
+        super(bha.Regular, self).__init__(
             2,
             0,
             2,
@@ -144,7 +144,7 @@ class Variable(bha.Variable):
         else:
             raise Exception("Name should be a valid Python identifier.")
         metadata["title"] = title
-        super().__init__(
+        super(bha.Variable, self).__init__(
             edges,
             metadata=metadata,
             underflow=underflow,
@@ -200,7 +200,7 @@ class Integer(bha.Integer):
         else:
             raise Exception("Name should be a valid Python identifier.")
         metadata["title"] = title
-        super().__init__(
+        super(bha.Integer, self).__init__(
             start,
             stop,
             metadata=metadata,
@@ -247,7 +247,9 @@ class IntCategory(bha.IntCategory):
         else:
             raise Exception("Name should be a valid Python identifier.")
         metadata["title"] = title
-        super().__init__(categories, metadata=metadata, growth=growth)
+        super(bha.IntCategory, self).__init__(
+            categories, metadata=metadata, growth=growth
+        )
 
     def __repr__(self):
         return "{self.__class__.__name__}({args}{kwargs})".format(
@@ -287,7 +289,9 @@ class StrCategory(bha.StrCategory):
         else:
             raise Exception("Name should be a valid Python identifier.")
         metadata["title"] = title
-        super().__init__(categories, metadata=metadata, growth=growth)
+        super(bha.StrCategory, self).__init__(
+            categories, metadata=metadata, growth=growth
+        )
 
     def __repr__(self):
         return "{self.__class__.__name__}({args}{kwargs})".format(
