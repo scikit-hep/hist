@@ -3,13 +3,28 @@ import numpy as np
 
 
 class NamedHist(BaseHist):
-
-    # ToDo: judge whether have no-named axes when initialization
+    def __init__(self, *args, **kwargs):
+        """
+            Initialize NamedHist object. Axis params must contain the names.
+        """
+        super(BaseHist, self).__init__(*args, **kwargs)
+        names = dict()
+        for ax in self.axes:
+            if not ax.name:
+                raise Exception(
+                    "Each axes in the NamedHist instance should have a name."
+                )
+            elif ax.name in names:
+                raise Exception(
+                    "NamedHist instance cannot contain axes with duplicated names."
+                )
+            else:
+                names[ax.name] = True
 
     def fill(self, *args, **kwargs):
         """
             Insert data into the histogram using names and return a \
-            NamedHist object. Params must contain the names of the axes.
+            NamedHist object.
         """
 
         # fill by default

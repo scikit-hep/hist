@@ -3,7 +3,7 @@ from hist import axis, NamedHist
 
 def test_basic_usage():
     h = NamedHist(
-        axis.Regular(10, 0, 1, title="x")
+        axis.Regular(10, 0, 1, name="y", title="t")
     )  # NamedHist should require axis.Regular to have a name set
 
     h.fill([0.35, 0.35, 0.45])  # Fill should be keyword only, with the names
