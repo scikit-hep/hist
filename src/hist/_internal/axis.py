@@ -18,10 +18,12 @@ class Regular(bha.Regular):
         transform=None
     ):
         metadata = dict()
-        if re.match(r"^[0-9a-zA-Z][0-9a-zA-Z_]*$", name):
+        if not name:
+            metadata["name"] = None
+        elif re.match(r"^[0-9a-zA-Z][0-9a-zA-Z_]*$", name):
             metadata["name"] = name
         else:
-            raise Exception("Name should be a Python Identifier.")
+            raise Exception("Name should be a valid Python identifier.")
         metadata["title"] = title
         super().__init__(
             bins,
@@ -76,10 +78,12 @@ class Bool(bha.Regular):
         transform=None
     ):
         metadata = dict()
-        if re.match(r"^[0-9a-zA-Z][0-9a-zA-Z_]*$", name):
+        if not name:
+            metadata["name"] = None
+        elif re.match(r"^[0-9a-zA-Z][0-9a-zA-Z_]*$", name):
             metadata["name"] = name
         else:
-            raise Exception("Name should be a Python Identifier.")
+            raise Exception("Name should be a valid Python identifier.")
         metadata["title"] = title
         super().__init__(
             2,
@@ -133,10 +137,12 @@ class Variable(bha.Variable):
         growth=False
     ):
         metadata = dict()
-        if re.match(r"^[0-9a-zA-Z][0-9a-zA-Z_]*$", name):
+        if not name:
+            metadata["name"] = None
+        elif re.match(r"^[0-9a-zA-Z][0-9a-zA-Z_]*$", name):
             metadata["name"] = name
         else:
-            raise Exception("Name should be a Python Identifier.")
+            raise Exception("Name should be a valid Python identifier.")
         metadata["title"] = title
         super().__init__(
             edges,
@@ -187,10 +193,12 @@ class Integer(bha.Integer):
         growth=False
     ):
         metadata = dict()
-        if re.match(r"^[0-9a-zA-Z][0-9a-zA-Z_]*$", name):
+        if not name:
+            metadata["name"] = None
+        elif re.match(r"^[0-9a-zA-Z][0-9a-zA-Z_]*$", name):
             metadata["name"] = name
         else:
-            raise Exception("Name should be a Python Identifier.")
+            raise Exception("Name should be a valid Python identifier.")
         metadata["title"] = title
         super().__init__(
             start,
@@ -232,10 +240,12 @@ class Integer(bha.Integer):
 class IntCategory(bha.IntCategory):
     def __init__(self, categories=None, *, name=None, title=None, growth=False):
         metadata = dict()
-        if re.match(r"^[0-9a-zA-Z][0-9a-zA-Z_]*$", name):
+        if not name:
+            metadata["name"] = None
+        elif re.match(r"^[0-9a-zA-Z][0-9a-zA-Z_]*$", name):
             metadata["name"] = name
         else:
-            raise Exception("Name should be a Python Identifier.")
+            raise Exception("Name should be a valid Python identifier.")
         metadata["title"] = title
         super().__init__(categories, metadata=metadata, growth=growth)
 
@@ -270,10 +280,12 @@ class IntCategory(bha.IntCategory):
 class StrCategory(bha.StrCategory):
     def __init__(self, categories=None, *, name=None, title=None, growth=False):
         metadata = dict()
-        if re.match(r"^[0-9a-zA-Z][0-9a-zA-Z_]*$", name):
+        if not name:
+            metadata["name"] = None
+        elif re.match(r"^[0-9a-zA-Z][0-9a-zA-Z_]*$", name):
             metadata["name"] = name
         else:
-            raise Exception("Name should be a Python Identifier.")
+            raise Exception("Name should be a valid Python identifier.")
         metadata["title"] = title
         super().__init__(categories, metadata=metadata, growth=growth)
 
