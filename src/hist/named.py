@@ -9,7 +9,6 @@ class NamedHist(BaseHist):
         """
 
         super(BaseHist, self).__init__(*args, **kwargs)
-
         self.names = dict()
         for ax in self.axes:
             if not ax.name:
@@ -47,3 +46,35 @@ class NamedHist(BaseHist):
         super().fill(*data)
 
         return self
+
+    def __getitem__(self, index):
+        """
+            Get histogram item.
+        """
+
+        if isinstance(index, dict):
+            k = list(index.keys())
+            if isinstance(k[0], str):
+                for key in k:
+                    for idx, axis in enumerate(self.axes):
+                        if key == axis.name:
+                            index[idx] = index.pop(key)
+                            break
+
+        return super().__getitem__(index)
+
+    def __setitem__(self, index, value):
+        """
+            Set histogram item.
+        """
+
+        if isinstance(index, dict):
+            k = list(index.keys())
+            if isinstance(k[0], str):
+                for key in k:
+                    for idx, axis in enumerate(self.axes):
+                        if key == axis.name:
+                            index[idx] = index.pop(key)
+                            break
+
+        return super().__setitem__(index, value)
