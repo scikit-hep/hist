@@ -1,9 +1,9 @@
 ---
 name: Support
 about: Describe your questions.
-title: "[SUPPORT]: "
+title: "[SUPPORT] "
 labels: question
-assignees: LovelyBuggies
+assignees: henryiii, LovelyBuggies
 
 ---
 
