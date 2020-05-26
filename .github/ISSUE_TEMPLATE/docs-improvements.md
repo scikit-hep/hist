@@ -1,9 +1,9 @@
 ---
 name: Docs improvements
 about: Describe the defects and expectations in docs
-title: "[DOCS]: "
+title: "[DOCS] "
 labels: documentation
-assignees: LovelyBuggies
+assignees: henryiii, LovelyBuggies
 
 ---
 
