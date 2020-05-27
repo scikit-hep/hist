@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Dict, List, Tuple, Union
 
 import re
 import boost_histogram.axis as bha
@@ -7,19 +8,19 @@ import boost_histogram.axis as bha
 class Regular(bha.Regular):
     def __init__(
         self,
-        bins,
-        start,
-        stop,
+        bins: int,
+        start: float,
+        stop: float,
         *,
-        name=None,
-        title=None,
-        underflow=True,
-        overflow=True,
-        growth=False,
-        circular=False,
-        transform=None
-    ):
-        metadata: dict = dict()
+        name: str = None,
+        title: str = None,
+        underflow: bool = True,
+        overflow: bool = True,
+        growth: bool = False,
+        circular: bool = False,
+        transform: bha.transform.Function = None
+    ) -> None:
+        metadata: Dict = dict()
         if not name:
             metadata["name"] = None
         elif re.match(r"^[0-9a-zA-Z][0-9a-zA-Z_]*$", name):
@@ -39,31 +40,31 @@ class Regular(bha.Regular):
             transform=transform,
         )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "{self.__class__.__name__}({args}{kwargs})".format(
             self=self, args=self._repr_args(), kwargs=self._repr_kwargs()
         )
 
     @property
-    def name(self):
+    def name(self) -> str:
         """
         Get or set the name for the Regular axis
         """
         return self.metadata["name"]
 
     @name.setter
-    def name(self, value):
+    def name(self, value: str) -> None:
         self.metadata["name"] = value
 
     @property
-    def title(self):
+    def title(self) -> str:
         """
         Get or set the title for the Regular axis
         """
         return self.metadata["title"]
 
     @title.setter
-    def title(self, value):
+    def title(self, value: str) -> None:
         self.metadata["title"] = value
 
 
@@ -71,15 +72,15 @@ class Bool(bha.Regular):
     def __init__(
         self,
         *,
-        name=None,
-        title=None,
-        underflow=False,
-        overflow=False,
-        growth=False,
-        circular=False,
-        transform=None
-    ):
-        metadata: dict = dict()
+        name: str = None,
+        title: str = None,
+        underflow: bool = False,
+        overflow: bool = False,
+        growth: bool = False,
+        circular: bool = False,
+        transform: bha.transform.Function = None
+    ) -> None:
+        metadata: Dict = dict()
         if not name:
             metadata["name"] = None
         elif re.match(r"^[0-9a-zA-Z][0-9a-zA-Z_]*$", name):
@@ -99,46 +100,46 @@ class Bool(bha.Regular):
             transform=transform,
         )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "{self.__class__.__name__}({args}{kwargs})".format(
             self=self, args=self._repr_args(), kwargs=self._repr_kwargs()
         )
 
     @property
-    def name(self):
+    def name(self) -> str:
         """
         Get or set the name for the Bool axis
         """
         return self.metadata["name"]
 
     @name.setter
-    def name(self, value):
+    def name(self, value: str) -> None:
         self.metadata["name"] = value
 
     @property
-    def title(self):
+    def title(self) -> str:
         """
         Get or set the title for the Bool axis
         """
         return self.metadata["title"]
 
     @title.setter
-    def title(self, value):
+    def title(self, value: str) -> None:
         self.metadata["title"] = value
 
 
 class Variable(bha.Variable):
     def __init__(
         self,
-        edges,
+        edges: List[float],
         *,
-        name=None,
-        title=None,
-        underflow=True,
-        overflow=True,
-        growth=False
-    ):
-        metadata: dict = dict()
+        name: str = None,
+        title: str = None,
+        underflow: bool = True,
+        overflow: bool = True,
+        growth: bool = False
+    ) -> None:
+        metadata: Dict = dict()
         if not name:
             metadata["name"] = None
         elif re.match(r"^[0-9a-zA-Z][0-9a-zA-Z_]*$", name):
@@ -154,47 +155,47 @@ class Variable(bha.Variable):
             growth=growth,
         )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "{self.__class__.__name__}({args}{kwargs})".format(
             self=self, args=self._repr_args(), kwargs=self._repr_kwargs()
         )
 
     @property
-    def name(self):
+    def name(self) -> str:
         """
         Get or set the name for the Variable axis
         """
         return self.metadata["name"]
 
     @name.setter
-    def name(self, value):
+    def name(self, value: str) -> None:
         self.metadata["name"] = value
 
     @property
-    def title(self):
+    def title(self) -> str:
         """
         Get or set the title for the Variable axis
         """
         return self.metadata["title"]
 
     @title.setter
-    def title(self, value):
+    def title(self, value: str) -> None:
         self.metadata["title"] = value
 
 
 class Integer(bha.Integer):
     def __init__(
         self,
-        start,
-        stop,
+        start: int,
+        stop: int,
         *,
-        name=None,
-        title=None,
-        underflow=True,
-        overflow=True,
-        growth=False
-    ):
-        metadata: dict = dict()
+        name: str = None,
+        title: str = None,
+        underflow: bool = True,
+        overflow: bool = True,
+        growth: bool = False
+    ) -> None:
+        metadata: Dict = dict()
         if not name:
             metadata["name"] = None
         elif re.match(r"^[0-9a-zA-Z][0-9a-zA-Z_]*$", name):
@@ -211,37 +212,44 @@ class Integer(bha.Integer):
             growth=growth,
         )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "{self.__class__.__name__}({args}{kwargs})".format(
             self=self, args=self._repr_args(), kwargs=self._repr_kwargs()
         )
 
     @property
-    def name(self):
+    def name(self) -> str:
         """
         Get or set the name for the Integer axis
         """
         return self.metadata["name"]
 
     @name.setter
-    def name(self, value):
+    def name(self, value: str) -> None:
         self.metadata["name"] = value
 
     @property
-    def title(self):
+    def title(self) -> str:
         """
         Get or set the title for the Integer axis
         """
         return self.metadata["title"]
 
     @title.setter
-    def title(self, value):
+    def title(self, value: str) -> None:
         self.metadata["title"] = value
 
 
 class IntCategory(bha.IntCategory):
-    def __init__(self, categories=None, *, name=None, title=None, growth=False):
-        metadata: dict = dict()
+    def __init__(
+        self,
+        categories: List[int] = None,
+        *,
+        name: str = None,
+        title: str = None,
+        growth: bool = False
+    ) -> None:
+        metadata: Dict = dict()
         if not name:
             metadata["name"] = None
         elif re.match(r"^[0-9a-zA-Z][0-9a-zA-Z_]*$", name):
@@ -253,37 +261,44 @@ class IntCategory(bha.IntCategory):
             categories, metadata=metadata, growth=growth
         )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "{self.__class__.__name__}({args}{kwargs})".format(
             self=self, args=self._repr_args(), kwargs=self._repr_kwargs()
         )
 
     @property
-    def name(self):
+    def name(self) -> str:
         """
         Get or set the name for the IntCategory axis
         """
         return self.metadata["name"]
 
     @name.setter
-    def name(self, value):
+    def name(self, value: str) -> None:
         self.metadata["name"] = value
 
     @property
-    def title(self):
+    def title(self) -> str:
         """
         Get or set the title for the IntCategory axis
         """
         return self.metadata["title"]
 
     @title.setter
-    def title(self, value):
+    def title(self, value: str) -> None:
         self.metadata["title"] = value
 
 
 class StrCategory(bha.StrCategory):
-    def __init__(self, categories=None, *, name=None, title=None, growth=False):
-        metadata: dict = dict()
+    def __init__(
+        self,
+        categories: Union[str, List[str]] = None,
+        *,
+        name: str = None,
+        title: str = None,
+        growth: bool = False
+    ) -> None:
+        metadata: Dict = dict()
         if not name:
             metadata["name"] = None
         elif re.match(r"^[0-9a-zA-Z][0-9a-zA-Z_]*$", name):
@@ -295,29 +310,29 @@ class StrCategory(bha.StrCategory):
             categories, metadata=metadata, growth=growth
         )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "{self.__class__.__name__}({args}{kwargs})".format(
             self=self, args=self._repr_args(), kwargs=self._repr_kwargs()
         )
 
     @property
-    def name(self):
+    def name(self) -> str:
         """
         Get or set the name for the StrCategory axis
         """
         return self.metadata["name"]
 
     @name.setter
-    def name(self, value):
+    def name(self, value: str) -> None:
         self.metadata["name"] = value
 
     @property
-    def title(self):
+    def title(self) -> str:
         """
         Get or set the title for the StrCategory axis
         """
         return self.metadata["title"]
 
     @title.setter
-    def title(self, value):
+    def title(self, value: str) -> None:
         self.metadata["title"] = value
