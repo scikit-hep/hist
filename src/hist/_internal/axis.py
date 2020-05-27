@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import re
 import boost_histogram.axis as bha
 
@@ -17,7 +19,7 @@ class Regular(bha.Regular):
         circular=False,
         transform=None
     ):
-        metadata = dict()
+        metadata: dict = dict()
         if not name:
             metadata["name"] = None
         elif re.match(r"^[0-9a-zA-Z][0-9a-zA-Z_]*$", name):
@@ -77,7 +79,7 @@ class Bool(bha.Regular):
         circular=False,
         transform=None
     ):
-        metadata = dict()
+        metadata: dict = dict()
         if not name:
             metadata["name"] = None
         elif re.match(r"^[0-9a-zA-Z][0-9a-zA-Z_]*$", name):
@@ -136,7 +138,7 @@ class Variable(bha.Variable):
         overflow=True,
         growth=False
     ):
-        metadata = dict()
+        metadata: dict = dict()
         if not name:
             metadata["name"] = None
         elif re.match(r"^[0-9a-zA-Z][0-9a-zA-Z_]*$", name):
@@ -192,7 +194,7 @@ class Integer(bha.Integer):
         overflow=True,
         growth=False
     ):
-        metadata = dict()
+        metadata: dict = dict()
         if not name:
             metadata["name"] = None
         elif re.match(r"^[0-9a-zA-Z][0-9a-zA-Z_]*$", name):
@@ -239,7 +241,7 @@ class Integer(bha.Integer):
 
 class IntCategory(bha.IntCategory):
     def __init__(self, categories=None, *, name=None, title=None, growth=False):
-        metadata = dict()
+        metadata: dict = dict()
         if not name:
             metadata["name"] = None
         elif re.match(r"^[0-9a-zA-Z][0-9a-zA-Z_]*$", name):
@@ -281,7 +283,7 @@ class IntCategory(bha.IntCategory):
 
 class StrCategory(bha.StrCategory):
     def __init__(self, categories=None, *, name=None, title=None, growth=False):
-        metadata = dict()
+        metadata: dict = dict()
         if not name:
             metadata["name"] = None
         elif re.match(r"^[0-9a-zA-Z][0-9a-zA-Z_]*$", name):

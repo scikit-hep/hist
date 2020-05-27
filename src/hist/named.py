@@ -9,7 +9,7 @@ class NamedHist(BaseHist):
         """
 
         super(BaseHist, self).__init__(*args, **kwargs)
-        self.names = dict()
+        self.names: dict = dict()
         for ax in self.axes:
             if not ax.name:
                 raise Exception(
@@ -38,8 +38,8 @@ class NamedHist(BaseHist):
                     break
 
         d = dict(zip(indices, values))
-        d = sorted(d.items(), key=lambda item: item[0])
-        nd = np.asarray(d, dtype=object)
+        l = sorted(d.items(), key=lambda item: item[0])
+        nd = np.asarray(l, dtype=object)
         data = nd.ravel()[1::2]
         if len(data) != len(self.axes):
             raise Exception("The axis names could not be found when filling.")
