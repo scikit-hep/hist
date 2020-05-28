@@ -200,9 +200,10 @@ def test_basic_usage():
     )
 
     z_one_only = h[{"z": bh.loc("T")}]
+    assert z_one_only[bh.loc("F"), bh.loc("F")] == 0
+    assert z_one_only[bh.loc("F"), bh.loc("T")] == 1
+    assert z_one_only[bh.loc("T"), bh.loc("F")] == 3
+    assert z_one_only[bh.loc("T"), bh.loc("T")] == 1
 
 
-#     assert z_one_only["F", "F"] == z_one_only[{"x": "F", "y": "F"}] == 0 # should work
-#     assert z_one_only["F", "T"] == z_one_only[{"x": "F", "y": "T"}] == 1 # should work
-#     assert z_one_only["T", "F"] == z_one_only[{"x": "T", "y": "F"}] == 3 # should work
-#     assert z_one_only["T", "T"] == z_one_only[{"x": "T", "y": "T"}] == 1 # should work
+# ToDo: Exception detection like fill with same names, fill with other names ...
