@@ -22,7 +22,7 @@ class Regular(bha.Regular):
         metadata: Dict = dict()
         if not name:
             metadata["name"] = None
-        elif re.match(r"^[0-9a-zA-Z][0-9a-zA-Z_]*$", name):
+        elif re.match(r"^[a-zA-Z][0-9]*[a-zA-Z_]*$", name):
             metadata["name"] = name
         else:
             raise Exception("Name should be a valid Python identifier.")
@@ -82,7 +82,7 @@ class Bool(bha.Regular):
         metadata: Dict = dict()
         if not name:
             metadata["name"] = None
-        elif re.match(r"^[0-9a-zA-Z][0-9a-zA-Z_]*$", name):
+        elif re.match(r"^[a-zA-Z][0-9]*[a-zA-Z_]*$", name):
             metadata["name"] = name
         else:
             raise Exception("Name should be a valid Python identifier.")
@@ -141,7 +141,7 @@ class Variable(bha.Variable):
         metadata: Dict = dict()
         if not name:
             metadata["name"] = None
-        elif re.match(r"^[0-9a-zA-Z][0-9a-zA-Z_]*$", name):
+        elif re.match(r"^[a-zA-Z][0-9]*[a-zA-Z_]*$", name):
             metadata["name"] = name
         else:
             raise Exception("Name should be a valid Python identifier.")
@@ -197,7 +197,7 @@ class Integer(bha.Integer):
         metadata: Dict = dict()
         if not name:
             metadata["name"] = None
-        elif re.match(r"^[0-9a-zA-Z][0-9a-zA-Z_]*$", name):
+        elif re.match(r"^[a-zA-Z][0-9]*[a-zA-Z_]*$", name):
             metadata["name"] = name
         else:
             raise Exception("Name should be a valid Python identifier.")
@@ -251,7 +251,7 @@ class IntCategory(bha.IntCategory):
         metadata: Dict = dict()
         if not name:
             metadata["name"] = None
-        elif re.match(r"^[0-9a-zA-Z][0-9a-zA-Z_]*$", name):
+        elif re.match(r"^[a-zA-Z][0-9]*[a-zA-Z_]*$", name):
             metadata["name"] = name
         else:
             raise Exception("Name should be a valid Python identifier.")
@@ -300,7 +300,7 @@ class StrCategory(bha.StrCategory):
         metadata: Dict = dict()
         if not name:
             metadata["name"] = None
-        elif re.match(r"^[0-9a-zA-Z][0-9a-zA-Z_]*$", name):
+        elif re.match(r"^[a-zA-Z][0-9]*[a-zA-Z_]*$", name):
             metadata["name"] = name
         else:
             raise Exception("Name should be a valid Python identifier.")
