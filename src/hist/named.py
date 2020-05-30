@@ -1,4 +1,5 @@
 from .core import BaseHist
+import numpy as np
 
 
 class NamedHist(BaseHist):
