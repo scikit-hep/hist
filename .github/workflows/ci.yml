@@ -24,6 +24,7 @@ jobs:
     strategy:
       matrix:
         python-version:
+        - 3.6
         - 3.8
     name: Check Python ${{ matrix.python-version }}
     steps:
