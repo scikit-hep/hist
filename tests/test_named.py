@@ -1,5 +1,7 @@
 from hist import axis, NamedHist
 import boost_histogram as bh
+import pytest
+import numpy as np
 
 
 def test_basic_usage():
@@ -206,4 +208,204 @@ def test_basic_usage():
     assert z_one_only[bh.loc("T"), bh.loc("T")] == 1
 
 
-# ToDo: Exception detection like fill with same names, fill with other names ...
+def test_errors():
+
+    # right axis names
+    assert NamedHist(axis.Regular(50, -3, 3, name="x0"))
+    assert NamedHist(axis.Bool(name="x_"))
+    assert NamedHist(axis.Variable(range(-3, 3), name="xx"))
+    assert NamedHist(axis.Integer(-3, 3, name="x_x"))
+    assert NamedHist(axis.IntCategory(range(-3, 3), name="X__X"))
+    assert NamedHist(axis.StrCategory("FT", name="X00"))
+
+    # wrong axis names: protected or private prefix
+    with pytest.raises(Exception):
+        NamedHist(axis.Regular(50, -3, 3, name="_x"))
+
+    with pytest.raises(Exception):
+        NamedHist(axis.Bool(name="__x"))
+
+    with pytest.raises(Exception):
+        NamedHist(axis.Variable(range(-3, 3), name="_x_"))
+
+    with pytest.raises(Exception):
+        NamedHist(axis.Integer(-3, 3, name="_x0"))
+
+    with pytest.raises(Exception):
+        NamedHist(axis.IntCategory(range(-3, 3), name="_0x"))
+
+    with pytest.raises(Exception):
+        NamedHist(axis.StrCategory("FT", name="_xX"))
+
+    # wrong axis names: number prefix
+    with pytest.raises(Exception):
+        NamedHist(axis.Regular(50, -3, 3, name="0"))
+
+    with pytest.raises(Exception):
+        NamedHist(axis.Bool(name="00"))
+
+    with pytest.raises(Exception):
+        NamedHist(axis.Variable(range(-3, 3), name="0x"))
+
+    with pytest.raises(Exception):
+        NamedHist(axis.Integer(-3, 3, name="0_x"))
+
+    with pytest.raises(Exception):
+        NamedHist(axis.IntCategory(range(-3, 3), name="00x"))
+
+    with pytest.raises(Exception):
+        NamedHist(axis.StrCategory("FT", name="0xx"))
+
+    # wrong axis names: unsupported chr
+    with pytest.raises(Exception):
+        NamedHist(axis.Regular(50, -3, 3, name="-x"))
+
+    with pytest.raises(Exception):
+        NamedHist(axis.Bool(name="x-"))
+
+    with pytest.raises(Exception):
+        NamedHist(axis.Variable(range(-3, 3), name="?x"))
+
+    with pytest.raises(Exception):
+        NamedHist(axis.Integer(-3, 3, name="%x"))
+
+    with pytest.raises(Exception):
+        NamedHist(axis.IntCategory(range(-3, 3), name="#x"))
+
+    with pytest.raises(Exception):
+        NamedHist(axis.StrCategory("FT", name="*x"))
+
+    # wrong axis names: empty names
+    with pytest.raises(Exception):
+        NamedHist(axis.Regular(50, -3, 3, name=""))
+
+    with pytest.raises(Exception):
+        NamedHist(axis.Bool(name=""))
+
+    with pytest.raises(Exception):
+        NamedHist(axis.Variable(range(-3, 3)))
+
+    with pytest.raises(Exception):
+        NamedHist(axis.Integer(-3, 3, name=""))
+
+    with pytest.raises(Exception):
+        NamedHist(axis.IntCategory(range(-3, 3), name=""))
+
+    with pytest.raises(Exception):
+        NamedHist(axis.StrCategory("FT"))
+
+    # right histogram axis names
+    assert NamedHist(
+        axis.Regular(50, -3, 3, name="x"), axis.Regular(50, -3, 3, name="y")
+    ).fill(x=np.random.randn(10), y=np.random.randn(10))
+
+    assert NamedHist(axis.Bool(name="x"), axis.Bool(name="y")).fill(
+        y=[True, False, True], x=[True, False, True]
+    )
+
+    assert NamedHist(
+        axis.Variable(range(-3, 3), name="x"), axis.Variable(range(-3, 3), name="y")
+    ).fill(x=np.random.randn(10), y=np.random.randn(10))
+
+    assert NamedHist(axis.Integer(-3, 3, name="x"), axis.Integer(-3, 3, name="y")).fill(
+        x=np.random.randn(10), y=np.random.randn(10)
+    )
+
+    assert NamedHist(
+        axis.IntCategory(range(-3, 3), name="x"),
+        axis.IntCategory(range(-3, 3), name="y"),
+    ).fill(x=np.random.randn(10), y=np.random.randn(10))
+
+    assert NamedHist(
+        axis.StrCategory(["F", "T"], name="x"), axis.StrCategory("FT", name="y")
+    ).fill(y=["T", "F", "T"], x=["T", "F", "T"])
+
+    # wrong histogram axis names: with the same names
+    with pytest.raises(Exception):
+        NamedHist(axis.Regular(50, -3, 3, name="x"), axis.Regular(50, -3, 3, name="x"))
+
+    with pytest.raises(Exception):
+        NamedHist(axis.Bool(name="y"), axis.Bool(name="y"))
+
+    with pytest.raises(Exception):
+        NamedHist(
+            axis.Variable(range(-3, 3), name="x"), axis.Variable(range(-3, 3), name="x")
+        )
+
+    with pytest.raises(Exception):
+        NamedHist(axis.Integer(-3, 3, name="x"), axis.Integer(-3, 3, name="x"))
+
+    with pytest.raises(Exception):
+        NamedHist(
+            axis.IntCategory(range(-3, 3), name="x"),
+            axis.IntCategory(range(-3, 3), name="x"),
+        )
+
+    with pytest.raises(Exception):
+        NamedHist(
+            axis.StrCategory("TF", name="y"), axis.StrCategory(["T", "F"], name="y")
+        )
+
+    # wrong histogram axis names: fill without names
+    with pytest.raises(Exception):
+        NamedHist(
+            axis.Regular(50, -3, 3, name="x"), axis.Regular(50, -3, 3, name="y")
+        ).fill(np.random.randn(10), np.random.randn(10))
+
+    with pytest.raises(Exception):
+        NamedHist(axis.Bool(name="x"), axis.Bool(name="y")).fill(
+            [True, False, True], [True, False, True]
+        )
+
+    with pytest.raises(Exception):
+        NamedHist(
+            axis.Variable(range(-3, 3), name="x"), axis.Variable(range(-3, 3), name="y")
+        ).fill(np.random.randn(10), np.random.randn(10))
+
+    with pytest.raises(Exception):
+        NamedHist(axis.Integer(-3, 3, name="x"), axis.Integer(-3, 3, name="y")).fill(
+            np.random.randn(10), np.random.randn(10)
+        )
+
+    with pytest.raises(Exception):
+        NamedHist(
+            axis.IntCategory(range(-3, 3), name="x"),
+            axis.IntCategory(range(-3, 3), name="y"),
+        ).fill(np.random.randn(10), np.random.randn(10))
+
+    with pytest.raises(Exception):
+        NamedHist(
+            axis.StrCategory(["F", "T"], name="x"), axis.StrCategory("FT", name="y")
+        ).fill(["T", "F", "T"], ["T", "F", "T"])
+
+    # wrong histogram axis names: fill by wrong names
+    with pytest.raises(Exception):
+        NamedHist(
+            axis.Regular(50, -3, 3, name="x"), axis.Regular(50, -3, 3, name="y")
+        ).fill(x=np.random.randn(10), z=np.random.randn(10))
+
+    with pytest.raises(Exception):
+        NamedHist(axis.Bool(name="x"), axis.Bool(name="y")).fill(
+            y=[True, False, True], z=[True, False, True]
+        )
+
+    with pytest.raises(Exception):
+        NamedHist(
+            axis.Variable(range(-3, 3), name="x"), axis.Variable(range(-3, 3), name="y")
+        ).fill(z=np.random.randn(10), x=np.random.randn(10))
+
+    with pytest.raises(Exception):
+        NamedHist(axis.Integer(-3, 3, name="x"), axis.Integer(-3, 3, name="y")).fill(
+            x=np.random.randn(10), z=np.random.randn(10)
+        )
+
+    with pytest.raises(Exception):
+        NamedHist(
+            axis.IntCategory(range(-3, 3), name="x"),
+            axis.IntCategory(range(-3, 3), name="y"),
+        ).fill(y=np.random.randn(10), z=np.random.randn(10))
+
+    with pytest.raises(Exception):
+        NamedHist(
+            axis.StrCategory(["F", "T"], name="x"), axis.StrCategory("FT", name="y")
+        ).fill(z=["T", "F", "T"], x=["T", "F", "T"])
