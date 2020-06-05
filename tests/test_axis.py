@@ -8,7 +8,7 @@ def test_basic_usage():
     """
         Test basic usage -- whether axis names work.
     """
-    
+
     # right axis names
     assert axis.Regular(50, -3, 3, name="x0")
     assert axis.Bool(name="x_")
@@ -16,12 +16,13 @@ def test_basic_usage():
     assert axis.Integer(-3, 3, name="x_x")
     assert axis.IntCategory(range(-3, 3), name="X__X")
     assert axis.StrCategory("FT", name="X00")
-    
+
+
 def test_errors():
     """
         Test errors -- whether name exceptions are thrown.
     """
-    
+
     # wrong axis names: protected or private prefix
     with pytest.raises(Exception):
         axis.Regular(50, -3, 3, name="_x")
