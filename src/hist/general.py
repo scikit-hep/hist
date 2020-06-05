@@ -3,10 +3,30 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from scipy.optimize import curve_fit
+from typing import Callable
 
 
 class Hist(BaseHist):
-    def pull_plot(self, func, fig=None, ax=None, pull_ax=None, **kwargs):
+    def __init__(self, *args, **kwargs):
+        """
+            Initialize Hist object. Axis params must contain the names.
+        """
+
+        super(BaseHist, self).__init__(*args, **kwargs)
+        self.names: dict = dict()
+        for ax in self.axes:
+            if not ax.name:
+                raise Exception(
+                    "Each axes in the Hist instance should have a name."
+                )
+            elif ax.name in self.names:
+                raise Exception(
+                    "Hist instance cannot contain axes with duplicated names."
+                )
+            else:
+                self.names[ax.name] = True
+    
+    def pull_plot(self, func: Callable, fig=None, ax=None, pull_ax=None, **kwargs):
         """
         Pull_plot method for Hist object.
         """
@@ -50,7 +70,7 @@ class Hist(BaseHist):
             pass
 
         """
-        Keyword Argument Conversion: convert the keywork arguments to several independent arguments
+        Keyword Argument Conversion: convert the kwargs to several independent args
         """
         # error bar keyword arguments
         eb_kwargs = dict()
