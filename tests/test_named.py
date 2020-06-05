@@ -209,90 +209,9 @@ def test_basic_usage():
 
 
 def test_errors():
-
-    # right axis names
-    assert NamedHist(axis.Regular(50, -3, 3, name="x0"))
-    assert NamedHist(axis.Bool(name="x_"))
-    assert NamedHist(axis.Variable(range(-3, 3), name="xx"))
-    assert NamedHist(axis.Integer(-3, 3, name="x_x"))
-    assert NamedHist(axis.IntCategory(range(-3, 3), name="X__X"))
-    assert NamedHist(axis.StrCategory("FT", name="X00"))
-
-    # wrong axis names: protected or private prefix
-    with pytest.raises(Exception):
-        NamedHist(axis.Regular(50, -3, 3, name="_x"))
-
-    with pytest.raises(Exception):
-        NamedHist(axis.Bool(name="__x"))
-
-    with pytest.raises(Exception):
-        NamedHist(axis.Variable(range(-3, 3), name="_x_"))
-
-    with pytest.raises(Exception):
-        NamedHist(axis.Integer(-3, 3, name="_x0"))
-
-    with pytest.raises(Exception):
-        NamedHist(axis.IntCategory(range(-3, 3), name="_0x"))
-
-    with pytest.raises(Exception):
-        NamedHist(axis.StrCategory("FT", name="_xX"))
-
-    # wrong axis names: number prefix
-    with pytest.raises(Exception):
-        NamedHist(axis.Regular(50, -3, 3, name="0"))
-
-    with pytest.raises(Exception):
-        NamedHist(axis.Bool(name="00"))
-
-    with pytest.raises(Exception):
-        NamedHist(axis.Variable(range(-3, 3), name="0x"))
-
-    with pytest.raises(Exception):
-        NamedHist(axis.Integer(-3, 3, name="0_x"))
-
-    with pytest.raises(Exception):
-        NamedHist(axis.IntCategory(range(-3, 3), name="00x"))
-
-    with pytest.raises(Exception):
-        NamedHist(axis.StrCategory("FT", name="0xx"))
-
-    # wrong axis names: unsupported chr
-    with pytest.raises(Exception):
-        NamedHist(axis.Regular(50, -3, 3, name="-x"))
-
-    with pytest.raises(Exception):
-        NamedHist(axis.Bool(name="x-"))
-
-    with pytest.raises(Exception):
-        NamedHist(axis.Variable(range(-3, 3), name="?x"))
-
-    with pytest.raises(Exception):
-        NamedHist(axis.Integer(-3, 3, name="%x"))
-
-    with pytest.raises(Exception):
-        NamedHist(axis.IntCategory(range(-3, 3), name="#x"))
-
-    with pytest.raises(Exception):
-        NamedHist(axis.StrCategory("FT", name="*x"))
-
-    # wrong axis names: empty names
-    with pytest.raises(Exception):
-        NamedHist(axis.Regular(50, -3, 3, name=""))
-
-    with pytest.raises(Exception):
-        NamedHist(axis.Bool(name=""))
-
-    with pytest.raises(Exception):
-        NamedHist(axis.Variable(range(-3, 3)))
-
-    with pytest.raises(Exception):
-        NamedHist(axis.Integer(-3, 3, name=""))
-
-    with pytest.raises(Exception):
-        NamedHist(axis.IntCategory(range(-3, 3), name=""))
-
-    with pytest.raises(Exception):
-        NamedHist(axis.StrCategory("FT"))
+    """
+        Test errors -- whether the name exceptions in the NamedHist are thrown.
+    """
 
     # right histogram axis names
     assert NamedHist(
