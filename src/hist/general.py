@@ -16,16 +16,14 @@ class Hist(BaseHist):
         self.names: dict = dict()
         for ax in self.axes:
             if not ax.name:
-                raise Exception(
-                    "Each axes in the Hist instance should have a name."
-                )
+                raise Exception("Each axes in the Hist instance should have a name.")
             elif ax.name in self.names:
                 raise Exception(
                     "Hist instance cannot contain axes with duplicated names."
                 )
             else:
                 self.names[ax.name] = True
-    
+
     def pull_plot(self, func: Callable, fig=None, ax=None, pull_ax=None, **kwargs):
         """
         Pull_plot method for Hist object.

@@ -2,7 +2,7 @@ from hist import Hist, axis
 
 
 def test_basic_usage():
-    h = Hist(axis.Regular(10, 0, 1))
+    h = Hist(axis.Regular(10, 0, 1, name="X"))
 
     h.fill([0.35, 0.35, 0.45])
 
