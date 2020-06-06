@@ -7,7 +7,7 @@ import numpy as np
 def test_basic_usage():
     """
         Test basic usage -- whether Hist are properly derived from
-        \boost-histogram and whether pull_plot method work.
+        boost-histogram and whether pull_plot method work.
     """
 
     # Basic
@@ -291,4 +291,4 @@ def test_errors():
     with pytest.raises(Exception):
         h.pull_plot(
             pdf, eb_ecolor=1.0, eb_mfc=1.0, eb_mec=1.0, eb_fmt=1.0
-        )  # should be str
+        )  # kwargs should be str
