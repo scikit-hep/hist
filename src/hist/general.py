@@ -1,9 +1,10 @@
 from .core import BaseHist
 import numpy as np
+import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from scipy.optimize import curve_fit
-from typing import Callable
+from typing import Callable, Optional, Tuple
 
 
 class Hist(BaseHist):
@@ -24,7 +25,18 @@ class Hist(BaseHist):
             else:
                 self.names[ax.name] = True
 
-    def pull_plot(self, func: Callable, fig=None, ax=None, pull_ax=None, **kwargs):
+    def pull_plot(
+        self,
+        func: Callable,
+        fig: Optional[matplotlib.figure.Figure] = None,
+        ax: Optional[matplotlib.axes._subplots.SubplotBase] = None,
+        pull_ax: Optional[matplotlib.axes._subplots.SubplotBase] = None,
+        **kwargs,
+    ) -> Tuple[
+        Optional[matplotlib.figure.Figure],
+        Optional[matplotlib.axes._subplots.SubplotBase],
+        Optional[matplotlib.axes._subplots.SubplotBase],
+    ]:
         """
         Pull_plot method for Hist object.
         """
@@ -51,18 +63,18 @@ class Hist(BaseHist):
         """
         Default Figure: construct the figure and axes
         """
-        if fig == None:
+        if fig is None:
             fig = plt.figure(figsize=(8, 8))
             grid = fig.add_gridspec(4, 4, wspace=0.5, hspace=0.5)
         else:
             grid = fig.add_gridspec(4, 4, wspace=0.5, hspace=0.5)
 
-        if ax == None:
+        if ax is None:
             ax = fig.add_subplot(grid[0:3, :])
         else:
             pass
 
-        if pull_ax == None:
+        if pull_ax is None:
             pull_ax = fig.add_subplot(grid[3, :], sharex=ax)
         else:
             pass
