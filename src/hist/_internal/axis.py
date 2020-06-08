@@ -21,8 +21,8 @@ class Regular(bha.Regular):
     ) -> None:
         metadata: Dict = dict()
         if not name:
-            metadata["name"] = None
-        elif re.match(r"^[a-zA-Z][0-9]*[a-zA-Z_]*$", name):
+            raise Exception("Each axis should have a name.")
+        elif re.match(r"^[a-zA-Z][a-zA-Z0-9_]*$", name):
             metadata["name"] = name
         else:
             raise Exception("Name should be a valid Python identifier.")
@@ -81,8 +81,8 @@ class Bool(bha.Regular):
     ) -> None:
         metadata: Dict = dict()
         if not name:
-            metadata["name"] = None
-        elif re.match(r"^[a-zA-Z][0-9]*[a-zA-Z_]*$", name):
+            raise Exception("Each axis should have a name.")
+        elif re.match(r"^[a-zA-Z][a-zA-Z0-9_]*$", name):
             metadata["name"] = name
         else:
             raise Exception("Name should be a valid Python identifier.")
@@ -140,8 +140,8 @@ class Variable(bha.Variable):
     ) -> None:
         metadata: Dict = dict()
         if not name:
-            metadata["name"] = None
-        elif re.match(r"^[a-zA-Z][0-9]*[a-zA-Z_]*$", name):
+            raise Exception("Each axis should have a name.")
+        elif re.match(r"^[a-zA-Z][a-zA-Z0-9_]*$", name):
             metadata["name"] = name
         else:
             raise Exception("Name should be a valid Python identifier.")
@@ -196,8 +196,8 @@ class Integer(bha.Integer):
     ) -> None:
         metadata: Dict = dict()
         if not name:
-            metadata["name"] = None
-        elif re.match(r"^[a-zA-Z][0-9]*[a-zA-Z_]*$", name):
+            raise Exception("Each axis should have a name.")
+        elif re.match(r"^[a-zA-Z][a-zA-Z0-9_]*$", name):
             metadata["name"] = name
         else:
             raise Exception("Name should be a valid Python identifier.")
@@ -250,8 +250,8 @@ class IntCategory(bha.IntCategory):
     ) -> None:
         metadata: Dict = dict()
         if not name:
-            metadata["name"] = None
-        elif re.match(r"^[a-zA-Z][0-9]*[a-zA-Z_]*$", name):
+            raise Exception("Each axis should have a name.")
+        elif re.match(r"^[a-zA-Z][a-zA-Z0-9_]*$", name):
             metadata["name"] = name
         else:
             raise Exception("Name should be a valid Python identifier.")
@@ -299,8 +299,8 @@ class StrCategory(bha.StrCategory):
     ) -> None:
         metadata: Dict = dict()
         if not name:
-            metadata["name"] = None
-        elif re.match(r"^[a-zA-Z][0-9]*[a-zA-Z_]*$", name):
+            raise Exception("Each axis should have a name.")
+        elif re.match(r"^[a-zA-Z][a-zA-Z0-9_]*$", name):
             metadata["name"] = name
         else:
             raise Exception("Name should be a valid Python identifier.")
