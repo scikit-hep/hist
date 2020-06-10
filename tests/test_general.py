@@ -22,7 +22,7 @@ def test_basic_usage():
             assert h[idx] == h[{0: idx}] == 0
 
     # Regular
-    h = h = Hist(
+    h = Hist(
         axis.Regular(10, 0, 1, name="x"),
         axis.Regular(10, 0, 1, name="y"),
         axis.Regular(2, 0, 2, name="z"),

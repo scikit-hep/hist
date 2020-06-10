@@ -22,7 +22,7 @@ def test_basic_usage():
             assert h[idx] == h[{0: idx}] == h[{"x": idx}] == 0
 
     # Regular
-    h = h = NamedHist(
+    h = NamedHist(
         axis.Regular(10, 0, 1, name="x"),
         axis.Regular(10, 0, 1, name="y"),
         axis.Regular(2, 0, 2, name="z"),
@@ -207,6 +207,45 @@ def test_basic_usage():
     assert z_one_only[bh.loc("T"), bh.loc("F")] == 3
     assert z_one_only[bh.loc("T"), bh.loc("T")] == 1
 
+    # right pull_plot
+    h = NamedHist(
+        axis.Regular(
+            50, -4, 4, name="S", title="s [units]", underflow=False, overflow=False
+        )
+    ).fill(S=np.random.normal(size=1_000))
+
+    def pdf(x, a=1 / np.sqrt(2 * np.pi), x0=0, sigma=1, offset=0):
+        return a * np.exp(-((x - x0) ** 2) / (2 * sigma ** 2)) + offset
+
+    assert h.pull_plot(
+        pdf,
+        eb_ecolor="crimson",
+        eb_mfc="crimson",
+        eb_mec="crimson",
+        eb_fmt="o",
+        eb_ms=6,
+        eb_capsize=1,
+        eb_capthick=2,
+        eb_alpha=0.8,
+        vp_c="gold",
+        vp_ls="-",
+        vp_lw=8,
+        vp_alpha=0.6,
+        mp_c="darkorange",
+        mp_ls=":",
+        mp_lw=4,
+        mp_alpha=1.0,
+        fp_c="chocolate",
+        fp_ls="-",
+        fp_lw=3,
+        fp_alpha=1.0,
+        bar_fc="orange",
+        pp_num=6,
+        pp_fc="orange",
+        pp_alpha=0.618,
+        pp_ec=None,
+    )
+
 
 def test_errors():
     """
@@ -328,3 +367,26 @@ def test_errors():
         NamedHist(
             axis.StrCategory(["F", "T"], name="x"), axis.StrCategory("FT", name="y")
         ).fill(z=["T", "F", "T"], x=["T", "F", "T"])
+
+    # wrong pull_plot: func not callable
+    h = NamedHist(
+        axis.Regular(
+            50, -4, 4, name="S", title="s [units]", underflow=False, overflow=False
+        )
+    ).fill(S=np.random.normal(size=1_000))
+
+    def pdf(x, a=1 / np.sqrt(2 * np.pi), x0=0, sigma=1, offset=0):
+        return a * np.exp(-((x - x0) ** 2) / (2 * sigma ** 2)) + offset
+
+    with pytest.raises(Exception):
+        h.pull_plot("pdf")
+
+    # wrong pull_plot: wrong kwargs names
+    with pytest.raises(Exception):
+        h.pull_plot(pdf, ecolor="crimson", mfc="crimson", mec="crimson", fmt="o")
+
+    # wrong pull_plot: kwargs types mis-matched
+    with pytest.raises(Exception):
+        h.pull_plot(
+            pdf, eb_ecolor=1.0, eb_mfc=1.0, eb_mec=1.0, eb_fmt=1.0
+        )  # kwargs should be str
