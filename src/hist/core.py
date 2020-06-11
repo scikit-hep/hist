@@ -49,21 +49,21 @@ class BaseHist(Histogram):
         """
         Computation and Fit
         """
-        # Compute function values
-        values = func(*self.axes.centers) * self.sum() * self.axes[0].widths
+
         yerr = np.sqrt(self.view())
 
         # Compute fit values: using func as fit model
         popt, pcov = curve_fit(f=func, xdata=self.axes.centers[0], ydata=self.view())
         fit = func(self.axes.centers[0], *popt)
-        
+
         # Compute uncertainty
         copt = correlated_values(popt, pcov)
-        y_nv = unumpy.nominal_values(func(self.axes.centers[0], *copt))
-        y_sd = unumpy.std_devs(func(self.axes.centers[0], *copt))
+        y_unc = func(self.axes.centers[0], *copt)
+        y_nv = unumpy.nominal_values(y_unc)
+        y_sd = unumpy.std_devs(y_unc)
 
         # Compute pulls: containing no INF values
-        pulls = (self.view() - values) / yerr
+        pulls = (self.view() - y_nv) / yerr
         pulls = [x if np.abs(x) != np.inf else 0 for x in pulls]
 
         """
@@ -149,13 +149,20 @@ class BaseHist(Histogram):
         """
         Main: plot the pulls using Matplotlib errorbar and plot methods
         """
-        ax.errorbar(self.axes.centers[0], self.view(), yerr, label="Histogram data", **eb_kwargs)
-        ax.plot(self.axes.centers[0], values, **vp_kwargs, label="Function value")
-        ax.plot(self.axes.centers[0], fit, **fp_kwargs, label="Fitting value")
-        line, = ax.plot(self.axes.centers[0], y_nv)
-        ax.fill_between(self.axes.centers[0], y_nv - y_sd, y_nv + y_sd, color=line.get_color(), alpha=0.2, label="Uncertainty")
+        ax.errorbar(
+            self.axes.centers[0], self.view(), yerr, label="Histogram data", **eb_kwargs
+        )
+        (line,) = ax.plot(self.axes.centers[0], fit, **fp_kwargs, label="Fitting value")
+        ax.fill_between(
+            self.axes.centers[0],
+            y_nv - y_sd,
+            y_nv + y_sd,
+            color=line.get_color(),
+            alpha=0.2,
+            label="Uncertainty",
+        )
         legend = ax.legend(loc=0)
-        
+
         ax.set_ylabel("Counts")
         fig.add_axes(ax)
 
@@ -190,9 +197,8 @@ class BaseHist(Histogram):
         plt.xlim(left_edge, right_edge)
 
         fig.add_axes(pull_ax)
-        
-        pull_ax.set_xlabel(h.axes[0].title)
+
+        pull_ax.set_xlabel(self.axes[0].title)
         pull_ax.set_ylabel("Pull")
-        plt.show()
 
         return fig, ax, pull_ax

@@ -17,6 +17,7 @@ dependencies:
   - uproot >=3.11.3
   - uproot-methods >=0.7.3
   - mypy >=0.770
+  - uncertainties >=3
   - pip:
     - mplhep>=0.1.8
     - -e .
