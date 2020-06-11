@@ -3,6 +3,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from scipy.optimize import curve_fit
+from uncertainties import correlated_values, unumpy
 from boost_histogram import Histogram
 from typing import Callable, Optional, Tuple
 
@@ -48,13 +49,18 @@ class BaseHist(Histogram):
         """
         Computation and Fit
         """
-        # Compute PDF values
+        # Compute function values
         values = func(*self.axes.centers) * self.sum() * self.axes[0].widths
         yerr = np.sqrt(self.view())
 
         # Compute fit values: using func as fit model
         popt, pcov = curve_fit(f=func, xdata=self.axes.centers[0], ydata=self.view())
         fit = func(self.axes.centers[0], *popt)
+        
+        # Compute uncertainty
+        copt = correlated_values(popt, pcov)
+        y_nv = unumpy.nominal_values(func(self.axes.centers[0], *copt))
+        y_sd = unumpy.std_devs(func(self.axes.centers[0], *copt))
 
         # Compute pulls: containing no INF values
         pulls = (self.view() - values) / yerr
@@ -100,15 +106,6 @@ class BaseHist(Histogram):
         for k in vp_kwargs:
             kwargs.pop("vp_" + k)
 
-        # mean plot keyword arguments
-        mp_kwargs = dict()
-        for kw in kwargs.keys():
-            if kw[:2] == "mp":
-                mp_kwargs[kw[3:]] = kwargs[kw]
-
-        for k in mp_kwargs:
-            kwargs.pop("mp_" + k)
-
         # fit plot keyword arguments
         fp_kwargs = dict()
         for kw in kwargs.keys():
@@ -152,10 +149,12 @@ class BaseHist(Histogram):
         """
         Main: plot the pulls using Matplotlib errorbar and plot methods
         """
-        ax.errorbar(self.axes.centers[0], self.view(), yerr, **eb_kwargs)
-        ax.plot(self.axes.centers[0], values, **vp_kwargs)
-        ax.plot(self.axes.centers[0], (self.view() + values) / 2, **mp_kwargs)
-        ax.plot(self.axes.centers[0], fit, **fp_kwargs)
+        ax.errorbar(self.axes.centers[0], self.view(), yerr, label="Histogram data", **eb_kwargs)
+        ax.plot(self.axes.centers[0], values, **vp_kwargs, label="Function value")
+        ax.plot(self.axes.centers[0], fit, **fp_kwargs, label="Fitting value")
+        line, = ax.plot(self.axes.centers[0], y_nv)
+        ax.fill_between(self.axes.centers[0], y_nv - y_sd, y_nv + y_sd, color=line.get_color(), alpha=0.2, label="Uncertainty")
+        legend = ax.legend(loc=0)
 
         fig.add_axes(ax)
 
@@ -190,5 +189,7 @@ class BaseHist(Histogram):
         plt.xlim(left_edge, right_edge)
 
         fig.add_axes(pull_ax)
+        
+        plt.show()
 
         return fig, ax, pull_ax
