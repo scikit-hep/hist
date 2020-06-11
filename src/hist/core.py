@@ -155,7 +155,8 @@ class BaseHist(Histogram):
         line, = ax.plot(self.axes.centers[0], y_nv)
         ax.fill_between(self.axes.centers[0], y_nv - y_sd, y_nv + y_sd, color=line.get_color(), alpha=0.2, label="Uncertainty")
         legend = ax.legend(loc=0)
-
+        
+        ax.set_ylabel("Counts")
         fig.add_axes(ax)
 
         """
@@ -190,6 +191,8 @@ class BaseHist(Histogram):
 
         fig.add_axes(pull_ax)
         
+        pull_ax.set_xlabel(h.axes[0].title)
+        pull_ax.set_ylabel("Pull")
         plt.show()
 
         return fig, ax, pull_ax
