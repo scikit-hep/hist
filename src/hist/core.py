@@ -113,7 +113,7 @@ class BaseHist(Histogram):
 
         for k in fp_kwargs:
             kwargs.pop("fp_" + k)
-            
+
         # uncertainty band keyword arguments
         ub_kwargs = dict()
         for kw in kwargs.keys():
@@ -122,7 +122,7 @@ class BaseHist(Histogram):
                 if kw == "ub_color":
                     raise KeyError("'ub_color' not needed.")
                 ub_kwargs[kw[3:]] = kwargs[kw]
-        
+
         for k in ub_kwargs:
             kwargs.pop("ub_" + k)
 
@@ -170,7 +170,7 @@ class BaseHist(Histogram):
             y_nv + y_sd,
             color=line.get_color(),
             label="Uncertainty",
-            **ub_kwargs
+            **ub_kwargs,
         )
         legend = ax.legend(loc=0)
 
