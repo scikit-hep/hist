@@ -421,11 +421,11 @@ def test_errors():
     
     # wrong pull_plot: disabled param - ub_color
     with pytest.raises(Exception):
-        h.pull_plot(pdf, ub_color="value")
+        h.pull_plot(pdf, ub_color="green")
         
     # wrong pull_plot: disabled param - bar_width
     with pytest.raises(Exception):
-        h.pull_plot(pdf, bar_width="value")
+        h.pull_plot(pdf, bar_width=1.)
 
     # wrong pull_plot: kwargs types mis-matched
     with pytest.raises(Exception):
