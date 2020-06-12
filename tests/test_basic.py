@@ -278,25 +278,26 @@ def test_errors():
     def pdf(x, a=1 / np.sqrt(2 * np.pi), x0=0, sigma=1, offset=0):
         exp = unp.exp if a.dtype == np.dtype("O") else np.exp
         return a * exp(-((x - x0) ** 2) / (2 * sigma ** 2)) + offset
-    
+
     h = BaseHist(
         axis.Regular(
             50, -4, 4, name="X", title="s [units]", underflow=False, overflow=False
         )
     ).fill(np.random.normal(size=10))
-    
+
     # wrong pull_plot: dimension error
     hh = BaseHist(
         axis.Regular(
             50, -4, 4, name="X", title="s [units]", underflow=False, overflow=False
-        ), axis.Regular(
+        ),
+        axis.Regular(
             50, -4, 4, name="Y", title="s [units]", underflow=False, overflow=False
-        )
+        ),
     ).fill(np.random.normal(size=10), np.random.normal(size=10))
-    
+
     with pytest.raises(Exception):
         hh.pull_plot(pdf)
-    
+
     # wrong pull_plot: func not callable
     with pytest.raises(Exception):
         h.pull_plot("pdf")
@@ -304,34 +305,34 @@ def test_errors():
     # wrong pull_plot: wrong kwargs names
     with pytest.raises(Exception):
         h.pull_plot(pdf, abc="crimson", xyz="crimson")
-    
+
     # wrong pull_plot: without kwargs prefix
     with pytest.raises(Exception):
         h.pull_plot(pdf, ecolor="crimson", mfc="crimson")
-    
+
     # wrong pull_plot: disabled param - labels
     with pytest.raises(Exception):
         h.pull_plot(pdf, eb_label="value")
-        
+
     with pytest.raises(Exception):
-        h.pull_plot(pdf, vp_label="value")  
-        
+        h.pull_plot(pdf, vp_label="value")
+
     with pytest.raises(Exception):
         h.pull_plot(pdf, fp_label="value")
-        
+
     with pytest.raises(Exception):
         h.pull_plot(pdf, ub_label="value")
-        
+
     with pytest.raises(Exception):
         h.pull_plot(pdf, bar_label="value")
-        
+
     with pytest.raises(Exception):
         h.pull_plot(pdf, pp_label="value")
-    
+
     # wrong pull_plot: disabled param - ub_color
     with pytest.raises(Exception):
         h.pull_plot(pdf, ub_color="value")
-        
+
     # wrong pull_plot: disabled param - bar_width
     with pytest.raises(Exception):
         h.pull_plot(pdf, bar_width="value")
