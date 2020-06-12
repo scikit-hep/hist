@@ -9,15 +9,16 @@ class NamedHist(BaseHist):
         """
 
         super(BaseHist, self).__init__(*args, **kwargs)
+        # ToDo: why cannot pass self.names for `if "" in self.names`
         self.names: dict = dict()
         for ax in self.axes:
-            if not ax.name:
+            if ax.name in self.names:
+                raise Exception(
+                    "Hist instance cannot contain axes with duplicated names."
+                )
+            elif not ax.name:
                 raise Exception(
                     "Each axes in the NamedHist instance should have a name."
-                )
-            elif ax.name in self.names:
-                raise Exception(
-                    "NamedHist instance cannot contain axes with duplicated names."
                 )
             else:
                 self.names[ax.name] = True

@@ -3,6 +3,7 @@ from hist import axis, BaseHist
 import boost_histogram as bh
 import pytest
 import numpy as np
+from uncertainties import unumpy as unp
 
 
 def test_version():
@@ -156,7 +157,8 @@ def test_basic_usage():
     ).fill(np.random.normal(size=1_000))
 
     def pdf(x, a=1 / np.sqrt(2 * np.pi), x0=0, sigma=1, offset=0):
-        return a * np.exp(-((x - x0) ** 2) / (2 * sigma ** 2)) + offset
+        exp = unp.exp if a.dtype == np.dtype("O") else np.exp
+        return a * exp(-((x - x0) ** 2) / (2 * sigma ** 2)) + offset
 
     assert h.pull_plot(
         pdf,
@@ -172,10 +174,6 @@ def test_basic_usage():
         vp_ls="-",
         vp_lw=8,
         vp_alpha=0.6,
-        mp_c="darkorange",
-        mp_ls=":",
-        mp_lw=4,
-        mp_alpha=1.0,
         fp_c="chocolate",
         fp_ls="-",
         fp_lw=3,
@@ -285,7 +283,8 @@ def test_errors():
     ).fill(np.random.normal(size=1_000))
 
     def pdf(x, a=1 / np.sqrt(2 * np.pi), x0=0, sigma=1, offset=0):
-        return a * np.exp(-((x - x0) ** 2) / (2 * sigma ** 2)) + offset
+        exp = unp.exp if a.dtype == np.dtype("O") else np.exp
+        return a * exp(-((x - x0) ** 2) / (2 * sigma ** 2)) + offset
 
     with pytest.raises(Exception):
         h.pull_plot("pdf")

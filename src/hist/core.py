@@ -14,12 +14,11 @@ class BaseHist(Histogram):
             Initialize Hist object. Axis params must contain the names.
         """
 
+        # ToDo: why cannot use super(Histogram, self).__init__(*args, **kwargs)
         super(BaseHist, self).__init__(*args, **kwargs)
         self.names: dict = dict()
         for ax in self.axes:
-            if not ax.name:
-                raise Exception("Each axes in the Hist instance should have a name.")
-            elif ax.name in self.names:
+            if ax.name in self.names:
                 raise Exception(
                     "Hist instance cannot contain axes with duplicated names."
                 )
@@ -198,7 +197,10 @@ class BaseHist(Histogram):
 
         fig.add_axes(pull_ax)
 
-        pull_ax.set_xlabel(self.axes[0].title)
+        if self.axes[0].name:
+            pull_ax.set_xlabel(self.axes[0].name)
+        else:
+            pull_ax.set_xlabel(self.axes[0].title)
         pull_ax.set_ylabel("Pull")
 
         return fig, ax, pull_ax
