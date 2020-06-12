@@ -113,12 +113,24 @@ class BaseHist(Histogram):
 
         for k in fp_kwargs:
             kwargs.pop("fp_" + k)
+            
+        # uncertainty band keyword arguments
+        ub_kwargs = dict()
+        for kw in kwargs.keys():
+            if kw[:2] == "ub":
+                # disable uncertainty band color arguments
+                if kw == "ub_color":
+                    raise KeyError("'ub_color' not needed.")
+                ub_kwargs[kw[3:]] = kwargs[kw]
+        
+        for k in ub_kwargs:
+            kwargs.pop("ub_" + k)
 
         # bar plot keyword arguments
         bar_kwargs = dict()
         for kw in kwargs.keys():
             if kw[:3] == "bar":
-                # disable bar width arguments
+                # disable bar width argument
                 if kw == "bar_width":
                     raise KeyError("'bar_width' not needed.")
                 bar_kwargs[kw[4:]] = kwargs[kw]
@@ -149,16 +161,16 @@ class BaseHist(Histogram):
         Main: plot the pulls using Matplotlib errorbar and plot methods
         """
         ax.errorbar(
-            self.axes.centers[0], self.view(), yerr, label="Histogram data", **eb_kwargs
+            self.axes.centers[0], self.view(), yerr, label="Histogram Data", **eb_kwargs
         )
-        (line,) = ax.plot(self.axes.centers[0], fit, **fp_kwargs, label="Fitting value")
+        (line,) = ax.plot(self.axes.centers[0], fit, label="Fitting Value", **fp_kwargs)
         ax.fill_between(
             self.axes.centers[0],
             y_nv - y_sd,
             y_nv + y_sd,
             color=line.get_color(),
-            alpha=0.2,
             label="Uncertainty",
+            **ub_kwargs
         )
         legend = ax.legend(loc=0)
 
