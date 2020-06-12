@@ -120,7 +120,7 @@ class BaseHist(Histogram):
             if kw[:2] == "ub":
                 # disable uncertainty band color arguments
                 if kw == "ub_color":
-                    raise KeyError("'ub_color' not needed.")
+                    raise ValueError("'ub_color' not needed.")
                 ub_kwargs[kw[3:]] = kwargs[kw]
 
         for k in ub_kwargs:
@@ -132,7 +132,7 @@ class BaseHist(Histogram):
             if kw[:3] == "bar":
                 # disable bar width argument
                 if kw == "bar_width":
-                    raise KeyError("'bar_width' not needed.")
+                    raise ValueError("'bar_width' not needed.")
                 bar_kwargs[kw[4:]] = kwargs[kw]
 
         for k in bar_kwargs:
@@ -155,7 +155,7 @@ class BaseHist(Histogram):
 
         # judge whether some arguements left
         if len(kwargs):
-            raise TypeError(f"'{list(kwargs.keys())[0]}' not needed.")
+            raise ValueError(f"'{list(kwargs.keys())[0]}' not needed.")
 
         """
         Main: plot the pulls using Matplotlib errorbar and plot methods
