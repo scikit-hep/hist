@@ -91,7 +91,11 @@ class BaseHist(Histogram):
         eb_kwargs = dict()
         for kw in kwargs.keys():
             if kw[:2] == "eb":
-                eb_kwargs[kw[3:]] = kwargs[kw]
+                # disabled argument
+                if kw == "eb_label":
+                    pass
+                else:
+                    eb_kwargs[kw[3:]] = kwargs[kw]
 
         for k in eb_kwargs:
             kwargs.pop("eb_" + k)
@@ -100,7 +104,11 @@ class BaseHist(Histogram):
         vp_kwargs = dict()
         for kw in kwargs.keys():
             if kw[:2] == "vp":
-                vp_kwargs[kw[3:]] = kwargs[kw]
+                # disabled argument
+                if kw == "vp_label":
+                    pass
+                else:
+                    vp_kwargs[kw[3:]] = kwargs[kw]
 
         for k in vp_kwargs:
             kwargs.pop("vp_" + k)
@@ -109,7 +117,11 @@ class BaseHist(Histogram):
         fp_kwargs = dict()
         for kw in kwargs.keys():
             if kw[:2] == "fp":
-                fp_kwargs[kw[3:]] = kwargs[kw]
+                # disabled argument
+                if kw == "fp_label":
+                    pass
+                else:
+                    fp_kwargs[kw[3:]] = kwargs[kw]
 
         for k in fp_kwargs:
             kwargs.pop("fp_" + k)
@@ -118,10 +130,13 @@ class BaseHist(Histogram):
         ub_kwargs = dict()
         for kw in kwargs.keys():
             if kw[:2] == "ub":
-                # disable uncertainty band color arguments
+                # disabled arguments
                 if kw == "ub_color":
-                    raise ValueError("'ub_color' not needed.")
-                ub_kwargs[kw[3:]] = kwargs[kw]
+                    pass
+                if kw == "ub_label":
+                    pass
+                else:
+                    ub_kwargs[kw[3:]] = kwargs[kw]
 
         for k in ub_kwargs:
             kwargs.pop("ub_" + k)
@@ -130,10 +145,13 @@ class BaseHist(Histogram):
         bar_kwargs = dict()
         for kw in kwargs.keys():
             if kw[:3] == "bar":
-                # disable bar width argument
+                # disabled arguments
                 if kw == "bar_width":
-                    raise ValueError("'bar_width' not needed.")
-                bar_kwargs[kw[4:]] = kwargs[kw]
+                    pass
+                if kw == "bar_label":
+                    pass
+                else:
+                    bar_kwargs[kw[4:]] = kwargs[kw]
 
         for k in bar_kwargs:
             kwargs.pop("bar_" + k)
@@ -142,10 +160,13 @@ class BaseHist(Histogram):
         pp_kwargs, pp_num = dict(), 3
         for kw in kwargs.keys():
             if kw[:2] == "pp":
-                # allow pp_num
+                # new argument
                 if kw == "pp_num":
                     pp_num = kwargs[kw]
                     continue
+                # disabled argument
+                if kw == "pp_label":
+                    raise ValueError(f"'pp_label' not needed.")
                 pp_kwargs[kw[3:]] = kwargs[kw]
 
         if "pp_num" in kwargs:
