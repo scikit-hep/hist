@@ -8,20 +8,9 @@ class NamedHist(BaseHist):
             Initialize NamedHist object. Axis params must contain the names.
         """
 
-        super(BaseHist, self).__init__(*args, **kwargs)
-        # ToDo: why cannot pass self.names for `if "" in self.names`
-        self.names: dict = dict()
-        for ax in self.axes:
-            if ax.name in self.names:
-                raise Exception(
-                    "Hist instance cannot contain axes with duplicated names."
-                )
-            elif not ax.name:
-                raise Exception(
-                    "Each axes in the NamedHist instance should have a name."
-                )
-            else:
-                self.names[ax.name] = True
+        super().__init__(*args, **kwargs)
+        if "" in self.names:
+            raise Exception("Each axes in the NamedHist instance should have a name.")
 
     def fill(self, *args, **kwargs):
         """

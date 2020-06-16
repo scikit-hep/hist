@@ -14,8 +14,7 @@ class BaseHist(Histogram):
             Initialize Hist object. Axis params must contain the names.
         """
 
-        # ToDo: why cannot use super(Histogram, self).__init__(*args, **kwargs)
-        super(BaseHist, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.names: dict = dict()
         for ax in self.axes:
             if ax.name in self.names:

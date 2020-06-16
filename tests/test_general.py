@@ -236,6 +236,26 @@ def test_errors():
     with pytest.raises(Exception):
         Hist(axis.StrCategory("TF", name="y"), axis.StrCategory(["T", "F"], name="y"))
 
+    # right histogram axis names: without names
+    assert Hist(axis.Regular(50, -3, 3, name=""), axis.Regular(50, -3, 3, name="x"))
+
+    assert Hist(axis.Bool(name=""), axis.Bool(name="y"))
+
+    assert Hist(
+        axis.Variable(range(-3, 3)), axis.Variable(range(-3, 3), name="x")
+    )  # name=None will be converted to name=''
+
+    assert Hist(axis.Integer(-3, 3, name=""), axis.Integer(-3, 3, name="x"))
+
+    assert Hist(
+        axis.IntCategory(range(-3, 3), name=""),
+        axis.IntCategory(range(-3, 3), name="x"),
+    )
+
+    assert Hist(
+        axis.StrCategory("TF"), axis.StrCategory(["T", "F"], name="x")
+    )  # name=None will be converted to name=''
+
     # wrong histogram axis names: fill with names
     with pytest.raises(Exception):
         Hist(axis.Regular(50, -3, 3, name="x"), axis.Regular(50, -3, 3, name="y")).fill(

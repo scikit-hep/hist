@@ -302,6 +302,32 @@ def test_errors():
             axis.StrCategory("TF", name="y"), axis.StrCategory(["T", "F"], name="y")
         )
 
+    # wrong histogram axis names: without names
+    with pytest.raises(Exception):
+        NamedHist(axis.Regular(50, -3, 3, name=""), axis.Regular(50, -3, 3, name="x"))
+
+    with pytest.raises(Exception):
+        NamedHist(axis.Bool(name=""), axis.Bool(name="y"))
+
+    with pytest.raises(Exception):
+        NamedHist(
+            axis.Variable(range(-3, 3)), axis.Variable(range(-3, 3))
+        )  # name=None will be converted to name=''
+
+    with pytest.raises(Exception):
+        NamedHist(axis.Integer(-3, 3, name=""), axis.Integer(-3, 3, name="x"))
+
+    with pytest.raises(Exception):
+        NamedHist(
+            axis.IntCategory(range(-3, 3), name=""),
+            axis.IntCategory(range(-3, 3), name="x"),
+        )
+
+    with pytest.raises(Exception):
+        NamedHist(
+            axis.StrCategory("TF"), axis.StrCategory(["T", "F"])
+        )  # name=None will be converted to name=''
+
     # wrong histogram axis names: fill without names
     with pytest.raises(Exception):
         NamedHist(

@@ -243,6 +243,26 @@ def test_errors():
             axis.StrCategory("TF", name="y"), axis.StrCategory(["T", "F"], name="y")
         )
 
+    # right histogram axis names: without names
+    assert BaseHist(axis.Regular(50, -3, 3, name=""), axis.Regular(50, -3, 3, name="x"))
+
+    assert BaseHist(axis.Bool(name=""), axis.Bool(name="y"))
+
+    assert BaseHist(
+        axis.Variable(range(-3, 3)), axis.Variable(range(-3, 3), name="x")
+    )  # name=None will be converted to name=''
+
+    assert BaseHist(axis.Integer(-3, 3, name=""), axis.Integer(-3, 3, name="x"))
+
+    assert BaseHist(
+        axis.IntCategory(range(-3, 3), name=""),
+        axis.IntCategory(range(-3, 3), name="x"),
+    )
+
+    assert BaseHist(
+        axis.StrCategory("TF"), axis.StrCategory(["T", "F"], name="x")
+    )  # name=None will be converted to name=''
+
     # wrong histogram axis names: fill with names
     with pytest.raises(Exception):
         BaseHist(
