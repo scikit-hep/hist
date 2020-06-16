@@ -3,6 +3,7 @@ from hist import axis, BaseHist
 import boost_histogram as bh
 import pytest
 import numpy as np
+from uncertainties import unumpy as unp
 
 
 def test_version():
@@ -153,10 +154,11 @@ def test_basic_usage():
         axis.Regular(
             50, -4, 4, name="S", title="s [units]", underflow=False, overflow=False
         )
-    ).fill(np.random.normal(size=1_000))
+    ).fill(np.random.normal(size=10))
 
     def pdf(x, a=1 / np.sqrt(2 * np.pi), x0=0, sigma=1, offset=0):
-        return a * np.exp(-((x - x0) ** 2) / (2 * sigma ** 2)) + offset
+        exp = unp.exp if a.dtype == np.dtype("O") else np.exp
+        return a * exp(-((x - x0) ** 2) / (2 * sigma ** 2)) + offset
 
     assert h.pull_plot(
         pdf,
@@ -172,10 +174,6 @@ def test_basic_usage():
         vp_ls="-",
         vp_lw=8,
         vp_alpha=0.6,
-        mp_c="darkorange",
-        mp_ls=":",
-        mp_lw=4,
-        mp_alpha=1.0,
         fp_c="chocolate",
         fp_ls="-",
         fp_lw=3,
@@ -245,6 +243,26 @@ def test_errors():
             axis.StrCategory("TF", name="y"), axis.StrCategory(["T", "F"], name="y")
         )
 
+    # right histogram axis names: without names
+    assert BaseHist(axis.Regular(50, -3, 3, name=""), axis.Regular(50, -3, 3, name="x"))
+
+    assert BaseHist(axis.Bool(name=""), axis.Bool(name="y"))
+
+    assert BaseHist(
+        axis.Variable(range(-3, 3)), axis.Variable(range(-3, 3), name="x")
+    )  # name=None will be converted to name=''
+
+    assert BaseHist(axis.Integer(-3, 3, name=""), axis.Integer(-3, 3, name="x"))
+
+    assert BaseHist(
+        axis.IntCategory(range(-3, 3), name=""),
+        axis.IntCategory(range(-3, 3), name="x"),
+    )
+
+    assert BaseHist(
+        axis.StrCategory("TF"), axis.StrCategory(["T", "F"], name="x")
+    )  # name=None will be converted to name=''
+
     # wrong histogram axis names: fill with names
     with pytest.raises(Exception):
         BaseHist(
@@ -277,25 +295,68 @@ def test_errors():
             axis.StrCategory(["F", "T"], name="x"), axis.StrCategory("FT", name="y")
         ).fill(x=["T", "F", "T"], y=["T", "F", "T"])
 
-    # wrong pull_plot: func not callable
+    def pdf(x, a=1 / np.sqrt(2 * np.pi), x0=0, sigma=1, offset=0):
+        exp = unp.exp if a.dtype == np.dtype("O") else np.exp
+        return a * exp(-((x - x0) ** 2) / (2 * sigma ** 2)) + offset
+
     h = BaseHist(
         axis.Regular(
-            50, -4, 4, name="S", title="s [units]", underflow=False, overflow=False
+            50, -4, 4, name="X", title="s [units]", underflow=False, overflow=False
         )
-    ).fill(np.random.normal(size=1_000))
+    ).fill(np.random.normal(size=10))
 
-    def pdf(x, a=1 / np.sqrt(2 * np.pi), x0=0, sigma=1, offset=0):
-        return a * np.exp(-((x - x0) ** 2) / (2 * sigma ** 2)) + offset
+    # wrong pull_plot: dimension error
+    hh = BaseHist(
+        axis.Regular(
+            50, -4, 4, name="X", title="s [units]", underflow=False, overflow=False
+        ),
+        axis.Regular(
+            50, -4, 4, name="Y", title="s [units]", underflow=False, overflow=False
+        ),
+    ).fill(np.random.normal(size=10), np.random.normal(size=10))
 
+    with pytest.raises(Exception):
+        hh.pull_plot(pdf)
+
+    # wrong pull_plot: func not callable
     with pytest.raises(Exception):
         h.pull_plot("pdf")
 
     # wrong pull_plot: wrong kwargs names
     with pytest.raises(Exception):
-        h.pull_plot(pdf, ecolor="crimson", mfc="crimson", mec="crimson", fmt="o")
+        h.pull_plot(pdf, abc="crimson", xyz="crimson")
+
+    # wrong pull_plot: without kwargs prefix
+    with pytest.raises(Exception):
+        h.pull_plot(pdf, ecolor="crimson", mfc="crimson")
+
+    # wrong pull_plot: disabled param - labels
+    with pytest.raises(Exception):
+        h.pull_plot(pdf, eb_label="value")
+
+    with pytest.raises(Exception):
+        h.pull_plot(pdf, vp_label="value")
+
+    with pytest.raises(Exception):
+        h.pull_plot(pdf, fp_label="value")
+
+    with pytest.raises(Exception):
+        h.pull_plot(pdf, ub_label="value")
+
+    with pytest.raises(Exception):
+        h.pull_plot(pdf, bar_label="value")
+
+    with pytest.raises(Exception):
+        h.pull_plot(pdf, pp_label="value")
+
+    # wrong pull_plot: disabled param - ub_color
+    with pytest.raises(Exception):
+        h.pull_plot(pdf, ub_color="value")
+
+    # wrong pull_plot: disabled param - bar_width
+    with pytest.raises(Exception):
+        h.pull_plot(pdf, bar_width="value")
 
     # wrong pull_plot: kwargs types mis-matched
     with pytest.raises(Exception):
-        h.pull_plot(
-            pdf, eb_ecolor=1.0, eb_mfc=1.0, eb_mec=1.0, eb_fmt=1.0
-        )  # kwargs should be str
+        h.pull_plot(pdf, eb_ecolor=1.0, eb_mfc=1.0)  # kwargs should be str

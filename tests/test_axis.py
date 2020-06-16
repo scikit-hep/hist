@@ -17,6 +17,13 @@ def test_basic_usage():
     assert axis.IntCategory(range(-3, 3), name="X__X")
     assert axis.StrCategory("FT", name="X00")
 
+    assert axis.Regular(50, -3, 3, name="")
+    assert axis.Bool(name="")
+    assert axis.Variable(range(-3, 3))
+    assert axis.Integer(-3, 3, name="")
+    assert axis.IntCategory(range(-3, 3), name="")
+    assert axis.StrCategory("FT")
+
 
 def test_errors():
     """
@@ -79,22 +86,3 @@ def test_errors():
 
     with pytest.raises(Exception):
         axis.StrCategory("FT", name="*x")
-
-    # wrong axis names: empty names
-    with pytest.raises(Exception):
-        axis.Regular(50, -3, 3, name="")
-
-    with pytest.raises(Exception):
-        axis.Bool(name="")
-
-    with pytest.raises(Exception):
-        axis.Variable(range(-3, 3))
-
-    with pytest.raises(Exception):
-        axis.Integer(-3, 3, name="")
-
-    with pytest.raises(Exception):
-        axis.IntCategory(range(-3, 3), name="")
-
-    with pytest.raises(Exception):
-        axis.StrCategory("FT")
