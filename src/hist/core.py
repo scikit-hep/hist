@@ -63,17 +63,20 @@ class BaseHist(Histogram):
         y_sd = unumpy.std_devs(y_unc)
 
         # Compute pulls: containing no INF values
-        pulls = (self.view() - y_nv) / yerr
-        pulls = [x if np.abs(x) != np.inf else 0 for x in pulls]
+        with np.errstate(divide='ignore'):
+            pulls = (self.view() - y_nv) / yerr
+        
+        pulls[np.isnan(pulls)] = 0
+        pulls[np.isinf(pulls)] = 0
 
         """
         Default Figure: construct the figure and axes
         """
         if fig is None:
             fig = plt.figure(figsize=(8, 8))
-            grid = fig.add_gridspec(4, 4, wspace=0.5, hspace=0.5)
+            grid = fig.add_gridspec(4, 4, wspace=0, hspace=0)
         else:
-            grid = fig.add_gridspec(4, 4, wspace=0.5, hspace=0.5)
+            grid = fig.add_gridspec(4, 4, wspace=0, hspace=0)
 
         if ax is None:
             ax = fig.add_subplot(grid[0:3, :])
@@ -215,7 +218,7 @@ class BaseHist(Histogram):
                 pp_kwargs["alpha"] *= np.power(0.618, i)
             else:
                 pp_kwargs["alpha"] = 0.618 * np.power(0.618, i)
-
+            
             upRect_startpoint = [left_edge, i * patch_height]
             upRect = patches.Rectangle(
                 upRect_startpoint, patch_width, patch_height, **pp_kwargs
