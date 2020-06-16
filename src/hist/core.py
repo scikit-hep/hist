@@ -74,17 +74,17 @@ class BaseHist(Histogram):
         """
         if fig is None:
             fig = plt.figure(figsize=(8, 8))
-            grid = fig.add_gridspec(1, 2, hspace=0, height_ratios=[3,1])
+            grid = fig.add_gridspec(2, 1, hspace=0, height_ratios=[3, 1])
         else:
             grid = fig.add_gridspec(4, 4, wspace=0, hspace=0)
 
         if ax is None:
-            ax = fig.add_subplot(grid[0:3, :])
+            ax = fig.add_subplot(grid[0])
         else:
             pass
 
         if pull_ax is None:
-            pull_ax = fig.add_subplot(grid[3, :], sharex=ax)
+            pull_ax = fig.add_subplot(grid[1], sharex=ax)
         else:
             pass
 
