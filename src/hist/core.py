@@ -63,25 +63,28 @@ class BaseHist(Histogram):
         y_sd = unumpy.std_devs(y_unc)
 
         # Compute pulls: containing no INF values
-        pulls = (self.view() - y_nv) / yerr
-        pulls = [x if np.abs(x) != np.inf else 0 for x in pulls]
+        with np.errstate(divide="ignore"):
+            pulls = (self.view() - y_nv) / yerr
+
+        pulls[np.isnan(pulls)] = 0
+        pulls[np.isinf(pulls)] = 0
 
         """
         Default Figure: construct the figure and axes
         """
         if fig is None:
             fig = plt.figure(figsize=(8, 8))
-            grid = fig.add_gridspec(4, 4, wspace=0.5, hspace=0.5)
+            grid = fig.add_gridspec(2, 1, hspace=0, height_ratios=[3, 1])
         else:
-            grid = fig.add_gridspec(4, 4, wspace=0.5, hspace=0.5)
+            grid = fig.add_gridspec(4, 4, wspace=0, hspace=0)
 
         if ax is None:
-            ax = fig.add_subplot(grid[0:3, :])
+            ax = fig.add_subplot(grid[0])
         else:
             pass
 
         if pull_ax is None:
-            pull_ax = fig.add_subplot(grid[3, :], sharex=ax)
+            pull_ax = fig.add_subplot(grid[1], sharex=ax)
         else:
             pass
 
