@@ -44,7 +44,7 @@ class BaseHist(Histogram):
         if callable(func) == False:
             raise TypeError("Callable parameter func is supported in pull plot.")
         if len(self.axes) != 1:
-            raise TypeError("Only 1d-histogram has pull plot.")
+            raise TypeError("Only 1D-histogram has pull plot.")
 
         """
         Computation and Fit
