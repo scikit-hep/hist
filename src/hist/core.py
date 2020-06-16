@@ -74,7 +74,7 @@ class BaseHist(Histogram):
         """
         if fig is None:
             fig = plt.figure(figsize=(8, 8))
-            grid = fig.add_gridspec(4, 4, wspace=0, hspace=0)
+            grid = fig.add_gridspec(1, 2, hspace=0, height_ratios=[3,1])
         else:
             grid = fig.add_gridspec(4, 4, wspace=0, hspace=0)
 
