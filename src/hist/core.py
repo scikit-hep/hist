@@ -63,9 +63,9 @@ class BaseHist(Histogram):
         y_sd = unumpy.std_devs(y_unc)
 
         # Compute pulls: containing no INF values
-        with np.errstate(divide='ignore'):
+        with np.errstate(divide="ignore"):
             pulls = (self.view() - y_nv) / yerr
-        
+
         pulls[np.isnan(pulls)] = 0
         pulls[np.isinf(pulls)] = 0
 
@@ -218,7 +218,7 @@ class BaseHist(Histogram):
                 pp_kwargs["alpha"] *= np.power(0.618, i)
             else:
                 pp_kwargs["alpha"] = 0.618 * np.power(0.618, i)
-            
+
             upRect_startpoint = [left_edge, i * patch_height]
             upRect = patches.Rectangle(
                 upRect_startpoint, patch_width, patch_height, **pp_kwargs
