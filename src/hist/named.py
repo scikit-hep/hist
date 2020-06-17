@@ -15,7 +15,7 @@ class NamedHist(BaseHist):
 
     def project(self, *args: Tuple[str]):
         """
-        Projection of axis idx
+        Projection of axis idx.
         """
 
         indices: tuple = tuple()
@@ -30,7 +30,7 @@ class NamedHist(BaseHist):
             if not find:
                 raise ValueError("The axis names could not be found.")
 
-        return super().project(*indices)
+        return super(Histogram, self).project(*indices)
 
     def fill(self, *args, **kwargs):
         """

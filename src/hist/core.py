@@ -26,7 +26,7 @@ class BaseHist(Histogram):
 
     def project(self, *args: Tuple[int]):
         """
-        Projection of axis idx
+        Projection of axis idx.
         """
 
         return super().project(*args)
