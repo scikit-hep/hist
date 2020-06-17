@@ -1,4 +1,5 @@
 import numpy as np
+import boost_histogram as bh
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
@@ -11,7 +12,7 @@ from typing import Callable, Optional, Tuple
 class BaseHist(Histogram):
     def __init__(self, *args, **kwargs):
         """
-            Initialize Hist object. Axis params must contain the names.
+            Initialize BaseHist object. Axis params must contain the names.
         """
 
         super().__init__(*args, **kwargs)
@@ -19,10 +20,20 @@ class BaseHist(Histogram):
         for ax in self.axes:
             if ax.name in self.names:
                 raise Exception(
-                    "Hist instance cannot contain axes with duplicated names."
+                    "BaseHist instance cannot contain axes with duplicated names."
                 )
             else:
                 self.names[ax.name] = True
+                
+    def projection(self, *args: Tuple[int]):
+        """
+        Project of axis idx
+        """
+        res = tuple()
+        for idx in args:
+            res += (self._hist[:, ::bh.sum],)
+            
+        return res
 
     def pull_plot(
         self,
@@ -37,7 +48,7 @@ class BaseHist(Histogram):
         Optional[matplotlib.axes._subplots.SubplotBase],
     ]:
         """
-        Pull_plot method for Hist object.
+        Pull_plot method for BaseHist object.
         """
 
         # Type judgement
