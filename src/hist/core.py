@@ -1,5 +1,4 @@
 import numpy as np
-import boost_histogram as bh
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
@@ -24,16 +23,13 @@ class BaseHist(Histogram):
                 )
             else:
                 self.names[ax.name] = True
-                
-    def projection(self, *args: Tuple[int]):
+
+    def project(self, *args: Tuple[int]):
         """
-        Project of axis idx
+        Projection of axis idx
         """
-        res = tuple()
-        for idx in args:
-            res += (self._hist[:, ::bh.sum],)
-            
-        return res
+
+        return super().project(*args)
 
     def pull_plot(
         self,

@@ -1,5 +1,6 @@
 from .core import BaseHist
 import numpy as np
+from typing import Tuple
 
 
 class NamedHist(BaseHist):
@@ -12,6 +13,25 @@ class NamedHist(BaseHist):
         if "" in self.names:
             raise Exception("Each axes in the NamedHist instance should have a name.")
 
+    def project(self, *args: Tuple[str]):
+        """
+        Projection of axis idx
+        """
+
+        indices: tuple = tuple()
+        for name in args:
+            find = False
+            for index, axis in enumerate(self.axes):
+                if name == axis.name:
+                    indices += (index,)
+                    find = True
+                    break
+
+            if not find:
+                raise ValueError("The axis names could not be found.")
+
+        return super().project(*indices)
+
     def fill(self, *args, **kwargs):
         """
             Insert data into the histogram using names and return a \
@@ -21,18 +41,21 @@ class NamedHist(BaseHist):
         indices = []
         values = []
         for name, val in kwargs.items():
+            find = False
             for index, axis in enumerate(self.axes):
                 if name == axis.name:
                     indices.append(index)
                     values.append(val)
+                    find = True
                     break
+
+            if not find:
+                raise ValueError("The axis names could not be found.")
 
         d = dict(zip(indices, values))
         l = sorted(d.items(), key=lambda item: item[0])
         nd = np.asarray(l, dtype=object)
         data = nd.ravel()[1::2]
-        if len(data) != len(self.axes):
-            raise Exception("The axis names could not be found when filling.")
         super().fill(*data)
 
         return self
