@@ -31,7 +31,9 @@ class BaseHist(Histogram):
 
         if len(args) != 0:
             if not all(isinstance(x, int) for x in args):
-                raise TypeError(f"Use axis indices as parameters for {self.__class__.__name__}")
+                raise TypeError(
+                    f"Use axis indices as parameters for {self.__class__.__name__}"
+                )
 
         return super().project(*args)
 

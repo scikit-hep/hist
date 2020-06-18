@@ -11,7 +11,9 @@ class NamedHist(BaseHist):
 
         super().__init__(*args, **kwargs)
         if "" in self.names:
-            raise Exception(f"Each axes in the {self.__class__.__name__} instance should have a name")
+            raise Exception(
+                f"Each axes in the {self.__class__.__name__} instance should have a name"
+            )
 
     def project(self, *args: Tuple[Union[int, str]]):
         """
