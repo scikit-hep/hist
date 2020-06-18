@@ -11,7 +11,7 @@ from typing import Callable, Optional, Tuple, Union
 class BaseHist(Histogram):
     def __init__(self, *args, **kwargs):
         """
-            Initialize BaseHist object. Axis params must contain the names.
+            Initialize BaseHist object. Axis params can contain the names.
         """
 
         super().__init__(*args, **kwargs)
@@ -19,7 +19,7 @@ class BaseHist(Histogram):
         for ax in self.axes:
             if ax.name in self.names:
                 raise Exception(
-                    "BaseHist instance cannot contain axes with duplicated names"
+                    f"{self.__class__.__name__} instance cannot contain axes with duplicated names."
                 )
             else:
                 self.names[ax.name] = True
@@ -31,7 +31,7 @@ class BaseHist(Histogram):
 
         if len(args) != 0:
             if not all(isinstance(x, int) for x in args):
-                raise TypeError("Use axis indices as parameters for BaseHist")
+                raise TypeError(f"Use axis indices as parameters for {self.__class__.__name__}")
 
         return super().project(*args)
 
