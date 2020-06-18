@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
+from matplotlib import transforms
 import matplotlib.patches as patches
 from scipy.optimize import curve_fit
 from uncertainties import correlated_values, unumpy
@@ -44,7 +45,95 @@ class BaseHist(Histogram):
             return super().project(*indices)
 
         else:
-            raise TypeError("Only projections by indices and names are supported")
+            raise TypeError(
+                f"Only projections by indices and names are supported for {self.__class__.__name__}"
+            )
+
+    def plot(
+        self,
+        fig: Optional[matplotlib.figure.Figure] = None,
+        main_ax: Optional[matplotlib.axes._subplots.SubplotBase] = None,
+        top_ax: Optional[matplotlib.axes._subplots.SubplotBase] = None,
+        side_ax: Optional[matplotlib.axes._subplots.SubplotBase] = None,
+        **kwargs,
+    ) -> Tuple[
+        Optional[matplotlib.figure.Figure],
+        Optional[matplotlib.axes._subplots.SubplotBase],
+        Optional[matplotlib.axes._subplots.SubplotBase],
+        Optional[matplotlib.axes._subplots.SubplotBase],
+    ]:
+        """
+        Plot method for BaseHist object.
+        """
+        # Type judgement
+        if len(self.axes) != 2:
+            raise TypeError("Only 2D-histogram has plot")
+            
+        """
+        Default Figure: construct the figure and axes
+        """
+        if fig is None:
+            fig = plt.figure(figsize=(8, 8))
+            grid = fig.add_gridspec(4, 4, hspace=0, wspace=0)
+
+        if main_ax is None:
+            main_ax = fig.add_subplot(grid[1:4, 0:3])
+
+        if top_ax is None:
+            top_ax = fig.add_subplot(grid[0:1, 0:3])
+            
+        if side_ax is None:
+            side_ax = fig.add_subplot(grid[1:4, 3:4])
+        
+        """
+        Keyword Argument Conversion: convert the kwargs to several independent args
+        """
+        # main plot keyword arguments
+        main_kwargs = dict()
+        for kw in kwargs.keys():
+            if kw[:4] == "main":
+                main_kwargs[kw[5:]] = kwargs[kw]
+
+        for k in main_kwargs:
+            kwargs.pop("main_" + k)
+            
+        # top plot keyword arguments
+        top_kwargs = dict()
+        for kw in kwargs.keys():
+            if kw[:3] == "top":
+                top_kwargs[kw[4:]] = kwargs[kw]
+
+        for k in top_kwargs:
+            kwargs.pop("top_" + k)
+            
+        # side plot keyword arguments
+        side_kwargs = dict()
+        for kw in kwargs.keys():
+            if kw[:4] == "side":
+                side_kwargs[kw[5:]] = kwargs[kw]
+
+        for k in side_kwargs:
+            kwargs.pop("side_" + k)
+
+        """
+        Plot: plot the 2d-histogram
+        """
+        
+        # main plot
+        X, Y = self.axes.edges
+        main_ax.pcolormesh(X.T, Y.T, self.view().T)
+        
+        # top plot
+        top_ax.step(self.axes.edges[1][0][:-1], self.project(1).view())
+        top_ax.xaxis.set_visible(False)
+        
+        # side plot
+        base = plt.gca().transData
+        rot = transforms.Affine2D().rotate_deg(270)
+        side_ax.step(self.axes.edges[1][0][:-1], self.project(0).view(), transform= rot + base)
+        side_ax.yaxis.set_visible(False)
+            
+        return main_ax, top_ax, side_ax
 
     def pull_plot(
         self,
@@ -71,7 +160,6 @@ class BaseHist(Histogram):
         """
         Computation and Fit
         """
-
         yerr = np.sqrt(self.view())
 
         # Compute fit values: using func as fit model
@@ -97,18 +185,12 @@ class BaseHist(Histogram):
         if fig is None:
             fig = plt.figure(figsize=(8, 8))
             grid = fig.add_gridspec(2, 1, hspace=0, height_ratios=[3, 1])
-        else:
-            grid = fig.add_gridspec(4, 4, wspace=0, hspace=0)
 
         if ax is None:
             ax = fig.add_subplot(grid[0])
-        else:
-            pass
 
         if pull_ax is None:
             pull_ax = fig.add_subplot(grid[1], sharex=ax)
-        else:
-            pass
 
         """
         Keyword Argument Conversion: convert the kwargs to several independent args

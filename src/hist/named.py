@@ -24,7 +24,7 @@ class NamedHist(BaseHist):
         # if len(args) == 0 or all(isinstance(x, str) for x in args):
         #     return super().project(*args)
 
-        # else: raise TypeError("Only projections by names are supported")
+        # else: raise TypeError(f"Only projections by names are supported for {self.__class__.__name__}")
 
         return super().project(*args)
 
