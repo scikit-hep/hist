@@ -28,14 +28,23 @@ class BaseHist(Histogram):
         """
         Projection of axis idx.
         """
+        if len(args) == 0 or all(isinstance(x, int) for x in args):
+            return super().project(*args)
 
-        if len(args) != 0:
-            if not all(isinstance(x, int) for x in args):
-                raise TypeError(
-                    f"Use axis indices as parameters for {self.__class__.__name__}"
-                )
+        elif all(isinstance(x, str) for x in args):
+            indices: tuple = tuple()
+            for name in args:
+                for index, axis in enumerate(self.axes):
+                    if name == axis.name:
+                        indices += (index,)
+                        break
+                else:
+                    raise ValueError("The axis names could not be found")
 
-        return super().project(*args)
+            return super().project(*indices)
+
+        else:
+            raise TypeError("Only projections by indices and names are supported")
 
     def pull_plot(
         self,
