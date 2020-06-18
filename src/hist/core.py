@@ -11,7 +11,7 @@ from typing import Callable, Optional, Tuple
 class BaseHist(Histogram):
     def __init__(self, *args, **kwargs):
         """
-            Initialize BaseHist object. Axis params must contain the names.
+            Initialize BaseHist object. Axis params can contain the names.
         """
 
         super().__init__(*args, **kwargs)
