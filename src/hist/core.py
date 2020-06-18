@@ -19,7 +19,7 @@ class BaseHist(Histogram):
         for ax in self.axes:
             if ax.name in self.names:
                 raise Exception(
-                    "BaseHist instance cannot contain axes with duplicated names."
+                    f"{self.__class__.__name__} instance cannot contain axes with duplicated names."
                 )
             else:
                 self.names[ax.name] = True
