@@ -20,9 +20,13 @@ class NamedHist(BaseHist):
         Projection of axis idx.
         """
 
-        if len(args) == 0 or all(isinstance(x, str) for x in args):
-            return super().project(*args)
-        else: raise TypeError("Only projections by names are supported")
+        # ToDo: should work
+        # if len(args) == 0 or all(isinstance(x, str) for x in args):
+        #     return super().project(*args)
+
+        # else: raise TypeError("Only projections by names are supported")
+
+        return super().project(*args)
 
     def fill(self, *args, **kwargs):
         """
