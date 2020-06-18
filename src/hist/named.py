@@ -15,7 +15,7 @@ class NamedHist(BaseHist):
                 f"Each axes in the {self.__class__.__name__} instance should have a name"
             )
 
-    def project(self, *args: Tuple[Union[int, str]]):
+    def project(self, *args: Union[int, str]):
         """
         Projection of axis idx.
         """

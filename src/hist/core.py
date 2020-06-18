@@ -25,7 +25,7 @@ class BaseHist(Histogram):
             else:
                 self.names[ax.name] = True
 
-    def project(self, *args: Tuple[Union[int, str]]):
+    def project(self, *args: Union[int, str]):
         """
         Projection of axis idx.
         """
@@ -68,7 +68,7 @@ class BaseHist(Histogram):
         # Type judgement
         if len(self.axes) != 2:
             raise TypeError("Only 2D-histogram has plot")
-            
+
         """
         Default Figure: construct the figure and axes
         """
@@ -80,11 +80,11 @@ class BaseHist(Histogram):
             main_ax = fig.add_subplot(grid[1:4, 0:3])
 
         if top_ax is None:
-            top_ax = fig.add_subplot(grid[0:1, 0:3])
-            
+            top_ax = fig.add_subplot(grid[0:1, 0:3], sharex=main_ax)
+
         if side_ax is None:
-            side_ax = fig.add_subplot(grid[1:4, 3:4])
-        
+            side_ax = fig.add_subplot(grid[1:4, 3:4], sharey=main_ax)
+
         """
         Keyword Argument Conversion: convert the kwargs to several independent args
         """
@@ -96,7 +96,7 @@ class BaseHist(Histogram):
 
         for k in main_kwargs:
             kwargs.pop("main_" + k)
-            
+
         # top plot keyword arguments
         top_kwargs = dict()
         for kw in kwargs.keys():
@@ -105,7 +105,7 @@ class BaseHist(Histogram):
 
         for k in top_kwargs:
             kwargs.pop("top_" + k)
-            
+
         # side plot keyword arguments
         side_kwargs = dict()
         for kw in kwargs.keys():
@@ -118,22 +118,51 @@ class BaseHist(Histogram):
         """
         Plot: plot the 2d-histogram
         """
-        
+
         # main plot
         X, Y = self.axes.edges
-        main_ax.pcolormesh(X.T, Y.T, self.view().T)
+        main_ax.pcolormesh(X.T, Y.T, self.view().T, **main_kwargs)
         
+        if self.axes[0].name:
+            main_ax.set_xlabel(self.axes[0].name)
+        else:
+            main_ax.set_xlabel(self.axes[0].title)
+            
+        if self.axes[1].name:
+            main_ax.set_ylabel(self.axes[1].name)
+        else:
+            main_ax.set_ylabel(self.axes[1].title)
+        # ToDo: why this will disable the top plot show?
+#         fig.add_axes(main_ax)
+
         # top plot
-        top_ax.step(self.axes.edges[1][0][:-1], self.project(1).view())
+        top_ax.step(self.axes.edges[1][0][:-1], self.project(0).view(), **top_kwargs)
+        top_ax.spines["top"].set_visible(False)
+        top_ax.spines["right"].set_visible(False)
         top_ax.xaxis.set_visible(False)
         
+        top_ax.set_ylabel("Counts")
+        # ToDo: why this will disable the side plot show?
+#         fig.add_axes(top_ax)
+
         # side plot
         base = plt.gca().transData
-        rot = transforms.Affine2D().rotate_deg(270)
-        side_ax.step(self.axes.edges[1][0][:-1], self.project(0).view(), transform= rot + base)
+        rot = transforms.Affine2D().rotate_deg(90)
+        side_ax.step(
+            self.axes.edges[1][0][:-1],
+            -self.project(1).view(),
+            transform=rot + base,
+            **side_kwargs,
+        )
+        side_ax.spines["top"].set_visible(False)
+        side_ax.spines["right"].set_visible(False)
         side_ax.yaxis.set_visible(False)
-            
-        return main_ax, top_ax, side_ax
+        
+        side_ax.set_xlabel("Counts")
+        # ToDo: odd add_axes
+#         fig.add_axes(side_ax)
+
+        return fig, main_ax, top_ax, side_ax
 
     def pull_plot(
         self,
