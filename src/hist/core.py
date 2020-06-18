@@ -122,28 +122,28 @@ class BaseHist(Histogram):
         # main plot
         X, Y = self.axes.edges
         main_ax.pcolormesh(X.T, Y.T, self.view().T, **main_kwargs)
-        
+
         if self.axes[0].name:
             main_ax.set_xlabel(self.axes[0].name)
         else:
             main_ax.set_xlabel(self.axes[0].title)
-            
+
         if self.axes[1].name:
             main_ax.set_ylabel(self.axes[1].name)
         else:
             main_ax.set_ylabel(self.axes[1].title)
         # ToDo: why this will disable the top plot show?
-#         fig.add_axes(main_ax)
+        #         fig.add_axes(main_ax)
 
         # top plot
         top_ax.step(self.axes.edges[1][0][:-1], self.project(0).view(), **top_kwargs)
         top_ax.spines["top"].set_visible(False)
         top_ax.spines["right"].set_visible(False)
         top_ax.xaxis.set_visible(False)
-        
+
         top_ax.set_ylabel("Counts")
         # ToDo: why this will disable the side plot show?
-#         fig.add_axes(top_ax)
+        #         fig.add_axes(top_ax)
 
         # side plot
         base = plt.gca().transData
@@ -157,10 +157,10 @@ class BaseHist(Histogram):
         side_ax.spines["top"].set_visible(False)
         side_ax.spines["right"].set_visible(False)
         side_ax.yaxis.set_visible(False)
-        
+
         side_ax.set_xlabel("Counts")
         # ToDo: odd add_axes
-#         fig.add_axes(side_ax)
+        #         fig.add_axes(side_ax)
 
         return fig, main_ax, top_ax, side_ax
 
