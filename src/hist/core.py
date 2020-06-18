@@ -5,7 +5,7 @@ import matplotlib.patches as patches
 from scipy.optimize import curve_fit
 from uncertainties import correlated_values, unumpy
 from boost_histogram import Histogram
-from typing import Callable, Optional, Tuple
+from typing import Callable, Optional, Tuple, Union
 
 
 class BaseHist(Histogram):
@@ -19,15 +19,19 @@ class BaseHist(Histogram):
         for ax in self.axes:
             if ax.name in self.names:
                 raise Exception(
-                    "BaseHist instance cannot contain axes with duplicated names."
+                    "BaseHist instance cannot contain axes with duplicated names"
                 )
             else:
                 self.names[ax.name] = True
 
-    def project(self, *args: Tuple[int]):
+    def project(self, *args: Tuple[Union[int, str]]):
         """
         Projection of axis idx.
         """
+
+        if len(args) != 0:
+            if not all(isinstance(x, int) for x in args):
+                raise TypeError("Use axis indices as parameters for BaseHist")
 
         return super().project(*args)
 
@@ -49,9 +53,9 @@ class BaseHist(Histogram):
 
         # Type judgement
         if callable(func) == False:
-            raise TypeError("Callable parameter func is supported in pull plot.")
+            raise TypeError("Callable parameter func is supported in pull plot")
         if len(self.axes) != 1:
-            raise TypeError("Only 1D-histogram has pull plot.")
+            raise TypeError("Only 1D-histogram has pull plot")
 
         """
         Computation and Fit
@@ -177,7 +181,7 @@ class BaseHist(Histogram):
                     continue
                 # disabled argument
                 if kw == "pp_label":
-                    raise ValueError(f"'pp_label' not needed.")
+                    raise ValueError(f"'pp_label' not needed")
                 pp_kwargs[kw[3:]] = kwargs[kw]
 
         if "pp_num" in kwargs:
@@ -187,7 +191,7 @@ class BaseHist(Histogram):
 
         # judge whether some arguements left
         if len(kwargs):
-            raise ValueError(f"'{list(kwargs.keys())[0]}' not needed.")
+            raise ValueError(f"'{list(kwargs.keys())[0]}' not needed")
 
         """
         Main: plot the pulls using Matplotlib errorbar and plot methods

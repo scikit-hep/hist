@@ -1,6 +1,6 @@
 from .core import BaseHist
 import numpy as np
-from typing import Tuple
+from typing import Union, Tuple
 
 
 class NamedHist(BaseHist):
@@ -11,26 +11,26 @@ class NamedHist(BaseHist):
 
         super().__init__(*args, **kwargs)
         if "" in self.names:
-            raise Exception("Each axes in the NamedHist instance should have a name.")
+            raise Exception("Each axes in the NamedHist instance should have a name")
 
-    def project(self, *args: Tuple[str]):
+    def project(self, *args: Tuple[Union[int, str]]):
         """
         Projection of axis idx.
         """
 
+        if all(isinstance(x, int) for x in args):
+            return super().project(*args)
+
         indices: tuple = tuple()
         for name in args:
-            find = False
             for index, axis in enumerate(self.axes):
                 if name == axis.name:
                     indices += (index,)
-                    find = True
                     break
+            else:
+                raise ValueError("The axis names could not be found")
 
-            if not find:
-                raise ValueError("The axis names could not be found.")
-
-        return super(Histogram, self).project(*indices)
+        return super().project(*indices)
 
     def fill(self, *args, **kwargs):
         """
@@ -41,16 +41,13 @@ class NamedHist(BaseHist):
         indices = []
         values = []
         for name, val in kwargs.items():
-            find = False
             for index, axis in enumerate(self.axes):
                 if name == axis.name:
                     indices.append(index)
                     values.append(val)
-                    find = True
                     break
-
-            if not find:
-                raise ValueError("The axis names could not be found.")
+            else:
+                raise ValueError("The axis names could not be found")
 
         d = dict(zip(indices, values))
         l = sorted(d.items(), key=lambda item: item[0])
