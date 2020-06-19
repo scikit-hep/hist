@@ -115,10 +115,13 @@ class BaseHist(Histogram):
         for k in side_kwargs:
             kwargs.pop("side_" + k)
 
+        # judge whether some arguements left
+        if len(kwargs):
+            raise ValueError(f"'{list(kwargs.keys())[0]}' not needed")
+
         """
         Plot: plot the 2d-histogram
         """
-
         # main plot
         X, Y = self.axes.edges
         main_ax.pcolormesh(X.T, Y.T, self.view().T, **main_kwargs)
