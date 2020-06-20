@@ -135,8 +135,6 @@ class BaseHist(Histogram):
             main_ax.set_ylabel(self.axes[1].name)
         else:
             main_ax.set_ylabel(self.axes[1].title)
-        # ToDo: why this will disable the top plot show?
-        #         fig.add_axes(main_ax)
 
         # top plot
         top_ax.step(self.axes.edges[1][0][:-1], self.project(0).view(), **top_kwargs)
@@ -145,8 +143,6 @@ class BaseHist(Histogram):
         top_ax.xaxis.set_visible(False)
 
         top_ax.set_ylabel("Counts")
-        # ToDo: why this will disable the side plot show?
-        #         fig.add_axes(top_ax)
 
         # side plot
         base = plt.gca().transData
@@ -162,8 +158,10 @@ class BaseHist(Histogram):
         side_ax.yaxis.set_visible(False)
 
         side_ax.set_xlabel("Counts")
-        # ToDo: odd add_axes
-        #         fig.add_axes(side_ax)
+
+        fig.add_axes(main_ax)
+        fig.add_axes(top_ax)
+        fig.add_axes(side_ax)
 
         return fig, main_ax, top_ax, side_ax
 
@@ -334,9 +332,7 @@ class BaseHist(Histogram):
             **ub_kwargs,
         )
         legend = ax.legend(loc=0)
-
         ax.set_ylabel("Counts")
-        fig.add_axes(ax)
 
         """
         Pull: plot the pulls using Matplotlib bar method
@@ -365,15 +361,15 @@ class BaseHist(Histogram):
                 downRect_startpoint, patch_width, patch_height, **pp_kwargs
             )
             pull_ax.add_patch(downRect)
-
         plt.xlim(left_edge, right_edge)
-
-        fig.add_axes(pull_ax)
 
         if self.axes[0].name:
             pull_ax.set_xlabel(self.axes[0].name)
         else:
             pull_ax.set_xlabel(self.axes[0].title)
         pull_ax.set_ylabel("Pull")
+
+        fig.add_axes(ax)
+        fig.add_axes(pull_ax)
 
         return fig, ax, pull_ax
