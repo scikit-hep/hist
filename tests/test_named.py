@@ -280,7 +280,7 @@ def test_basic_usage():
         ),
     ).fill(B=np.random.normal(size=10), A=np.random.normal(size=10))
 
-    assert h.plot(
+    assert h.plot2d_full(
         main_cmap="cividis",
         top_ls="--",
         top_color="orange",
@@ -521,18 +521,18 @@ def test_errors():
     ).fill(B=np.random.normal(size=10), A=np.random.normal(size=10))
 
     with pytest.raises(Exception):
-        h.project("A").plot()
+        h.project("A").plot2d_full()
 
     # wrong kwargs names
     with pytest.raises(Exception):
-        h.plot(abc="red")
+        h.plot2d_full(abc="red")
 
     with pytest.raises(Exception):
-        h.plot(color="red")
+        h.plot2d_full(color="red")
 
     # wrong kwargs type
     with pytest.raises(Exception):
-        h.plot(main_cmap=0.1, side_lw="autumn")
+        h.plot2d_full(main_cmap=0.1, side_lw="autumn")
 
     """
     Pull Plot

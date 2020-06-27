@@ -1,8 +1,8 @@
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
-from matplotlib import transforms
 import matplotlib.patches as patches
+from matplotlib import transforms
 from scipy.optimize import curve_fit
 from uncertainties import correlated_values, unumpy
 from boost_histogram import Histogram
@@ -49,7 +49,7 @@ class BaseHist(Histogram):
                 f"Only projections by indices and names are supported for {self.__class__.__name__}"
             )
 
-    def plot(
+    def plot2d_full(
         self,
         fig: Optional[matplotlib.figure.Figure] = None,
         main_ax: Optional[matplotlib.axes._subplots.SubplotBase] = None,
@@ -63,11 +63,11 @@ class BaseHist(Histogram):
         Optional[matplotlib.axes._subplots.SubplotBase],
     ]:
         """
-        Plot method for BaseHist object.
+        Plot2d_full method for BaseHist object.
         """
         # Type judgement
         if len(self.axes) != 2:
-            raise TypeError("Only 2D-histogram has plot")
+            raise TypeError("Only 2D-histogram has plot2d_full")
 
         """
         Default Figure: construct the figure and axes
