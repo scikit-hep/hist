@@ -49,6 +49,52 @@ class BaseHist(Histogram):
                 f"Only projections by indices and names are supported for {self.__class__.__name__}"
             )
 
+    def plot2d(
+        self,
+        fig: Optional[matplotlib.figure.Figure] = None,
+        ax: Optional[matplotlib.axes._subplots.SubplotBase] = None,
+        **kwargs,
+    ) -> Tuple[
+        Optional[matplotlib.figure.Figure],
+        Optional[matplotlib.axes._subplots.SubplotBase],
+    ]:
+        """
+        Plot2d method for BaseHist object.
+        """
+        # Type judgement
+        if len(self.axes) != 2:
+            raise TypeError("Only 2D-histogram has plot2d_full")
+
+        """
+        Default Figure: construct the figure and axes
+        """
+        if fig is None:
+            fig = plt.figure(figsize=(8, 8))
+            grid = fig.add_gridspec(4, 4, hspace=0, wspace=0)
+
+        if ax is None:
+            ax = fig.add_subplot(grid[:, :])
+
+        """
+        Plot: plot the 2d-histogram
+        """
+        X, Y = self.axes.edges
+        ax.pcolormesh(X.T, Y.T, self.view().T, **kwargs)
+
+        if self.axes[0].name:
+            ax.set_xlabel(self.axes[0].name)
+        else:
+            ax.set_xlabel(self.axes[0].title)
+
+        if self.axes[1].name:
+            ax.set_ylabel(self.axes[1].name)
+        else:
+            ax.set_ylabel(self.axes[1].title)
+
+        fig.add_axes(ax)
+
+        return fig, ax
+
     def plot2d_full(
         self,
         fig: Optional[matplotlib.figure.Figure] = None,

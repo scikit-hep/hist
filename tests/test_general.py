@@ -224,7 +224,21 @@ def test_basic_usage():
             assert h.project(*str_perm)
 
     """
-    Plot
+    Plot2d
+    """
+    h = Hist(
+        axis.Regular(
+            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+        ),
+        axis.Regular(
+            50, -4, 4, name="B", title="b [units]", underflow=False, overflow=False
+        ),
+    ).fill(np.random.normal(size=10), np.random.normal(size=10))
+
+    assert h.plot2d(cmap="cividis")
+
+    """
+    Plot2d_full
     """
     h = Hist(
         axis.Regular(
@@ -397,7 +411,31 @@ def test_errors():
         h.project("G", "H")
 
     """
-    Plot
+    Plot2d
+    """
+    # dimension error
+    h = Hist(
+        axis.Regular(
+            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+        ),
+        axis.Regular(
+            50, -4, 4, name="B", title="b [units]", underflow=False, overflow=False
+        ),
+    ).fill(np.random.normal(size=10), np.random.normal(size=10))
+
+    with pytest.raises(Exception):
+        h.project("A").plot2d()
+
+    # wrong kwargs names
+    with pytest.raises(Exception):
+        h.plot2d(abc="red")
+
+    # wrong kwargs type
+    with pytest.raises(Exception):
+        h.plot2d(cmap=0.1)
+
+    """
+    Plot2d_full
     """
     # dimension error
     h = Hist(
