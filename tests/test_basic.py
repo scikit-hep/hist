@@ -276,6 +276,28 @@ def test_basic_usage():
     )
 
     """
+    Plot
+    """
+    h = BaseHist(
+        axis.Regular(
+            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+        ),
+    ).fill(np.random.normal(size=10))
+
+    assert h.plot(color="green", ls="--", lw=3)
+
+    h = BaseHist(
+        axis.Regular(
+            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+        ),
+        axis.Regular(
+            50, -4, 4, name="B", title="b [units]", underflow=False, overflow=False
+        ),
+    ).fill(np.random.normal(size=10), np.random.normal(size=10))
+
+    assert h.plot(cmap="cividis")
+
+    """
     Pull Plot
     """
     h = BaseHist(
@@ -502,6 +524,41 @@ def test_errors():
     # wrong kwargs type
     with pytest.raises(Exception):
         h.plot2d_full(main_cmap=0.1, side_lw="autumn")
+
+    """
+    Plot
+    """
+    # dimension error
+    h = BaseHist(
+        axis.Regular(
+            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+        ),
+        axis.Regular(
+            50, -4, 4, name="B", title="b [units]", underflow=False, overflow=False
+        ),
+        axis.Regular(
+            50, -4, 4, name="C", title="c [units]", underflow=False, overflow=False
+        ),
+    ).fill(
+        np.random.normal(size=10), np.random.normal(size=10), np.random.normal(size=10)
+    )
+
+    with pytest.raises(Exception):
+        h.plot()
+
+    # wrong kwargs names
+    with pytest.raises(Exception):
+        h.project("A").plot(abc="red")
+
+    with pytest.raises(Exception):
+        h.project("A", "C").plot(abc="red")
+
+    # wrong kwargs type
+    with pytest.raises(Exception):
+        h.project("B").plot(ls="red")
+
+    with pytest.raises(Exception):
+        h.project("A", "C").plot(cmap=0.1)
 
     """
     Pull Plot

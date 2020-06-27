@@ -49,6 +49,19 @@ class BaseHist(Histogram):
                 f"Only projections by indices and names are supported for {self.__class__.__name__}"
             )
 
+    def plot(
+        self, *args, **kwargs,
+    ):  # ToDo: how to add return type hints
+        """
+        Plot method for BaseHist object.
+        """
+        if len(self.axes) == 1:
+            return self.plot1d(*args, **kwargs), None
+        elif len(self.axes) == 2:
+            return self.plot2d(*args, **kwargs)
+        else:
+            raise NotImplemented("Please project to 1D or 2D before calling plot")
+
     def plot1d(
         self,
         fig: Optional[matplotlib.figure.Figure] = None,
