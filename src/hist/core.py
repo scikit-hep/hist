@@ -165,7 +165,7 @@ class BaseHist(Histogram):
 
         return fig, main_ax, top_ax, side_ax
 
-    def pull_plot(
+    def plot_pull(
         self,
         func: Callable,
         fig: Optional[matplotlib.figure.Figure] = None,
@@ -178,7 +178,7 @@ class BaseHist(Histogram):
         Optional[matplotlib.axes._subplots.SubplotBase],
     ]:
         """
-        Pull_plot method for BaseHist object.
+        Plot_pull method for BaseHist object.
         """
 
         # Type judgement

@@ -9,7 +9,7 @@ from uncertainties import unumpy as unp
 def test_basic_usage():
     """
         Test basic usage -- whether Hist are properly derived from
-        boost-histogram and whether pull_plot method work.
+        boost-histogram and whether plot_pull method work.
     """
 
     """
@@ -258,7 +258,7 @@ def test_basic_usage():
         exp = unp.exp if a.dtype == np.dtype("O") else np.exp
         return a * exp(-((x - x0) ** 2) / (2 * sigma ** 2)) + offset
 
-    assert h.pull_plot(
+    assert h.plot_pull(
         pdf,
         eb_ecolor="crimson",
         eb_mfc="crimson",
@@ -437,59 +437,59 @@ def test_errors():
     ).fill(np.random.normal(size=10), np.random.normal(size=10))
 
     with pytest.raises(Exception):
-        hh.pull_plot(pdf)
+        hh.plot_pull(pdf)
 
     # not callable
     with pytest.raises(Exception):
-        h.pull_plot("1")
+        h.plot_pull("1")
 
     with pytest.raises(Exception):
-        h.pull_plot(1)
+        h.plot_pull(1)
 
     with pytest.raises(Exception):
-        h.pull_plot(0.1)
+        h.plot_pull(0.1)
 
     with pytest.raises(Exception):
-        h.pull_plot((1, 2))
+        h.plot_pull((1, 2))
 
     with pytest.raises(Exception):
-        h.pull_plot([1, 2])
+        h.plot_pull([1, 2])
 
     with pytest.raises(Exception):
-        h.pull_plot({"a": 1})
+        h.plot_pull({"a": 1})
 
     # wrong kwargs names
     with pytest.raises(Exception):
-        h.pull_plot(pdf, abc="crimson", xyz="crimson")
+        h.plot_pull(pdf, abc="crimson", xyz="crimson")
 
     with pytest.raises(Exception):
-        h.pull_plot(pdf, ecolor="crimson", mfc="crimson")
+        h.plot_pull(pdf, ecolor="crimson", mfc="crimson")
 
     # disabled params
     with pytest.raises(Exception):
-        h.pull_plot(pdf, eb_label="value")
+        h.plot_pull(pdf, eb_label="value")
 
     with pytest.raises(Exception):
-        h.pull_plot(pdf, vp_label="value")
+        h.plot_pull(pdf, vp_label="value")
 
     with pytest.raises(Exception):
-        h.pull_plot(pdf, fp_label="value")
+        h.plot_pull(pdf, fp_label="value")
 
     with pytest.raises(Exception):
-        h.pull_plot(pdf, ub_label="value")
+        h.plot_pull(pdf, ub_label="value")
 
     with pytest.raises(Exception):
-        h.pull_plot(pdf, bar_label="value")
+        h.plot_pull(pdf, bar_label="value")
 
     with pytest.raises(Exception):
-        h.pull_plot(pdf, pp_label="value")
+        h.plot_pull(pdf, pp_label="value")
 
     with pytest.raises(Exception):
-        h.pull_plot(pdf, ub_color="value")
+        h.plot_pull(pdf, ub_color="value")
 
     with pytest.raises(Exception):
-        h.pull_plot(pdf, bar_width="value")
+        h.plot_pull(pdf, bar_width="value")
 
     # wrong kwargs types
     with pytest.raises(Exception):
-        h.pull_plot(pdf, eb_ecolor=1.0, eb_mfc=1.0)  # kwargs should be str
+        h.plot_pull(pdf, eb_ecolor=1.0, eb_mfc=1.0)  # kwargs should be str
