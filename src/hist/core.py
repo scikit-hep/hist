@@ -49,6 +49,47 @@ class BaseHist(Histogram):
                 f"Only projections by indices and names are supported for {self.__class__.__name__}"
             )
 
+    def plot1d(
+        self,
+        fig: Optional[matplotlib.figure.Figure] = None,
+        ax: Optional[matplotlib.axes._subplots.SubplotBase] = None,
+        **kwargs,
+    ) -> Tuple[
+        Optional[matplotlib.figure.Figure],
+        Optional[matplotlib.axes._subplots.SubplotBase],
+    ]:
+        """
+        Plot1d method for BaseHist object.
+        """
+        # Type judgement
+        if len(self.axes) != 1:
+            raise TypeError("Only 1D-histogram has plot1d")
+
+        """
+        Default Figure: construct the figure and axes
+        """
+        if fig is None:
+            fig = plt.figure(figsize=(8, 8))
+            grid = fig.add_gridspec(4, 4, hspace=0, wspace=0)
+
+        if ax is None:
+            ax = fig.add_subplot(grid[:, :])
+
+        """
+        Plot: plot the 1d-histogram
+        """
+        ax.step(self.axes.edges[0][:-1], self.project(0).view(), **kwargs)
+        if self.axes[0].name:
+            ax.set_xlabel(self.axes[0].name)
+        else:
+            ax.set_xlabel(self.axes[0].title)
+
+        ax.set_ylabel("Counts")
+
+        fig.add_axes(ax)
+
+        return fig, ax
+
     def plot2d(
         self,
         fig: Optional[matplotlib.figure.Figure] = None,
@@ -63,7 +104,7 @@ class BaseHist(Histogram):
         """
         # Type judgement
         if len(self.axes) != 2:
-            raise TypeError("Only 2D-histogram has plot2d_full")
+            raise TypeError("Only 2D-histogram has plot2d")
 
         """
         Default Figure: construct the figure and axes

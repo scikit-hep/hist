@@ -269,6 +269,17 @@ def test_basic_usage():
             assert h.project(*str_perm)
 
     """
+    Plot1d
+    """
+    h = NamedHist(
+        axis.Regular(
+            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+        ),
+    ).fill(A=np.random.normal(size=10))
+
+    assert h.plot1d(color="green", ls="--", lw=3)
+
+    """
     Plot2d
     """
     h = NamedHist(
@@ -520,6 +531,30 @@ def test_errors():
 
     with pytest.raises(Exception):
         h.project("G", "H")
+
+    """
+    Plot1d
+    """
+    # dimension error
+    h = NamedHist(
+        axis.Regular(
+            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+        ),
+        axis.Regular(
+            50, -4, 4, name="B", title="b [units]", underflow=False, overflow=False
+        ),
+    ).fill(B=np.random.normal(size=10), A=np.random.normal(size=10))
+
+    with pytest.raises(Exception):
+        h.plot1d()
+
+    # wrong kwargs names
+    with pytest.raises(Exception):
+        h.project("A").plot1d(abc="red")
+
+    # wrong kwargs type
+    with pytest.raises(Exception):
+        h.project("B").plot1d(ls="red")
 
     """
     Plot2d
