@@ -294,28 +294,6 @@ def test_basic_usage():
     assert h.plot2d(cmap="cividis")
 
     """
-    Plot
-    """
-    h = NamedHist(
-        axis.Regular(
-            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
-        ),
-    ).fill(A=np.random.normal(size=10))
-
-    assert h.plot(color="green", ls="--", lw=3)
-
-    h = NamedHist(
-        axis.Regular(
-            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
-        ),
-        axis.Regular(
-            50, -4, 4, name="B", title="b [units]", underflow=False, overflow=False
-        ),
-    ).fill(B=np.random.normal(size=10), A=np.random.normal(size=10))
-
-    assert h.plot(cmap="cividis")
-
-    """
     Plot2d_full
     """
     h = NamedHist(
@@ -338,7 +316,29 @@ def test_basic_usage():
     )
 
     """
-    Pull Plot
+    Plot
+    """
+    h = NamedHist(
+        axis.Regular(
+            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+        ),
+    ).fill(A=np.random.normal(size=10))
+
+    assert h.plot(color="green", ls="--", lw=3)
+
+    h = NamedHist(
+        axis.Regular(
+            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+        ),
+        axis.Regular(
+            50, -4, 4, name="B", title="b [units]", underflow=False, overflow=False
+        ),
+    ).fill(B=np.random.normal(size=10), A=np.random.normal(size=10))
+
+    assert h.plot(cmap="cividis")
+
+    """
+    Plot Pull
     """
     h = NamedHist(
         axis.Regular(
@@ -667,7 +667,7 @@ def test_errors():
         h.project("A", "C").plot(cmap=0.1)
 
     """
-    Pull Plot
+    Plot Pull
     """
     # dimension error
     hh = NamedHist(

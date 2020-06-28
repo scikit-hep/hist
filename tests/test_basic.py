@@ -298,7 +298,7 @@ def test_basic_usage():
     assert h.plot(cmap="cividis")
 
     """
-    Pull Plot
+    Plot Pull
     """
     h = BaseHist(
         axis.Regular(
@@ -561,7 +561,7 @@ def test_errors():
         h.project("A", "C").plot(cmap=0.1)
 
     """
-    Pull Plot
+    Plot Pull
     """
     # dimension error
     hh = BaseHist(
