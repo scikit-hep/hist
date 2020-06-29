@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from scipy.optimize import curve_fit
 from uncertainties import correlated_values, unumpy
-from boost_histogram import Histogram
+from boost_histogram import Histogram, loc
 from typing import Callable, Optional, Tuple
 
 
@@ -241,3 +241,24 @@ class BaseHist(Histogram):
         pull_ax.set_ylabel("Pull")
 
         return fig, ax, pull_ax
+
+    def __getitem__(self, index):
+        """
+            Get histogram item.
+        """
+
+        if not hasattr(index, "__iter__"):
+            index = () + (index,)
+
+        t: tuple = ()
+        for i, idx in enumerate(index):
+            if isinstance(idx, complex):
+                begin = self.axes[i].edges[0]
+                end = self.axes[i].edges[-1]
+                bins = len(self.axes[0].edges) - 1
+                interval_len = (end - begin) / bins # ToDo: is there a better way?
+                t += (loc(idx.imag + idx.real * interval_len),)
+            else:
+                t += (idx,)
+
+        return super().__getitem__(t)
