@@ -256,7 +256,7 @@ class BaseHist(Histogram):
                 begin = self.axes[i].edges[0]
                 end = self.axes[i].edges[-1]
                 bins = len(self.axes[0].edges) - 1
-                interval_len = (end - begin) / bins # ToDo: is there a better way?
+                interval_len = (end - begin) / bins  # ToDo: is there a better way?
                 t += (loc(idx.imag + idx.real * interval_len),)
             else:
                 t += (idx,)
