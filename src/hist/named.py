@@ -1,5 +1,6 @@
 from .core import BaseHist
 import numpy as np
+from typing import Union, Tuple
 
 
 class NamedHist(BaseHist):
@@ -10,7 +11,22 @@ class NamedHist(BaseHist):
 
         super().__init__(*args, **kwargs)
         if "" in self.names:
-            raise Exception("Each axes in the NamedHist instance should have a name.")
+            raise Exception(
+                f"Each axes in the {self.__class__.__name__} instance should have a name"
+            )
+
+    def project(self, *args: Union[int, str]):
+        """
+        Projection of axis idx.
+        """
+
+        # ToDo: should work in boost-histogram 0.8.0
+        # if len(args) == 0 or all(isinstance(x, str) for x in args):
+        #     return super().project(*args)
+
+        # else: raise TypeError(f"Only projections by names are supported for {self.__class__.__name__}")
+
+        return super().project(*args)
 
     def fill(self, *args, **kwargs):
         """
@@ -26,13 +42,13 @@ class NamedHist(BaseHist):
                     indices.append(index)
                     values.append(val)
                     break
+            else:
+                raise ValueError("The axis names could not be found")
 
         d = dict(zip(indices, values))
         l = sorted(d.items(), key=lambda item: item[0])
         nd = np.asarray(l, dtype=object)
         data = nd.ravel()[1::2]
-        if len(data) != len(self.axes):
-            raise Exception("The axis names could not be found when filling.")
         super().fill(*data)
 
         return self

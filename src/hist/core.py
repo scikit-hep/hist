@@ -2,16 +2,34 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
+from matplotlib import transforms
 from scipy.optimize import curve_fit
 from uncertainties import correlated_values, unumpy
 from boost_histogram import Histogram
-from typing import Callable, Optional, Tuple
+from typing import Callable, Optional, Tuple, Union
+
+# typing alias
+Plot1D_RetType = Tuple[matplotlib.figure.Figure, matplotlib.axes._subplots.SubplotBase]
+Plot2D_RetType = Tuple[
+    matplotlib.figure.Figure, matplotlib.axes._subplots.SubplotBase,
+]
+Plot2DFull_RetType = Tuple[
+    matplotlib.figure.Figure,
+    matplotlib.axes._subplots.SubplotBase,
+    matplotlib.axes._subplots.SubplotBase,
+    matplotlib.axes._subplots.SubplotBase,
+]
+PlotPull_RetType = Tuple[
+    matplotlib.figure.Figure,
+    matplotlib.axes._subplots.SubplotBase,
+    matplotlib.axes._subplots.SubplotBase,
+]
 
 
 class BaseHist(Histogram):
     def __init__(self, *args, **kwargs):
         """
-            Initialize Hist object. Axis params must contain the names.
+            Initialize BaseHist object. Axis params can contain the names.
         """
 
         super().__init__(*args, **kwargs)
@@ -19,37 +37,259 @@ class BaseHist(Histogram):
         for ax in self.axes:
             if ax.name in self.names:
                 raise Exception(
-                    "Hist instance cannot contain axes with duplicated names."
+                    f"{self.__class__.__name__} instance cannot contain axes with duplicated names."
                 )
             else:
                 self.names[ax.name] = True
 
-    def pull_plot(
+    def project(self, *args: Union[int, str]):
+        """
+        Projection of axis idx.
+        """
+        if len(args) == 0 or all(isinstance(x, int) for x in args):
+            return super().project(*args)
+
+        elif all(isinstance(x, str) for x in args):
+            indices: tuple = tuple()
+            for name in args:
+                for index, axis in enumerate(self.axes):
+                    if name == axis.name:
+                        indices += (index,)
+                        break
+                else:
+                    raise ValueError("The axis names could not be found")
+
+            return super().project(*indices)
+
+        else:
+            raise TypeError(
+                f"Only projections by indices and names are supported for {self.__class__.__name__}"
+            )
+
+    def plot(self, *args, **kwargs,) -> Union[Plot1D_RetType, Plot2D_RetType]:
+        """
+        Plot method for BaseHist object.
+        """
+        if len(self.axes) == 1:
+            return self.plot1d(*args, **kwargs), None
+        elif len(self.axes) == 2:
+            return self.plot2d(*args, **kwargs)
+        else:
+            raise NotImplemented("Please project to 1D or 2D before calling plot")
+
+    def plot1d(
+        self,
+        fig: Optional[matplotlib.figure.Figure] = None,
+        ax: Optional[matplotlib.axes._subplots.SubplotBase] = None,
+        **kwargs,
+    ) -> Plot1D_RetType:
+        """
+        Plot1d method for BaseHist object.
+        """
+        # Type judgement
+        if len(self.axes) != 1:
+            raise TypeError("Only 1D-histogram has plot1d")
+
+        """
+        Default Figure: construct the figure and axes
+        """
+        if fig is None:
+            fig = plt.figure(figsize=(8, 8))
+            grid = fig.add_gridspec(4, 4, hspace=0, wspace=0)
+
+        if ax is None:
+            ax = fig.add_subplot(grid[:, :])
+
+        """
+        Plot: plot the 1d-histogram
+        """
+        ax.step(self.axes.edges[0][:-1], self.project(0).view(), **kwargs)
+        if self.axes[0].name:
+            ax.set_xlabel(self.axes[0].name)
+        else:
+            ax.set_xlabel(self.axes[0].title)
+
+        ax.set_ylabel("Counts")
+
+        fig.add_axes(ax)
+
+        return fig, ax
+
+    def plot2d(
+        self,
+        fig: Optional[matplotlib.figure.Figure] = None,
+        ax: Optional[matplotlib.axes._subplots.SubplotBase] = None,
+        **kwargs,
+    ) -> Plot2D_RetType:
+        """
+        Plot2d method for BaseHist object.
+        """
+        # Type judgement
+        if len(self.axes) != 2:
+            raise TypeError("Only 2D-histogram has plot2d")
+
+        """
+        Default Figure: construct the figure and axes
+        """
+        if fig is None:
+            fig = plt.figure(figsize=(8, 8))
+            grid = fig.add_gridspec(4, 4, hspace=0, wspace=0)
+
+        if ax is None:
+            ax = fig.add_subplot(grid[:, :])
+
+        """
+        Plot: plot the 2d-histogram
+        """
+        X, Y = self.axes.edges
+        ax.pcolormesh(X.T, Y.T, self.view().T, **kwargs)
+
+        if self.axes[0].name:
+            ax.set_xlabel(self.axes[0].name)
+        else:
+            ax.set_xlabel(self.axes[0].title)
+
+        if self.axes[1].name:
+            ax.set_ylabel(self.axes[1].name)
+        else:
+            ax.set_ylabel(self.axes[1].title)
+
+        fig.add_axes(ax)
+
+        return fig, ax
+
+    def plot2d_full(
+        self,
+        fig: Optional[matplotlib.figure.Figure] = None,
+        main_ax: Optional[matplotlib.axes._subplots.SubplotBase] = None,
+        top_ax: Optional[matplotlib.axes._subplots.SubplotBase] = None,
+        side_ax: Optional[matplotlib.axes._subplots.SubplotBase] = None,
+        **kwargs,
+    ) -> Plot2DFull_RetType:
+        """
+        Plot2d_full method for BaseHist object.
+        """
+        # Type judgement
+        if len(self.axes) != 2:
+            raise TypeError("Only 2D-histogram has plot2d_full")
+
+        """
+        Default Figure: construct the figure and axes
+        """
+        if fig is None:
+            fig = plt.figure(figsize=(8, 8))
+            grid = fig.add_gridspec(4, 4, hspace=0, wspace=0)
+
+        if main_ax is None:
+            main_ax = fig.add_subplot(grid[1:4, 0:3])
+
+        if top_ax is None:
+            top_ax = fig.add_subplot(grid[0:1, 0:3], sharex=main_ax)
+
+        if side_ax is None:
+            side_ax = fig.add_subplot(grid[1:4, 3:4], sharey=main_ax)
+
+        """
+        Keyword Argument Conversion: convert the kwargs to several independent args
+        """
+        # main plot keyword arguments
+        main_kwargs = dict()
+        for kw in kwargs.keys():
+            if kw[:4] == "main":
+                main_kwargs[kw[5:]] = kwargs[kw]
+
+        for k in main_kwargs:
+            kwargs.pop("main_" + k)
+
+        # top plot keyword arguments
+        top_kwargs = dict()
+        for kw in kwargs.keys():
+            if kw[:3] == "top":
+                top_kwargs[kw[4:]] = kwargs[kw]
+
+        for k in top_kwargs:
+            kwargs.pop("top_" + k)
+
+        # side plot keyword arguments
+        side_kwargs = dict()
+        for kw in kwargs.keys():
+            if kw[:4] == "side":
+                side_kwargs[kw[5:]] = kwargs[kw]
+
+        for k in side_kwargs:
+            kwargs.pop("side_" + k)
+
+        # judge whether some arguements left
+        if len(kwargs):
+            raise ValueError(f"'{list(kwargs.keys())[0]}' not needed")
+
+        """
+        Plot: plot the 2d-histogram
+        """
+        # main plot
+        X, Y = self.axes.edges
+        main_ax.pcolormesh(X.T, Y.T, self.view().T, **main_kwargs)
+
+        if self.axes[0].name:
+            main_ax.set_xlabel(self.axes[0].name)
+        else:
+            main_ax.set_xlabel(self.axes[0].title)
+
+        if self.axes[1].name:
+            main_ax.set_ylabel(self.axes[1].name)
+        else:
+            main_ax.set_ylabel(self.axes[1].title)
+
+        # top plot
+        top_ax.step(self.axes.edges[1][0][:-1], self.project(0).view(), **top_kwargs)
+        top_ax.spines["top"].set_visible(False)
+        top_ax.spines["right"].set_visible(False)
+        top_ax.xaxis.set_visible(False)
+
+        top_ax.set_ylabel("Counts")
+
+        # side plot
+        base = plt.gca().transData
+        rot = transforms.Affine2D().rotate_deg(90)
+        side_ax.step(
+            self.axes.edges[1][0][:-1],
+            -self.project(1).view(),
+            transform=rot + base,
+            **side_kwargs,
+        )
+        side_ax.spines["top"].set_visible(False)
+        side_ax.spines["right"].set_visible(False)
+        side_ax.yaxis.set_visible(False)
+
+        side_ax.set_xlabel("Counts")
+
+        fig.add_axes(main_ax)
+        fig.add_axes(top_ax)
+        fig.add_axes(side_ax)
+
+        return fig, main_ax, top_ax, side_ax
+
+    def plot_pull(
         self,
         func: Callable,
         fig: Optional[matplotlib.figure.Figure] = None,
         ax: Optional[matplotlib.axes._subplots.SubplotBase] = None,
         pull_ax: Optional[matplotlib.axes._subplots.SubplotBase] = None,
         **kwargs,
-    ) -> Tuple[
-        Optional[matplotlib.figure.Figure],
-        Optional[matplotlib.axes._subplots.SubplotBase],
-        Optional[matplotlib.axes._subplots.SubplotBase],
-    ]:
+    ) -> PlotPull_RetType:
         """
-        Pull_plot method for Hist object.
+        Plot_pull method for BaseHist object.
         """
 
         # Type judgement
         if callable(func) == False:
-            raise TypeError("Callable parameter func is supported in pull plot.")
+            raise TypeError("Callable parameter func is supported in pull plot")
         if len(self.axes) != 1:
-            raise TypeError("Only 1D-histogram has pull plot.")
+            raise TypeError("Only 1D-histogram has pull plot")
 
         """
         Computation and Fit
         """
-
         yerr = np.sqrt(self.view())
 
         # Compute fit values: using func as fit model
@@ -75,18 +315,12 @@ class BaseHist(Histogram):
         if fig is None:
             fig = plt.figure(figsize=(8, 8))
             grid = fig.add_gridspec(2, 1, hspace=0, height_ratios=[3, 1])
-        else:
-            grid = fig.add_gridspec(4, 4, wspace=0, hspace=0)
 
         if ax is None:
             ax = fig.add_subplot(grid[0])
-        else:
-            pass
 
         if pull_ax is None:
             pull_ax = fig.add_subplot(grid[1], sharex=ax)
-        else:
-            pass
 
         """
         Keyword Argument Conversion: convert the kwargs to several independent args
@@ -170,7 +404,7 @@ class BaseHist(Histogram):
                     continue
                 # disabled argument
                 if kw == "pp_label":
-                    raise ValueError(f"'pp_label' not needed.")
+                    raise ValueError(f"'pp_label' not needed")
                 pp_kwargs[kw[3:]] = kwargs[kw]
 
         if "pp_num" in kwargs:
@@ -180,7 +414,7 @@ class BaseHist(Histogram):
 
         # judge whether some arguements left
         if len(kwargs):
-            raise ValueError(f"'{list(kwargs.keys())[0]}' not needed.")
+            raise ValueError(f"'{list(kwargs.keys())[0]}' not needed")
 
         """
         Main: plot the pulls using Matplotlib errorbar and plot methods
@@ -198,9 +432,7 @@ class BaseHist(Histogram):
             **ub_kwargs,
         )
         legend = ax.legend(loc=0)
-
         ax.set_ylabel("Counts")
-        fig.add_axes(ax)
 
         """
         Pull: plot the pulls using Matplotlib bar method
@@ -229,15 +461,15 @@ class BaseHist(Histogram):
                 downRect_startpoint, patch_width, patch_height, **pp_kwargs
             )
             pull_ax.add_patch(downRect)
-
         plt.xlim(left_edge, right_edge)
-
-        fig.add_axes(pull_ax)
 
         if self.axes[0].name:
             pull_ax.set_xlabel(self.axes[0].name)
         else:
             pull_ax.set_xlabel(self.axes[0].title)
         pull_ax.set_ylabel("Pull")
+
+        fig.add_axes(ax)
+        fig.add_axes(pull_ax)
 
         return fig, ax, pull_ax

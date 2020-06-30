@@ -25,7 +25,7 @@ class Regular(bha.Regular):
         elif re.match(r"^[a-zA-Z][a-zA-Z0-9_]*$", name):
             metadata["name"] = name
         else:
-            raise Exception("Name should be a valid Python identifier.")
+            raise Exception("Name should be a valid Python identifier")
         metadata["title"] = title
         super(bha.Regular, self).__init__(
             bins,
@@ -85,7 +85,7 @@ class Bool(bha.Regular):
         elif re.match(r"^[a-zA-Z][a-zA-Z0-9_]*$", name):
             metadata["name"] = name
         else:
-            raise Exception("Name should be a valid Python identifier.")
+            raise Exception("Name should be a valid Python identifier")
         metadata["title"] = title
         super(bha.Regular, self).__init__(
             2,
@@ -144,7 +144,7 @@ class Variable(bha.Variable):
         elif re.match(r"^[a-zA-Z][a-zA-Z0-9_]*$", name):
             metadata["name"] = name
         else:
-            raise Exception("Name should be a valid Python identifier.")
+            raise Exception("Name should be a valid Python identifier")
         metadata["title"] = title
         super(bha.Variable, self).__init__(
             edges,
@@ -200,7 +200,7 @@ class Integer(bha.Integer):
         elif re.match(r"^[a-zA-Z][a-zA-Z0-9_]*$", name):
             metadata["name"] = name
         else:
-            raise Exception("Name should be a valid Python identifier.")
+            raise Exception("Name should be a valid Python identifier")
         metadata["title"] = title
         super(bha.Integer, self).__init__(
             start,
@@ -254,7 +254,7 @@ class IntCategory(bha.IntCategory):
         elif re.match(r"^[a-zA-Z][a-zA-Z0-9_]*$", name):
             metadata["name"] = name
         else:
-            raise Exception("Name should be a valid Python identifier.")
+            raise Exception("Name should be a valid Python identifier")
         metadata["title"] = title
         super(bha.IntCategory, self).__init__(
             categories, metadata=metadata, growth=growth
@@ -303,7 +303,7 @@ class StrCategory(bha.StrCategory):
         elif re.match(r"^[a-zA-Z][a-zA-Z0-9_]*$", name):
             metadata["name"] = name
         else:
-            raise Exception("Name should be a valid Python identifier.")
+            raise Exception("Name should be a valid Python identifier")
         metadata["title"] = title
         super(bha.StrCategory, self).__init__(
             categories, metadata=metadata, growth=growth

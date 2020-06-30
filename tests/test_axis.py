@@ -9,7 +9,9 @@ def test_basic_usage():
         Test basic usage -- whether axis names work.
     """
 
-    # right axis names
+    """
+    Names
+    """
     assert axis.Regular(50, -3, 3, name="x0")
     assert axis.Bool(name="x_")
     assert axis.Variable(range(-3, 3), name="xx")
@@ -30,7 +32,10 @@ def test_errors():
         Test errors -- whether name exceptions are thrown.
     """
 
-    # wrong axis names: protected or private prefix
+    """
+    Names
+    """
+    # protected or private prefix
     with pytest.raises(Exception):
         axis.Regular(50, -3, 3, name="_x")
 
@@ -49,7 +54,7 @@ def test_errors():
     with pytest.raises(Exception):
         axis.StrCategory("FT", name="_xX")
 
-    # wrong axis names: number prefix
+    # number prefix
     with pytest.raises(Exception):
         axis.Regular(50, -3, 3, name="0")
 
@@ -68,7 +73,7 @@ def test_errors():
     with pytest.raises(Exception):
         axis.StrCategory("FT", name="0xx")
 
-    # wrong axis names: unsupported chr
+    # unsupported chr
     with pytest.raises(Exception):
         axis.Regular(50, -3, 3, name="-x")
 
