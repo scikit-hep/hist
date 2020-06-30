@@ -8,6 +8,23 @@ from uncertainties import correlated_values, unumpy
 from boost_histogram import Histogram
 from typing import Callable, Optional, Tuple, Union
 
+# typing alias
+Plot1D_RetType = Tuple[matplotlib.figure.Figure, matplotlib.axes._subplots.SubplotBase]
+Plot2D_RetType = Tuple[
+    matplotlib.figure.Figure, matplotlib.axes._subplots.SubplotBase,
+]
+Plot2DFull_RetType = Tuple[
+    matplotlib.figure.Figure,
+    matplotlib.axes._subplots.SubplotBase,
+    matplotlib.axes._subplots.SubplotBase,
+    matplotlib.axes._subplots.SubplotBase,
+]
+PlotPull_RetType = Tuple[
+    matplotlib.figure.Figure,
+    matplotlib.axes._subplots.SubplotBase,
+    matplotlib.axes._subplots.SubplotBase,
+]
+
 
 class BaseHist(Histogram):
     def __init__(self, *args, **kwargs):
@@ -49,9 +66,7 @@ class BaseHist(Histogram):
                 f"Only projections by indices and names are supported for {self.__class__.__name__}"
             )
 
-    def plot(
-        self, *args, **kwargs,
-    ):  # ToDo: how to add return type hints
+    def plot(self, *args, **kwargs,) -> Union[Plot1D_RetType, Plot2D_RetType]:
         """
         Plot method for BaseHist object.
         """
@@ -67,7 +82,7 @@ class BaseHist(Histogram):
         fig: Optional[matplotlib.figure.Figure] = None,
         ax: Optional[matplotlib.axes._subplots.SubplotBase] = None,
         **kwargs,
-    ) -> Tuple[matplotlib.figure.Figure, matplotlib.axes._subplots.SubplotBase]:
+    ) -> Plot1D_RetType:
         """
         Plot1d method for BaseHist object.
         """
@@ -105,7 +120,7 @@ class BaseHist(Histogram):
         fig: Optional[matplotlib.figure.Figure] = None,
         ax: Optional[matplotlib.axes._subplots.SubplotBase] = None,
         **kwargs,
-    ) -> Tuple[matplotlib.figure.Figure, matplotlib.axes._subplots.SubplotBase]:
+    ) -> Plot2D_RetType:
         """
         Plot2d method for BaseHist object.
         """
@@ -150,12 +165,7 @@ class BaseHist(Histogram):
         top_ax: Optional[matplotlib.axes._subplots.SubplotBase] = None,
         side_ax: Optional[matplotlib.axes._subplots.SubplotBase] = None,
         **kwargs,
-    ) -> Tuple[
-        matplotlib.figure.Figure,
-        matplotlib.axes._subplots.SubplotBase,
-        matplotlib.axes._subplots.SubplotBase,
-        matplotlib.axes._subplots.SubplotBase,
-    ]:
+    ) -> Plot2DFull_RetType:
         """
         Plot2d_full method for BaseHist object.
         """
@@ -266,11 +276,7 @@ class BaseHist(Histogram):
         ax: Optional[matplotlib.axes._subplots.SubplotBase] = None,
         pull_ax: Optional[matplotlib.axes._subplots.SubplotBase] = None,
         **kwargs,
-    ) -> Tuple[
-        matplotlib.figure.Figure,
-        matplotlib.axes._subplots.SubplotBase,
-        matplotlib.axes._subplots.SubplotBase,
-    ]:
+    ) -> PlotPull_RetType:
         """
         Plot_pull method for BaseHist object.
         """
