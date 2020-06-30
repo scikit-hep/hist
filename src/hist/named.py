@@ -20,7 +20,7 @@ class NamedHist(BaseHist):
         Projection of axis idx.
         """
 
-        # ToDo: should work
+        # ToDo: should work in boost-histogram 0.8.0
         # if len(args) == 0 or all(isinstance(x, str) for x in args):
         #     return super().project(*args)
 
