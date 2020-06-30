@@ -67,10 +67,7 @@ class BaseHist(Histogram):
         fig: Optional[matplotlib.figure.Figure] = None,
         ax: Optional[matplotlib.axes._subplots.SubplotBase] = None,
         **kwargs,
-    ) -> Tuple[
-        Optional[matplotlib.figure.Figure],
-        Optional[matplotlib.axes._subplots.SubplotBase],
-    ]:
+    ) -> Tuple[matplotlib.figure.Figure, matplotlib.axes._subplots.SubplotBase]:
         """
         Plot1d method for BaseHist object.
         """
@@ -108,10 +105,7 @@ class BaseHist(Histogram):
         fig: Optional[matplotlib.figure.Figure] = None,
         ax: Optional[matplotlib.axes._subplots.SubplotBase] = None,
         **kwargs,
-    ) -> Tuple[
-        Optional[matplotlib.figure.Figure],
-        Optional[matplotlib.axes._subplots.SubplotBase],
-    ]:
+    ) -> Tuple[matplotlib.figure.Figure, matplotlib.axes._subplots.SubplotBase]:
         """
         Plot2d method for BaseHist object.
         """
@@ -157,10 +151,10 @@ class BaseHist(Histogram):
         side_ax: Optional[matplotlib.axes._subplots.SubplotBase] = None,
         **kwargs,
     ) -> Tuple[
-        Optional[matplotlib.figure.Figure],
-        Optional[matplotlib.axes._subplots.SubplotBase],
-        Optional[matplotlib.axes._subplots.SubplotBase],
-        Optional[matplotlib.axes._subplots.SubplotBase],
+        matplotlib.figure.Figure,
+        matplotlib.axes._subplots.SubplotBase,
+        matplotlib.axes._subplots.SubplotBase,
+        matplotlib.axes._subplots.SubplotBase,
     ]:
         """
         Plot2d_full method for BaseHist object.
@@ -273,9 +267,9 @@ class BaseHist(Histogram):
         pull_ax: Optional[matplotlib.axes._subplots.SubplotBase] = None,
         **kwargs,
     ) -> Tuple[
-        Optional[matplotlib.figure.Figure],
-        Optional[matplotlib.axes._subplots.SubplotBase],
-        Optional[matplotlib.axes._subplots.SubplotBase],
+        matplotlib.figure.Figure,
+        matplotlib.axes._subplots.SubplotBase,
+        matplotlib.axes._subplots.SubplotBase,
     ]:
         """
         Plot_pull method for BaseHist object.
