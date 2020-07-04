@@ -248,7 +248,7 @@ class BaseHist(Histogram):
         """
 
         if not hasattr(index, "__iter__"):
-            index = () + (index,)
+            index = (index,)
 
         t: tuple = ()
         for i, idx in enumerate(index):
