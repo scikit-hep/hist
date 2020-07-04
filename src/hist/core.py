@@ -6,7 +6,7 @@ from matplotlib import transforms
 from scipy.optimize import curve_fit
 from uncertainties import correlated_values, unumpy
 from boost_histogram import Histogram, loc
-from typing import Callable, Optional, Tuple
+from typing import Callable, Optional, Tuple, Union
 
 # typing alias
 Plot1D_RetType = Tuple[matplotlib.figure.Figure, matplotlib.axes._subplots.SubplotBase]
