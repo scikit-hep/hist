@@ -247,17 +247,18 @@ class BaseHist(Histogram):
             Get histogram item.
         """
 
+        if isinstance(index, dict):
+            return super().__getitem__(index)
+
         if not hasattr(index, "__iter__"):
-            index = () + (index,)
+            index = (index,)
 
         t: tuple = ()
-        for i, idx in enumerate(index):
+        for idx in index:
             if isinstance(idx, complex):
-                begin = self.axes[i].edges[0]
-                end = self.axes[i].edges[-1]
-                bins = len(self.axes[0].edges) - 1
-                interval_len = (end - begin) / bins  # ToDo: is there a better way?
-                t += (loc(idx.imag + idx.real * interval_len),)
+                t += (loc(idx.imag, int(idx.real)),)
+            elif isinstance(idx, str):
+                t += (loc(idx),)
             else:
                 t += (idx,)
 
