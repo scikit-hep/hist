@@ -263,3 +263,25 @@ class BaseHist(Histogram):
                 t += (idx,)
 
         return super().__getitem__(t)
+
+    def __setitem__(self, index, value):
+        """
+            Set histogram item.
+        """
+
+        if isinstance(index, dict):
+            return super().__setitem__(index, value)
+
+        if not hasattr(index, "__iter__"):
+            index = (index,)
+
+        t: tuple = ()
+        for idx in index:
+            if isinstance(idx, complex):
+                t += (loc(idx.imag, int(idx.real)),)
+            elif isinstance(idx, str):
+                t += (loc(idx),)
+            else:
+                t += (idx,)
+
+        return super().__setitem__(t, value)
