@@ -3,6 +3,7 @@ from hist import axis, BaseHist
 import boost_histogram as bh
 import pytest
 import numpy as np
+import itertools
 from uncertainties import unumpy as unp
 
 
@@ -13,11 +14,14 @@ def test_version():
 def test_basic_usage():
     """
         Test basic usage -- whether BaseHist are properly derived from
-        boost-histogram and whether pull_plot method work.
+        boost-histogram and whether plot_pull method work.
     """
 
-    # Basic
-    h = BaseHist(axis.Regular(10, 0, 1, name="x")).fill([0.35, 0.35, 0.45])
+    """
+    Initialization
+    """
+    # basic
+    h = BaseHist(axis.Regular(10, 0, 1)).fill([0.35, 0.35, 0.45])
 
     for idx in range(10):
         if idx == 3:
@@ -27,6 +31,55 @@ def test_basic_usage():
         else:
             assert h[idx] == h[{0: idx}] == 0
 
+    # with named axes
+    assert BaseHist(
+        axis.Regular(50, -3, 3, name="x"), axis.Regular(50, -3, 3, name="y")
+    ).fill(np.random.randn(10), np.random.randn(10))
+
+    assert BaseHist(axis.Bool(name="x"), axis.Bool(name="y")).fill(
+        [True, False, True], [True, False, True]
+    )
+
+    assert BaseHist(
+        axis.Variable(range(-3, 3), name="x"), axis.Variable(range(-3, 3), name="y")
+    ).fill(np.random.randn(10), np.random.randn(10))
+
+    assert BaseHist(axis.Integer(-3, 3, name="x"), axis.Integer(-3, 3, name="y")).fill(
+        np.random.randn(10), np.random.randn(10)
+    )
+
+    assert BaseHist(
+        axis.IntCategory(range(-3, 3), name="x"),
+        axis.IntCategory(range(-3, 3), name="y"),
+    ).fill(np.random.randn(10), np.random.randn(10))
+
+    assert BaseHist(
+        axis.StrCategory(["F", "T"], name="x"), axis.StrCategory("FT", name="y")
+    ).fill(["T", "F", "T"], ["T", "F", "T"])
+
+    # with no-named axes
+    assert BaseHist(axis.Regular(50, -3, 3, name=""), axis.Regular(50, -3, 3, name="x"))
+
+    assert BaseHist(axis.Bool(name=""), axis.Bool(name="y"))
+
+    assert BaseHist(
+        axis.Variable(range(-3, 3)), axis.Variable(range(-3, 3), name="x")
+    )  # name=None will be converted to name=''
+
+    assert BaseHist(axis.Integer(-3, 3, name=""), axis.Integer(-3, 3, name="x"))
+
+    assert BaseHist(
+        axis.IntCategory(range(-3, 3), name=""),
+        axis.IntCategory(range(-3, 3), name="x"),
+    )
+
+    assert BaseHist(
+        axis.StrCategory("TF"), axis.StrCategory(["T", "F"], name="x")
+    )  # name=None will be converted to name=''
+
+    """
+    Fill
+    """
     # Regular
     h = BaseHist(
         axis.Regular(10, 0, 1, name="x"),
@@ -149,7 +202,104 @@ def test_basic_usage():
     assert z_one_only[bh.loc("T"), bh.loc("F")] == 3
     assert z_one_only[bh.loc("T"), bh.loc("T")] == 1
 
-    # right pull_plot
+    """
+    Projection
+    """
+    h = BaseHist(
+        axis.Regular(
+            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+        ),
+        axis.Bool(name="B", title="b [units]"),
+        axis.Variable(range(11), name="C", title="c [units]"),
+        axis.Integer(0, 10, name="D", title="d [units]"),
+        axis.IntCategory(range(10), name="E", title="e [units]"),
+        axis.StrCategory("FT", name="F", title="f [units]"),
+    )
+
+    # via indices
+    for num in range(6):
+        for int_perm in list(itertools.permutations(range(0, 6), num)):
+            assert h.project(*int_perm)
+
+    # via names
+    for num in range(6):
+        for str_perm in list(
+            itertools.permutations(["A", "B", "C", "D", "E", "F"], num)
+        ):
+            assert h.project(*str_perm)
+
+    """
+    Plot1d
+    """
+    h = BaseHist(
+        axis.Regular(
+            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+        ),
+    ).fill(np.random.normal(size=10))
+
+    assert h.plot1d(color="green", ls="--", lw=3)
+
+    """
+    Plot2d
+    """
+    h = BaseHist(
+        axis.Regular(
+            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+        ),
+        axis.Regular(
+            50, -4, 4, name="B", title="b [units]", underflow=False, overflow=False
+        ),
+    ).fill(np.random.normal(size=10), np.random.normal(size=10))
+
+    assert h.plot2d(cmap="cividis")
+
+    """
+    Plot2d_full
+    """
+    h = BaseHist(
+        axis.Regular(
+            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+        ),
+        axis.Regular(
+            50, -4, 4, name="B", title="b [units]", underflow=False, overflow=False
+        ),
+    ).fill(np.random.normal(size=10), np.random.normal(size=10))
+
+    assert h.plot2d_full(
+        main_cmap="cividis",
+        top_ls="--",
+        top_color="orange",
+        top_lw=2,
+        side_ls="-.",
+        side_lw=1,
+        side_color="steelblue",
+    )
+
+    """
+    Plot
+    """
+    h = BaseHist(
+        axis.Regular(
+            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+        ),
+    ).fill(np.random.normal(size=10))
+
+    assert h.plot(color="green", ls="--", lw=3)
+
+    h = BaseHist(
+        axis.Regular(
+            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+        ),
+        axis.Regular(
+            50, -4, 4, name="B", title="b [units]", underflow=False, overflow=False
+        ),
+    ).fill(np.random.normal(size=10), np.random.normal(size=10))
+
+    assert h.plot(cmap="cividis")
+
+    """
+    Plot Pull
+    """
     h = BaseHist(
         axis.Regular(
             50, -4, 4, name="S", title="s [units]", underflow=False, overflow=False
@@ -160,7 +310,7 @@ def test_basic_usage():
         exp = unp.exp if a.dtype == np.dtype("O") else np.exp
         return a * exp(-((x - x0) ** 2) / (2 * sigma ** 2)) + offset
 
-    assert h.pull_plot(
+    assert h.plot_pull(
         pdf,
         eb_ecolor="crimson",
         eb_mfc="crimson",
@@ -191,33 +341,10 @@ def test_errors():
         Test errors -- whether the name exceptions in the BaseHist are thrown.
     """
 
-    # right histogram axis names
-    assert BaseHist(
-        axis.Regular(50, -3, 3, name="x"), axis.Regular(50, -3, 3, name="y")
-    ).fill(np.random.randn(10), np.random.randn(10))
-
-    assert BaseHist(axis.Bool(name="x"), axis.Bool(name="y")).fill(
-        [True, False, True], [True, False, True]
-    )
-
-    assert BaseHist(
-        axis.Variable(range(-3, 3), name="x"), axis.Variable(range(-3, 3), name="y")
-    ).fill(np.random.randn(10), np.random.randn(10))
-
-    assert BaseHist(axis.Integer(-3, 3, name="x"), axis.Integer(-3, 3, name="y")).fill(
-        np.random.randn(10), np.random.randn(10)
-    )
-
-    assert BaseHist(
-        axis.IntCategory(range(-3, 3), name="x"),
-        axis.IntCategory(range(-3, 3), name="y"),
-    ).fill(np.random.randn(10), np.random.randn(10))
-
-    assert BaseHist(
-        axis.StrCategory(["F", "T"], name="x"), axis.StrCategory("FT", name="y")
-    ).fill(["T", "F", "T"], ["T", "F", "T"])
-
-    # wrong histogram axis names: with the same names
+    """
+    Initialization
+    """
+    # with duplicated names
     with pytest.raises(Exception):
         BaseHist(axis.Regular(50, -3, 3, name="x"), axis.Regular(50, -3, 3, name="x"))
 
@@ -243,27 +370,10 @@ def test_errors():
             axis.StrCategory("TF", name="y"), axis.StrCategory(["T", "F"], name="y")
         )
 
-    # right histogram axis names: without names
-    assert BaseHist(axis.Regular(50, -3, 3, name=""), axis.Regular(50, -3, 3, name="x"))
-
-    assert BaseHist(axis.Bool(name=""), axis.Bool(name="y"))
-
-    assert BaseHist(
-        axis.Variable(range(-3, 3)), axis.Variable(range(-3, 3), name="x")
-    )  # name=None will be converted to name=''
-
-    assert BaseHist(axis.Integer(-3, 3, name=""), axis.Integer(-3, 3, name="x"))
-
-    assert BaseHist(
-        axis.IntCategory(range(-3, 3), name=""),
-        axis.IntCategory(range(-3, 3), name="x"),
-    )
-
-    assert BaseHist(
-        axis.StrCategory("TF"), axis.StrCategory(["T", "F"], name="x")
-    )  # name=None will be converted to name=''
-
-    # wrong histogram axis names: fill with names
+    """
+    Fill
+    """
+    # with names
     with pytest.raises(Exception):
         BaseHist(
             axis.Regular(50, -3, 3, name="x"), axis.Regular(50, -3, 3, name="y")
@@ -305,7 +415,155 @@ def test_errors():
         )
     ).fill(np.random.normal(size=10))
 
-    # wrong pull_plot: dimension error
+    """
+    Projection
+    """
+    h = BaseHist(
+        axis.Regular(
+            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+        ),
+        axis.Bool(name="B", title="b [units]"),
+        axis.Variable(range(11), name="C", title="c [units]"),
+        axis.Integer(0, 10, name="D", title="d [units]"),
+        axis.IntCategory(range(10), name="E", title="e [units]"),
+        axis.StrCategory("FT", name="F", title="f [units]"),
+    )
+
+    # duplicated
+    with pytest.raises(Exception):
+        h.project(0, 0)
+
+    with pytest.raises(Exception):
+        h.project("A", "A")
+
+    # wrong/mixed types
+    with pytest.raises(Exception):
+        h.project(2, "A")
+
+    with pytest.raises(Exception):
+        h.project(True, "A")
+
+    # cannot found
+    with pytest.raises(Exception):
+        h.project(-1, 9)
+
+    with pytest.raises(Exception):
+        h.project("G", "H")
+
+    """
+    Plot1d
+    """
+    # dimension error
+    h = BaseHist(
+        axis.Regular(
+            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+        ),
+        axis.Regular(
+            50, -4, 4, name="B", title="b [units]", underflow=False, overflow=False
+        ),
+    ).fill(np.random.normal(size=10), np.random.normal(size=10))
+
+    with pytest.raises(Exception):
+        h.plot1d()
+
+    # wrong kwargs names
+    with pytest.raises(Exception):
+        h.project("A").plot1d(abc="red")
+
+    # wrong kwargs type
+    with pytest.raises(Exception):
+        h.project("B").plot1d(ls="red")
+
+    """
+    Plot2d
+    """
+    # dimension error
+    h = BaseHist(
+        axis.Regular(
+            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+        ),
+        axis.Regular(
+            50, -4, 4, name="B", title="b [units]", underflow=False, overflow=False
+        ),
+    ).fill(np.random.normal(size=10), np.random.normal(size=10))
+
+    with pytest.raises(Exception):
+        h.project("A").plot2d()
+
+    # wrong kwargs names
+    with pytest.raises(Exception):
+        h.plot2d(abc="red")
+
+    # wrong kwargs type
+    with pytest.raises(Exception):
+        h.plot2d(cmap=0.1)
+
+    """
+    Plot2d_full
+    """
+    # dimension error
+    h = BaseHist(
+        axis.Regular(
+            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+        ),
+        axis.Regular(
+            50, -4, 4, name="B", title="b [units]", underflow=False, overflow=False
+        ),
+    ).fill(np.random.normal(size=10), np.random.normal(size=10))
+
+    with pytest.raises(Exception):
+        h.project("A").plot2d_full()
+
+    # wrong kwargs names
+    with pytest.raises(Exception):
+        h.plot2d_full(abc="red")
+
+    with pytest.raises(Exception):
+        h.plot2d_full(color="red")
+
+    # wrong kwargs type
+    with pytest.raises(Exception):
+        h.plot2d_full(main_cmap=0.1, side_lw="autumn")
+
+    """
+    Plot
+    """
+    # dimension error
+    h = BaseHist(
+        axis.Regular(
+            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+        ),
+        axis.Regular(
+            50, -4, 4, name="B", title="b [units]", underflow=False, overflow=False
+        ),
+        axis.Regular(
+            50, -4, 4, name="C", title="c [units]", underflow=False, overflow=False
+        ),
+    ).fill(
+        np.random.normal(size=10), np.random.normal(size=10), np.random.normal(size=10)
+    )
+
+    with pytest.raises(Exception):
+        h.plot()
+
+    # wrong kwargs names
+    with pytest.raises(Exception):
+        h.project("A").plot(abc="red")
+
+    with pytest.raises(Exception):
+        h.project("A", "C").plot(abc="red")
+
+    # wrong kwargs type
+    with pytest.raises(Exception):
+        h.project("B").plot(ls="red")
+
+    with pytest.raises(Exception):
+        h.project("A", "C").plot(cmap=0.1)
+
+    """
+    Plot Pull
+    """
+    # dimension error
     hh = BaseHist(
         axis.Regular(
             50, -4, 4, name="X", title="s [units]", underflow=False, overflow=False
@@ -316,47 +574,59 @@ def test_errors():
     ).fill(np.random.normal(size=10), np.random.normal(size=10))
 
     with pytest.raises(Exception):
-        hh.pull_plot(pdf)
+        hh.plot_pull(pdf)
 
-    # wrong pull_plot: func not callable
+    # not callable
     with pytest.raises(Exception):
-        h.pull_plot("pdf")
-
-    # wrong pull_plot: wrong kwargs names
-    with pytest.raises(Exception):
-        h.pull_plot(pdf, abc="crimson", xyz="crimson")
-
-    # wrong pull_plot: without kwargs prefix
-    with pytest.raises(Exception):
-        h.pull_plot(pdf, ecolor="crimson", mfc="crimson")
-
-    # wrong pull_plot: disabled param - labels
-    with pytest.raises(Exception):
-        h.pull_plot(pdf, eb_label="value")
+        h.plot_pull("1")
 
     with pytest.raises(Exception):
-        h.pull_plot(pdf, vp_label="value")
+        h.plot_pull(1)
 
     with pytest.raises(Exception):
-        h.pull_plot(pdf, fp_label="value")
+        h.plot_pull(0.1)
 
     with pytest.raises(Exception):
-        h.pull_plot(pdf, ub_label="value")
+        h.plot_pull((1, 2))
 
     with pytest.raises(Exception):
-        h.pull_plot(pdf, bar_label="value")
+        h.plot_pull([1, 2])
 
     with pytest.raises(Exception):
-        h.pull_plot(pdf, pp_label="value")
+        h.plot_pull({"a": 1})
 
-    # wrong pull_plot: disabled param - ub_color
+    # wrong kwargs names
     with pytest.raises(Exception):
-        h.pull_plot(pdf, ub_color="value")
+        h.plot_pull(pdf, abc="crimson", xyz="crimson")
 
-    # wrong pull_plot: disabled param - bar_width
     with pytest.raises(Exception):
-        h.pull_plot(pdf, bar_width="value")
+        h.plot_pull(pdf, ecolor="crimson", mfc="crimson")
 
-    # wrong pull_plot: kwargs types mis-matched
+    # disabled params
     with pytest.raises(Exception):
-        h.pull_plot(pdf, eb_ecolor=1.0, eb_mfc=1.0)  # kwargs should be str
+        h.plot_pull(pdf, eb_label="value")
+
+    with pytest.raises(Exception):
+        h.plot_pull(pdf, vp_label="value")
+
+    with pytest.raises(Exception):
+        h.plot_pull(pdf, fp_label="value")
+
+    with pytest.raises(Exception):
+        h.plot_pull(pdf, ub_label="value")
+
+    with pytest.raises(Exception):
+        h.plot_pull(pdf, bar_label="value")
+
+    with pytest.raises(Exception):
+        h.plot_pull(pdf, pp_label="value")
+
+    with pytest.raises(Exception):
+        h.plot_pull(pdf, ub_color="value")
+
+    with pytest.raises(Exception):
+        h.plot_pull(pdf, bar_width="value")
+
+    # wrong kwargs types
+    with pytest.raises(Exception):
+        h.plot_pull(pdf, eb_ecolor=1.0, eb_mfc=1.0)  # kwargs should be str
