@@ -488,6 +488,8 @@ class BaseHist(Histogram):
         t: tuple = ()
         for idx in index:
             if isinstance(idx, complex):
+                if idx.real % 1 != 0:
+                    raise ValueError(f"The real part should be an integer")
                 t += (loc(idx.imag, int(idx.real)),)
             elif isinstance(idx, str):
                 t += (loc(idx),)
