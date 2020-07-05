@@ -210,6 +210,7 @@ def test_basic_usage():
     )
 
     assert h[6] == h[bh.loc(1)] == h[1j] == h[0j + 1] == h[-3j + 4] == h[bh.loc(1, 0)]
+    h[6] = h[bh.loc(1)] = h[1j] = h[0j + 1] = h[-3j + 4] = h[bh.loc(1, 0)] = 0
 
     h = BaseHist(
         axis.Regular(50, -5, 5, name="Norm", title="normal distribution"),
