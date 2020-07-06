@@ -5,7 +5,7 @@ import matplotlib.patches as patches
 from matplotlib import transforms
 from scipy.optimize import curve_fit
 from uncertainties import correlated_values, unumpy
-from boost_histogram import Histogram, loc
+from boost_histogram import Histogram, loc, rebin
 from typing import Callable, Optional, Tuple, Union
 
 # typing alias
@@ -481,7 +481,9 @@ class BaseHist(Histogram):
 
         if isinstance(x, slice):
             return slice(
-                self._loc_shortcut(x.start), self._loc_shortcut(x.stop), x.step,
+                self._loc_shortcut(x.start),
+                self._loc_shortcut(x.stop),
+                self._step_shortcut(x.step),
             )
         elif isinstance(x, complex):
             if x.real % 1 != 0:
@@ -490,6 +492,19 @@ class BaseHist(Histogram):
                 return loc(x.imag, int(x.real))
         elif isinstance(x, str):
             return loc(x)
+        else:
+            return x
+
+    def _step_shortcut(self, x):
+        """
+            Convert some specific indices to step.
+        """
+
+        if isinstance(x, complex):
+            if x.real % 1 != 0:
+                raise ValueError(f"The real part should be an integer")
+            else:
+                return rebin(int(x.imag))
         else:
             return x
 
