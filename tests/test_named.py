@@ -242,6 +242,32 @@ def test_basic_usage():
     assert z_one_only[bh.loc("T"), bh.loc("T")] == 1
 
     """
+    Access
+    """
+    h = NamedHist(axis.Regular(10, -5, 5, name="X", title="x [units]")).fill(
+        X=np.random.normal(size=1000)
+    )
+
+    assert h[6] == h[bh.loc(1)] == h[1j] == h[0j + 1] == h[-3j + 4] == h[bh.loc(1, 0)]
+    h[6] = h[bh.loc(1)] = h[1j] = h[0j + 1] = h[-3j + 4] = h[bh.loc(1, 0)] = 0
+
+    h = NamedHist(
+        axis.Regular(50, -5, 5, name="Norm", title="normal distribution"),
+        axis.Regular(50, -5, 5, name="Unif", title="uniform distribution"),
+        axis.StrCategory(["hi", "hello"], name="Greet"),
+        axis.Bool(name="Yes"),
+        axis.Integer(0, 1000, name="Int"),
+    ).fill(
+        Norm=np.random.normal(size=1000),
+        Unif=np.random.uniform(size=1000),
+        Greet=["hi"] * 800 + ["hello"] * 200,
+        Yes=[True] * 600 + [False] * 400,
+        Int=np.ones(1000),
+    )
+
+    assert h[0j, -0j + 2, "hi", True, 1]
+
+    """
     Projection
     """
     h = NamedHist(
