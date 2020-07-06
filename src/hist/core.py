@@ -474,29 +474,39 @@ class BaseHist(Histogram):
 
         return fig, ax, pull_ax
 
+    def _loc_shortcut(self, x):
+        """
+            Convert some specific indices to location.
+        """
+
+        if isinstance(x, slice):
+            return slice(
+                self._loc_shortcut(x.start), self._loc_shortcut(x.stop), x.step,
+            )
+        elif isinstance(x, complex):
+            if x.real % 1 != 0:
+                raise ValueError(f"The real part should be an integer")
+            else:
+                return loc(x.imag, int(x.real))
+        elif isinstance(x, str):
+            return loc(x)
+        else:
+            return x
+
     def __getitem__(self, index):
         """
             Get histogram item.
         """
 
         if isinstance(index, dict):
-            return super().__getitem__(index)
+            return super().__getitem__(
+                {k: self._loc_shortcut(v) for k, v in index.items()}
+            )
 
         if not hasattr(index, "__iter__"):
             index = (index,)
 
-        t: tuple = ()
-        for idx in index:
-            if isinstance(idx, complex):
-                if idx.real % 1 != 0:
-                    raise ValueError(f"The real part should be an integer")
-                t += (loc(idx.imag, int(idx.real)),)
-            elif isinstance(idx, str):
-                t += (loc(idx),)
-            else:
-                t += (idx,)
-
-        return super().__getitem__(t)
+        return super().__getitem__(tuple(self._loc_shortcut(v) for v in index))
 
     def __setitem__(self, index, value):
         """
@@ -504,18 +514,11 @@ class BaseHist(Histogram):
         """
 
         if isinstance(index, dict):
-            return super().__setitem__(index, value)
+            return super().__setitem__(
+                {k: self._loc_shortcut(v) for k, v in index.items()}, value
+            )
 
         if not hasattr(index, "__iter__"):
             index = (index,)
 
-        t: tuple = ()
-        for idx in index:
-            if isinstance(idx, complex):
-                t += (loc(idx.imag, int(idx.real)),)
-            elif isinstance(idx, str):
-                t += (loc(idx),)
-            else:
-                t += (idx,)
-
-        return super().__setitem__(t, value)
+        return super().__setitem__(tuple(self._loc_shortcut(v) for v in index), value)
