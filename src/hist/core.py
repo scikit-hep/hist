@@ -488,6 +488,8 @@ class BaseHist(Histogram):
         elif isinstance(x, complex):
             if x.real % 1 != 0:
                 raise ValueError(f"The real part should be an integer")
+            elif x.imag % 1 != 0:
+                raise ValueError(f"The imaginary part should be an integer")
             else:
                 return loc(x.imag, int(x.real))
         elif isinstance(x, str):
@@ -503,6 +505,8 @@ class BaseHist(Histogram):
         if isinstance(x, complex):
             if x.real != 0:
                 raise ValueError(f"The step should not have real part")
+            elif x.imag % 1 != 0:
+                raise ValueError(f"The imaginary part should be an integer")
             else:
                 return rebin(int(x.imag))
         else:
