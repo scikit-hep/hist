@@ -70,9 +70,9 @@ class BaseHist(Histogram):
         """
         Plot method for BaseHist object.
         """
-        if self.rank == 1:
+        if self.ndim == 1:
             return self.plot1d(*args, **kwargs), None
-        elif self.rank == 2:
+        elif self.ndim == 2:
             return self.plot2d(*args, **kwargs)
         else:
             raise NotImplemented("Please project to 1D or 2D before calling plot")
@@ -87,7 +87,7 @@ class BaseHist(Histogram):
         Plot1d method for BaseHist object.
         """
         # Type judgement
-        if self.rank != 1:
+        if self.ndim != 1:
             raise TypeError("Only 1D-histogram has plot1d")
 
         """
@@ -125,7 +125,7 @@ class BaseHist(Histogram):
         Plot2d method for BaseHist object.
         """
         # Type judgement
-        if self.rank != 2:
+        if self.ndim != 2:
             raise TypeError("Only 2D-histogram has plot2d")
 
         """
@@ -170,7 +170,7 @@ class BaseHist(Histogram):
         Plot2d_full method for BaseHist object.
         """
         # Type judgement
-        if self.rank != 2:
+        if self.ndim != 2:
             raise TypeError("Only 2D-histogram has plot2d_full")
 
         """
@@ -284,7 +284,7 @@ class BaseHist(Histogram):
         # Type judgement
         if callable(func) == False:
             raise TypeError("Callable parameter func is supported in pull plot")
-        if self.rank != 1:
+        if self.ndim != 1:
             raise TypeError("Only 1D-histogram has pull plot")
 
         """
