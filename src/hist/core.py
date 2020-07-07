@@ -66,7 +66,14 @@ class BaseHist(Histogram):
                 f"Only projections by indices and names are supported for {self.__class__.__name__}"
             )
 
-    def plot(self, *args, **kwargs,) -> Union[Plot1D_RetType, Plot2D_RetType]:
+    def density(self):
+        """
+        Density Histogram.
+        """
+
+        return self / self.sum()  # ToDo: maybe should not be filled
+
+    def plot(self, *args, **kwargs) -> Union[Plot1D_RetType, Plot2D_RetType]:
         """
         Plot method for BaseHist object.
         """
