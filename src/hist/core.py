@@ -110,7 +110,15 @@ class BaseHist(Histogram):
         """
         Plot: plot the 1d-histogram
         """
-        ax.step(self.axes.edges[0][:-1], self.project(0).view(), **kwargs)
+        if self.axes[0].name:
+            ax.step(
+                self.axes.edges[0][:-1],
+                self.project(self.axes[0].name).view(),
+                **kwargs,
+            )
+        else:
+            ax.step(self.axes.edges[0][:-1], self.project(0).view(), **kwargs)
+
         if self.axes[0].name:
             ax.set_xlabel(self.axes[0].name)
         else:
@@ -248,7 +256,17 @@ class BaseHist(Histogram):
             main_ax.set_ylabel(self.axes[1].title)
 
         # top plot
-        top_ax.step(self.axes.edges[1][0][:-1], self.project(0).view(), **top_kwargs)
+        if self.axes[0].name:
+            top_ax.step(
+                self.axes.edges[1][0][:-1],
+                self.project(self.axes[0].name).view(),
+                **top_kwargs,
+            )
+        else:
+            top_ax.step(
+                self.axes.edges[1][0][:-1], self.project(0).view(), **top_kwargs
+            )
+
         top_ax.spines["top"].set_visible(False)
         top_ax.spines["right"].set_visible(False)
         top_ax.xaxis.set_visible(False)
@@ -258,12 +276,22 @@ class BaseHist(Histogram):
         # side plot
         base = plt.gca().transData
         rot = transforms.Affine2D().rotate_deg(90)
-        side_ax.step(
-            self.axes.edges[1][0][:-1],
-            -self.project(1).view(),
-            transform=rot + base,
-            **side_kwargs,
-        )
+
+        if self.axes[1].name:
+            side_ax.step(
+                self.axes.edges[1][0][:-1],
+                -self.project(self.axes[1].name).view(),
+                transform=rot + base,
+                **side_kwargs,
+            )
+        else:
+            side_ax.step(
+                self.axes.edges[1][0][:-1],
+                -self.project(1).view(),
+                transform=rot + base,
+                **side_kwargs,
+            )
+
         side_ax.spines["top"].set_visible(False)
         side_ax.spines["right"].set_visible(False)
         side_ax.yaxis.set_visible(False)

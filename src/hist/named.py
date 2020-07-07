@@ -20,13 +20,13 @@ class NamedHist(BaseHist):
         Projection of axis idx.
         """
 
-        # ToDo: should work in boost-histogram 0.8.0
-        # if len(args) == 0 or all(isinstance(x, str) for x in args):
-        #     return super().project(*args)
+        if len(args) == 0 or all(isinstance(x, str) for x in args):
+            return super().project(*args)
 
-        # else: raise TypeError(f"Only projections by names are supported for {self.__class__.__name__}")
-
-        return super().project(*args)
+        else:
+            raise TypeError(
+                f"Only projections by names are supported for {self.__class__.__name__}"
+            )
 
     def fill(self, *args, **kwargs):
         """

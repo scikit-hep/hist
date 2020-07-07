@@ -245,16 +245,14 @@ def test_basic_usage():
     )
 
     # via indices
-    for num in range(6):
-        for int_perm in list(itertools.permutations(range(0, 6), num)):
-            assert h.project(*int_perm)
+    assert h.project()
+    assert h.project(0, 1)
+    assert h.project(0, 1, 2, 3, 4, 5)
 
     # via names
-    for num in range(6):
-        for str_perm in list(
-            itertools.permutations(["A", "B", "C", "D", "E", "F"], num)
-        ):
-            assert h.project(*str_perm)
+    assert h.project()
+    assert h.project("A", "B")
+    assert h.project("A", "B", "C", "D", "E", "F")
 
     """
     Plot1d
