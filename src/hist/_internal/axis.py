@@ -67,7 +67,7 @@ class Regular(bha.Regular):
         self.metadata["title"] = value
 
 
-class Boolean(bha.Regular):
+class Boolean(bha.Regular):  # ToDo: should be derived from bha.Boolean
     def __init__(self, *, name: str = None, title: str = None) -> None:
         metadata: Dict = dict()
         if not name:
