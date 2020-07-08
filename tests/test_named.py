@@ -2,7 +2,6 @@ from hist import axis, NamedHist
 import boost_histogram as bh
 import pytest
 import numpy as np
-import itertools
 from uncertainties import unumpy as unp
 
 
@@ -31,7 +30,7 @@ def test_basic_usage():
         axis.Regular(50, -3, 3, name="x"), axis.Regular(50, -3, 3, name="y")
     ).fill(x=np.random.randn(10), y=np.random.randn(10))
 
-    assert NamedHist(axis.Bool(name="x"), axis.Bool(name="y")).fill(
+    assert NamedHist(axis.Boolean(name="x"), axis.Boolean(name="y")).fill(
         y=[True, False, True], x=[True, False, True]
     )
 
@@ -94,8 +93,10 @@ def test_basic_usage():
                     == 0
                 )
 
-    # Bool
-    h = NamedHist(axis.Bool(name="x"), axis.Bool(name="y"), axis.Bool(name="z"),).fill(
+    # Boolean
+    h = NamedHist(
+        axis.Boolean(name="x"), axis.Boolean(name="y"), axis.Boolean(name="z"),
+    ).fill(
         x=[True, True, True, True, True, False, True],
         y=[False, True, True, False, False, True, False],
         z=[False, False, True, True, True, True, True],
@@ -255,7 +256,7 @@ def test_basic_usage():
         axis.Regular(50, -5, 5, name="Norm", title="normal distribution"),
         axis.Regular(50, -5, 5, name="Unif", title="uniform distribution"),
         axis.StrCategory(["hi", "hello"], name="Greet"),
-        axis.Bool(name="Yes"),
+        axis.Boolean(name="Yes"),
         axis.Integer(0, 1000, name="Int"),
     ).fill(
         Norm=np.random.normal(size=1000),
@@ -274,25 +275,17 @@ def test_basic_usage():
         axis.Regular(
             50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
         ),
-        axis.Bool(name="B", title="b [units]"),
+        axis.Boolean(name="B", title="b [units]"),
         axis.Variable(range(11), name="C", title="c [units]"),
         axis.Integer(0, 10, name="D", title="d [units]"),
         axis.IntCategory(range(10), name="E", title="e [units]"),
         axis.StrCategory("FT", name="F", title="f [units]"),
     )
 
-    # ToDo: shouldn't work -- move to test_errors when finished
-    # via indices
-    for num in range(6):
-        for int_perm in list(itertools.permutations(range(0, 6), num)):
-            assert h.project(*int_perm)
-
     # via names
-    for num in range(6):
-        for str_perm in list(
-            itertools.permutations(["A", "B", "C", "D", "E", "F"], num)
-        ):
-            assert h.project(*str_perm)
+    assert h.project()
+    assert h.project("A", "B")
+    assert h.project("A", "B", "C", "D", "E", "F")
 
     """
     Plot1d
@@ -417,7 +410,7 @@ def test_errors():
         ).fill(x=np.random.randn(10), y=np.random.randn(10))
 
     with pytest.raises(Exception):
-        NamedHist(axis.Bool(name=""), axis.Bool(name="")).fill(
+        NamedHist(axis.Boolean(name=""), axis.Boolean(name="")).fill(
             y=[True, False, True], x=[True, False, True]
         )
 
@@ -447,7 +440,7 @@ def test_errors():
         NamedHist(axis.Regular(50, -3, 3, name="x"), axis.Regular(50, -3, 3, name="x"))
 
     with pytest.raises(Exception):
-        NamedHist(axis.Bool(name="y"), axis.Bool(name="y"))
+        NamedHist(axis.Boolean(name="y"), axis.Boolean(name="y"))
 
     with pytest.raises(Exception):
         NamedHist(
@@ -478,7 +471,7 @@ def test_errors():
         ).fill(np.random.randn(10), np.random.randn(10))
 
     with pytest.raises(Exception):
-        NamedHist(axis.Bool(name="x"), axis.Bool(name="y")).fill(
+        NamedHist(axis.Boolean(name="x"), axis.Boolean(name="y")).fill(
             [True, False, True], [True, False, True]
         )
 
@@ -510,7 +503,7 @@ def test_errors():
         ).fill(x=np.random.randn(10), z=np.random.randn(10))
 
     with pytest.raises(Exception):
-        NamedHist(axis.Bool(name="x"), axis.Bool(name="y")).fill(
+        NamedHist(axis.Boolean(name="x"), axis.Boolean(name="y")).fill(
             y=[True, False, True], z=[True, False, True]
         )
 
@@ -552,12 +545,18 @@ def test_errors():
         axis.Regular(
             50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
         ),
-        axis.Bool(name="B", title="b [units]"),
+        axis.Boolean(name="B", title="b [units]"),
         axis.Variable(range(11), name="C", title="c [units]"),
         axis.Integer(0, 10, name="D", title="d [units]"),
         axis.IntCategory(range(10), name="E", title="e [units]"),
         axis.StrCategory("FT", name="F", title="f [units]"),
     )
+
+    # via indices
+    with pytest.raises(Exception):
+        h.project(0, 1)
+    with pytest.raises(Exception):
+        h.project(0, 1, 2, 3, 4, 5)
 
     # duplicated
     with pytest.raises(Exception):

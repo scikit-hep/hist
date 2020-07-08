@@ -67,18 +67,8 @@ class Regular(bha.Regular):
         self.metadata["title"] = value
 
 
-class Bool(bha.Regular):
-    def __init__(
-        self,
-        *,
-        name: str = None,
-        title: str = None,
-        underflow: bool = False,
-        overflow: bool = False,
-        growth: bool = False,
-        circular: bool = False,
-        transform: bha.transform.Function = None
-    ) -> None:
+class Boolean(bha.Regular):  # ToDo: should be derived from bha.Boolean
+    def __init__(self, *, name: str = None, title: str = None) -> None:
         metadata: Dict = dict()
         if not name:
             metadata["name"] = ""
@@ -87,17 +77,7 @@ class Bool(bha.Regular):
         else:
             raise Exception("Name should be a valid Python identifier")
         metadata["title"] = title
-        super(bha.Regular, self).__init__(
-            2,
-            0,
-            2,
-            metadata=metadata,
-            underflow=underflow,
-            overflow=overflow,
-            growth=growth,
-            circular=circular,
-            transform=transform,
-        )
+        super(bha.Regular, self).__init__(2, 0, 2, metadata=metadata)
 
     def __repr__(self) -> str:
         return "{self.__class__.__name__}({args}{kwargs})".format(

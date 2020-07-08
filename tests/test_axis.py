@@ -13,14 +13,14 @@ def test_basic_usage():
     Names
     """
     assert axis.Regular(50, -3, 3, name="x0")
-    assert axis.Bool(name="x_")
+    assert axis.Boolean(name="x_")
     assert axis.Variable(range(-3, 3), name="xx")
     assert axis.Integer(-3, 3, name="x_x")
     assert axis.IntCategory(range(-3, 3), name="X__X")
     assert axis.StrCategory("FT", name="X00")
 
     assert axis.Regular(50, -3, 3, name="")
-    assert axis.Bool(name="")
+    assert axis.Boolean(name="")
     assert axis.Variable(range(-3, 3))
     assert axis.Integer(-3, 3, name="")
     assert axis.IntCategory(range(-3, 3), name="")
@@ -40,7 +40,7 @@ def test_errors():
         axis.Regular(50, -3, 3, name="_x")
 
     with pytest.raises(Exception):
-        axis.Bool(name="__x")
+        axis.Boolean(name="__x")
 
     with pytest.raises(Exception):
         axis.Variable(range(-3, 3), name="_x_")
@@ -59,7 +59,7 @@ def test_errors():
         axis.Regular(50, -3, 3, name="0")
 
     with pytest.raises(Exception):
-        axis.Bool(name="00")
+        axis.Boolean(name="00")
 
     with pytest.raises(Exception):
         axis.Variable(range(-3, 3), name="0x")
@@ -78,7 +78,7 @@ def test_errors():
         axis.Regular(50, -3, 3, name="-x")
 
     with pytest.raises(Exception):
-        axis.Bool(name="x-")
+        axis.Boolean(name="x-")
 
     with pytest.raises(Exception):
         axis.Variable(range(-3, 3), name="?x")
