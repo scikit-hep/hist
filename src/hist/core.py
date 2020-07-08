@@ -71,7 +71,10 @@ class BaseHist(Histogram):
         Density Histogram.
         """
 
-        return self / self.sum()  # ToDo: maybe should not be filled
+        return self.view() / self.sum() / np.prod(self.axes.widths, axis=0)
+
+    # ToDo: maybe should not be filled
+    # ToDo: flow should be removed
 
     def plot(self, *args, **kwargs) -> Union[Plot1D_RetType, Plot2D_RetType]:
         """
