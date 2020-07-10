@@ -8,6 +8,6 @@ from .version import version as __version__
 
 from .general import Hist
 from .named import NamedHist
-from .core import BaseHist
+from .core import BaseHist, Histogram
 
 from . import axis

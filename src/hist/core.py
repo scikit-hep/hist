@@ -1,11 +1,12 @@
 import numpy as np
+import boost_histogram as bh
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from matplotlib import transforms
+from functools import partial
 from scipy.optimize import curve_fit
 from uncertainties import correlated_values, unumpy
-import boost_histogram as bh
 from typing import Callable, Optional, Tuple, Union
 
 # typing alias
@@ -25,14 +26,16 @@ PlotPull_RetType = Tuple[
     matplotlib.axes._subplots.SubplotBase,
 ]
 
+
 class Histogram(bh.Histogram):
     def __init__(self, *axes):
         self._hist = axes
         self._ax = self._hist
-        
+
     def do_something(self):
         print(self._hist)
-        
+
+
 class always_normal_method:
     def __get__(self, instance, owner=None):
         return partial(self.method, instance or owner())
@@ -40,15 +43,16 @@ class always_normal_method:
     def __init__(self, method):
         self.method = method
 
-class BaseHist(Histogram):
+
+class BaseHist(bh.Histogram):
     def __init__(self, *args, **kwargs):
         """
             Initialize BaseHist object. Axis params can contain the names.
         """
 
-        super().__init__(*args, **kwargs)
-        self.names: dict = dict()
-        if hasattr(self, axes):
+        if len(args):
+            super().__init__(*args, **kwargs)
+            self.names: dict = dict()
             for ax in self.axes:
                 if ax.name in self.names:
                     raise Exception(
@@ -56,11 +60,11 @@ class BaseHist(Histogram):
                     )
                 else:
                     self.names[ax.name] = True
-        
-        self._hist = None
-        self._ax = []
-        self._storage_proxy = None
-    
+        else:
+            self._hist = None
+            self._ax = []
+            self._storage_proxy = None
+
     @always_normal_method
     def Regular(self):
         if self._hist:
@@ -68,20 +72,16 @@ class BaseHist(Histogram):
         self._ax.append("Regular")
         return self
 
-    @always_normal_method
-    def Variable(self):
-        if self._hist:
-            raise RuntimeError("Cannot add an axis to an existing histogram")
-        self._ax.append("Variable")
-        return self
-
     def __getattribute__(self, item):
-        if not self._hist and not isinstance(getattr(self.__class__, item), always_normal_method):
+
+        if not super().__getattribute__("_hist") and not isinstance(
+            super().__getattribute__(item), always_normal_method
+        ):
             # Make histogram real here
             super().__init__(*self._ax, storage=self._storage_proxy)
             self._storage_proxy = None
 
-        return object.__getattribute__(self, item)
+        return super().__getattribute__(item)
 
     def project(self, *args: Union[int, str]):
         """
