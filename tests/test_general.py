@@ -646,3 +646,9 @@ def test_errors():
     # wrong kwargs types
     with pytest.raises(Exception):
         h.plot_pull(pdf, eb_ecolor=1.0, eb_mfc=1.0)  # kwargs should be str
+
+
+def test_histogram_quick_construction():
+    h = Hist.Regular(10, 0, 1, name="x")
+    h.fill([0.5, 0.5])
+    assert h[0.5j] == 2

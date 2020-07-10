@@ -28,13 +28,7 @@ PlotPull_RetType = Tuple[
 ]
 
 
-class Histogram(bh.Histogram):
-    def __init__(self, *axes):
-        self._hist = axes
-        self._ax = self._hist
-
-    def do_something(self):
-        print(self._hist)
+from .axis import Regular
 
 
 class always_normal_method:
@@ -50,8 +44,8 @@ class BaseHist(bh.Histogram):
         """
             Initialize BaseHist object. Axis params can contain the names.
         """
-
         if len(args):
+            self._ax = list(args)
             super().__init__(*args, **kwargs)
             self.names: dict = dict()
             for ax in self.axes:
@@ -62,15 +56,15 @@ class BaseHist(bh.Histogram):
                 else:
                     self.names[ax.name] = True
         else:
-            self._hist = None
             self._ax = []
+            self._hist = None
             self._storage_proxy = None
 
     @always_normal_method
-    def Regular(self):
+    def Regular(self, *args, **kwargs):
         if self._hist:
             raise RuntimeError("Cannot add an axis to an existing histogram")
-        self._ax.append("Regular")
+        self._ax.append(Regular(*args, **kwargs))
         return self
 
     def __getattribute__(self, item):
@@ -79,10 +73,13 @@ class BaseHist(bh.Histogram):
             super().__getattribute__(item), always_normal_method
         ):
             # Make histogram real here
-            super().__init__(*self._ax, storage=self._storage_proxy)
-            self._storage_proxy = None
+            ax = object.__getattribute__(self, "_ax")
+            storage = (
+                object.__getattribute__(self, "_storage_proxy") or bh.storage.Double()
+            )
+            object.__getattribute__(self, "__init__")(*ax, storage=storage)
 
-        return super().__getattribute__(item)
+        return object.__getattribute__(self, item)
 
     def project(self, *args: Union[int, str]):
         """
@@ -566,8 +563,6 @@ class BaseHist(bh.Histogram):
         elif isinstance(x, complex):
             if x.real % 1 != 0:
                 raise ValueError(f"The real part should be an integer")
-            elif x.imag % 1 != 0:
-                raise ValueError(f"The imaginary part should be an integer")
             else:
                 return loc(x.imag, int(x.real))
         elif isinstance(x, str):
