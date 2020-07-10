@@ -7,6 +7,7 @@ from matplotlib import transforms
 from functools import partial
 from scipy.optimize import curve_fit
 from uncertainties import correlated_values, unumpy
+from boost_histogram import Histogram, loc, rebin
 from typing import Callable, Optional, Tuple, Union
 
 # typing alias
@@ -107,13 +108,21 @@ class BaseHist(bh.Histogram):
                 f"Only projections by indices and names are supported for {self.__class__.__name__}"
             )
 
-    def plot(self, *args, **kwargs,) -> Union[Plot1D_RetType, Plot2D_RetType]:
+    def density(self):
+        """
+        Density Histogram.
+        """
+        # ToDo: maybe should not be filled
+        # ToDo: flow should be removed
+        return self.view() / self.sum() / np.prod(self.axes.widths, axis=0)
+
+    def plot(self, *args, **kwargs) -> Union[Plot1D_RetType, Plot2D_RetType]:
         """
         Plot method for BaseHist object.
         """
-        if self.rank == 1:
+        if self.ndim == 1:
             return self.plot1d(*args, **kwargs), None
-        elif self.rank == 2:
+        elif self.ndim == 2:
             return self.plot2d(*args, **kwargs)
         else:
             raise NotImplemented("Please project to 1D or 2D before calling plot")
@@ -128,7 +137,7 @@ class BaseHist(bh.Histogram):
         Plot1d method for BaseHist object.
         """
         # Type judgement
-        if self.rank != 1:
+        if self.ndim != 1:
             raise TypeError("Only 1D-histogram has plot1d")
 
         """
@@ -144,7 +153,15 @@ class BaseHist(bh.Histogram):
         """
         Plot: plot the 1d-histogram
         """
-        ax.step(self.axes.edges[0][:-1], self.project(0).view(), **kwargs)
+        if self.axes[0].name:
+            ax.step(
+                self.axes.edges[0][:-1],
+                self.project(self.axes[0].name).view(),
+                **kwargs,
+            )
+        else:
+            ax.step(self.axes.edges[0][:-1], self.project(0).view(), **kwargs)
+
         if self.axes[0].name:
             ax.set_xlabel(self.axes[0].name)
         else:
@@ -166,7 +183,7 @@ class BaseHist(bh.Histogram):
         Plot2d method for BaseHist object.
         """
         # Type judgement
-        if self.rank != 2:
+        if self.ndim != 2:
             raise TypeError("Only 2D-histogram has plot2d")
 
         """
@@ -211,7 +228,7 @@ class BaseHist(bh.Histogram):
         Plot2d_full method for BaseHist object.
         """
         # Type judgement
-        if self.rank != 2:
+        if self.ndim != 2:
             raise TypeError("Only 2D-histogram has plot2d_full")
 
         """
@@ -282,7 +299,17 @@ class BaseHist(bh.Histogram):
             main_ax.set_ylabel(self.axes[1].title)
 
         # top plot
-        top_ax.step(self.axes.edges[1][0][:-1], self.project(0).view(), **top_kwargs)
+        if self.axes[0].name:
+            top_ax.step(
+                self.axes.edges[1][0][:-1],
+                self.project(self.axes[0].name).view(),
+                **top_kwargs,
+            )
+        else:
+            top_ax.step(
+                self.axes.edges[1][0][:-1], self.project(0).view(), **top_kwargs
+            )
+
         top_ax.spines["top"].set_visible(False)
         top_ax.spines["right"].set_visible(False)
         top_ax.xaxis.set_visible(False)
@@ -292,12 +319,22 @@ class BaseHist(bh.Histogram):
         # side plot
         base = plt.gca().transData
         rot = transforms.Affine2D().rotate_deg(90)
-        side_ax.step(
-            self.axes.edges[1][0][:-1],
-            -self.project(1).view(),
-            transform=rot + base,
-            **side_kwargs,
-        )
+
+        if self.axes[1].name:
+            side_ax.step(
+                self.axes.edges[1][0][:-1],
+                -self.project(self.axes[1].name).view(),
+                transform=rot + base,
+                **side_kwargs,
+            )
+        else:
+            side_ax.step(
+                self.axes.edges[1][0][:-1],
+                -self.project(1).view(),
+                transform=rot + base,
+                **side_kwargs,
+            )
+
         side_ax.spines["top"].set_visible(False)
         side_ax.spines["right"].set_visible(False)
         side_ax.yaxis.set_visible(False)
@@ -325,7 +362,7 @@ class BaseHist(bh.Histogram):
         # Type judgement
         if callable(func) == False:
             raise TypeError("Callable parameter func is supported in pull plot")
-        if self.rank != 1:
+        if self.ndim != 1:
             raise TypeError("Only 1D-histogram has pull plot")
 
         """
@@ -514,3 +551,71 @@ class BaseHist(bh.Histogram):
         fig.add_axes(pull_ax)
 
         return fig, ax, pull_ax
+
+    def _loc_shortcut(self, x):
+        """
+            Convert some specific indices to location.
+        """
+
+        if isinstance(x, slice):
+            return slice(
+                self._loc_shortcut(x.start),
+                self._loc_shortcut(x.stop),
+                self._step_shortcut(x.step),
+            )
+        elif isinstance(x, complex):
+            if x.real % 1 != 0:
+                raise ValueError(f"The real part should be an integer")
+            elif x.imag % 1 != 0:
+                raise ValueError(f"The imaginary part should be an integer")
+            else:
+                return loc(x.imag, int(x.real))
+        elif isinstance(x, str):
+            return loc(x)
+        else:
+            return x
+
+    def _step_shortcut(self, x):
+        """
+            Convert some specific indices to step.
+        """
+
+        if isinstance(x, complex):
+            if x.real != 0:
+                raise ValueError(f"The step should not have real part")
+            elif x.imag % 1 != 0:
+                raise ValueError(f"The imaginary part should be an integer")
+            else:
+                return rebin(int(x.imag))
+        else:
+            return x
+
+    def __getitem__(self, index):
+        """
+            Get histogram item.
+        """
+
+        if isinstance(index, dict):
+            return super().__getitem__(
+                {k: self._loc_shortcut(v) for k, v in index.items()}
+            )
+
+        if not hasattr(index, "__iter__"):
+            index = (index,)
+
+        return super().__getitem__(tuple(self._loc_shortcut(v) for v in index))
+
+    def __setitem__(self, index, value):
+        """
+            Set histogram item.
+        """
+
+        if isinstance(index, dict):
+            return super().__setitem__(
+                {k: self._loc_shortcut(v) for k, v in index.items()}, value
+            )
+
+        if not hasattr(index, "__iter__"):
+            index = (index,)
+
+        return super().__setitem__(tuple(self._loc_shortcut(v) for v in index), value)

@@ -1,0 +1,53 @@
+name: CD
+
+on:
+  workflow_dispatch:
+  release:
+    types:
+    - published
+
+jobs:
+  dist:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - name: Install wheel and SDist requirements
+      run: python -m pip install "setuptools>=42.0" "setuptools_scm[toml]>=4.1" "wheel" "twine"
+
+    - name: Build SDist
+      run: python setup.py sdist
+
+    - uses: actions/upload-artifact@v2
+      with:
+        path: dist/*
+
+    - name: Build wheel
+      run: >
+        python -m pip wheel . -w wheels
+
+    - uses: actions/upload-artifact@v2
+      with:
+        path: wheels/hist*.whl
+
+    - name: Check metadata
+      run: twine check dist/* wheels/*
+
+  publish:
+    needs: [dist]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release' && github.event.action == 'published'
+
+    steps:
+    - uses: actions/download-artifact@v2
+      with:
+        name: artifact
+        path: dist
+
+    - uses: pypa/gh-action-pypi-publish@v1.3.1
+      with:
+        user: __token__
+        password: ${{ secrets.pypi_password }}
