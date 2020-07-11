@@ -1,9 +1,9 @@
+# -*- coding: utf-8 -*-
 from hist import Hist, axis
 import boost_histogram as bh
 import pytest
 import numpy as np
 from uncertainties import unumpy as unp
-import hist
 
 
 def test_general_init():
@@ -651,8 +651,7 @@ def test_histogram_quick_constrution():
 
 
 def test_histogram_unnamed_axes():
-
-    h = Hist(axis.Regular(10, 0, 1), axis.Regular(20, -3, 3))
+    Hist(axis.Regular(10, 0, 1), axis.Regular(20, -3, 3))
 
 
 def test_histogram_loc():

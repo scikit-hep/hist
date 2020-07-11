@@ -1,9 +1,9 @@
+# -*- coding: utf-8 -*-
 import hist
 from hist import axis, BaseHist
 import boost_histogram as bh
 import pytest
 import numpy as np
-import itertools
 from uncertainties import unumpy as unp
 
 

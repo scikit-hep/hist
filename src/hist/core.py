@@ -1,13 +1,15 @@
+# -*- coding: utf-8 -*-
 import numpy as np
 import boost_histogram as bh
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from matplotlib import transforms
-from functools import partial
 from scipy.optimize import curve_fit
 from uncertainties import correlated_values, unumpy
 from typing import Callable, Optional, Tuple, Union
+
+from .axis import Regular
 
 # typing alias
 Plot1D_RetType = Tuple[matplotlib.figure.Figure, matplotlib.axes._subplots.SubplotBase]
@@ -25,9 +27,6 @@ PlotPull_RetType = Tuple[
     matplotlib.axes._subplots.SubplotBase,
     matplotlib.axes._subplots.SubplotBase,
 ]
-
-
-from .axis import Regular
 
 
 class always_normal_method:
@@ -76,7 +75,7 @@ class BaseHist(bh.Histogram):
         if (
             not super().__getattribute__("_hist")
             and not isinstance(super().__getattribute__(item), always_normal_method)
-            and not item in {"_hist", "_ax"}
+            and item not in {"_hist", "_ax"}
         ):
             # Make histogram real here
             ax = object.__getattribute__(self, "_ax")
@@ -128,7 +127,7 @@ class BaseHist(bh.Histogram):
         elif self.ndim == 2:
             return self.plot2d(*args, **kwargs)
         else:
-            raise NotImplemented("Please project to 1D or 2D before calling plot")
+            raise NotImplementedError("Please project to 1D or 2D before calling plot")
 
     def plot1d(
         self,
@@ -341,7 +340,7 @@ class BaseHist(bh.Histogram):
         """
 
         # Type judgement
-        if callable(func) == False:
+        if not callable(func):
             raise TypeError("Callable parameter func is supported in pull plot")
         if self.ndim != 1:
             raise TypeError("Only 1D-histogram has pull plot")
@@ -463,7 +462,7 @@ class BaseHist(bh.Histogram):
                     continue
                 # disabled argument
                 if kw == "pp_label":
-                    raise ValueError(f"'pp_label' not needed")
+                    raise ValueError("'pp_label' not needed")
                 pp_kwargs[kw[3:]] = kwargs[kw]
 
         if "pp_num" in kwargs:
@@ -472,7 +471,7 @@ class BaseHist(bh.Histogram):
             kwargs.pop("pp_" + k)
 
         # judge whether some arguements left
-        if len(kwargs):
+        if kwargs:
             raise ValueError(f"'{list(kwargs.keys())[0]}' not needed")
 
         """
@@ -490,7 +489,7 @@ class BaseHist(bh.Histogram):
             label="Uncertainty",
             **ub_kwargs,
         )
-        legend = ax.legend(loc=0)
+        ax.legend(loc=0)
         ax.set_ylabel("Counts")
 
         """
@@ -543,7 +542,7 @@ class BaseHist(bh.Histogram):
             )
         elif isinstance(x, complex):
             if x.real % 1 != 0:
-                raise ValueError(f"The real part should be an integer")
+                raise ValueError("The real part should be an integer")
             else:
                 return bh.loc(x.imag, int(x.real))
         elif isinstance(x, str):
@@ -558,9 +557,9 @@ class BaseHist(bh.Histogram):
 
         if isinstance(x, complex):
             if x.real != 0:
-                raise ValueError(f"The step should not have real part")
+                raise ValueError("The step should not have real part")
             elif x.imag % 1 != 0:
-                raise ValueError(f"The imaginary part should be an integer")
+                raise ValueError("The imaginary part should be an integer")
             else:
                 return bh.rebin(int(x.imag))
         else:

@@ -1,7 +1,6 @@
+# -*- coding: utf-8 -*-
 from hist import axis
-import boost_histogram as bh
 import pytest
-import numpy as np
 
 
 def test_axis_names():

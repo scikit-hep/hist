@@ -1,6 +1,3 @@
 
 Development Guideline
 ===========================
-
-
-
