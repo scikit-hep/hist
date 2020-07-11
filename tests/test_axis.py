@@ -4,14 +4,11 @@ import pytest
 import numpy as np
 
 
-def test_basic_usage():
+def test_axis_names():
     """
-        Test basic usage -- whether axis names work.
+        Test axis names -- whether axis names work.
     """
 
-    """
-    Names
-    """
     assert axis.Regular(50, -3, 3, name="x0")
     assert axis.Boolean(name="x_")
     assert axis.Variable(range(-3, 3), name="xx")
@@ -26,15 +23,6 @@ def test_basic_usage():
     assert axis.IntCategory(range(-3, 3), name="")
     assert axis.StrCategory("FT")
 
-
-def test_errors():
-    """
-        Test errors -- whether name exceptions are thrown.
-    """
-
-    """
-    Names
-    """
     # protected or private prefix
     with pytest.raises(Exception):
         axis.Regular(50, -3, 3, name="_x")

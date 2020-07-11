@@ -1,11 +1,12 @@
 import numpy as np
+import boost_histogram as bh
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from matplotlib import transforms
+from functools import partial
 from scipy.optimize import curve_fit
 from uncertainties import correlated_values, unumpy
-from boost_histogram import Histogram, loc, rebin
 from typing import Callable, Optional, Tuple, Union
 
 # typing alias
@@ -26,21 +27,65 @@ PlotPull_RetType = Tuple[
 ]
 
 
-class BaseHist(Histogram):
+from .axis import Regular
+
+
+class always_normal_method:
+    def __get__(self, instance, owner=None):
+        self.instance = instance or owner()
+        return self
+
+    def __init__(self, method):
+        self.method = method
+        self.instance = None
+
+    def __call__(self, *args, **kwargs):
+        return self.method(self.instance, *args, **kwargs)
+
+
+class BaseHist(bh.Histogram):
     def __init__(self, *args, **kwargs):
         """
             Initialize BaseHist object. Axis params can contain the names.
         """
+        if len(args):
+            self._ax = list(args)
+            super().__init__(*args, **kwargs)
+            self.names: dict = dict()
+            for ax in self.axes:
+                if ax.name in self.names:
+                    raise Exception(
+                        f"{self.__class__.__name__} instance cannot contain axes with duplicated names."
+                    )
+                else:
+                    self.names[ax.name] = True
+        else:
+            self._ax = []
+            self._hist = None
+            self._storage_proxy = None
 
-        super().__init__(*args, **kwargs)
-        self.names: dict = dict()
-        for ax in self.axes:
-            if ax.name in self.names:
-                raise Exception(
-                    f"{self.__class__.__name__} instance cannot contain axes with duplicated names."
-                )
-            else:
-                self.names[ax.name] = True
+    @always_normal_method
+    def Regular(self, *args, **kwargs):
+        if self._hist:
+            raise RuntimeError("Cannot add an axis to an existing histogram")
+        self._ax.append(Regular(*args, **kwargs))
+        return self
+
+    def __getattribute__(self, item):
+
+        if (
+            not super().__getattribute__("_hist")
+            and not isinstance(super().__getattribute__(item), always_normal_method)
+            and not item in {"_hist", "_ax"}
+        ):
+            # Make histogram real here
+            ax = object.__getattribute__(self, "_ax")
+            storage = (
+                object.__getattribute__(self, "_storage_proxy") or bh.storage.Double()
+            )
+            object.__getattribute__(self, "__init__")(*ax, storage=storage)
+
+        return object.__getattribute__(self, item)
 
     def project(self, *args: Union[int, str]):
         """
@@ -524,12 +569,10 @@ class BaseHist(Histogram):
         elif isinstance(x, complex):
             if x.real % 1 != 0:
                 raise ValueError(f"The real part should be an integer")
-            elif x.imag % 1 != 0:
-                raise ValueError(f"The imaginary part should be an integer")
             else:
-                return loc(x.imag, int(x.real))
+                return bh.loc(x.imag, int(x.real))
         elif isinstance(x, str):
-            return loc(x)
+            return bh.loc(x)
         else:
             return x
 
@@ -544,7 +587,7 @@ class BaseHist(Histogram):
             elif x.imag % 1 != 0:
                 raise ValueError(f"The imaginary part should be an integer")
             else:
-                return rebin(int(x.imag))
+                return bh.rebin(int(x.imag))
         else:
             return x
 
