@@ -7,7 +7,6 @@ from matplotlib import transforms
 from functools import partial
 from scipy.optimize import curve_fit
 from uncertainties import correlated_values, unumpy
-from boost_histogram import Histogram, loc, rebin
 from typing import Callable, Optional, Tuple, Union
 
 # typing alias
@@ -564,9 +563,9 @@ class BaseHist(bh.Histogram):
             if x.real % 1 != 0:
                 raise ValueError(f"The real part should be an integer")
             else:
-                return loc(x.imag, int(x.real))
+                return bh.loc(x.imag, int(x.real))
         elif isinstance(x, str):
-            return loc(x)
+            return bh.loc(x)
         else:
             return x
 
@@ -581,7 +580,7 @@ class BaseHist(bh.Histogram):
             elif x.imag % 1 != 0:
                 raise ValueError(f"The imaginary part should be an integer")
             else:
-                return rebin(int(x.imag))
+                return bh.rebin(int(x.imag))
         else:
             return x
 
