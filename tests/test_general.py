@@ -5,15 +5,11 @@ import numpy as np
 from uncertainties import unumpy as unp
 
 
-def test_basic_usage():
+def test_general_init():
     """
-        Test basic usage -- whether Hist are properly derived from
-        boost-histogram and whether plot_pull method work.
+        Test general init -- whether Hist can be properly initialized.
     """
 
-    """
-    Initialization
-    """
     # basic
     h = Hist(axis.Regular(10, 0, 1)).fill([0.35, 0.35, 0.45])
 
@@ -71,9 +67,36 @@ def test_basic_usage():
         axis.StrCategory("TF"), axis.StrCategory(["T", "F"], name="x")
     )  # name=None will be converted to name=''
 
+    # with duplicated names
+    with pytest.raises(Exception):
+        Hist(axis.Regular(50, -3, 3, name="x"), axis.Regular(50, -3, 3, name="x"))
+
+    with pytest.raises(Exception):
+        Hist(axis.Boolean(name="y"), axis.Boolean(name="y"))
+
+    with pytest.raises(Exception):
+        Hist(
+            axis.Variable(range(-3, 3), name="x"), axis.Variable(range(-3, 3), name="x")
+        )
+
+    with pytest.raises(Exception):
+        Hist(axis.Integer(-3, 3, name="x"), axis.Integer(-3, 3, name="x"))
+
+    with pytest.raises(Exception):
+        Hist(
+            axis.IntCategory(range(-3, 3), name="x"),
+            axis.IntCategory(range(-3, 3), name="x"),
+        )
+
+    with pytest.raises(Exception):
+        Hist(axis.StrCategory("TF", name="y"), axis.StrCategory(["T", "F"], name="y"))
+
+
+def test_general_fill():
     """
-    Fill
+        Test general fill -- whether Hist can be properly filled.
     """
+
     # Regular
     h = Hist(
         axis.Regular(10, 0, 1, name="x"),
@@ -198,197 +221,6 @@ def test_basic_usage():
     assert z_one_only[bh.loc("T"), bh.loc("F")] == 3
     assert z_one_only[bh.loc("T"), bh.loc("T")] == 1
 
-    """
-    Access
-    """
-    h = Hist(axis.Regular(10, -5, 5, name="X", title="x [units]")).fill(
-        np.random.normal(size=1000)
-    )
-
-    assert h[6] == h[bh.loc(1)] == h[1j] == h[0j + 1] == h[-3j + 4] == h[bh.loc(1, 0)]
-    h[6] = h[bh.loc(1)] = h[1j] = h[0j + 1] = h[-3j + 4] = h[bh.loc(1, 0)] = 0
-
-    h = Hist(
-        axis.Regular(50, -5, 5, name="Norm", title="normal distribution"),
-        axis.Regular(50, -5, 5, name="Unif", title="uniform distribution"),
-        axis.StrCategory(["hi", "hello"], name="Greet"),
-        axis.Boolean(name="Yes"),
-        axis.Integer(0, 1000, name="Int"),
-    ).fill(
-        np.random.normal(size=1000),
-        np.random.uniform(size=1000),
-        ["hi"] * 800 + ["hello"] * 200,
-        [True] * 600 + [False] * 400,
-        np.ones(1000),
-    )
-
-    """
-    Projection
-    """
-    h = Hist(
-        axis.Regular(
-            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
-        ),
-        axis.Boolean(name="B", title="b [units]"),
-        axis.Variable(range(11), name="C", title="c [units]"),
-        axis.Integer(0, 10, name="D", title="d [units]"),
-        axis.IntCategory(range(10), name="E", title="e [units]"),
-        axis.StrCategory("FT", name="F", title="f [units]"),
-    )
-
-    # via indices
-    assert h.project()
-    assert h.project(0, 1)
-    assert h.project(0, 1, 2, 3, 4, 5)
-
-    # via names
-    assert h.project()
-    assert h.project("A", "B")
-    assert h.project("A", "B", "C", "D", "E", "F")
-
-    """
-    Plot1d
-    """
-    h = Hist(
-        axis.Regular(
-            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
-        ),
-    ).fill(np.random.normal(size=10))
-
-    assert h.plot1d(color="green", ls="--", lw=3)
-
-    """
-    Plot2d
-    """
-    h = Hist(
-        axis.Regular(
-            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
-        ),
-        axis.Regular(
-            50, -4, 4, name="B", title="b [units]", underflow=False, overflow=False
-        ),
-    ).fill(np.random.normal(size=10), np.random.normal(size=10))
-
-    assert h.plot2d(cmap="cividis")
-
-    """
-    Plot2d_full
-    """
-    h = Hist(
-        axis.Regular(
-            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
-        ),
-        axis.Regular(
-            50, -4, 4, name="B", title="b [units]", underflow=False, overflow=False
-        ),
-    ).fill(np.random.normal(size=10), np.random.normal(size=10))
-
-    assert h.plot2d_full(
-        main_cmap="cividis",
-        top_ls="--",
-        top_color="orange",
-        top_lw=2,
-        side_ls="-.",
-        side_lw=1,
-        side_color="steelblue",
-    )
-
-    """
-    Plot
-    """
-    h = Hist(
-        axis.Regular(
-            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
-        ),
-    ).fill(np.random.normal(size=10))
-
-    assert h.plot(color="green", ls="--", lw=3)
-
-    h = Hist(
-        axis.Regular(
-            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
-        ),
-        axis.Regular(
-            50, -4, 4, name="B", title="b [units]", underflow=False, overflow=False
-        ),
-    ).fill(np.random.normal(size=10), np.random.normal(size=10))
-
-    assert h.plot(cmap="cividis")
-
-    """
-    Plot Pull
-    """
-    h = Hist(
-        axis.Regular(
-            50, -4, 4, name="S", title="s [units]", underflow=False, overflow=False
-        )
-    ).fill(np.random.normal(size=10))
-
-    def pdf(x, a=1 / np.sqrt(2 * np.pi), x0=0, sigma=1, offset=0):
-        exp = unp.exp if a.dtype == np.dtype("O") else np.exp
-        return a * exp(-((x - x0) ** 2) / (2 * sigma ** 2)) + offset
-
-    assert h.plot_pull(
-        pdf,
-        eb_ecolor="crimson",
-        eb_mfc="crimson",
-        eb_mec="crimson",
-        eb_fmt="o",
-        eb_ms=6,
-        eb_capsize=1,
-        eb_capthick=2,
-        eb_alpha=0.8,
-        vp_c="gold",
-        vp_ls="-",
-        vp_lw=8,
-        vp_alpha=0.6,
-        fp_c="chocolate",
-        fp_ls="-",
-        fp_lw=3,
-        fp_alpha=1.0,
-        bar_fc="orange",
-        pp_num=6,
-        pp_fc="orange",
-        pp_alpha=0.618,
-        pp_ec=None,
-    )
-
-
-def test_errors():
-    """
-        Test errors -- whether the name exceptions in the Hist are thrown.
-    """
-
-    """
-    Initialization
-    """
-    # with duplicated names
-    with pytest.raises(Exception):
-        Hist(axis.Regular(50, -3, 3, name="x"), axis.Regular(50, -3, 3, name="x"))
-
-    with pytest.raises(Exception):
-        Hist(axis.Boolean(name="y"), axis.Boolean(name="y"))
-
-    with pytest.raises(Exception):
-        Hist(
-            axis.Variable(range(-3, 3), name="x"), axis.Variable(range(-3, 3), name="x")
-        )
-
-    with pytest.raises(Exception):
-        Hist(axis.Integer(-3, 3, name="x"), axis.Integer(-3, 3, name="x"))
-
-    with pytest.raises(Exception):
-        Hist(
-            axis.IntCategory(range(-3, 3), name="x"),
-            axis.IntCategory(range(-3, 3), name="x"),
-        )
-
-    with pytest.raises(Exception):
-        Hist(axis.StrCategory("TF", name="y"), axis.StrCategory(["T", "F"], name="y"))
-
-    """
-    Fill
-    """
     # with names
     with pytest.raises(Exception):
         Hist(axis.Regular(50, -3, 3, name="x"), axis.Regular(50, -3, 3, name="y")).fill(
@@ -431,9 +263,59 @@ def test_errors():
         )
     ).fill(np.random.normal(size=10))
 
+
+def test_general_access():
     """
-    Projection
+        Test general access -- whether Hist bins can be accessed.
     """
+
+    h = Hist(axis.Regular(10, -5, 5, name="X", title="x [units]")).fill(
+        np.random.normal(size=1000)
+    )
+
+    assert h[6] == h[bh.loc(1)] == h[1j] == h[0j + 1] == h[-3j + 4] == h[bh.loc(1, 0)]
+    h[6] = h[bh.loc(1)] = h[1j] = h[0j + 1] = h[-3j + 4] = h[bh.loc(1, 0)] = 0
+
+    h = Hist(
+        axis.Regular(50, -5, 5, name="Norm", title="normal distribution"),
+        axis.Regular(50, -5, 5, name="Unif", title="uniform distribution"),
+        axis.StrCategory(["hi", "hello"], name="Greet"),
+        axis.Boolean(name="Yes"),
+        axis.Integer(0, 1000, name="Int"),
+    ).fill(
+        np.random.normal(size=1000),
+        np.random.uniform(size=1000),
+        ["hi"] * 800 + ["hello"] * 200,
+        [True] * 600 + [False] * 400,
+        np.ones(1000),
+    )
+
+
+def test_general_project():
+    """
+        Test general project -- whether Hist can be projected properly.
+    """
+    h = Hist(
+        axis.Regular(
+            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+        ),
+        axis.Boolean(name="B", title="b [units]"),
+        axis.Variable(range(11), name="C", title="c [units]"),
+        axis.Integer(0, 10, name="D", title="d [units]"),
+        axis.IntCategory(range(10), name="E", title="e [units]"),
+        axis.StrCategory("FT", name="F", title="f [units]"),
+    )
+
+    # via indices
+    assert h.project()
+    assert h.project(0, 1)
+    assert h.project(0, 1, 2, 3, 4, 5)
+
+    # via names
+    assert h.project()
+    assert h.project("A", "B")
+    assert h.project("A", "B", "C", "D", "E", "F")
+
     h = Hist(
         axis.Regular(
             50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
@@ -466,9 +348,20 @@ def test_errors():
     with pytest.raises(Exception):
         h.project("G", "H")
 
+
+def test_general_plot1d():
     """
-    Plot1d
+        Test general plot1d -- whether 1d-Hist can be plotted properly.
     """
+
+    h = Hist(
+        axis.Regular(
+            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+        ),
+    ).fill(np.random.normal(size=10))
+
+    assert h.plot1d(color="green", ls="--", lw=3)
+
     # dimension error
     h = Hist(
         axis.Regular(
@@ -490,9 +383,23 @@ def test_errors():
     with pytest.raises(Exception):
         h.project("B").plot1d(ls="red")
 
+
+def test_general_plot2d():
     """
-    Plot2d
+        Test general plot2d -- whether 2d-Hist can be plotted properly.
     """
+
+    h = Hist(
+        axis.Regular(
+            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+        ),
+        axis.Regular(
+            50, -4, 4, name="B", title="b [units]", underflow=False, overflow=False
+        ),
+    ).fill(np.random.normal(size=10), np.random.normal(size=10))
+
+    assert h.plot2d(cmap="cividis")
+
     # dimension error
     h = Hist(
         axis.Regular(
@@ -514,9 +421,31 @@ def test_errors():
     with pytest.raises(Exception):
         h.plot2d(cmap=0.1)
 
+
+def test_general_plot2d_full():
     """
-    Plot2d_full
+        Test general plot2d_full -- whether 2d-Hist can be fully plotted properly.
     """
+
+    h = Hist(
+        axis.Regular(
+            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+        ),
+        axis.Regular(
+            50, -4, 4, name="B", title="b [units]", underflow=False, overflow=False
+        ),
+    ).fill(np.random.normal(size=10), np.random.normal(size=10))
+
+    assert h.plot2d_full(
+        main_cmap="cividis",
+        top_ls="--",
+        top_color="orange",
+        top_lw=2,
+        side_ls="-.",
+        side_lw=1,
+        side_color="steelblue",
+    )
+
     # dimension error
     h = Hist(
         axis.Regular(
@@ -541,9 +470,31 @@ def test_errors():
     with pytest.raises(Exception):
         h.plot2d_full(main_cmap=0.1, side_lw="autumn")
 
+
+def test_general_plot():
     """
-    Plot
+        Test general plot -- whether Hist can be plotted properly.
     """
+
+    h = Hist(
+        axis.Regular(
+            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+        ),
+    ).fill(np.random.normal(size=10))
+
+    assert h.plot(color="green", ls="--", lw=3)
+
+    h = Hist(
+        axis.Regular(
+            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+        ),
+        axis.Regular(
+            50, -4, 4, name="B", title="b [units]", underflow=False, overflow=False
+        ),
+    ).fill(np.random.normal(size=10), np.random.normal(size=10))
+
+    assert h.plot(cmap="cividis")
+
     # dimension error
     h = Hist(
         axis.Regular(
@@ -576,9 +527,47 @@ def test_errors():
     with pytest.raises(Exception):
         h.project("A", "C").plot(cmap=0.1)
 
+
+def test_general_plot_pull():
     """
-    Plot Pull
+        Test general plot_pull -- whether 1d-Hist can be plotted pull properly.
     """
+
+    h = Hist(
+        axis.Regular(
+            50, -4, 4, name="S", title="s [units]", underflow=False, overflow=False
+        )
+    ).fill(np.random.normal(size=10))
+
+    def pdf(x, a=1 / np.sqrt(2 * np.pi), x0=0, sigma=1, offset=0):
+        exp = unp.exp if a.dtype == np.dtype("O") else np.exp
+        return a * exp(-((x - x0) ** 2) / (2 * sigma ** 2)) + offset
+
+    assert h.plot_pull(
+        pdf,
+        eb_ecolor="crimson",
+        eb_mfc="crimson",
+        eb_mec="crimson",
+        eb_fmt="o",
+        eb_ms=6,
+        eb_capsize=1,
+        eb_capthick=2,
+        eb_alpha=0.8,
+        vp_c="gold",
+        vp_ls="-",
+        vp_lw=8,
+        vp_alpha=0.6,
+        fp_c="chocolate",
+        fp_ls="-",
+        fp_lw=3,
+        fp_alpha=1.0,
+        bar_fc="orange",
+        pp_num=6,
+        pp_fc="orange",
+        pp_alpha=0.618,
+        pp_ec=None,
+    )
+
     # dimension error
     hh = Hist(
         axis.Regular(
