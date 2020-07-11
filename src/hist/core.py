@@ -32,10 +32,15 @@ from .axis import Regular
 
 class always_normal_method:
     def __get__(self, instance, owner=None):
-        return partial(self.method, instance or owner())
+        self.instance = instance or owner()
+        return self
 
     def __init__(self, method):
         self.method = method
+        self.instance = None
+
+    def __call__(self, *args, **kwargs):
+        return self.method(self.instance, *args, **kwargs)
 
 
 class BaseHist(bh.Histogram):
@@ -68,10 +73,13 @@ class BaseHist(bh.Histogram):
 
     def __getattribute__(self, item):
 
-        if not super().__getattribute__("_hist") and not isinstance(
-            super().__getattribute__(item), always_normal_method
+        if (
+            not super().__getattribute__("_hist")
+            and not isinstance(super().__getattribute__(item), always_normal_method)
+            and not item in {"_hist", "_ax"}
         ):
             # Make histogram real here
+            print(f"{item} made this real: {type(super().__getattribute__(item))}")
             ax = object.__getattribute__(self, "_ax")
             storage = (
                 object.__getattribute__(self, "_storage_proxy") or bh.storage.Double()

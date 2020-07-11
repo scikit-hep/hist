@@ -641,3 +641,9 @@ def test_histogram_quick_construction():
     h = Hist.Regular(10, 0, 1, name="x")
     h.fill([0.5, 0.5])
     assert h[0.5j] == 2
+
+
+def test_histogram_quick_constrution():
+    h = Hist.Regular(10, 0, 1, name="x").Regular(10, -1, 1, name="y")
+    h.fill([0.5, 0.5], [-0.2, 0.6])
+    assert h[0.5j, -0.2j] == 1
