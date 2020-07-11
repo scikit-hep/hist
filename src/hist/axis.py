@@ -3,8 +3,10 @@ from typing import Dict, List, Union
 
 import re
 import boost_histogram.axis as bha
+import hist.utils
 
 
+@hist.utils.set_family(hist.utils.HIST_FAMILY)
 class Regular(bha.Regular):
     def __init__(
         self,
@@ -108,6 +110,7 @@ class Boolean(bha.Regular):  # ToDo: should be derived from bha.Boolean
         self.metadata["title"] = value
 
 
+@hist.utils.set_family(hist.utils.HIST_FAMILY)
 class Variable(bha.Variable):
     def __init__(
         self,
@@ -163,6 +166,7 @@ class Variable(bha.Variable):
         self.metadata["title"] = value
 
 
+@hist.utils.set_family(hist.utils.HIST_FAMILY)
 class Integer(bha.Integer):
     def __init__(
         self,
@@ -220,6 +224,7 @@ class Integer(bha.Integer):
         self.metadata["title"] = value
 
 
+@hist.utils.set_family(hist.utils.HIST_FAMILY)
 class IntCategory(bha.IntCategory):
     def __init__(
         self,
@@ -269,6 +274,7 @@ class IntCategory(bha.IntCategory):
         self.metadata["title"] = value
 
 
+@hist.utils.set_family(hist.utils.HIST_FAMILY)
 class StrCategory(bha.StrCategory):
     def __init__(
         self,
