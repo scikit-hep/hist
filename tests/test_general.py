@@ -3,6 +3,7 @@ import boost_histogram as bh
 import pytest
 import numpy as np
 from uncertainties import unumpy as unp
+import hist
 
 
 def test_general_init():
@@ -650,18 +651,22 @@ def test_histogram_quick_constrution():
 
 
 def test_histogram_unnamed_axes():
+
     h = Hist(axis.Regular(10, 0, 1), axis.Regular(20, -3, 3))
 
 
 def test_histogram_loc():
     h = Hist(axis.Regular(100, -50, 50))
+
     h.fill([0, 2.1])
     h[0j] == 1
     h[2.1j] == 1
 
 
 def test_histogram_rebin():
+
     h = Hist(axis.Regular(100, 0, 1))
+
     assert len(h.axes[0]) == 100
     assert len(h[::2j].axes[0]) == 50  # type: ignore
     assert len(h[::10j].axes[0]) == 10  # type: ignore
