@@ -10,3 +10,4 @@ from . import axis
 from .general import Hist
 from .named import NamedHist
 from .core import BaseHist
+from . import numpy
