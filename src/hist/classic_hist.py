@@ -30,7 +30,7 @@ def main():
     with open(args.input) if args.input else sys.stdin as f:
         values = [float(v) for v in f]
 
-    h = bh.numpy.histogram(values, bins=args.buckets)
+    h = bh.numpy.histogram(values, bins=args.buckets, histogram=hist.Hist)
 
     if args.output_image:
         import matplotlib.pyplot as plt
