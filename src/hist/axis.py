@@ -49,7 +49,7 @@ class Regular(bha.Regular):
         """
         Get or set the name for the Regular axis
         """
-        return self.metadata["name"]
+        return self.metadata["name"] if self.metadata else ""
 
     @name.setter
     def name(self, value: str) -> None:
@@ -60,7 +60,7 @@ class Regular(bha.Regular):
         """
         Get or set the title for the Regular axis
         """
-        return self.metadata["title"]
+        return self.metadata["title"] if self.metadata else ""
 
     @title.setter
     def title(self, value: str) -> None:
@@ -89,7 +89,7 @@ class Boolean(bha.Regular):  # ToDo: should be derived from bha.Boolean
         """
         Get or set the name for the Bool axis
         """
-        return self.metadata["name"]
+        return self.metadata["name"] if self.metadata else ""
 
     @name.setter
     def name(self, value: str) -> None:
@@ -100,7 +100,7 @@ class Boolean(bha.Regular):  # ToDo: should be derived from bha.Boolean
         """
         Get or set the title for the Bool axis
         """
-        return self.metadata["title"]
+        return self.metadata["title"] if self.metadata else ""
 
     @title.setter
     def title(self, value: str) -> None:
@@ -144,7 +144,7 @@ class Variable(bha.Variable):
         """
         Get or set the name for the Variable axis
         """
-        return self.metadata["name"]
+        return self.metadata["name"] if self.metadata else ""
 
     @name.setter
     def name(self, value: str) -> None:
@@ -155,7 +155,7 @@ class Variable(bha.Variable):
         """
         Get or set the title for the Variable axis
         """
-        return self.metadata["title"]
+        return self.metadata["title"] if self.metadata else ""
 
     @title.setter
     def title(self, value: str) -> None:
@@ -201,7 +201,7 @@ class Integer(bha.Integer):
         """
         Get or set the name for the Integer axis
         """
-        return self.metadata["name"]
+        return self.metadata["name"] if self.metadata else ""
 
     @name.setter
     def name(self, value: str) -> None:
@@ -212,7 +212,7 @@ class Integer(bha.Integer):
         """
         Get or set the title for the Integer axis
         """
-        return self.metadata["title"]
+        return self.metadata["title"] if self.metadata else ""
 
     @title.setter
     def title(self, value: str) -> None:
@@ -250,7 +250,7 @@ class IntCategory(bha.IntCategory):
         """
         Get or set the name for the IntCategory axis
         """
-        return self.metadata["name"]
+        return self.metadata["name"] if self.metadata else ""
 
     @name.setter
     def name(self, value: str) -> None:
@@ -261,7 +261,7 @@ class IntCategory(bha.IntCategory):
         """
         Get or set the title for the IntCategory axis
         """
-        return self.metadata["title"]
+        return self.metadata["title"] if self.metadata else ""
 
     @title.setter
     def title(self, value: str) -> None:
@@ -299,7 +299,7 @@ class StrCategory(bha.StrCategory):
         """
         Get or set the name for the StrCategory axis
         """
-        return self.metadata["name"]
+        return self.metadata["name"] if self.metadata else ""
 
     @name.setter
     def name(self, value: str) -> None:
@@ -310,7 +310,7 @@ class StrCategory(bha.StrCategory):
         """
         Get or set the title for the StrCategory axis
         """
-        return self.metadata["title"]
+        return self.metadata["title"] if self.metadata else ""
 
     @title.setter
     def title(self, value: str) -> None:
