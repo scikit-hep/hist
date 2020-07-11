@@ -9,6 +9,7 @@ from scipy.optimize import curve_fit
 from uncertainties import correlated_values, unumpy
 from typing import Callable, Optional, Tuple, Union
 
+import hist.utils
 from .axis import Regular
 
 # typing alias
@@ -42,18 +43,18 @@ class always_normal_method:
         return self.method(self.instance, *args, **kwargs)
 
 
+@hist.utils.set_family(hist.utils.HIST_FAMILY)
 class BaseHist(bh.Histogram):
     def __init__(self, *args, **kwargs):
         """
             Initialize BaseHist object. Axis params can contain the names.
         """
         if len(args):
-            self._ax = list(args)
             super().__init__(*args, **kwargs)
             self.names: dict = dict()
             for ax in self.axes:
                 if ax.name and ax.name in self.names:
-                    raise Exception(
+                    raise KeyError(
                         f"{self.__class__.__name__} instance cannot contain axes with duplicated names."
                     )
                 else:
