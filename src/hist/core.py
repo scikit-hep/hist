@@ -53,7 +53,7 @@ class BaseHist(bh.Histogram):
             super().__init__(*args, **kwargs)
             self.names: dict = dict()
             for ax in self.axes:
-                if ax.name in self.names:
+                if ax.name and ax.name in self.names:
                     raise Exception(
                         f"{self.__class__.__name__} instance cannot contain axes with duplicated names."
                     )
