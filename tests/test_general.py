@@ -670,3 +670,5 @@ def test_histogram_rebin():
     assert len(h.axes[0]) == 100
     assert len(h[::2j].axes[0]) == 50  # type: ignore
     assert len(h[::10j].axes[0]) == 10  # type: ignore
+
+    # ToDo: test complex & density & proxy
