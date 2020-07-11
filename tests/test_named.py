@@ -5,15 +5,11 @@ import numpy as np
 from uncertainties import unumpy as unp
 
 
-def test_basic_usage():
+def test_named_init():
     """
-        Test basic usage -- whether NamedHist are properly derived from\
-        boost-histogram and whether it can be filled by names.
+        Test named init -- whether NamedHist can be properly initialized.
     """
 
-    """
-    Initialization
-    """
     # basic
     h = NamedHist(axis.Regular(10, 0, 1, name="x")).fill(x=[0.35, 0.35, 0.45])
 
@@ -51,9 +47,70 @@ def test_basic_usage():
         axis.StrCategory(["F", "T"], name="x"), axis.StrCategory("FT", name="y")
     ).fill(y=["T", "F", "T"], x=["T", "F", "T"])
 
+    # with no-named axes
+    with pytest.raises(Exception):
+        NamedHist(
+            axis.Regular(50, -3, 3, name=""), axis.Regular(50, -3, 3, name="")
+        ).fill(x=np.random.randn(10), y=np.random.randn(10))
+
+    with pytest.raises(Exception):
+        NamedHist(axis.Boolean(name=""), axis.Boolean(name="")).fill(
+            y=[True, False, True], x=[True, False, True]
+        )
+
+    with pytest.raises(Exception):
+        NamedHist(axis.Variable(range(-3, 3)), axis.Variable(range(-3, 3))).fill(
+            x=np.random.randn(10), y=np.random.randn(10)
+        )
+
+    with pytest.raises(Exception):
+        NamedHist(axis.Integer(-3, 3), axis.Integer(-3, 3)).fill(
+            x=np.random.randn(10), y=np.random.randn(10)
+        )
+
+    with pytest.raises(Exception):
+        NamedHist(
+            axis.IntCategory(range(-3, 3), name=""),
+            axis.IntCategory(range(-3, 3), name=""),
+        ).fill(x=np.random.randn(10), y=np.random.randn(10))
+
+    with pytest.raises(Exception):
+        NamedHist(
+            axis.StrCategory(["F", "T"], name=""), axis.StrCategory("FT", name="")
+        ).fill(y=["T", "F", "T"], x=["T", "F", "T"])
+
+    # with duplicated names
+    with pytest.raises(Exception):
+        NamedHist(axis.Regular(50, -3, 3, name="x"), axis.Regular(50, -3, 3, name="x"))
+
+    with pytest.raises(Exception):
+        NamedHist(axis.Boolean(name="y"), axis.Boolean(name="y"))
+
+    with pytest.raises(Exception):
+        NamedHist(
+            axis.Variable(range(-3, 3), name="x"), axis.Variable(range(-3, 3), name="x")
+        )
+
+    with pytest.raises(Exception):
+        NamedHist(axis.Integer(-3, 3, name="x"), axis.Integer(-3, 3, name="x"))
+
+    with pytest.raises(Exception):
+        NamedHist(
+            axis.IntCategory(range(-3, 3), name="x"),
+            axis.IntCategory(range(-3, 3), name="x"),
+        )
+
+    with pytest.raises(Exception):
+        NamedHist(
+            axis.StrCategory("TF", name="y"), axis.StrCategory(["T", "F"], name="y")
+        )
+
+
+def test_named_fill():
     """
-    Fill
+        Test named fill -- whether NamedHist can be properly filled.
     """
+
     # Regular
     h = NamedHist(
         axis.Regular(10, 0, 1, name="x"),
@@ -242,228 +299,6 @@ def test_basic_usage():
     assert z_one_only[bh.loc("T"), bh.loc("F")] == 3
     assert z_one_only[bh.loc("T"), bh.loc("T")] == 1
 
-    """
-    Access
-    """
-    h = NamedHist(axis.Regular(10, -5, 5, name="X", title="x [units]")).fill(
-        X=np.random.normal(size=1000)
-    )
-
-    assert h[6] == h[bh.loc(1)] == h[1j] == h[0j + 1] == h[-3j + 4] == h[bh.loc(1, 0)]
-    h[6] = h[bh.loc(1)] = h[1j] = h[0j + 1] = h[-3j + 4] = h[bh.loc(1, 0)] = 0
-
-    h = NamedHist(
-        axis.Regular(50, -5, 5, name="Norm", title="normal distribution"),
-        axis.Regular(50, -5, 5, name="Unif", title="uniform distribution"),
-        axis.StrCategory(["hi", "hello"], name="Greet"),
-        axis.Boolean(name="Yes"),
-        axis.Integer(0, 1000, name="Int"),
-    ).fill(
-        Norm=np.random.normal(size=1000),
-        Unif=np.random.uniform(size=1000),
-        Greet=["hi"] * 800 + ["hello"] * 200,
-        Yes=[True] * 600 + [False] * 400,
-        Int=np.ones(1000),
-    )
-
-    assert h[0j, -0j + 2, "hi", True, 1]
-
-    """
-    Projection
-    """
-    h = NamedHist(
-        axis.Regular(
-            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
-        ),
-        axis.Boolean(name="B", title="b [units]"),
-        axis.Variable(range(11), name="C", title="c [units]"),
-        axis.Integer(0, 10, name="D", title="d [units]"),
-        axis.IntCategory(range(10), name="E", title="e [units]"),
-        axis.StrCategory("FT", name="F", title="f [units]"),
-    )
-
-    # via names
-    assert h.project()
-    assert h.project("A", "B")
-    assert h.project("A", "B", "C", "D", "E", "F")
-
-    """
-    Plot1d
-    """
-    h = NamedHist(
-        axis.Regular(
-            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
-        ),
-    ).fill(A=np.random.normal(size=10))
-
-    assert h.plot1d(color="green", ls="--", lw=3)
-
-    """
-    Plot2d
-    """
-    h = NamedHist(
-        axis.Regular(
-            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
-        ),
-        axis.Regular(
-            50, -4, 4, name="B", title="b [units]", underflow=False, overflow=False
-        ),
-    ).fill(B=np.random.normal(size=10), A=np.random.normal(size=10))
-
-    assert h.plot2d(cmap="cividis")
-
-    """
-    Plot2d_full
-    """
-    h = NamedHist(
-        axis.Regular(
-            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
-        ),
-        axis.Regular(
-            50, -4, 4, name="B", title="b [units]", underflow=False, overflow=False
-        ),
-    ).fill(B=np.random.normal(size=10), A=np.random.normal(size=10))
-
-    assert h.plot2d_full(
-        main_cmap="cividis",
-        top_ls="--",
-        top_color="orange",
-        top_lw=2,
-        side_ls="-.",
-        side_lw=1,
-        side_color="steelblue",
-    )
-
-    """
-    Plot
-    """
-    h = NamedHist(
-        axis.Regular(
-            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
-        ),
-    ).fill(A=np.random.normal(size=10))
-
-    assert h.plot(color="green", ls="--", lw=3)
-
-    h = NamedHist(
-        axis.Regular(
-            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
-        ),
-        axis.Regular(
-            50, -4, 4, name="B", title="b [units]", underflow=False, overflow=False
-        ),
-    ).fill(B=np.random.normal(size=10), A=np.random.normal(size=10))
-
-    assert h.plot(cmap="cividis")
-
-    """
-    Plot Pull
-    """
-    h = NamedHist(
-        axis.Regular(
-            50, -4, 4, name="S", title="s [units]", underflow=False, overflow=False
-        )
-    ).fill(S=np.random.normal(size=10))
-
-    def pdf(x, a=1 / np.sqrt(2 * np.pi), x0=0, sigma=1, offset=0):
-        exp = unp.exp if a.dtype == np.dtype("O") else np.exp
-        return a * exp(-((x - x0) ** 2) / (2 * sigma ** 2)) + offset
-
-    assert h.plot_pull(
-        pdf,
-        eb_ecolor="crimson",
-        eb_mfc="crimson",
-        eb_mec="crimson",
-        eb_fmt="o",
-        eb_ms=6,
-        eb_capsize=1,
-        eb_capthick=2,
-        eb_alpha=0.8,
-        vp_c="gold",
-        vp_ls="-",
-        vp_lw=8,
-        vp_alpha=0.6,
-        fp_c="chocolate",
-        fp_ls="-",
-        fp_lw=3,
-        fp_alpha=1.0,
-        bar_fc="orange",
-        pp_num=6,
-        pp_fc="orange",
-        pp_alpha=0.618,
-        pp_ec=None,
-    )
-
-
-def test_errors():
-    """
-        Test errors -- whether the name exceptions in the NamedHist are thrown.
-    """
-
-    """
-    Initialization
-    """
-    # with no-named axes
-    with pytest.raises(Exception):
-        NamedHist(
-            axis.Regular(50, -3, 3, name=""), axis.Regular(50, -3, 3, name="")
-        ).fill(x=np.random.randn(10), y=np.random.randn(10))
-
-    with pytest.raises(Exception):
-        NamedHist(axis.Boolean(name=""), axis.Boolean(name="")).fill(
-            y=[True, False, True], x=[True, False, True]
-        )
-
-    with pytest.raises(Exception):
-        NamedHist(axis.Variable(range(-3, 3)), axis.Variable(range(-3, 3))).fill(
-            x=np.random.randn(10), y=np.random.randn(10)
-        )
-
-    with pytest.raises(Exception):
-        NamedHist(axis.Integer(-3, 3), axis.Integer(-3, 3)).fill(
-            x=np.random.randn(10), y=np.random.randn(10)
-        )
-
-    with pytest.raises(Exception):
-        NamedHist(
-            axis.IntCategory(range(-3, 3), name=""),
-            axis.IntCategory(range(-3, 3), name=""),
-        ).fill(x=np.random.randn(10), y=np.random.randn(10))
-
-    with pytest.raises(Exception):
-        NamedHist(
-            axis.StrCategory(["F", "T"], name=""), axis.StrCategory("FT", name="")
-        ).fill(y=["T", "F", "T"], x=["T", "F", "T"])
-
-    # with duplicated names
-    with pytest.raises(Exception):
-        NamedHist(axis.Regular(50, -3, 3, name="x"), axis.Regular(50, -3, 3, name="x"))
-
-    with pytest.raises(Exception):
-        NamedHist(axis.Boolean(name="y"), axis.Boolean(name="y"))
-
-    with pytest.raises(Exception):
-        NamedHist(
-            axis.Variable(range(-3, 3), name="x"), axis.Variable(range(-3, 3), name="x")
-        )
-
-    with pytest.raises(Exception):
-        NamedHist(axis.Integer(-3, 3, name="x"), axis.Integer(-3, 3, name="x"))
-
-    with pytest.raises(Exception):
-        NamedHist(
-            axis.IntCategory(range(-3, 3), name="x"),
-            axis.IntCategory(range(-3, 3), name="x"),
-        )
-
-    with pytest.raises(Exception):
-        NamedHist(
-            axis.StrCategory("TF", name="y"), axis.StrCategory(["T", "F"], name="y")
-        )
-
-    """
-    Fill
-    """
     # without names
     with pytest.raises(Exception):
         NamedHist(
@@ -538,9 +373,57 @@ def test_errors():
         )
     ).fill(X=np.random.normal(size=10))
 
+
+def test_named_access():
     """
-    Projection
+        Test named access -- whether NamedHist bins can be accessed.
     """
+
+    h = NamedHist(axis.Regular(10, -5, 5, name="X", title="x [units]")).fill(
+        X=np.random.normal(size=1000)
+    )
+
+    assert h[6] == h[bh.loc(1)] == h[1j] == h[0j + 1] == h[-3j + 4] == h[bh.loc(1, 0)]
+    h[6] = h[bh.loc(1)] = h[1j] = h[0j + 1] = h[-3j + 4] = h[bh.loc(1, 0)] = 0
+
+    h = NamedHist(
+        axis.Regular(50, -5, 5, name="Norm", title="normal distribution"),
+        axis.Regular(50, -5, 5, name="Unif", title="uniform distribution"),
+        axis.StrCategory(["hi", "hello"], name="Greet"),
+        axis.Boolean(name="Yes"),
+        axis.Integer(0, 1000, name="Int"),
+    ).fill(
+        Norm=np.random.normal(size=1000),
+        Unif=np.random.uniform(size=1000),
+        Greet=["hi"] * 800 + ["hello"] * 200,
+        Yes=[True] * 600 + [False] * 400,
+        Int=np.ones(1000),
+    )
+
+    assert h[0j, -0j + 2, "hi", True, 1]
+
+
+def test_named_project():
+    """
+        Test named project -- whether NamedHist can be projected properly.
+    """
+
+    h = NamedHist(
+        axis.Regular(
+            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+        ),
+        axis.Boolean(name="B", title="b [units]"),
+        axis.Variable(range(11), name="C", title="c [units]"),
+        axis.Integer(0, 10, name="D", title="d [units]"),
+        axis.IntCategory(range(10), name="E", title="e [units]"),
+        axis.StrCategory("FT", name="F", title="f [units]"),
+    )
+
+    # via names
+    assert h.project()
+    assert h.project("A", "B")
+    assert h.project("A", "B", "C", "D", "E", "F")
+
     h = NamedHist(
         axis.Regular(
             50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
@@ -579,9 +462,20 @@ def test_errors():
     with pytest.raises(Exception):
         h.project("G", "H")
 
+
+def test_named_plot1d():
     """
-    Plot1d
+        Test named plot1d -- whether 1d-NamedHist can be plotted properly.
     """
+
+    h = NamedHist(
+        axis.Regular(
+            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+        ),
+    ).fill(A=np.random.normal(size=10))
+
+    assert h.plot1d(color="green", ls="--", lw=3)
+
     # dimension error
     h = NamedHist(
         axis.Regular(
@@ -603,9 +497,23 @@ def test_errors():
     with pytest.raises(Exception):
         h.project("B").plot1d(ls="red")
 
+
+def test_named_plot2d():
     """
-    Plot2d
+        Test named plot2d -- whether 2d-NamedHist can be plotted properly.
     """
+
+    h = NamedHist(
+        axis.Regular(
+            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+        ),
+        axis.Regular(
+            50, -4, 4, name="B", title="b [units]", underflow=False, overflow=False
+        ),
+    ).fill(B=np.random.normal(size=10), A=np.random.normal(size=10))
+
+    assert h.plot2d(cmap="cividis")
+
     # dimension error
     h = NamedHist(
         axis.Regular(
@@ -627,9 +535,31 @@ def test_errors():
     with pytest.raises(Exception):
         h.plot2d(cmap=0.1)
 
+
+def test_named_plot2d_full():
     """
-    Plot2d_full
+        Test named plot2d_full -- whether 2d-NamedHist can be fully plotted properly.
     """
+
+    h = NamedHist(
+        axis.Regular(
+            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+        ),
+        axis.Regular(
+            50, -4, 4, name="B", title="b [units]", underflow=False, overflow=False
+        ),
+    ).fill(B=np.random.normal(size=10), A=np.random.normal(size=10))
+
+    assert h.plot2d_full(
+        main_cmap="cividis",
+        top_ls="--",
+        top_color="orange",
+        top_lw=2,
+        side_ls="-.",
+        side_lw=1,
+        side_color="steelblue",
+    )
+
     # dimension error
     h = NamedHist(
         axis.Regular(
@@ -654,9 +584,31 @@ def test_errors():
     with pytest.raises(Exception):
         h.plot2d_full(main_cmap=0.1, side_lw="autumn")
 
+
+def test_named_plot():
     """
-    Plot
+        Test named plot -- whether NamedHist can be plotted properly.
     """
+
+    h = NamedHist(
+        axis.Regular(
+            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+        ),
+    ).fill(A=np.random.normal(size=10))
+
+    assert h.plot(color="green", ls="--", lw=3)
+
+    h = NamedHist(
+        axis.Regular(
+            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+        ),
+        axis.Regular(
+            50, -4, 4, name="B", title="b [units]", underflow=False, overflow=False
+        ),
+    ).fill(B=np.random.normal(size=10), A=np.random.normal(size=10))
+
+    assert h.plot(cmap="cividis")
+
     # dimension error
     h = NamedHist(
         axis.Regular(
@@ -691,9 +643,47 @@ def test_errors():
     with pytest.raises(Exception):
         h.project("A", "C").plot(cmap=0.1)
 
+
+def test_named_plot_pull():
     """
-    Plot Pull
+        Test named plot_pull -- whether 1d-NamedHist can be plotted pull properly.
     """
+
+    h = NamedHist(
+        axis.Regular(
+            50, -4, 4, name="S", title="s [units]", underflow=False, overflow=False
+        )
+    ).fill(S=np.random.normal(size=10))
+
+    def pdf(x, a=1 / np.sqrt(2 * np.pi), x0=0, sigma=1, offset=0):
+        exp = unp.exp if a.dtype == np.dtype("O") else np.exp
+        return a * exp(-((x - x0) ** 2) / (2 * sigma ** 2)) + offset
+
+    assert h.plot_pull(
+        pdf,
+        eb_ecolor="crimson",
+        eb_mfc="crimson",
+        eb_mec="crimson",
+        eb_fmt="o",
+        eb_ms=6,
+        eb_capsize=1,
+        eb_capthick=2,
+        eb_alpha=0.8,
+        vp_c="gold",
+        vp_ls="-",
+        vp_lw=8,
+        vp_alpha=0.6,
+        fp_c="chocolate",
+        fp_ls="-",
+        fp_lw=3,
+        fp_alpha=1.0,
+        bar_fc="orange",
+        pp_num=6,
+        pp_fc="orange",
+        pp_alpha=0.618,
+        pp_ec=None,
+    )
+
     # dimension error
     hh = NamedHist(
         axis.Regular(
