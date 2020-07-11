@@ -651,7 +651,7 @@ def test_histogram_quick_constrution():
 
 
 def test_histogram_unnamed_axes():
-    h = Hist(hist.axis.Regular(10, 0, 1), hist.axis.Regular(20, -3, 3))
+    h = Hist(hist.axis.Regular(10, 0, 1), hist.axis.Regular(20, -3, 3, name="X"))
 
 
 def test_histogram_loc():
