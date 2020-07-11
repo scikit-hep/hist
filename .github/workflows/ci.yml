@@ -41,4 +41,3 @@ jobs:
 
     - name: Test package
       run: python -m pytest
-

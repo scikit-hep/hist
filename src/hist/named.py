@@ -1,6 +1,7 @@
+# -*- coding: utf-8 -*-
 from .core import BaseHist
 import numpy as np
-from typing import Union, Tuple
+from typing import Union
 
 
 class NamedHist(BaseHist):
@@ -46,8 +47,8 @@ class NamedHist(BaseHist):
                 raise ValueError("The axis names could not be found")
 
         d = dict(zip(indices, values))
-        l = sorted(d.items(), key=lambda item: item[0])
-        nd = np.asarray(l, dtype=object)
+        lst = sorted(d.items(), key=lambda item: item[0])
+        nd = np.asarray(lst, dtype=object)
         data = nd.ravel()[1::2]
         super().fill(*data)
 
