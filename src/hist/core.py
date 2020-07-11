@@ -79,7 +79,6 @@ class BaseHist(bh.Histogram):
             and not item in {"_hist", "_ax"}
         ):
             # Make histogram real here
-            print(f"{item} made this real: {type(super().__getattribute__(item))}")
             ax = object.__getattribute__(self, "_ax")
             storage = (
                 object.__getattribute__(self, "_storage_proxy") or bh.storage.Double()
