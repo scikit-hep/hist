@@ -165,10 +165,7 @@ class BaseHist(bh.Histogram):
         else:
             ax.step(self.axes.edges[0][:-1], self.project(0).view(), **kwargs)
 
-        if self.axes[0].name:
-            ax.set_xlabel(self.axes[0].name)
-        else:
-            ax.set_xlabel(self.axes[0].title)
+        ax.set_xlabel(self.axes[0].title or self.axes[0].name)
 
         ax.set_ylabel("Counts")
 
@@ -205,15 +202,8 @@ class BaseHist(bh.Histogram):
         X, Y = self.axes.edges
         ax.pcolormesh(X.T, Y.T, self.view().T, **kwargs)
 
-        if self.axes[0].name:
-            ax.set_xlabel(self.axes[0].name)
-        else:
-            ax.set_xlabel(self.axes[0].title)
-
-        if self.axes[1].name:
-            ax.set_ylabel(self.axes[1].name)
-        else:
-            ax.set_ylabel(self.axes[1].title)
+        ax.set_xlabel(self.axes[0].title or self.axes[0].name)
+        ax.set_ylabel(self.axes[1].title or self.axes[1].name)
 
         fig.add_axes(ax)
 
@@ -291,27 +281,15 @@ class BaseHist(bh.Histogram):
         X, Y = self.axes.edges
         main_ax.pcolormesh(X.T, Y.T, self.view().T, **main_kwargs)
 
-        if self.axes[0].name:
-            main_ax.set_xlabel(self.axes[0].name)
-        else:
-            main_ax.set_xlabel(self.axes[0].title)
-
-        if self.axes[1].name:
-            main_ax.set_ylabel(self.axes[1].name)
-        else:
-            main_ax.set_ylabel(self.axes[1].title)
+        main_ax.set_xlabel(self.axes[0].title or self.axes[0].name)
+        main_ax.set_ylabel(self.axes[1].title or self.axes[1].name)
 
         # top plot
-        if self.axes[0].name:
-            top_ax.step(
-                self.axes.edges[1][0][:-1],
-                self.project(self.axes[0].name).view(),
-                **top_kwargs,
-            )
-        else:
-            top_ax.step(
-                self.axes.edges[1][0][:-1], self.project(0).view(), **top_kwargs
-            )
+        top_ax.step(
+            self.axes.edges[1][0][:-1],
+            self.project(self.axes[0].name or 0).view(),
+            **top_kwargs,
+        )
 
         top_ax.spines["top"].set_visible(False)
         top_ax.spines["right"].set_visible(False)
@@ -544,10 +522,7 @@ class BaseHist(bh.Histogram):
             pull_ax.add_patch(downRect)
         plt.xlim(left_edge, right_edge)
 
-        if self.axes[0].name:
-            pull_ax.set_xlabel(self.axes[0].name)
-        else:
-            pull_ax.set_xlabel(self.axes[0].title)
+        pull_ax.set_xlabel(self.axes[0].title or self.axes[0].name)
         pull_ax.set_ylabel("Pull")
 
         fig.add_axes(ax)
