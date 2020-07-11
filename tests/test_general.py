@@ -651,18 +651,22 @@ def test_histogram_quick_constrution():
 
 
 def test_histogram_unnamed_axes():
-    h = Hist(hist.axis.Regular(10, 0, 1), hist.axis.Regular(20, -3, 3))
+
+    h = Hist(axis.Regular(10, 0, 1), axis.Regular(20, -3, 3))
 
 
 def test_histogram_loc():
-    h = Hist(hist.axis.Regular(100, -50, 50))
+    h = Hist(axis.Regular(100, -50, 50))
+
     h.fill([0, 2.1])
     h[0j] == 1
     h[2.1j] == 1
 
 
 def test_histogram_rebin():
-    h = Hist(hist.axis.Regular(100, 0, 1))
+
+    h = Hist(axis.Regular(100, 0, 1))
+
     assert len(h.axes[0]) == 100
     assert len(h[::2j].axes[0]) == 50  # type: ignore
     assert len(h[::10j].axes[0]) == 10  # type: ignore
