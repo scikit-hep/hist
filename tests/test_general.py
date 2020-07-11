@@ -10,6 +10,7 @@ def test_general_init():
     """
         Test general init -- whether Hist can be properly initialized.
     """
+    np.random.seed(42)
 
     # basic
     h = Hist(axis.Regular(10, 0, 1)).fill([0.35, 0.35, 0.45])
