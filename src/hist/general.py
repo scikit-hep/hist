@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from .core import BaseHist
+from .basehist import BaseHist
 
 
 class Hist(BaseHist):
