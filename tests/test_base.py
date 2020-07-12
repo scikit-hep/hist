@@ -11,9 +11,9 @@ def test_version():
     assert hist.__version__ is not None
 
 
-def test_core_init():
+def test_base_init():
     """
-        Test core init -- whether BaseHist can be properly initialized.
+        Test base init -- whether BaseHist can be properly initialized.
     """
 
     # basic
@@ -100,9 +100,9 @@ def test_core_init():
         )
 
 
-def test_core_fill():
+def test_base_fill():
     """
-        Test core fill -- whether BaseHist can be properly filled.
+        Test base fill -- whether BaseHist can be properly filled.
     """
 
     # Regular
@@ -272,9 +272,9 @@ def test_core_fill():
     ).fill(np.random.normal(size=10))
 
 
-def test_core_access():
+def test_base_access():
     """
-        Test core access -- whether BaseHist bins can be accessed.
+        Test base access -- whether BaseHist bins can be accessed.
     """
 
     h = BaseHist(axis.Regular(10, -5, 5, name="X", title="x [units]")).fill(
@@ -301,9 +301,9 @@ def test_core_access():
     assert h[0j, -0j + 2, "hi", True, 1]
 
 
-def test_core_project():
+def test_base_project():
     """
-        Test core project -- whether BaseHist can be projected properly.
+        Test base project -- whether BaseHist can be projected properly.
     """
 
     h = BaseHist(
@@ -360,9 +360,9 @@ def test_core_project():
         h.project("G", "H")
 
 
-def test_core_plot1d():
+def test_base_plot1d():
     """
-        Test core plot1d -- whether 1d-BaseHist can be plotted properly.
+        Test base plot1d -- whether 1d-BaseHist can be plotted properly.
     """
 
     h = BaseHist(
@@ -395,9 +395,9 @@ def test_core_plot1d():
         h.project("B").plot1d(ls="red")
 
 
-def test_core_plot2d():
+def test_base_plot2d():
     """
-        Test core plot2d -- whether 2d-BaseHist can be plotted properly.
+        Test base plot2d -- whether 2d-BaseHist can be plotted properly.
     """
 
     h = BaseHist(
@@ -433,9 +433,9 @@ def test_core_plot2d():
         h.plot2d(cmap=0.1)
 
 
-def test_core_plot2d_full():
+def test_base_plot2d_full():
     """
-        Test core plot2d_full -- whether 2d-BaseHist can be fully plotted properly.
+        Test base plot2d_full -- whether 2d-BaseHist can be fully plotted properly.
     """
 
     h = BaseHist(
@@ -482,9 +482,9 @@ def test_core_plot2d_full():
         h.plot2d_full(main_cmap=0.1, side_lw="autumn")
 
 
-def test_core_plot():
+def test_base_plot():
     """
-        Test core plot -- whether BaseHist can be plotted properly.
+        Test base plot -- whether BaseHist can be plotted properly.
     """
 
     h = BaseHist(
@@ -539,9 +539,9 @@ def test_core_plot():
         h.project("A", "C").plot(cmap=0.1)
 
 
-def test_core_plot_pull():
+def test_base_plot_pull():
     """
-        Test core plot_pull -- whether 1d-BaseHist can be plotted pull properly.
+        Test base plot_pull -- whether 1d-BaseHist can be plotted pull properly.
     """
 
     h = BaseHist(
@@ -648,9 +648,9 @@ def test_core_plot_pull():
         h.plot_pull(pdf, eb_ecolor=1.0, eb_mfc=1.0)  # kwargs should be str
 
 
-def test_core_index_access():
+def test_base_index_access():
     """
-        Test core index access -- whether BaseHist can be accessed by index.
+        Test base index access -- whether BaseHist can be accessed by index.
     """
 
     h = BaseHist(
