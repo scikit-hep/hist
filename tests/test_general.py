@@ -685,6 +685,16 @@ def test_general_index_access():
         h[0:10:20j, 0:5:10j, "hello", False, 5]
 
 
+def test_general_density():
+    """
+        Test general density -- whether Hist can be accessed by index.
+    """
+
+    for data in range(10, 20, 10):
+        h = Hist(axis.Regular(10, -3, 3, name="x")).fill(np.random.randn(data))
+        assert round(sum(h.density()), 2) == round(10 / 6, 2)
+
+
 # henry's tests
 def test_histogram_quick_construction():
     h = Hist.Regular(10, 0, 1, name="x")
