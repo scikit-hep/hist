@@ -8,7 +8,7 @@
 from .version import version as __version__
 
 from . import axis
-from .general import Hist
+from .hist import Hist
 from .namedhist import NamedHist
 from .basehist import BaseHist
 from . import numpy
