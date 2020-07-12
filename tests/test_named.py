@@ -752,3 +752,49 @@ def test_named_plot_pull():
     # wrong kwargs types
     with pytest.raises(Exception):
         h.plot_pull(pdf, eb_ecolor=1.0, eb_mfc=1.0)  # kwargs should be str
+
+
+def test_named_index_access():
+    """
+        Test named index access -- whether NamedHist can be accessed by index.
+    """
+
+    h = NamedHist(
+        axis.Regular(10, -5, 5, name="Norm", title="normal distribution"),
+        axis.Regular(10, -5, 5, name="Unif", title="uniform distribution"),
+        axis.StrCategory(["hi", "hello"], name="Greet"),
+        axis.Boolean(name="Yes"),
+        axis.Integer(0, 10, name="Int"),
+    ).fill(
+        Norm=np.random.normal(size=10),
+        Unif=np.random.uniform(size=10),
+        Greet=["hi"] * 8 + ["hello"] * 2,
+        Yes=[True] * 6 + [False] * 4,
+        Int=np.ones(10),
+    )
+
+    assert (
+        h[1j, 1j, "hi", True, 1]
+        == h[6, 6, bh.loc("hi"), bh.loc(True), bh.loc(1)]
+        == h[0j + 1, -2j + 3, "hi", True, 1]
+        == h[bh.loc(1, 0), bh.loc(2, -1), "hi", True, 1]
+    )
+
+    assert h[0:10:2j, 0:5:5j, "hello", False, 5]
+
+    # wrong loc shortcut
+    with pytest.raises(Exception):
+        h[0.5, 1 / 2, "hi", True, 1]
+
+    with pytest.raises(Exception):
+        h[0.5 + 1j, 1 / 2 + 1j, "hi", True, 1]
+
+    # wrong rebin shortcut
+    with pytest.raises(Exception):
+        h[0:10:0.2j, 0:5:0.5j, "hello", False, 5]
+
+    with pytest.raises(Exception):
+        h[0 : 10 : 1 + 2j, 0 : 5 : 1 + 5j, "hello", False, 5]
+
+    with pytest.raises(Exception):
+        h[0:10:20j, 0:5:10j, "hello", False, 5]

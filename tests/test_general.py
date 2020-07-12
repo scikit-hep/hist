@@ -639,6 +639,53 @@ def test_general_plot_pull():
         h.plot_pull(pdf, eb_ecolor=1.0, eb_mfc=1.0)  # kwargs should be str
 
 
+def test_general_index_access():
+    """
+        Test general index access -- whether Hist can be accessed by index.
+    """
+
+    h = Hist(
+        axis.Regular(10, -5, 5, name="Norm", title="normal distribution"),
+        axis.Regular(10, -5, 5, name="Unif", title="uniform distribution"),
+        axis.StrCategory(["hi", "hello"], name="Greet"),
+        axis.Boolean(name="Yes"),
+        axis.Integer(0, 10, name="Int"),
+    ).fill(
+        np.random.normal(size=10),
+        np.random.uniform(size=10),
+        ["hi"] * 8 + ["hello"] * 2,
+        [True] * 6 + [False] * 4,
+        np.ones(10),
+    )
+
+    assert (
+        h[1j, 1j, "hi", True, 1]
+        == h[6, 6, bh.loc("hi"), bh.loc(True), bh.loc(1)]
+        == h[0j + 1, -2j + 3, "hi", True, 1]
+        == h[bh.loc(1, 0), bh.loc(2, -1), "hi", True, 1]
+    )
+
+    assert h[0:10:2j, 0:5:5j, "hello", False, 5]
+
+    # wrong loc shortcut
+    with pytest.raises(Exception):
+        h[0.5, 1 / 2, "hi", True, 1]
+
+    with pytest.raises(Exception):
+        h[0.5 + 1j, 1 / 2 + 1j, "hi", True, 1]
+
+    # wrong rebin shortcut
+    with pytest.raises(Exception):
+        h[0:10:0.2j, 0:5:0.5j, "hello", False, 5]
+
+    with pytest.raises(Exception):
+        h[0 : 10 : 1 + 2j, 0 : 5 : 1 + 5j, "hello", False, 5]
+
+    with pytest.raises(Exception):
+        h[0:10:20j, 0:5:10j, "hello", False, 5]
+
+
+# henry's tests
 def test_histogram_quick_construction():
     h = Hist.Regular(10, 0, 1, name="x")
     h.fill([0.5, 0.5])
