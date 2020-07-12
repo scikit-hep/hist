@@ -538,6 +538,8 @@ class BaseHist(bh.Histogram):
 
         fig.add_axes(ax)
         fig.add_axes(pull_ax)
+        
+        plt.close(fig)
 
         return fig, ax, pull_ax
 
