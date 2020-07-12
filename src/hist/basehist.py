@@ -13,8 +13,6 @@ import hist.utils
 from .axis import Regular
 from .axestuple import NamedAxesTuple
 
-plt.rcParams.update({"figure.max_open_warning": 0})
-
 # typing alias
 Plot1D_RetType = Tuple[matplotlib.figure.Figure, matplotlib.axes._subplots.SubplotBase]
 Plot2D_RetType = Tuple[
@@ -189,8 +187,6 @@ class BaseHist(bh.Histogram):
 
         fig.add_axes(ax)
 
-        plt.close(fig)
-
         return fig, ax
 
     def plot2d(
@@ -226,8 +222,6 @@ class BaseHist(bh.Histogram):
         ax.set_ylabel(self.axes[1].title)
 
         fig.add_axes(ax)
-
-        plt.close(fig)
 
         return fig, ax
 
@@ -347,8 +341,6 @@ class BaseHist(bh.Histogram):
         fig.add_axes(main_ax)
         fig.add_axes(top_ax)
         fig.add_axes(side_ax)
-
-        plt.close(fig)
 
         return fig, main_ax, top_ax, side_ax
 
@@ -551,8 +543,6 @@ class BaseHist(bh.Histogram):
 
         fig.add_axes(ax)
         fig.add_axes(pull_ax)
-
-        plt.close(fig)
 
         return fig, ax, pull_ax
 
