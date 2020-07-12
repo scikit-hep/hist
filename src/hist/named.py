@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from .core import BaseHist
+from .basehist import BaseHist
 import numpy as np
 from typing import Union
 
