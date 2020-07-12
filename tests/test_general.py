@@ -645,28 +645,27 @@ def test_general_index_access():
     """
 
     h = Hist(
-        axis.Regular(10, -5, 5, name="Norm", title="normal distribution"),
-        axis.Regular(10, -5, 5, name="Unif", title="uniform distribution"),
+        axis.Regular(10, -5, 5, name="Ones"),
+        axis.Regular(10, -5, 5, name="Twos"),
         axis.StrCategory(["hi", "hello"], name="Greet"),
         axis.Boolean(name="Yes"),
         axis.Integer(0, 10, name="Int"),
     ).fill(
-        np.random.normal(size=10),
-        np.random.uniform(size=10),
+        np.ones(10),
+        np.ones(10) * 2,
         ["hi"] * 8 + ["hello"] * 2,
         [True] * 6 + [False] * 4,
         np.ones(10),
     )
 
-    assert (
-        h[1j, 1j, "hi", True, 1]
-        == h[6, 6, bh.loc("hi"), bh.loc(True), bh.loc(1)]
-        == h[0j + 1, -2j + 3, "hi", True, 1]
-        == h[bh.loc(1, 0), bh.loc(2, -1), "hi", True, 1]
-    )
+    assert h[1j, 2j, "hi", True, 1] == 6
+    assert h[6, 7, bh.loc("hi"), bh.loc(True), bh.loc(1)] == 6
+    assert h[0j + 1, -2j + 4, "hi", True, 1] == 6
+    assert h[bh.loc(1, 0), bh.loc(3, -1), "hi", True, 1] == 6
 
     assert h[0:10:2j, 0:5:5j, "hello", False, 5]
-    assert len(h[::2j, 0:5, :, :, :].axes[1]) == len(h[:, 0:5, :, :, :].axes[1]) == 5
+    assert len(h[::2j, 0:5, :, :, :].axes[1]) == 5
+    assert len(h[:, 0:5, :, :, :].axes[1]) == 5
 
     # wrong loc shortcut
     with pytest.raises(Exception):
@@ -700,7 +699,8 @@ def test_general_proxy():
         .fill([0.5, 0.5], [-0.2, 0.6])
     )
 
-    assert h[0.5j, -0.2j] == h[bh.loc(0.5), bh.loc(0.6)] == 1
+    assert h[0.5j, -0.2j] == 1
+    assert h[bh.loc(0.5), bh.loc(0.6)] == 1
 
     # add axes to existing histogram
     with pytest.raises(Exception):
