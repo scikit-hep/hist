@@ -50,24 +50,17 @@ def test_general_init():
     ).fill(["T", "F", "T"], ["T", "F", "T"])
 
     # with no-named axes
-    assert Hist(axis.Regular(50, -3, 3, name=""), axis.Regular(50, -3, 3, name="x"))
+    assert Hist(axis.Regular(50, -3, 3), axis.Regular(50, -3, 3))
 
-    assert Hist(axis.Boolean(name=""), axis.Boolean(name="y"))
+    assert Hist(axis.Boolean(), axis.Boolean())
 
-    assert Hist(
-        axis.Variable(range(-3, 3)), axis.Variable(range(-3, 3), name="x")
-    )  # name=None will be converted to name=''
+    assert Hist(axis.Variable(range(-3, 3)), axis.Variable(range(-3, 3)))
 
-    assert Hist(axis.Integer(-3, 3, name=""), axis.Integer(-3, 3, name="x"))
+    assert Hist(axis.Integer(-3, 3), axis.Integer(-3, 3))
 
-    assert Hist(
-        axis.IntCategory(range(-3, 3), name=""),
-        axis.IntCategory(range(-3, 3), name="x"),
-    )
+    assert Hist(axis.IntCategory(range(-3, 3)), axis.IntCategory(range(-3, 3)),)
 
-    assert Hist(
-        axis.StrCategory("TF"), axis.StrCategory(["T", "F"], name="x")
-    )  # name=None will be converted to name=''
+    assert Hist(axis.StrCategory("TF"), axis.StrCategory(["T", "F"]))
 
     # with duplicated names
     with pytest.raises(Exception):

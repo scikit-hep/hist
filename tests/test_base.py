@@ -54,24 +54,17 @@ def test_base_init():
     ).fill(["T", "F", "T"], ["T", "F", "T"])
 
     # with no-named axes
-    assert BaseHist(axis.Regular(50, -3, 3, name=""), axis.Regular(50, -3, 3, name="x"))
+    assert BaseHist(axis.Regular(50, -3, 3), axis.Regular(50, -3, 3))
 
-    assert BaseHist(axis.Boolean(name=""), axis.Boolean(name="y"))
+    assert BaseHist(axis.Boolean(), axis.Boolean())
 
-    assert BaseHist(
-        axis.Variable(range(-3, 3)), axis.Variable(range(-3, 3), name="x")
-    )  # name=None will be converted to name=''
+    assert BaseHist(axis.Variable(range(-3, 3)), axis.Variable(range(-3, 3)))
 
-    assert BaseHist(axis.Integer(-3, 3, name=""), axis.Integer(-3, 3, name="x"))
+    assert BaseHist(axis.Integer(-3, 3), axis.Integer(-3, 3))
 
-    assert BaseHist(
-        axis.IntCategory(range(-3, 3), name=""),
-        axis.IntCategory(range(-3, 3), name="x"),
-    )
+    assert BaseHist(axis.IntCategory(range(-3, 3)), axis.IntCategory(range(-3, 3)),)
 
-    assert BaseHist(
-        axis.StrCategory("TF"), axis.StrCategory(["T", "F"], name="x")
-    )  # name=None will be converted to name=''
+    assert BaseHist(axis.StrCategory("TF"), axis.StrCategory(["T", "F"]))
 
     # with duplicated names
     with pytest.raises(Exception):

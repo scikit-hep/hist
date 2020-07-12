@@ -50,12 +50,12 @@ def test_named_init():
 
     # with no-named axes
     with pytest.raises(Exception):
-        NamedHist(
-            axis.Regular(50, -3, 3, name=""), axis.Regular(50, -3, 3, name="")
-        ).fill(x=np.random.randn(10), y=np.random.randn(10))
+        NamedHist(axis.Regular(50, -3, 3), axis.Regular(50, -3, 3)).fill(
+            x=np.random.randn(10), y=np.random.randn(10)
+        )
 
     with pytest.raises(Exception):
-        NamedHist(axis.Boolean(name=""), axis.Boolean(name="")).fill(
+        NamedHist(axis.Boolean(), axis.Boolean()).fill(
             y=[True, False, True], x=[True, False, True]
         )
 
@@ -70,15 +70,14 @@ def test_named_init():
         )
 
     with pytest.raises(Exception):
-        NamedHist(
-            axis.IntCategory(range(-3, 3), name=""),
-            axis.IntCategory(range(-3, 3), name=""),
-        ).fill(x=np.random.randn(10), y=np.random.randn(10))
+        NamedHist(axis.IntCategory(range(-3, 3)), axis.IntCategory(range(-3, 3)),).fill(
+            x=np.random.randn(10), y=np.random.randn(10)
+        )
 
     with pytest.raises(Exception):
-        NamedHist(
-            axis.StrCategory(["F", "T"], name=""), axis.StrCategory("FT", name="")
-        ).fill(y=["T", "F", "T"], x=["T", "F", "T"])
+        NamedHist(axis.StrCategory(["F", "T"]), axis.StrCategory("FT")).fill(
+            y=["T", "F", "T"], x=["T", "F", "T"]
+        )
 
     # with duplicated names
     with pytest.raises(Exception):
