@@ -11,6 +11,7 @@ from typing import Callable, Optional, Tuple, Union, List, Any
 
 import hist.utils
 from .axis import Regular
+from .axestuple import NamedAxesTuple
 
 # typing alias
 Plot1D_RetType = Tuple[matplotlib.figure.Figure, matplotlib.axes._subplots.SubplotBase]
@@ -68,6 +69,14 @@ class BaseHist(bh.Histogram):
                 # title will return name if title is not set, so this is safe
                 if not ax.title:
                     ax.title = f"Axis {i}"
+
+    def _generate_axes_(self) -> NamedAxesTuple:
+        """
+        This is called to fill in the axes. Subclasses can override it if they need
+        to change the axes tuple.
+        """
+
+        return NamedAxesTuple(self._axis(i) for i in range(self.ndim))
 
     @property
     def names(self) -> List[str]:

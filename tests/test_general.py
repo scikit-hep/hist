@@ -670,3 +670,29 @@ def test_histogram_rebin():
     assert len(h.axes[0]) == 100
     assert len(h[::2j].axes[0]) == 50  # type: ignore
     assert len(h[::10j].axes[0]) == 10  # type: ignore
+
+
+def test_axestuple():
+
+    h = Hist(
+        axis.Regular(20, 0, 12, name="A", title="alpha"),
+        axis.Regular(10, 1, 3, name="B"),
+        axis.Regular(15, 3, 5, title="other"),
+        axis.Regular(5, 3, 2),
+    )
+
+    assert h.axes.names == ("A", "B", "", "")
+    assert h.axes.titles == ("alpha", "B", "other", "Axis 3")
+
+    assert h.axes[0].size == 20
+    assert h.axes["A"].size == 20
+
+    assert h.axes[1].size == 10
+    assert h.axes["B"].size == 10
+
+    assert h.axes[2].size == 15
+
+    assert h.axes[:2].sizes == (20, 10)
+    assert h.axes["A":"B"].sizes == (20,)
+    assert h.axes[:"B"].sizes == (20,)
+    assert h.axes["B":].sizes == (10, 15, 5)
