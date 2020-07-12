@@ -1,13 +1,57 @@
 # -*- coding: utf-8 -*-
 from typing import Dict, List, Union
 
+import sys
 import re
 import boost_histogram.axis as bha
 import hist.utils
+from typing import Any
+
+if sys.version_info >= (3, 8):
+    from typing import Protocol
+else:
+    from typing_extensions import Protocol
+
+
+class AxisProtocol(Protocol):
+    metadata: Any
+    name: str
+    title: str
+
+
+class AxesMixin:
+    __slots__ = ()
+
+    @property
+    def name(self: AxisProtocol) -> str:
+        """
+        Get or set the name for the Regular axis
+        """
+        return self.metadata.get("name", "") if isinstance(self.metadata, dict) else ""
+
+    @name.setter
+    def name(self: AxisProtocol, value: str) -> None:
+        self.metadata["name"] = value
+
+    @property
+    def title(self: AxisProtocol) -> str:
+        """
+        Get or set the title for the Regular axis
+        """
+        title = (
+            self.metadata.get("title", "") if isinstance(self.metadata, dict) else ""
+        )
+        return title or self.name
+
+    @title.setter
+    def title(self: AxisProtocol, value: str) -> None:
+        self.metadata["title"] = value
 
 
 @hist.utils.set_family(hist.utils.HIST_FAMILY)
-class Regular(bha.Regular):
+class Regular(bha.Regular, AxesMixin):
+    __slots__ = ()
+
     def __init__(
         self,
         bins: int,
@@ -30,7 +74,7 @@ class Regular(bha.Regular):
         else:
             raise Exception("Name should be a valid Python identifier")
         metadata["title"] = title
-        super(bha.Regular, self).__init__(
+        super().__init__(
             bins,
             start,
             stop,
@@ -42,35 +86,11 @@ class Regular(bha.Regular):
             transform=transform,
         )
 
-    def __repr__(self) -> str:
-        return "{self.__class__.__name__}({args}{kwargs})".format(
-            self=self, args=self._repr_args(), kwargs=self._repr_kwargs()
-        )
 
-    @property
-    def name(self) -> str:
-        """
-        Get or set the name for the Regular axis
-        """
-        return self.metadata["name"] if self.metadata else ""
+@hist.utils.set_family(hist.utils.HIST_FAMILY)
+class Boolean(bha.Boolean, AxesMixin):
+    __slots__ = ()
 
-    @name.setter
-    def name(self, value: str) -> None:
-        self.metadata["name"] = value
-
-    @property
-    def title(self) -> str:
-        """
-        Get or set the title for the Regular axis
-        """
-        return self.metadata["title"] if self.metadata else ""
-
-    @title.setter
-    def title(self, value: str) -> None:
-        self.metadata["title"] = value
-
-
-class Boolean(bha.Regular):  # ToDo: should be derived from bha.Boolean
     def __init__(self, *, name: str = None, title: str = None) -> None:
         metadata: Dict = dict()
         if not name:
@@ -80,38 +100,13 @@ class Boolean(bha.Regular):  # ToDo: should be derived from bha.Boolean
         else:
             raise Exception("Name should be a valid Python identifier")
         metadata["title"] = title
-        super(bha.Regular, self).__init__(2, 0, 2, metadata=metadata)
-
-    def __repr__(self) -> str:
-        return "{self.__class__.__name__}({args}{kwargs})".format(
-            self=self, args=self._repr_args(), kwargs=self._repr_kwargs()
-        )
-
-    @property
-    def name(self) -> str:
-        """
-        Get or set the name for the Bool axis
-        """
-        return self.metadata["name"] if self.metadata else ""
-
-    @name.setter
-    def name(self, value: str) -> None:
-        self.metadata["name"] = value
-
-    @property
-    def title(self) -> str:
-        """
-        Get or set the title for the Bool axis
-        """
-        return self.metadata["title"] if self.metadata else ""
-
-    @title.setter
-    def title(self, value: str) -> None:
-        self.metadata["title"] = value
+        super().__init__(metadata=metadata)
 
 
 @hist.utils.set_family(hist.utils.HIST_FAMILY)
-class Variable(bha.Variable):
+class Variable(bha.Variable, AxesMixin):
+    __slots__ = ()
+
     def __init__(
         self,
         edges: Union[range, List[float]],
@@ -130,7 +125,7 @@ class Variable(bha.Variable):
         else:
             raise Exception("Name should be a valid Python identifier")
         metadata["title"] = title
-        super(bha.Variable, self).__init__(
+        super().__init__(
             edges,
             metadata=metadata,
             underflow=underflow,
@@ -138,36 +133,11 @@ class Variable(bha.Variable):
             growth=growth,
         )
 
-    def __repr__(self) -> str:
-        return "{self.__class__.__name__}({args}{kwargs})".format(
-            self=self, args=self._repr_args(), kwargs=self._repr_kwargs()
-        )
-
-    @property
-    def name(self) -> str:
-        """
-        Get or set the name for the Variable axis
-        """
-        return self.metadata["name"] if self.metadata else ""
-
-    @name.setter
-    def name(self, value: str) -> None:
-        self.metadata["name"] = value
-
-    @property
-    def title(self) -> str:
-        """
-        Get or set the title for the Variable axis
-        """
-        return self.metadata["title"] if self.metadata else ""
-
-    @title.setter
-    def title(self, value: str) -> None:
-        self.metadata["title"] = value
-
 
 @hist.utils.set_family(hist.utils.HIST_FAMILY)
-class Integer(bha.Integer):
+class Integer(bha.Integer, AxesMixin):
+    __slots__ = ()
+
     def __init__(
         self,
         start: int,
@@ -187,7 +157,7 @@ class Integer(bha.Integer):
         else:
             raise Exception("Name should be a valid Python identifier")
         metadata["title"] = title
-        super(bha.Integer, self).__init__(
+        super().__init__(
             start,
             stop,
             metadata=metadata,
@@ -196,36 +166,11 @@ class Integer(bha.Integer):
             growth=growth,
         )
 
-    def __repr__(self) -> str:
-        return "{self.__class__.__name__}({args}{kwargs})".format(
-            self=self, args=self._repr_args(), kwargs=self._repr_kwargs()
-        )
-
-    @property
-    def name(self) -> str:
-        """
-        Get or set the name for the Integer axis
-        """
-        return self.metadata["name"] if self.metadata else ""
-
-    @name.setter
-    def name(self, value: str) -> None:
-        self.metadata["name"] = value
-
-    @property
-    def title(self) -> str:
-        """
-        Get or set the title for the Integer axis
-        """
-        return self.metadata["title"] if self.metadata else ""
-
-    @title.setter
-    def title(self, value: str) -> None:
-        self.metadata["title"] = value
-
 
 @hist.utils.set_family(hist.utils.HIST_FAMILY)
-class IntCategory(bha.IntCategory):
+class IntCategory(bha.IntCategory, AxesMixin):
+    __slots__ = ()
+
     def __init__(
         self,
         categories: Union[range, List[int]] = None,
@@ -242,40 +187,13 @@ class IntCategory(bha.IntCategory):
         else:
             raise Exception("Name should be a valid Python identifier")
         metadata["title"] = title
-        super(bha.IntCategory, self).__init__(
-            categories, metadata=metadata, growth=growth
-        )
-
-    def __repr__(self) -> str:
-        return "{self.__class__.__name__}({args}{kwargs})".format(
-            self=self, args=self._repr_args(), kwargs=self._repr_kwargs()
-        )
-
-    @property
-    def name(self) -> str:
-        """
-        Get or set the name for the IntCategory axis
-        """
-        return self.metadata["name"] if self.metadata else ""
-
-    @name.setter
-    def name(self, value: str) -> None:
-        self.metadata["name"] = value
-
-    @property
-    def title(self) -> str:
-        """
-        Get or set the title for the IntCategory axis
-        """
-        return self.metadata["title"] if self.metadata else ""
-
-    @title.setter
-    def title(self, value: str) -> None:
-        self.metadata["title"] = value
+        super().__init__(categories, metadata=metadata, growth=growth)
 
 
 @hist.utils.set_family(hist.utils.HIST_FAMILY)
-class StrCategory(bha.StrCategory):
+class StrCategory(bha.StrCategory, AxesMixin):
+    __slots__ = ()
+
     def __init__(
         self,
         categories: Union[str, List[str]] = None,
@@ -292,33 +210,4 @@ class StrCategory(bha.StrCategory):
         else:
             raise Exception("Name should be a valid Python identifier")
         metadata["title"] = title
-        super(bha.StrCategory, self).__init__(
-            categories, metadata=metadata, growth=growth
-        )
-
-    def __repr__(self) -> str:
-        return "{self.__class__.__name__}({args}{kwargs})".format(
-            self=self, args=self._repr_args(), kwargs=self._repr_kwargs()
-        )
-
-    @property
-    def name(self) -> str:
-        """
-        Get or set the name for the StrCategory axis
-        """
-        return self.metadata["name"] if self.metadata else ""
-
-    @name.setter
-    def name(self, value: str) -> None:
-        self.metadata["name"] = value
-
-    @property
-    def title(self) -> str:
-        """
-        Get or set the title for the StrCategory axis
-        """
-        return self.metadata["title"] if self.metadata else ""
-
-    @title.setter
-    def title(self, value: str) -> None:
-        self.metadata["title"] = value
+        super().__init__(categories, metadata=metadata, growth=growth)
