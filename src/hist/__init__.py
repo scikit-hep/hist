@@ -9,7 +9,7 @@ from .version import version as __version__
 
 from . import axis
 from .general import Hist
-from .named import NamedHist
+from .namedhist import NamedHist
 from .basehist import BaseHist
 from . import numpy
 
