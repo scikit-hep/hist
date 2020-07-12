@@ -666,6 +666,7 @@ def test_general_index_access():
     )
 
     assert h[0:10:2j, 0:5:5j, "hello", False, 5]
+    assert len(h[::2j, 0:5, :, :, :].axes[1]) == len(h[:, 0:5, :, :, :].axes[1]) == 5
 
     # wrong loc shortcut
     with pytest.raises(Exception):
@@ -685,38 +686,28 @@ def test_general_index_access():
         h[0:10:20j, 0:5:10j, "hello", False, 5]
 
 
-# henry's tests
-def test_histogram_quick_construction():
-    h = Hist.Regular(10, 0, 1, name="x")
-    h.fill([0.5, 0.5])
+def test_general_proxy():
+    """
+        Test general proxy -- whether Hist proxy works properly.
+    """
+    h = Hist.Regular(10, 0, 1, name="x").fill([0.5, 0.5])
     assert h[0.5j] == 2
 
+    h = (
+        Hist()
+        .Regular(10, 0, 1, name="x")
+        .Regular(10, -1, 1, name="y")
+        .fill([0.5, 0.5], [-0.2, 0.6])
+    )
 
-def test_histogram_quick_constrution():
-    h = Hist.Regular(10, 0, 1, name="x").Regular(10, -1, 1, name="y")
-    h.fill([0.5, 0.5], [-0.2, 0.6])
-    assert h[0.5j, -0.2j] == 1
+    assert h[0.5j, -0.2j] == h[bh.loc(0.5), bh.loc(0.6)] == 1
 
+    # add axes to existing histogram
+    with pytest.raises(Exception):
+        Hist().Regular(10, 0, 1, name="x").fill([0.5, 0.5]).Regular(10, -1, 1, name="y")
 
-def test_histogram_unnamed_axes():
-    Hist(axis.Regular(10, 0, 1), axis.Regular(20, -3, 3))
-
-
-def test_histogram_loc():
-    h = Hist(axis.Regular(100, -50, 50))
-
-    h.fill([0, 2.1])
-    h[0j] == 1
-    h[2.1j] == 1
-
-
-def test_histogram_rebin():
-
-    h = Hist(axis.Regular(100, 0, 1))
-
-    assert len(h.axes[0]) == 100
-    assert len(h[::2j].axes[0]) == 50  # type: ignore
-    assert len(h[::10j].axes[0]) == 10  # type: ignore
+    with pytest.raises(Exception):
+        Hist(axis.Regular(10, 0, 1, name="x")).Regular(10, -1, 1, name="y")
 
 
 def test_axestuple():

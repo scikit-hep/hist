@@ -798,3 +798,29 @@ def test_named_index_access():
 
     with pytest.raises(Exception):
         h[0:10:20j, 0:5:10j, "hello", False, 5]
+
+
+def test_named_proxy():
+    """
+        Test named proxy -- whether NamedHist proxy works properly.
+    """
+    h = NamedHist.Regular(10, 0, 1, name="x").fill(x=[0.5, 0.5])
+    assert h[0.5j] == 2
+
+    h = (
+        NamedHist()
+        .Regular(10, 0, 1, name="x")
+        .Regular(10, -1, 1, name="y")
+        .fill(x=[0.5, 0.5], y=[-0.2, 0.6])
+    )
+
+    assert h[0.5j, -0.2j] == h[bh.loc(0.5), bh.loc(0.6)] == 1
+
+    # add axes to existing histogram
+    with pytest.raises(Exception):
+        NamedHist().Regular(10, 0, 1, name="x").fill(x=[0.5, 0.5]).Regular(
+            10, -1, 1, name="y"
+        )
+
+    with pytest.raises(Exception):
+        NamedHist(axis.Regular(10, 0, 1, name="x")).Regular(10, -1, 1, name="y")

@@ -692,3 +692,29 @@ def test_base_index_access():
 
     with pytest.raises(Exception):
         h[0:10:20j, 0:5:10j, "hello", False, 5]
+
+
+def test_base_proxy():
+    """
+        Test base proxy -- whether BaseHist proxy works properly.
+    """
+    h = BaseHist.Regular(10, 0, 1, name="x").fill([0.5, 0.5])
+    assert h[0.5j] == 2
+
+    h = (
+        BaseHist()
+        .Regular(10, 0, 1, name="x")
+        .Regular(10, -1, 1, name="y")
+        .fill([0.5, 0.5], [-0.2, 0.6])
+    )
+
+    assert h[0.5j, -0.2j] == h[bh.loc(0.5), bh.loc(0.6)] == 1
+
+    # add axes to existing histogram
+    with pytest.raises(Exception):
+        BaseHist().Regular(10, 0, 1, name="x").fill([0.5, 0.5]).Regular(
+            10, -1, 1, name="y"
+        )
+
+    with pytest.raises(Exception):
+        BaseHist(axis.Regular(10, 0, 1, name="x")).Regular(10, -1, 1, name="y")
