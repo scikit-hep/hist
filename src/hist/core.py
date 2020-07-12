@@ -12,6 +12,8 @@ from typing import Callable, Optional, Tuple, Union, List, Any
 import hist.utils
 from .axis import Regular
 
+plt.rcParams.update({"figure.max_open_warning": 0})
+
 # typing alias
 Plot1D_RetType = Tuple[matplotlib.figure.Figure, matplotlib.axes._subplots.SubplotBase]
 Plot2D_RetType = Tuple[
