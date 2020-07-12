@@ -718,9 +718,38 @@ def test_base_proxy():
 
 def test_base_density():
     """
-        Test base density -- whether BaseHist can be accessed by index.
+        Test base density -- whether BaseHist density work properly.
     """
 
     for data in range(10, 20, 10):
         h = BaseHist(axis.Regular(10, -3, 3, name="x")).fill(np.random.randn(data))
         assert pytest.approx(sum(h.density()), 2) == pytest.approx(10 / 6, 2)
+
+
+def test_base_axestuple():
+    """
+        Test base axes tuple -- whether BaseHist axes tuple work properly.
+    """
+
+    h = BaseHist(
+        axis.Regular(20, 0, 12, name="A", title="alpha"),
+        axis.Regular(10, 1, 3, name="B"),
+        axis.Regular(15, 3, 5, title="other"),
+        axis.Regular(5, 3, 2),
+    )
+
+    assert h.axes.name == ("A", "B", "", "")
+    assert h.axes.title == ("alpha", "B", "other", "Axis 3")
+
+    assert h.axes[0].size == 20
+    assert h.axes["A"].size == 20
+
+    assert h.axes[1].size == 10
+    assert h.axes["B"].size == 10
+
+    assert h.axes[2].size == 15
+
+    assert h.axes[:2].size == (20, 10)
+    assert h.axes["A":"B"].size == (20,)
+    assert h.axes[:"B"].size == (20,)
+    assert h.axes["B":].size == (10, 15, 5)
