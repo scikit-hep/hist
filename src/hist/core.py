@@ -78,10 +78,6 @@ class BaseHist(bh.Histogram):
 
         return NamedAxesTuple(self._axis(i) for i in range(self.ndim))
 
-    @property
-    def names(self) -> List[str]:
-        return [ax.name for ax in self.axes]
-
     @always_normal_method
     def Regular(self, *args, **kwargs):
         if self._hist:

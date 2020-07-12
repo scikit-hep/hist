@@ -31,25 +31,16 @@ class NamedAxesTuple(AxesTuple):
         return super().__getitem__(item)
 
     @property
-    def names(self) -> Tuple[str]:
+    def name(self) -> Tuple[str]:
         """
         The names of the axes. May be empty strings.
         """
         return tuple(ax.name for ax in self)  # type: ignore
 
     @property
-    def titles(self) -> Tuple[str]:
+    def title(self) -> Tuple[str]:
         """
         The titles of the axes. Defaults to name if title not given, or Axis N
         if neither was given.
         """
         return tuple(ax.title for ax in self)  # type: ignore
-
-    # Missing in boost-histogram 0.9.0
-    @property
-    def sizes(self) -> Tuple[int]:
-        """
-        The sizes of the axes.
-        """
-
-        return tuple(ax.size for ax in self)  # type: ignore

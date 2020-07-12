@@ -681,8 +681,8 @@ def test_axestuple():
         axis.Regular(5, 3, 2),
     )
 
-    assert h.axes.names == ("A", "B", "", "")
-    assert h.axes.titles == ("alpha", "B", "other", "Axis 3")
+    assert h.axes.name == ("A", "B", "", "")
+    assert h.axes.title == ("alpha", "B", "other", "Axis 3")
 
     assert h.axes[0].size == 20
     assert h.axes["A"].size == 20
@@ -692,7 +692,7 @@ def test_axestuple():
 
     assert h.axes[2].size == 15
 
-    assert h.axes[:2].sizes == (20, 10)
-    assert h.axes["A":"B"].sizes == (20,)
-    assert h.axes[:"B"].sizes == (20,)
-    assert h.axes["B":].sizes == (10, 15, 5)
+    assert h.axes[:2].size == (20, 10)
+    assert h.axes["A":"B"].size == (20,)
+    assert h.axes[:"B"].size == (20,)
+    assert h.axes["B":].size == (10, 15, 5)
