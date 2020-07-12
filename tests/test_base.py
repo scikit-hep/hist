@@ -727,4 +727,4 @@ def test_base_density():
 
     for data in range(10, 20, 10):
         h = BaseHist(axis.Regular(10, -3, 3, name="x")).fill(np.random.randn(data))
-        assert round(sum(h.density()), 2) == round(10 / 6, 2)
+        assert pytest.approx(sum(h.density()), 2) == pytest.approx(10 / 6, 2)
