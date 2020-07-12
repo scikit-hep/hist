@@ -691,23 +691,6 @@ def test_general_proxy():
         Test general proxy -- whether Hist proxy works properly.
     """
     h = Hist.Regular(10, 0, 1, name="x").fill([0.5, 0.5])
-
-
-def test_general_density():
-    """
-        Test general density -- whether Hist can be accessed by index.
-    """
-
-    for data in range(10, 20, 10):
-        h = Hist(axis.Regular(10, -3, 3, name="x")).fill(np.random.randn(data))
-        assert round(sum(h.density()), 2) == round(10 / 6, 2)
-
-
-# henry's tests
-def test_histogram_quick_construction():
-    h = Hist.Regular(10, 0, 1, name="x")
-    h.fill([0.5, 0.5])
-
     assert h[0.5j] == 2
 
     h = (
@@ -727,6 +710,17 @@ def test_histogram_quick_construction():
         Hist(axis.Regular(10, 0, 1, name="x")).Regular(10, -1, 1, name="y")
 
 
+def test_general_density():
+    """
+        Test general density -- whether Hist can be accessed by index.
+    """
+
+    for data in range(10, 20, 10):
+        h = Hist(axis.Regular(10, -3, 3, name="x")).fill(np.random.randn(data))
+        assert round(sum(h.density()), 2) == round(10 / 6, 2)
+
+
+# henry's tests
 def test_axestuple():
 
     h = Hist(
