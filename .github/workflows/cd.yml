@@ -31,7 +31,7 @@ jobs:
 
     - uses: actions/upload-artifact@v2
       with:
-        path: wheels/hist*.whl
+        path: wheels/hist-*.whl
 
     - name: Check metadata
       run: twine check dist/* wheels/*

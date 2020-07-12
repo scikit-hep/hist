@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from .core import BaseHist
+from .basehist import BaseHist
 import numpy as np
 from typing import Union
 
@@ -11,7 +11,7 @@ class NamedHist(BaseHist):
         """
 
         super().__init__(*args, **kwargs)
-        if "" in self.names:
+        if "" in self.axes.name:
             raise Exception(
                 f"Each axes in the {self.__class__.__name__} instance should have a name"
             )

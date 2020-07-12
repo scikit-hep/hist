@@ -11,6 +11,7 @@ from typing import Callable, Optional, Tuple, Union, List, Any
 
 import hist.utils
 from .axis import Regular
+from .axestuple import NamedAxesTuple
 
 plt.rcParams.update({"figure.max_open_warning": 0})
 
@@ -71,9 +72,13 @@ class BaseHist(bh.Histogram):
                 if not ax.title:
                     ax.title = f"Axis {i}"
 
-    @property
-    def names(self) -> List[str]:
-        return [ax.name for ax in self.axes]
+    def _generate_axes_(self) -> NamedAxesTuple:
+        """
+        This is called to fill in the axes. Subclasses can override it if they need
+        to change the axes tuple.
+        """
+
+        return NamedAxesTuple(self._axis(i) for i in range(self.ndim))
 
     @always_normal_method
     def Regular(self, *args, **kwargs):
