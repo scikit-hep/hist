@@ -176,7 +176,7 @@ class BaseHist(bh.Histogram):
         else:
             ax.step(self.axes.edges[0][:-1], self.project(0).view(), **kwargs)
 
-        ax.set_xlabel(self.axes[0].title or self.axes[0].name)
+        ax.set_xlabel(self.axes[0].title)
 
         ax.set_ylabel("Counts")
 
@@ -213,8 +213,8 @@ class BaseHist(bh.Histogram):
         X, Y = self.axes.edges
         ax.pcolormesh(X.T, Y.T, self.view().T, **kwargs)
 
-        ax.set_xlabel(self.axes[0].title or self.axes[0].name)
-        ax.set_ylabel(self.axes[1].title or self.axes[1].name)
+        ax.set_xlabel(self.axes[0].title)
+        ax.set_ylabel(self.axes[1].title)
 
         fig.add_axes(ax)
 
@@ -292,8 +292,8 @@ class BaseHist(bh.Histogram):
         X, Y = self.axes.edges
         main_ax.pcolormesh(X.T, Y.T, self.view().T, **main_kwargs)
 
-        main_ax.set_xlabel(self.axes[0].title or self.axes[0].name)
-        main_ax.set_ylabel(self.axes[1].title or self.axes[1].name)
+        main_ax.set_xlabel(self.axes[0].title)
+        main_ax.set_ylabel(self.axes[1].title)
 
         # top plot
         top_ax.step(
@@ -533,7 +533,7 @@ class BaseHist(bh.Histogram):
             pull_ax.add_patch(downRect)
         plt.xlim(left_edge, right_edge)
 
-        pull_ax.set_xlabel(self.axes[0].title or self.axes[0].name)
+        pull_ax.set_xlabel(self.axes[0].title)
         pull_ax.set_ylabel("Pull")
 
         fig.add_axes(ax)
