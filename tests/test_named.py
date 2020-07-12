@@ -800,7 +800,7 @@ def test_named_index_access():
         h[0:10:20j, 0:5:10j, "hello", False, 5]
 
 
-@pytest.mark.xfail  # ToDo: should work
+@pytest.mark.xfail  # ToDo: NamedHist's proxy should work
 def test_named_proxy():
     """
         Test named proxy -- whether NamedHist proxy works properly.
