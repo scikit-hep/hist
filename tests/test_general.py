@@ -5,6 +5,8 @@ import pytest
 import numpy as np
 from uncertainties import unumpy as unp
 
+# ToDo: specify what error is raised
+
 
 def test_general_init():
     """
@@ -50,24 +52,17 @@ def test_general_init():
     ).fill(["T", "F", "T"], ["T", "F", "T"])
 
     # with no-named axes
-    assert Hist(axis.Regular(50, -3, 3, name=""), axis.Regular(50, -3, 3, name="x"))
+    assert Hist(axis.Regular(50, -3, 3), axis.Regular(50, -3, 3))
 
-    assert Hist(axis.Boolean(name=""), axis.Boolean(name="y"))
+    assert Hist(axis.Boolean(), axis.Boolean())
 
-    assert Hist(
-        axis.Variable(range(-3, 3)), axis.Variable(range(-3, 3), name="x")
-    )  # name=None will be converted to name=''
+    assert Hist(axis.Variable(range(-3, 3)), axis.Variable(range(-3, 3)))
 
-    assert Hist(axis.Integer(-3, 3, name=""), axis.Integer(-3, 3, name="x"))
+    assert Hist(axis.Integer(-3, 3), axis.Integer(-3, 3))
 
-    assert Hist(
-        axis.IntCategory(range(-3, 3), name=""),
-        axis.IntCategory(range(-3, 3), name="x"),
-    )
+    assert Hist(axis.IntCategory(range(-3, 3)), axis.IntCategory(range(-3, 3)),)
 
-    assert Hist(
-        axis.StrCategory("TF"), axis.StrCategory(["T", "F"], name="x")
-    )  # name=None will be converted to name=''
+    assert Hist(axis.StrCategory("TF"), axis.StrCategory(["T", "F"]))
 
     # with duplicated names
     with pytest.raises(Exception):
@@ -645,27 +640,27 @@ def test_general_index_access():
     """
 
     h = Hist(
-        axis.Regular(10, -5, 5, name="Norm", title="normal distribution"),
-        axis.Regular(10, -5, 5, name="Unif", title="uniform distribution"),
+        axis.Regular(10, -5, 5, name="Ones"),
+        axis.Regular(10, -5, 5, name="Twos"),
         axis.StrCategory(["hi", "hello"], name="Greet"),
         axis.Boolean(name="Yes"),
         axis.Integer(0, 10, name="Int"),
     ).fill(
-        np.random.normal(size=10),
-        np.random.uniform(size=10),
+        np.ones(10),
+        np.ones(10) * 2,
         ["hi"] * 8 + ["hello"] * 2,
         [True] * 6 + [False] * 4,
         np.ones(10),
     )
 
-    assert (
-        h[1j, 1j, "hi", True, 1]
-        == h[6, 6, bh.loc("hi"), bh.loc(True), bh.loc(1)]
-        == h[0j + 1, -2j + 3, "hi", True, 1]
-        == h[bh.loc(1, 0), bh.loc(2, -1), "hi", True, 1]
-    )
+    assert h[1j, 2j, "hi", True, 1] == 6
+    assert h[6, 7, bh.loc("hi"), bh.loc(True), bh.loc(1)] == 6
+    assert h[0j + 1, -2j + 4, "hi", True, 1] == 6
+    assert h[bh.loc(1, 0), bh.loc(3, -1), "hi", True, 1] == 6
 
     assert h[0:10:2j, 0:5:5j, "hello", False, 5]
+    assert len(h[::2j, 0:5, :, :, :].axes[1]) == 5
+    assert len(h[:, 0:5, :, :, :].axes[1]) == 5
 
     # wrong loc shortcut
     with pytest.raises(Exception):
@@ -685,6 +680,31 @@ def test_general_index_access():
         h[0:10:20j, 0:5:10j, "hello", False, 5]
 
 
+def test_general_proxy():
+    """
+        Test general proxy -- whether Hist proxy works properly.
+    """
+    h = Hist.Regular(10, 0, 1, name="x").fill([0.5, 0.5])
+    assert h[0.5j] == 2
+
+    h = (
+        Hist()
+        .Regular(10, 0, 1, name="x")
+        .Regular(10, -1, 1, name="y")
+        .fill([0.5, 0.5], [-0.2, 0.6])
+    )
+
+    assert h[0.5j, -0.2j] == 1
+    assert h[bh.loc(0.5), bh.loc(0.6)] == 1
+
+    # add axes to existing histogram
+    with pytest.raises(Exception):
+        Hist().Regular(10, 0, 1, name="x").fill([0.5, 0.5]).Regular(10, -1, 1, name="y")
+
+    with pytest.raises(Exception):
+        Hist(axis.Regular(10, 0, 1, name="x")).Regular(10, -1, 1, name="y")
+
+
 def test_general_density():
     """
         Test general density -- whether Hist can be accessed by index.
@@ -692,43 +712,10 @@ def test_general_density():
 
     for data in range(10, 20, 10):
         h = Hist(axis.Regular(10, -3, 3, name="x")).fill(np.random.randn(data))
-        assert round(sum(h.density()), 2) == round(10 / 6, 2)
+        assert pytest.approx(sum(h.density()), 2) == pytest.approx(10 / 6, 2)
 
 
 # henry's tests
-def test_histogram_quick_construction():
-    h = Hist.Regular(10, 0, 1, name="x")
-    h.fill([0.5, 0.5])
-    assert h[0.5j] == 2
-
-
-def test_histogram_quick_constrution():
-    h = Hist.Regular(10, 0, 1, name="x").Regular(10, -1, 1, name="y")
-    h.fill([0.5, 0.5], [-0.2, 0.6])
-    assert h[0.5j, -0.2j] == 1
-
-
-def test_histogram_unnamed_axes():
-    Hist(axis.Regular(10, 0, 1), axis.Regular(20, -3, 3))
-
-
-def test_histogram_loc():
-    h = Hist(axis.Regular(100, -50, 50))
-
-    h.fill([0, 2.1])
-    h[0j] == 1
-    h[2.1j] == 1
-
-
-def test_histogram_rebin():
-
-    h = Hist(axis.Regular(100, 0, 1))
-
-    assert len(h.axes[0]) == 100
-    assert len(h[::2j].axes[0]) == 50  # type: ignore
-    assert len(h[::10j].axes[0]) == 10  # type: ignore
-
-
 def test_axestuple():
 
     h = Hist(

@@ -6,6 +6,8 @@ import pytest
 import numpy as np
 from uncertainties import unumpy as unp
 
+# ToDo: specify what error is raised
+
 
 def test_version():
     assert hist.__version__ is not None
@@ -54,24 +56,17 @@ def test_base_init():
     ).fill(["T", "F", "T"], ["T", "F", "T"])
 
     # with no-named axes
-    assert BaseHist(axis.Regular(50, -3, 3, name=""), axis.Regular(50, -3, 3, name="x"))
+    assert BaseHist(axis.Regular(50, -3, 3), axis.Regular(50, -3, 3))
 
-    assert BaseHist(axis.Boolean(name=""), axis.Boolean(name="y"))
+    assert BaseHist(axis.Boolean(), axis.Boolean())
 
-    assert BaseHist(
-        axis.Variable(range(-3, 3)), axis.Variable(range(-3, 3), name="x")
-    )  # name=None will be converted to name=''
+    assert BaseHist(axis.Variable(range(-3, 3)), axis.Variable(range(-3, 3)))
 
-    assert BaseHist(axis.Integer(-3, 3, name=""), axis.Integer(-3, 3, name="x"))
+    assert BaseHist(axis.Integer(-3, 3), axis.Integer(-3, 3))
 
-    assert BaseHist(
-        axis.IntCategory(range(-3, 3), name=""),
-        axis.IntCategory(range(-3, 3), name="x"),
-    )
+    assert BaseHist(axis.IntCategory(range(-3, 3)), axis.IntCategory(range(-3, 3)),)
 
-    assert BaseHist(
-        axis.StrCategory("TF"), axis.StrCategory(["T", "F"], name="x")
-    )  # name=None will be converted to name=''
+    assert BaseHist(axis.StrCategory("TF"), axis.StrCategory(["T", "F"]))
 
     # with duplicated names
     with pytest.raises(Exception):
@@ -654,27 +649,27 @@ def test_base_index_access():
     """
 
     h = BaseHist(
-        axis.Regular(10, -5, 5, name="Norm", title="normal distribution"),
-        axis.Regular(10, -5, 5, name="Unif", title="uniform distribution"),
+        axis.Regular(10, -5, 5, name="Ones"),
+        axis.Regular(10, -5, 5, name="Twos"),
         axis.StrCategory(["hi", "hello"], name="Greet"),
         axis.Boolean(name="Yes"),
         axis.Integer(0, 10, name="Int"),
     ).fill(
-        np.random.normal(size=10),
-        np.random.uniform(size=10),
+        np.ones(10),
+        np.ones(10) * 2,
         ["hi"] * 8 + ["hello"] * 2,
         [True] * 6 + [False] * 4,
         np.ones(10),
     )
 
-    assert (
-        h[1j, 1j, "hi", True, 1]
-        == h[6, 6, bh.loc("hi"), bh.loc(True), bh.loc(1)]
-        == h[0j + 1, -2j + 3, "hi", True, 1]
-        == h[bh.loc(1, 0), bh.loc(2, -1), "hi", True, 1]
-    )
+    assert h[1j, 2j, "hi", True, 1] == 6
+    assert h[6, 7, bh.loc("hi"), bh.loc(True), bh.loc(1)] == 6
+    assert h[0j + 1, -2j + 4, "hi", True, 1] == 6
+    assert h[bh.loc(1, 0), bh.loc(3, -1), "hi", True, 1] == 6
 
     assert h[0:10:2j, 0:5:5j, "hello", False, 5]
+    assert len(h[::2j, 0:5, :, :, :].axes[1]) == 5
+    assert len(h[:, 0:5, :, :, :].axes[1]) == 5
 
     # wrong loc shortcut
     with pytest.raises(Exception):
@@ -694,6 +689,33 @@ def test_base_index_access():
         h[0:10:20j, 0:5:10j, "hello", False, 5]
 
 
+def test_base_proxy():
+    """
+        Test base proxy -- whether BaseHist proxy works properly.
+    """
+    h = BaseHist.Regular(10, 0, 1, name="x").fill([0.5, 0.5])
+    assert h[0.5j] == 2
+
+    h = (
+        BaseHist()
+        .Regular(10, 0, 1, name="x")
+        .Regular(10, -1, 1, name="y")
+        .fill([0.5, 0.5], [-0.2, 0.6])
+    )
+
+    assert h[0.5j, -0.2j] == 1
+    assert h[bh.loc(0.5), bh.loc(0.6)] == 1
+
+    # add axes to existing histogram
+    with pytest.raises(Exception):
+        BaseHist().Regular(10, 0, 1, name="x").fill([0.5, 0.5]).Regular(
+            10, -1, 1, name="y"
+        )
+
+    with pytest.raises(Exception):
+        BaseHist(axis.Regular(10, 0, 1, name="x")).Regular(10, -1, 1, name="y")
+
+
 def test_base_density():
     """
         Test base density -- whether BaseHist can be accessed by index.
@@ -701,4 +723,4 @@ def test_base_density():
 
     for data in range(10, 20, 10):
         h = BaseHist(axis.Regular(10, -3, 3, name="x")).fill(np.random.randn(data))
-        assert round(sum(h.density()), 2) == round(10 / 6, 2)
+        assert pytest.approx(sum(h.density()), 2) == pytest.approx(10 / 6, 2)
