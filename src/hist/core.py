@@ -7,7 +7,7 @@ import matplotlib.patches as patches
 from matplotlib import transforms
 from scipy.optimize import curve_fit
 from uncertainties import correlated_values, unumpy
-from typing import Callable, Optional, Tuple, Union
+from typing import Callable, Optional, Tuple, Union, List, Any
 
 import hist.utils
 from .axis import Regular
@@ -45,24 +45,33 @@ class always_normal_method:
 
 @hist.utils.set_family(hist.utils.HIST_FAMILY)
 class BaseHist(bh.Histogram):
+    __slots__ = ("_ax", "_storage_proxy")
+
     def __init__(self, *args, **kwargs):
         """
             Initialize BaseHist object. Axis params can contain the names.
         """
+        self._ax: List[Any] = []
+        self._hist: Any = None
+        self._storage_proxy: Any = None
+
         if len(args):
-            super().__init__(*args, **kwargs)
-            self.names: dict = dict()
-            for ax in self.axes:
-                if ax.name and ax.name in self.names:
-                    raise KeyError(
-                        f"{self.__class__.__name__} instance cannot contain axes with duplicated names."
-                    )
-                else:
-                    self.names[ax.name] = True
-        else:
-            self._ax = []
             self._hist = None
-            self._storage_proxy = None
+            self._ax = []
+            super().__init__(*args, **kwargs)
+            valid_names = [ax.name for ax in self.axes if ax.name]
+            if len(valid_names) != len(set(valid_names)):
+                raise KeyError(
+                    f"{self.__class__.__name__} instance cannot contain axes with duplicated names"
+                )
+            for i, ax in enumerate(self.axes):
+                # title will return name if title is not set, so this is safe
+                if not ax.title:
+                    ax.title = f"Axis {i}"
+
+    @property
+    def names(self) -> List[str]:
+        return [ax.name for ax in self.axes]
 
     @always_normal_method
     def Regular(self, *args, **kwargs):
@@ -74,8 +83,10 @@ class BaseHist(bh.Histogram):
     def __getattribute__(self, item):
 
         if (
-            not super().__getattribute__("_hist")
-            and not isinstance(super().__getattribute__(item), always_normal_method)
+            not object.__getattribute__(self, "_hist")
+            and not isinstance(
+                object.__getattribute__(self, item), always_normal_method
+            )
             and item not in {"_hist", "_ax"}
         ):
             # Make histogram real here
