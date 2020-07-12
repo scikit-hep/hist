@@ -182,6 +182,8 @@ class BaseHist(bh.Histogram):
 
         fig.add_axes(ax)
 
+        plt.close(fig)
+
         return fig, ax
 
     def plot2d(
@@ -217,6 +219,8 @@ class BaseHist(bh.Histogram):
         ax.set_ylabel(self.axes[1].title)
 
         fig.add_axes(ax)
+
+        plt.close(fig)
 
         return fig, ax
 
@@ -336,6 +340,8 @@ class BaseHist(bh.Histogram):
         fig.add_axes(main_ax)
         fig.add_axes(top_ax)
         fig.add_axes(side_ax)
+
+        plt.close(fig)
 
         return fig, main_ax, top_ax, side_ax
 
