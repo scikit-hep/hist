@@ -5,6 +5,8 @@ import pytest
 import numpy as np
 from uncertainties import unumpy as unp
 
+# ToDo: specify what error is raised
+
 
 def test_named_init():
     """

@@ -6,6 +6,8 @@ import pytest
 import numpy as np
 from uncertainties import unumpy as unp
 
+# ToDo: specify what error is raised
+
 
 def test_version():
     assert hist.__version__ is not None
