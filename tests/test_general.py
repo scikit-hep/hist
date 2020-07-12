@@ -707,7 +707,7 @@ def test_general_proxy():
 
 def test_general_density():
     """
-        Test general density -- whether Hist can be accessed by index.
+        Test general density -- whether Hist density work properly.
     """
 
     for data in range(10, 20, 10):
@@ -715,8 +715,10 @@ def test_general_density():
         assert pytest.approx(sum(h.density()), 2) == pytest.approx(10 / 6, 2)
 
 
-# henry's tests
-def test_axestuple():
+def test_general_axestuple():
+    """
+        Test general axes tuple -- whether Hist axes tuple work properly.
+    """
 
     h = Hist(
         axis.Regular(20, 0, 12, name="A", title="alpha"),

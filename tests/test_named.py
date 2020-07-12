@@ -832,9 +832,38 @@ def test_named_proxy():
 
 def test_named_density():
     """
-        Test named density -- whether NamedHist can be accessed by index.
+        Test named density -- whether NamedHist density work properly.
     """
 
     for data in range(10, 20, 10):
         h = NamedHist(axis.Regular(10, -3, 3, name="x")).fill(x=np.random.randn(data))
         assert pytest.approx(sum(h.density()), 2) == pytest.approx(10 / 6, 2)
+
+
+def test_named_axestuple():
+    """
+        Test named axes tuple -- whether NamedHist axes tuple work properly.
+    """
+
+    h = NamedHist(
+        axis.Regular(20, 0, 12, name="A"),
+        axis.Regular(10, 1, 3, name="B", title="Beta"),
+        axis.Regular(15, 3, 5, name="C"),
+        axis.Regular(5, 3, 2, name="D", title="Axis 3"),
+    )
+
+    assert h.axes.name == ("A", "B", "C", "D")
+    assert h.axes.title == ("A", "Beta", "C", "Axis 3")
+
+    assert h.axes[0].size == 20
+    assert h.axes["A"].size == 20
+
+    assert h.axes[1].size == 10
+    assert h.axes["B"].size == 10
+
+    assert h.axes[2].size == 15
+
+    assert h.axes[:2].size == (20, 10)
+    assert h.axes["A":"B"].size == (20,)
+    assert h.axes[:"B"].size == (20,)
+    assert h.axes["B":].size == (10, 15, 5)
