@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Any
 
 import sys
 import re
 import boost_histogram.axis as bha
 import hist.utils
-from typing import Any
 
 if sys.version_info >= (3, 8):
     from typing import Protocol
