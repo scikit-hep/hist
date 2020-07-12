@@ -824,3 +824,13 @@ def test_named_proxy():
 
     with pytest.raises(Exception):
         NamedHist(axis.Regular(10, 0, 1, name="x")).Regular(10, -1, 1, name="y")
+
+
+def test_named_density():
+    """
+        Test named density -- whether NamedHist can be accessed by index.
+    """
+
+    for data in range(10, 20, 10):
+        h = NamedHist(axis.Regular(10, -3, 3, name="x")).fill(x=np.random.randn(data))
+        assert round(sum(h.density()), 2) == round(10 / 6, 2)

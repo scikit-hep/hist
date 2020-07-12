@@ -718,3 +718,13 @@ def test_base_proxy():
 
     with pytest.raises(Exception):
         BaseHist(axis.Regular(10, 0, 1, name="x")).Regular(10, -1, 1, name="y")
+
+
+def test_base_density():
+    """
+        Test base density -- whether BaseHist can be accessed by index.
+    """
+
+    for data in range(10, 20, 10):
+        h = BaseHist(axis.Regular(10, -3, 3, name="x")).fill(np.random.randn(data))
+        assert round(sum(h.density()), 2) == round(10 / 6, 2)
