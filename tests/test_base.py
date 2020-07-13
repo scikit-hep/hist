@@ -19,15 +19,23 @@ def test_base_init():
     """
 
     # basic
-    h = BaseHist(axis.Regular(10, 0, 1)).fill([0.35, 0.35, 0.45])
+    h = BaseHist(
+        axis.Regular(10, 0, 1, name="x"), axis.Regular(10, 0, 1, name="y")
+    ).fill([0.35, 0.35, 0.45], [0.35, 0.35, 0.45])
 
     for idx in range(10):
         if idx == 3:
-            assert h[idx] == h[{0: idx}] == 2
+            assert h[idx, idx] == 2
+            assert h[{0: idx, 1: idx}] == 2
+            assert h[{"x": idx, "y": idx}] == 2
         elif idx == 4:
-            assert h[idx] == h[{0: idx}] == 1
+            assert h[idx, idx] == 1
+            assert h[{0: idx, 1: idx}] == 1
+            assert h[{"x": idx, "y": idx}] == 1
         else:
-            assert h[idx] == h[{0: idx}] == 0
+            assert h[idx, idx] == 0
+            assert h[{0: idx, 1: idx}] == 0
+            assert h[{"x": idx, "y": idx}] == 0
 
     # with named axes
     assert BaseHist(
@@ -106,9 +114,9 @@ def test_base_fill():
         axis.Regular(10, 0, 1, name="y"),
         axis.Regular(2, 0, 2, name="z"),
     ).fill(
-        [0.35, 0.35, 0.35, 0.45, 0.55, 0.55, 0.55],
-        [0.35, 0.35, 0.45, 0.45, 0.45, 0.45, 0.45],
-        [0, 0, 1, 1, 1, 1, 1],
+        x=[0.35, 0.35, 0.35, 0.45, 0.55, 0.55, 0.55],
+        y=[0.35, 0.35, 0.45, 0.45, 0.45, 0.45, 0.45],
+        z=[0, 0, 1, 1, 1, 1, 1],
     )
 
     z_one_only = h[{2: bh.loc(1)}]
@@ -144,9 +152,9 @@ def test_base_fill():
         axis.Variable(range(11), name="y"),
         axis.Variable(range(3), name="z"),
     ).fill(
-        [3.5, 3.5, 3.5, 4.5, 5.5, 5.5, 5.5],
-        [3.5, 3.5, 4.5, 4.5, 4.5, 4.5, 4.5],
-        [0, 0, 1, 1, 1, 1, 1],
+        x=[3.5, 3.5, 3.5, 4.5, 5.5, 5.5, 5.5],
+        y=[3.5, 3.5, 4.5, 4.5, 4.5, 4.5, 4.5],
+        z=[0, 0, 1, 1, 1, 1, 1],
     )
 
     z_one_only = h[{2: bh.loc(1)}]
@@ -190,9 +198,9 @@ def test_base_fill():
         axis.IntCategory(range(10), name="y"),
         axis.IntCategory(range(2), name="z"),
     ).fill(
-        [3.5, 3.5, 3.5, 4.5, 5.5, 5.5, 5.5],
-        [3.5, 3.5, 4.5, 4.5, 4.5, 4.5, 4.5],
-        [0, 0, 1, 1, 1, 1, 1],
+        x=[3.5, 3.5, 3.5, 4.5, 5.5, 5.5, 5.5],
+        y=[3.5, 3.5, 4.5, 4.5, 4.5, 4.5, 4.5],
+        z=[0, 0, 1, 1, 1, 1, 1],
     )
 
     z_one_only = h[{2: bh.loc(1)}]
@@ -637,6 +645,7 @@ def test_base_plot_pull():
         h.plot_pull(pdf, eb_ecolor=1.0, eb_mfc=1.0)  # kwargs should be str
 
 
+@pytest.mark.xfail
 def test_base_index_access():
     """
         Test base index access -- whether BaseHist can be accessed by index.
@@ -657,9 +666,29 @@ def test_base_index_access():
     )
 
     assert h[1j, 2j, "hi", True, 1] == 6
-    assert h[6, 7, bh.loc("hi"), bh.loc(True), bh.loc(1)] == 6
+    assert (
+        h[
+            {
+                0: 6,
+                1: 7,
+                2: bh.loc("hi"),
+                3: bh.loc(True),
+                4: bh.loc(1),
+            }
+        ]
+        == 6
+    )
     assert h[0j + 1, -2j + 4, "hi", True, 1] == 6
-    assert h[bh.loc(1, 0), bh.loc(3, -1), "hi", True, 1] == 6
+    assert (
+        h[
+            "Ones" : bh.loc(1, 0),
+            "Twos" : bh.loc(3, -1),
+            "Greet":"hi",
+            "Yes":True,
+            "Int":1,
+        ]
+        == 6
+    )
 
     assert h[0:10:2j, 0:5:5j, "hello", False, 5]
     assert len(h[::2j, 0:5, :, :, :].axes[1]) == 5
