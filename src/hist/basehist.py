@@ -171,7 +171,9 @@ class BaseHist(bh.Histogram):
                 f"Only projection by indices or names is supported for {self.__class__.__name__}"
             )
 
-    def fill(self, *args, weight=None, sample=None, thread: Optional[int] =None, **kwargs):
+    def fill(
+        self, *args, weight=None, sample=None, thread: Optional[int] = None, **kwargs
+    ):
         """
             Insert data into the histogram using names and indices return \
             a Hist object.
@@ -248,7 +250,9 @@ class BaseHist(bh.Histogram):
             elif any(isinstance(k, str) for k in index.keys()):
                 indices: dict = {}
                 for n, v in list(index.items()):
-                    indices[self._name_to_index(n) if isinstance(n, str) else n] = self._loc_shortcut(v)
+                    indices[
+                        self._name_to_index(n) if isinstance(n, str) else n
+                    ] = self._loc_shortcut(v)
 
                 return indices
 

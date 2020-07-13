@@ -29,7 +29,9 @@ class NamedHist(BaseHist):
                 f"Only projections by names are supported for {self.__class__.__name__}"
             )
 
-    def fill(self, *args, weight=None, sample=None, thread: Optional[int] =None, **kwargs):
+    def fill(
+        self, *args, weight=None, sample=None, thread: Optional[int] = None, **kwargs
+    ):
         """
             Insert data into the histogram using names and return a \
             NamedHist object. NamedHist could only be filled by names.

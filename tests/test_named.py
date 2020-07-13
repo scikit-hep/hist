@@ -822,12 +822,12 @@ def test_named_index_access():
         ]
         == 6
     )
-    
+
     with pytest.raises(Exception):
-        h[0 : bh.loc(1, 0), 1 : bh.loc(3, -1), 2:"hi", 3:True, 4:1]== 6
-        
+        h[0 : bh.loc(1, 0), 1 : bh.loc(3, -1), 2:"hi", 3:True, 4:1] == 6
+
     with pytest.raises(Exception):
-        h[0 : bh.loc(1, 0), 1 : bh.loc(3, -1), "Greet":"hi", 3:True, 4:1]== 6
+        h[0 : bh.loc(1, 0), 1 : bh.loc(3, -1), "Greet":"hi", 3:True, 4:1] == 6
 
     assert h[0:10:2j, 0:5:5j, "hello", False, 5]
     assert len(h[::2j, 0:5, :, :, :].axes[1]) == 5
