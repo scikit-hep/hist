@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from .basehist import BaseHist
-from typing import Union
+from typing import Union, Optional
 
 
 class NamedHist(BaseHist):
@@ -29,7 +29,7 @@ class NamedHist(BaseHist):
                 f"Only projections by names are supported for {self.__class__.__name__}"
             )
 
-    def fill(self, *args, **kwargs):
+    def fill(self, *args, weight=None, sample=None, thread: Optional[int] =None, **kwargs):
         """
             Insert data into the histogram using names and return a \
             NamedHist object. NamedHist could only be filled by names.

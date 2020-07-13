@@ -662,9 +662,9 @@ def test_general_index_access():
     assert (
         h[
             "Ones" : bh.loc(1, 0),
-            "Twos" : bh.loc(3, -1),
+            1 : bh.loc(3, -1),
             "Greet":"hi",
-            "Yes":True,
+            3 :True,
             "Int":1,
         ]
         == 6

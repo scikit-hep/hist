@@ -670,11 +670,11 @@ def test_base_index_access():
     assert h[0j + 1, -2j + 4, "hi", True, 1] == 6
     assert (
         h[
-            "Ones" : bh.loc(1, 0),
+            0: bh.loc(1, 0),
             "Twos" : bh.loc(3, -1),
-            "Greet":"hi",
+            2:"hi",
             "Yes":True,
-            "Int":1,
+            4:1,
         ]
         == 6
     )
