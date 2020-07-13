@@ -49,7 +49,7 @@ class NamedHist(BaseHist):
         """
 
         if isinstance(index, dict):
-            if all(isinstance(k, int) for k in index.keys()):
+            if any(isinstance(k, int) for k in index.keys()):
                 raise TypeError(
                     f"Only access by names are supported for {self.__class__.__name__} in dictionay"
                 )
@@ -62,7 +62,7 @@ class NamedHist(BaseHist):
         """
 
         if isinstance(index, dict):
-            if all(isinstance(k, int) for k in index.keys()):
+            if any(isinstance(k, int) for k in index.keys()):
                 raise TypeError(
                     f"Only access by names are supported for {self.__class__.__name__} in dictionay"
                 )
