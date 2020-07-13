@@ -226,29 +226,29 @@ def test_base_fill():
 
     # with names
     assert BaseHist(
-            axis.Regular(50, -3, 3, name="x"), axis.Regular(50, -3, 3, name="y")
-        ).fill(x=np.random.randn(10), y=np.random.randn(10))
+        axis.Regular(50, -3, 3, name="x"), axis.Regular(50, -3, 3, name="y")
+    ).fill(x=np.random.randn(10), y=np.random.randn(10))
 
     assert BaseHist(axis.Boolean(name="x"), axis.Boolean(name="y")).fill(
-            x=[True, False, True], y=[True, False, True]
-        )
+        x=[True, False, True], y=[True, False, True]
+    )
 
     assert BaseHist(
-            axis.Variable(range(-3, 3), name="x"), axis.Variable(range(-3, 3), name="y")
-        ).fill(x=np.random.randn(10), y=np.random.randn(10))
+        axis.Variable(range(-3, 3), name="x"), axis.Variable(range(-3, 3), name="y")
+    ).fill(x=np.random.randn(10), y=np.random.randn(10))
 
     assert BaseHist(axis.Integer(-3, 3, name="x"), axis.Integer(-3, 3, name="y")).fill(
-            x=np.random.randn(10), y=np.random.randn(10)
-        )
+        x=np.random.randn(10), y=np.random.randn(10)
+    )
 
     assert BaseHist(
-            axis.IntCategory(range(-3, 3), name="x"),
-            axis.IntCategory(range(-3, 3), name="y"),
-        ).fill(x=np.random.randn(10), y=np.random.randn(10))
+        axis.IntCategory(range(-3, 3), name="x"),
+        axis.IntCategory(range(-3, 3), name="y"),
+    ).fill(x=np.random.randn(10), y=np.random.randn(10))
 
     assert BaseHist(
-            axis.StrCategory(["F", "T"], name="x"), axis.StrCategory("FT", name="y")
-        ).fill(x=["T", "F", "T"], y=["T", "F", "T"])
+        axis.StrCategory(["F", "T"], name="x"), axis.StrCategory("FT", name="y")
+    ).fill(x=["T", "F", "T"], y=["T", "F", "T"])
 
     def pdf(x, a=1 / np.sqrt(2 * np.pi), x0=0, sigma=1, offset=0):
         exp = unp.exp if a.dtype == np.dtype("O") else np.exp
