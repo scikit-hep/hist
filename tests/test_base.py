@@ -693,27 +693,116 @@ def test_base_proxy():
     """
         Test base proxy -- whether BaseHist proxy works properly.
     """
-    h = BaseHist.Regular(10, 0, 1, name="x").fill([0.5, 0.5])
+    h = BaseHist.Reg(10, 0, 1, name="x").fill([0.5, 0.5])
     assert h[0.5j] == 2
 
     h = (
         BaseHist()
-        .Regular(10, 0, 1, name="x")
-        .Regular(10, -1, 1, name="y")
-        .fill([0.5, 0.5], [-0.2, 0.6])
+        .Reg(10, 0, 1, name="x")
+        .Reg(10, 0, 1, name="y")
+        .fill([0.5, 0.5], [0.2, 0.6])
     )
 
-    assert h[0.5j, -0.2j] == 1
+    assert h[0.5j, 0.2j] == 1
     assert h[bh.loc(0.5), bh.loc(0.6)] == 1
+
+    h = BaseHist.Bool(name="x").fill([True, True])
+    assert h[bh.loc(True)] == 2
+
+    h = BaseHist().Bool(name="x").Bool(name="y").fill([True, True], [True, False])
+
+    assert h[True, True] == 1
+    assert h[True, False] == 1
+
+    h = BaseHist.Var(range(10), name="x").fill([5, 5])
+    assert h[5j] == 2
+
+    h = (
+        BaseHist()
+        .Var(range(10), name="x")
+        .Var(range(10), name="y")
+        .fill([5, 5], [2, 6])
+    )
+
+    assert h[5j, 2j] == 1
+    assert h[bh.loc(5), bh.loc(6)] == 1
+
+    h = BaseHist.Int(0, 10, name="x").fill([5, 5])
+    assert h[5j] == 2
+
+    h = BaseHist().Int(0, 10, name="x").Int(0, 10, name="y").fill([5, 5], [2, 6])
+
+    assert h[5j, 2j] == 1
+    assert h[bh.loc(5), bh.loc(6)] == 1
+
+    h = BaseHist.IntCat(range(10), name="x").fill([5, 5])
+    assert h[5j] == 2
+
+    h = (
+        BaseHist()
+        .IntCat(range(10), name="x")
+        .IntCat(range(10), name="y")
+        .fill([5, 5], [2, 6])
+    )
+
+    assert h[5j, 2j] == 1
+    assert h[bh.loc(5), bh.loc(6)] == 1
+
+    h = BaseHist.StrCat("TF", name="x").fill(["T", "T"])
+    assert h["T"] == 2
+
+    h = (
+        BaseHist()
+        .StrCat("TF", name="x")
+        .StrCat("TF", name="y")
+        .fill(["T", "T"], ["T", "F"])
+    )
+
+    assert h["T", "T"] == 1
+    assert h["T", "F"] == 1
 
     # add axes to existing histogram
     with pytest.raises(Exception):
-        BaseHist().Regular(10, 0, 1, name="x").fill([0.5, 0.5]).Regular(
-            10, -1, 1, name="y"
+        BaseHist().Reg(10, 0, 1, name="x").fill([0.5, 0.5]).Reg(10, -1, 1, name="y")
+
+    with pytest.raises(Exception):
+        BaseHist(axis.Reg(10, 0, 1, name="x")).Reg(10, -1, 1, name="y")
+
+    with pytest.raises(Exception):
+        BaseHist().Bool(name="x").fill([True, True]).Bool(name="y")
+
+    with pytest.raises(Exception):
+        BaseHist(axis.Bool(name="x")).Bool(name="y")
+
+    with pytest.raises(Exception):
+        BaseHist().Var(range(0, 1, 10), name="x").fill([0.5, 0.5]).Var(
+            range(0, 1, 10), name="y"
         )
 
     with pytest.raises(Exception):
-        BaseHist(axis.Regular(10, 0, 1, name="x")).Regular(10, -1, 1, name="y")
+        BaseHist(axis.Var(range(0, 1, 10), name="x")).Var(range(0, 1, 10), name="y")
+
+    with pytest.raises(Exception):
+        BaseHist().Int(0, 10, name="x").fill([0.5, 0.5]).Int(0, 10, name="y")
+
+    with pytest.raises(Exception):
+        BaseHist(axis.Int(0, 10, name="x")).Int(0, 10, name="y")
+
+    with pytest.raises(Exception):
+        BaseHist().IntCat(range(0, 1, 10), name="x").fill([0.5, 0.5]).IntCat(
+            range(0, 1, 10), name="y"
+        )
+
+    with pytest.raises(Exception):
+        BaseHist(axis.IntCat(range(0, 1, 10), name="x")).IntCat(
+            range(0, 1, 10), name="y"
+        )
+
+    with pytest.raises(Exception):
+        BaseHist().StrCat("TF", name="x").fill(["T", "T"]).StrCat("TF", name="y")
+
+    with pytest.raises(Exception):
+        BaseHist(axis.StrCat("TF", name="x")).StrCat("TF", name="y")
 
 
 def test_base_density():

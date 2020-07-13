@@ -10,7 +10,7 @@ from uncertainties import correlated_values, unumpy
 from typing import Callable, Optional, Tuple, Union, List, Any
 
 import hist.utils
-from .axis import Regular
+from .axis import Regular, Boolean, Variable, Integer, IntCategory, StrCategory
 from .axestuple import NamedAxesTuple
 
 # typing alias
@@ -81,10 +81,45 @@ class BaseHist(bh.Histogram):
         return NamedAxesTuple(self._axis(i) for i in range(self.ndim))
 
     @always_normal_method
-    def Regular(self, *args, **kwargs):
+    def Reg(self, *args, **kwargs):
         if self._hist:
             raise RuntimeError("Cannot add an axis to an existing histogram")
         self._ax.append(Regular(*args, **kwargs))
+        return self
+
+    @always_normal_method
+    def Bool(self, *args, **kwargs):
+        if self._hist:
+            raise RuntimeError("Cannot add an axis to an existing histogram")
+        self._ax.append(Boolean(*args, **kwargs))
+        return self
+
+    @always_normal_method
+    def Var(self, *args, **kwargs):
+        if self._hist:
+            raise RuntimeError("Cannot add an axis to an existing histogram")
+        self._ax.append(Variable(*args, **kwargs))
+        return self
+
+    @always_normal_method
+    def Int(self, *args, **kwargs):
+        if self._hist:
+            raise RuntimeError("Cannot add an axis to an existing histogram")
+        self._ax.append(Integer(*args, **kwargs))
+        return self
+
+    @always_normal_method
+    def IntCat(self, *args, **kwargs):
+        if self._hist:
+            raise RuntimeError("Cannot add an axis to an existing histogram")
+        self._ax.append(IntCategory(*args, **kwargs))
+        return self
+
+    @always_normal_method
+    def StrCat(self, *args, **kwargs):
+        if self._hist:
+            raise RuntimeError("Cannot add an axis to an existing histogram")
+        self._ax.append(StrCategory(*args, **kwargs))
         return self
 
     def __getattribute__(self, item):

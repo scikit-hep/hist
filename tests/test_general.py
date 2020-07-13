@@ -684,25 +684,110 @@ def test_general_proxy():
     """
         Test general proxy -- whether Hist proxy works properly.
     """
-    h = Hist.Regular(10, 0, 1, name="x").fill([0.5, 0.5])
+
+    h = Hist.Reg(10, 0, 1, name="x").fill([0.5, 0.5])
     assert h[0.5j] == 2
 
     h = (
         Hist()
-        .Regular(10, 0, 1, name="x")
-        .Regular(10, -1, 1, name="y")
-        .fill([0.5, 0.5], [-0.2, 0.6])
+        .Reg(10, 0, 1, name="x")
+        .Reg(10, 0, 1, name="y")
+        .fill([0.5, 0.5], [0.2, 0.6])
     )
 
-    assert h[0.5j, -0.2j] == 1
+    assert h[0.5j, 0.2j] == 1
     assert h[bh.loc(0.5), bh.loc(0.6)] == 1
+
+    h = Hist.Bool(name="x").fill([True, True])
+    assert h[bh.loc(True)] == 2
+
+    h = Hist().Bool(name="x").Bool(name="y").fill([True, True], [True, False])
+
+    assert h[True, True] == 1
+    assert h[True, False] == 1
+
+    h = Hist.Var(range(10), name="x").fill([5, 5])
+    assert h[5j] == 2
+
+    h = Hist().Var(range(10), name="x").Var(range(10), name="y").fill([5, 5], [2, 6])
+
+    assert h[5j, 2j] == 1
+    assert h[bh.loc(5), bh.loc(6)] == 1
+
+    h = Hist.Int(0, 10, name="x").fill([5, 5])
+    assert h[5j] == 2
+
+    h = Hist().Int(0, 10, name="x").Int(0, 10, name="y").fill([5, 5], [2, 6])
+
+    assert h[5j, 2j] == 1
+    assert h[bh.loc(5), bh.loc(6)] == 1
+
+    h = Hist.IntCat(range(10), name="x").fill([5, 5])
+    assert h[5j] == 2
+
+    h = (
+        Hist()
+        .IntCat(range(10), name="x")
+        .IntCat(range(10), name="y")
+        .fill([5, 5], [2, 6])
+    )
+
+    assert h[5j, 2j] == 1
+    assert h[bh.loc(5), bh.loc(6)] == 1
+
+    h = Hist.StrCat("TF", name="x").fill(["T", "T"])
+    assert h["T"] == 2
+
+    h = (
+        Hist()
+        .StrCat("TF", name="x")
+        .StrCat("TF", name="y")
+        .fill(["T", "T"], ["T", "F"])
+    )
+
+    assert h["T", "T"] == 1
+    assert h["T", "F"] == 1
 
     # add axes to existing histogram
     with pytest.raises(Exception):
-        Hist().Regular(10, 0, 1, name="x").fill([0.5, 0.5]).Regular(10, -1, 1, name="y")
+        Hist().Reg(10, 0, 1, name="x").fill([0.5, 0.5]).Reg(10, -1, 1, name="y")
 
     with pytest.raises(Exception):
-        Hist(axis.Regular(10, 0, 1, name="x")).Regular(10, -1, 1, name="y")
+        Hist(axis.Reg(10, 0, 1, name="x")).Reg(10, -1, 1, name="y")
+
+    with pytest.raises(Exception):
+        Hist().Bool(name="x").fill([True, True]).Bool(name="y")
+
+    with pytest.raises(Exception):
+        Hist(axis.Bool(name="x")).Bool(name="y")
+
+    with pytest.raises(Exception):
+        Hist().Var(range(0, 1, 10), name="x").fill([0.5, 0.5]).Var(
+            range(0, 1, 10), name="y"
+        )
+
+    with pytest.raises(Exception):
+        Hist(axis.Var(range(0, 1, 10), name="x")).Var(range(0, 1, 10), name="y")
+
+    with pytest.raises(Exception):
+        Hist().Int(0, 10, name="x").fill([0.5, 0.5]).Int(0, 10, name="y")
+
+    with pytest.raises(Exception):
+        Hist(axis.Int(0, 10, name="x")).Int(0, 10, name="y")
+
+    with pytest.raises(Exception):
+        Hist().IntCat(range(0, 1, 10), name="x").fill([0.5, 0.5]).IntCat(
+            range(0, 1, 10), name="y"
+        )
+
+    with pytest.raises(Exception):
+        Hist(axis.IntCat(range(0, 1, 10), name="x")).IntCat(range(0, 1, 10), name="y")
+
+    with pytest.raises(Exception):
+        Hist().StrCat("TF", name="x").fill(["T", "T"]).StrCat("TF", name="y")
+
+    with pytest.raises(Exception):
+        Hist(axis.StrCat("TF", name="x")).StrCat("TF", name="y")
 
 
 def test_general_density():
