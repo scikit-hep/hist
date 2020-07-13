@@ -140,6 +140,17 @@ class BaseHist(bh.Histogram):
 
         return object.__getattribute__(self, item)
 
+    def _name_to_index(self, name: str) -> int:
+        """
+            Transform axis name to axis index, given axis name, return axis \
+            index.
+        """
+        for index, axis in enumerate(self.axes):
+            if name == axis.name:
+                return index
+
+        raise ValueError("The axis names could not be found")
+
     def project(self, *args: Union[int, str]):
         """
         Projection of axis idx.
@@ -150,19 +161,139 @@ class BaseHist(bh.Histogram):
         elif all(isinstance(x, str) for x in args):
             indices: tuple = tuple()
             for name in args:
-                for index, axis in enumerate(self.axes):
-                    if name == axis.name:
-                        indices += (index,)
-                        break
-                else:
-                    raise ValueError("The axis names could not be found")
+                if isinstance(
+                    name, str
+                ):  # ToDo: redundant line - mypy cannot realized it
+                    indices += (self._name_to_index(name),)
 
             return super().project(*indices)
 
         else:
             raise TypeError(
-                f"Only projections by indices and names are supported for {self.__class__.__name__}"
+                f"Only projection by indices or names is supported for {self.__class__.__name__}"
             )
+
+    def fill(self, *args, **kwargs):
+        """
+            Insert data into the histogram using names and indices return \
+            a Hist object.
+        """
+
+        if len(args) and not len(kwargs):
+            return super().fill(*args)
+
+        elif (
+            isinstance(kwargs, dict)
+            and all(isinstance(k, str) for k in kwargs.keys())
+            and not len(args)
+        ):
+            indices: dict = {}
+            for n, v in kwargs.items():
+                indices[self._name_to_index(n)] = v
+
+            lst = sorted(indices.items(), key=lambda item: item[0])
+            nd = np.asarray(lst, dtype=object)
+            data = nd.ravel()[1::2]
+            return super().fill(*data)
+
+        else:
+            raise TypeError(
+                f"Only dict with keys of int or str is supported for {self.__class__.__name__}"
+            )
+
+    def _loc_shortcut(self, x):
+        """
+            Convert some specific indices to location.
+        """
+
+        if isinstance(x, slice):
+            return slice(
+                self._loc_shortcut(x.start),
+                self._loc_shortcut(x.stop),
+                self._step_shortcut(x.step),
+            )
+        elif isinstance(x, complex):
+            if x.real % 1 != 0:
+                raise ValueError("The real part should be an integer")
+            else:
+                return bh.loc(x.imag, int(x.real))
+        elif isinstance(x, str):
+            return bh.loc(x)
+        else:
+            return x
+
+    def _step_shortcut(self, x):
+        """
+            Convert some specific indices to step.
+        """
+
+        if isinstance(x, complex):
+            if x.real != 0:
+                raise ValueError("The step should not have real part")
+            elif x.imag % 1 != 0:
+                raise ValueError("The imaginary part should be an integer")
+            else:
+                return bh.rebin(int(x.imag))
+        else:
+            return x
+
+    def __getitem__(self, index):
+        """
+            Get histogram item.
+        """
+
+        if isinstance(index, dict):
+
+            if all(isinstance(k, int) for k in index.keys()):
+                return super().__getitem__(
+                    {k: self._loc_shortcut(v) for k, v in index.items()}
+                )
+
+            elif all(isinstance(k, str) for k in index.keys()):
+                indices: dict = {}
+                for n, v in list(index.items()):
+                    indices[self._name_to_index(n)] = self._loc_shortcut(v)
+
+                return super().__getitem__(indices)
+
+            else:
+                raise TypeError(
+                    f"Only dict with keys of int or str is supported for {self.__class__.__name__}"
+                )
+
+        if not hasattr(index, "__iter__"):
+            index = (index,)
+
+        return super().__getitem__(tuple(self._loc_shortcut(v) for v in index))
+
+    def __setitem__(self, index, value):
+        """
+            Set histogram item.
+        """
+
+        if isinstance(index, dict):
+
+            if all(isinstance(k, int) for k in index.keys()):
+                return super().__setitem__(
+                    {k: self._loc_shortcut(v) for k, v in index.items()}, value
+                )
+
+            elif all(isinstance(k, str) for k in index.keys()):
+                indices: dict = {}
+                for n, v in list(index.items()):
+                    indices[self._name_to_index(n)] = self._loc_shortcut(v)
+
+                return super().__setitem__(indices, value)
+
+            else:
+                raise TypeError(
+                    f"Only dict with keys of int or str is supported for {self.__class__.__name__}"
+                )
+
+        if not hasattr(index, "__iter__"):
+            index = (index,)
+
+        return super().__setitem__(tuple(self._loc_shortcut(v) for v in index), value)
 
     def density(self):
         """
@@ -395,7 +526,9 @@ class BaseHist(bh.Histogram):
 
         # Type judgement
         if not callable(func):
-            raise TypeError("Callable parameter func is supported in pull plot")
+            raise TypeError(
+                f"Callable parameter func is supported for {self.__class__.__name__} in plot pull"
+            )
         if self.ndim != 1:
             raise TypeError("Only 1D-histogram has pull plot")
 
@@ -582,69 +715,3 @@ class BaseHist(bh.Histogram):
         fig.add_axes(pull_ax)
 
         return fig, ax, pull_ax
-
-    def _loc_shortcut(self, x):
-        """
-            Convert some specific indices to location.
-        """
-
-        if isinstance(x, slice):
-            return slice(
-                self._loc_shortcut(x.start),
-                self._loc_shortcut(x.stop),
-                self._step_shortcut(x.step),
-            )
-        elif isinstance(x, complex):
-            if x.real % 1 != 0:
-                raise ValueError("The real part should be an integer")
-            else:
-                return bh.loc(x.imag, int(x.real))
-        elif isinstance(x, str):
-            return bh.loc(x)
-        else:
-            return x
-
-    def _step_shortcut(self, x):
-        """
-            Convert some specific indices to step.
-        """
-
-        if isinstance(x, complex):
-            if x.real != 0:
-                raise ValueError("The step should not have real part")
-            elif x.imag % 1 != 0:
-                raise ValueError("The imaginary part should be an integer")
-            else:
-                return bh.rebin(int(x.imag))
-        else:
-            return x
-
-    def __getitem__(self, index):
-        """
-            Get histogram item.
-        """
-
-        if isinstance(index, dict):
-            return super().__getitem__(
-                {k: self._loc_shortcut(v) for k, v in index.items()}
-            )
-
-        if not hasattr(index, "__iter__"):
-            index = (index,)
-
-        return super().__getitem__(tuple(self._loc_shortcut(v) for v in index))
-
-    def __setitem__(self, index, value):
-        """
-            Set histogram item.
-        """
-
-        if isinstance(index, dict):
-            return super().__setitem__(
-                {k: self._loc_shortcut(v) for k, v in index.items()}, value
-            )
-
-        if not hasattr(index, "__iter__"):
-            index = (index,)
-
-        return super().__setitem__(tuple(self._loc_shortcut(v) for v in index), value)

@@ -225,34 +225,28 @@ def test_base_fill():
     assert z_one_only[bh.loc("T"), bh.loc("T")] == 1
 
     # with names
-    with pytest.raises(Exception):
-        BaseHist(
+    assert BaseHist(
             axis.Regular(50, -3, 3, name="x"), axis.Regular(50, -3, 3, name="y")
         ).fill(x=np.random.randn(10), y=np.random.randn(10))
 
-    with pytest.raises(Exception):
-        BaseHist(axis.Boolean(name="x"), axis.Boolean(name="y")).fill(
+    assert BaseHist(axis.Boolean(name="x"), axis.Boolean(name="y")).fill(
             x=[True, False, True], y=[True, False, True]
         )
 
-    with pytest.raises(Exception):
-        BaseHist(
+    assert BaseHist(
             axis.Variable(range(-3, 3), name="x"), axis.Variable(range(-3, 3), name="y")
         ).fill(x=np.random.randn(10), y=np.random.randn(10))
 
-    with pytest.raises(Exception):
-        BaseHist(axis.Integer(-3, 3, name="x"), axis.Integer(-3, 3, name="y")).fill(
+    assert BaseHist(axis.Integer(-3, 3, name="x"), axis.Integer(-3, 3, name="y")).fill(
             x=np.random.randn(10), y=np.random.randn(10)
         )
 
-    with pytest.raises(Exception):
-        BaseHist(
+    assert BaseHist(
             axis.IntCategory(range(-3, 3), name="x"),
             axis.IntCategory(range(-3, 3), name="y"),
         ).fill(x=np.random.randn(10), y=np.random.randn(10))
 
-    with pytest.raises(Exception):
-        BaseHist(
+    assert BaseHist(
             axis.StrCategory(["F", "T"], name="x"), axis.StrCategory("FT", name="y")
         ).fill(x=["T", "F", "T"], y=["T", "F", "T"])
 
