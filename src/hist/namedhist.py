@@ -11,10 +11,11 @@ class NamedHist(BaseHist):
         """
 
         super().__init__(*args, **kwargs)
-        if "" in self.axes.name:
-            raise Exception(
-                f"Each axes in the {self.__class__.__name__} instance should have a name"
-            )
+        if len(args):
+            if "" in self.axes.name:
+                raise RuntimeError(
+                    f"Each axes in the {self.__class__.__name__} instance should have a name"
+                )
 
     def project(self, *args: Union[int, str]):
         """
