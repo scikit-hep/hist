@@ -161,10 +161,8 @@ class BaseHist(bh.Histogram):
         elif all(isinstance(x, str) for x in args):
             indices: tuple = tuple()
             for name in args:
-                if isinstance(
-                    name, str
-                ):  # ToDo: redundant line - mypy cannot realized it
-                    indices += (self._name_to_index(name),)
+                assert isinstance(name, str)  # for MyPy
+                indices += (self._name_to_index(name),)
 
             return super().project(*indices)
 
