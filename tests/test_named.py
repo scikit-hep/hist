@@ -806,27 +806,116 @@ def test_named_proxy():
         Test named proxy -- whether NamedHist proxy works properly.
     """
 
-    h = NamedHist.Regular(10, 0, 1, name="x").fill(x=[0.5, 0.5])
+    h = NamedHist.Reg(10, 0, 1, name="x").fill(x=[0.5, 0.5])
     assert h[0.5j] == 2
 
     h = (
         NamedHist()
-        .Regular(10, 0, 1, name="x")
-        .Regular(10, -1, 1, name="y")
-        .fill(x=[0.5, 0.5], y=[-0.2, 0.6])
+        .Reg(10, 0, 1, name="x")
+        .Reg(10, 0, 1, name="y")
+        .fill(x=[0.5, 0.5], y=[0.2, 0.6])
     )
 
-    assert h[0.5j, -0.2j] == 1
+    assert h[0.5j, 0.2j] == 1
     assert h[bh.loc(0.5), bh.loc(0.6)] == 1
+
+    h = NamedHist.Bool(name="x").fill(x=[True, True])
+    assert h[bh.loc(True)] == 2
+
+    h = NamedHist().Bool(name="x").Bool(name="y").fill(x=[True, True], y=[True, False])
+
+    assert h[True, True] == 1
+    assert h[True, False] == 1
+
+    h = NamedHist.Var(range(10), name="x").fill(x=[5, 5])
+    assert h[5j] == 2
+
+    h = (
+        NamedHist()
+        .Var(range(10), name="x")
+        .Var(range(10), name="y")
+        .fill(x=[5, 5], y=[2, 6])
+    )
+
+    assert h[5j, 2j] == 1
+    assert h[bh.loc(5), bh.loc(6)] == 1
+
+    h = NamedHist.Int(0, 10, name="x").fill(x=[5, 5])
+    assert h[5j] == 2
+
+    h = NamedHist().Int(0, 10, name="x").Int(0, 10, name="y").fill(x=[5, 5], y=[2, 6])
+
+    assert h[5j, 2j] == 1
+    assert h[bh.loc(5), bh.loc(6)] == 1
+
+    h = NamedHist.IntCat(range(10), name="x").fill(x=[5, 5])
+    assert h[5j] == 2
+
+    h = (
+        NamedHist()
+        .IntCat(range(10), name="x")
+        .IntCat(range(10), name="y")
+        .fill(x=[5, 5], y=[2, 6])
+    )
+
+    assert h[5j, 2j] == 1
+    assert h[bh.loc(5), bh.loc(6)] == 1
+
+    h = NamedHist.StrCat("TF", name="x").fill(x=["T", "T"])
+    assert h["T"] == 2
+
+    h = (
+        NamedHist()
+        .StrCat("TF", name="x")
+        .StrCat("TF", name="y")
+        .fill(x=["T", "T"], y=["T", "F"])
+    )
+
+    assert h["T", "T"] == 1
+    assert h["T", "F"] == 1
 
     # add axes to existing histogram
     with pytest.raises(Exception):
-        NamedHist().Regular(10, 0, 1, name="x").fill(x=[0.5, 0.5]).Regular(
-            10, -1, 1, name="y"
+        NamedHist().Reg(10, 0, 1, name="x").fill(x=[0.5, 0.5]).Reg(10, -1, 1, name="y")
+
+    with pytest.raises(Exception):
+        NamedHist(axis.Reg(10, 0, 1, name="x")).Reg(10, -1, 1, name="y")
+
+    with pytest.raises(Exception):
+        NamedHist().Bool(name="x").fill(x=[True, True]).Bool(name="y")
+
+    with pytest.raises(Exception):
+        NamedHist(axis.Bool(name="x")).Bool(name="y")
+
+    with pytest.raises(Exception):
+        NamedHist().Var(range(0, 1, 10), name="x").fill(x=[0.5, 0.5]).Var(
+            range(0, 1, 10), name="y"
         )
 
     with pytest.raises(Exception):
-        NamedHist(axis.Regular(10, 0, 1, name="x")).Regular(10, -1, 1, name="y")
+        NamedHist(axis.Var(range(0, 1, 10), name="x")).Var(range(0, 1, 10), name="y")
+
+    with pytest.raises(Exception):
+        NamedHist().Int(0, 10, name="x").fill(x=[0.5, 0.5]).Int(0, 10, name="y")
+
+    with pytest.raises(Exception):
+        NamedHist(axis.Int(0, 10, name="x")).Int(0, 10, name="y")
+
+    with pytest.raises(Exception):
+        NamedHist().IntCat(range(0, 1, 10), name="x").fill(x=[0.5, 0.5]).IntCat(
+            range(0, 1, 10), name="y"
+        )
+
+    with pytest.raises(Exception):
+        NamedHist(axis.IntCat(range(0, 1, 10), name="x")).IntCat(
+            range(0, 1, 10), name="y"
+        )
+
+    with pytest.raises(Exception):
+        NamedHist().StrCat("TF", name="x").fill(x=["T", "T"]).StrCat("TF", name="y")
+
+    with pytest.raises(Exception):
+        NamedHist(axis.StrCat("TF", name="x")).StrCat("TF", name="y")
 
 
 def test_named_density():
