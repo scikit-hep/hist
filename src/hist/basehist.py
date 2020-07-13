@@ -52,9 +52,11 @@ class BaseHist(bh.Histogram):
         """
             Initialize BaseHist object. Axis params can contain the names.
         """
-        self._ax: List[Any] = []
+        # TODO: Make a base class type Axis for Hist
+        self._ax: List[bh.axis.Axis] = []
         self._hist: Any = None
         self._storage_proxy: Any = None
+        self.axes: NamedAxesTuple
 
         if len(args):
             self._hist = None
