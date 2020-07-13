@@ -235,24 +235,22 @@ class BaseHist(bh.Histogram):
         else:
             return x
 
-    def __getitem__(self, index):
+    def _index_transform(self, index):
         """
-            Get histogram item.
+            Auxiliary function for __getitem__ and __setitem__.
         """
 
         if isinstance(index, dict):
 
             if all(isinstance(k, int) for k in index.keys()):
-                return super().__getitem__(
-                    {k: self._loc_shortcut(v) for k, v in index.items()}
-                )
+                return {k: self._loc_shortcut(v) for k, v in index.items()}
 
             elif all(isinstance(k, str) for k in index.keys()):
                 indices: dict = {}
                 for n, v in list(index.items()):
                     indices[self._name_to_index(n)] = self._loc_shortcut(v)
 
-                return super().__getitem__(indices)
+                return indices
 
             else:
                 raise TypeError(
@@ -262,36 +260,21 @@ class BaseHist(bh.Histogram):
         if not hasattr(index, "__iter__"):
             index = (index,)
 
-        return super().__getitem__(tuple(self._loc_shortcut(v) for v in index))
+        return tuple(self._loc_shortcut(v) for v in index)
+
+    def __getitem__(self, index):
+        """
+            Get histogram item.
+        """
+
+        return super().__getitem__(self._index_transform(index))
 
     def __setitem__(self, index, value):
         """
             Set histogram item.
         """
 
-        if isinstance(index, dict):
-
-            if all(isinstance(k, int) for k in index.keys()):
-                return super().__setitem__(
-                    {k: self._loc_shortcut(v) for k, v in index.items()}, value
-                )
-
-            elif all(isinstance(k, str) for k in index.keys()):
-                indices: dict = {}
-                for n, v in list(index.items()):
-                    indices[self._name_to_index(n)] = self._loc_shortcut(v)
-
-                return super().__setitem__(indices, value)
-
-            else:
-                raise TypeError(
-                    f"Only dict with keys of int or str is supported for {self.__class__.__name__}"
-                )
-
-        if not hasattr(index, "__iter__"):
-            index = (index,)
-
-        return super().__setitem__(tuple(self._loc_shortcut(v) for v in index), value)
+        return super().__setitem__(self._index_transform(index), value)
 
     def density(self):
         """
