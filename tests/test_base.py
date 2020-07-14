@@ -342,12 +342,11 @@ def test_base_project():
     with pytest.raises(Exception):
         h.project("A", "A")
 
-    # wrong/mixed types
     with pytest.raises(Exception):
-        h.project(2, "A")
+        h.project(0, "A")
 
-    with pytest.raises(Exception):
-        h.project(True, "A")
+    # mixed types
+    assert h.project(2, "A")
 
     # cannot found
     with pytest.raises(Exception):

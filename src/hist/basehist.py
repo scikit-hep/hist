@@ -158,17 +158,20 @@ class BaseHist(bh.Histogram):
         if len(args) == 0 or all(isinstance(x, int) for x in args):
             return super().project(*args)
 
-        elif all(isinstance(x, str) for x in args):
+        elif all(isinstance(x, (int, str)) for x in args):
             indices: tuple = tuple()
             for name in args:
-                assert isinstance(name, str)  # for MyPy
-                indices += (self._name_to_index(name),)
+                key = self._name_to_index(name) if isinstance(name, str) else name
+                if key in indices:
+                    raise ValueError("Duplicate index keys are contained")
+                else:
+                    indices += (key,)
 
             return super().project(*indices)
 
         else:
             raise TypeError(
-                f"Only projection by indices or names is supported for {self.__class__.__name__}"
+                f"Only projection by indices and names is supported for {self.__class__.__name__}"
             )
 
     def fill(
