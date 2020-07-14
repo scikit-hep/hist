@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from .basehist import BaseHist
-import numpy as np
-from typing import Union
+from typing import Union, Optional
 
 
 class NamedHist(BaseHist):
@@ -30,30 +29,21 @@ class NamedHist(BaseHist):
                 f"Only projections by names are supported for {self.__class__.__name__}"
             )
 
-    def fill(self, *args, **kwargs):
+    def fill(
+        self, *args, weight=None, sample=None, thread: Optional[int] = None, **kwargs
+    ):
         """
             Insert data into the histogram using names and return a \
             NamedHist object. NamedHist could only be filled by names.
         """
 
-        indices = []
-        values = []
-        for name, val in kwargs.items():
-            for index, axis in enumerate(self.axes):
-                if name == axis.name:
-                    indices.append(index)
-                    values.append(val)
-                    break
-            else:
-                raise ValueError("The axis names could not be found")
+        if len(kwargs) and all(isinstance(k, str) for k in kwargs.keys()):
+            return super().fill(*args, **kwargs)
 
-        d = dict(zip(indices, values))
-        lst = sorted(d.items(), key=lambda item: item[0])
-        nd = np.asarray(lst, dtype=object)
-        data = nd.ravel()[1::2]
-        super().fill(*data)
-
-        return self
+        else:
+            raise TypeError(
+                f"Only fill by names are supported for {self.__class__.__name__}"
+            )
 
     def __getitem__(self, index):
         """
@@ -61,13 +51,10 @@ class NamedHist(BaseHist):
         """
 
         if isinstance(index, dict):
-            k = list(index.keys())
-            if isinstance(k[0], str):
-                for key in k:
-                    for idx, axis in enumerate(self.axes):
-                        if key == axis.name:
-                            index[idx] = index.pop(key)
-                            break
+            if any(isinstance(k, int) for k in index.keys()):
+                raise TypeError(
+                    f"Only access by names are supported for {self.__class__.__name__} in dictionay"
+                )
 
         return super().__getitem__(index)
 
@@ -77,12 +64,9 @@ class NamedHist(BaseHist):
         """
 
         if isinstance(index, dict):
-            k = list(index.keys())
-            if isinstance(k[0], str):
-                for key in k:
-                    for idx, axis in enumerate(self.axes):
-                        if key == axis.name:
-                            index[idx] = index.pop(key)
-                            break
+            if any(isinstance(k, int) for k in index.keys()):
+                raise TypeError(
+                    f"Only access by names are supported for {self.__class__.__name__} in dictionay"
+                )
 
         return super().__setitem__(index, value)

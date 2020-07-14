@@ -14,15 +14,24 @@ def test_named_init():
     """
 
     # basic
-    h = NamedHist(axis.Regular(10, 0, 1, name="x")).fill(x=[0.35, 0.35, 0.45])
+    h = NamedHist(
+        axis.Regular(10, 0, 1, name="x"), axis.Regular(10, 0, 1, name="y")
+    ).fill(x=[0.35, 0.35, 0.45], y=[0.35, 0.35, 0.45])
 
     for idx in range(10):
         if idx == 3:
-            assert h[idx] == h[{0: idx}] == h[{"x": idx}] == 2
+            assert h[idx, idx] == 2
+            assert h[{"x": idx, "y": idx}] == 2
+            with pytest.raises(Exception):
+                h[{0: idx, 1: idx}] == 2
         elif idx == 4:
-            assert h[idx] == h[{0: idx}] == h[{"x": idx}] == 1
+            assert h[idx, idx] == 1
+            with pytest.raises(Exception):
+                h[{0: idx, 1: idx}] == 1
         else:
-            assert h[idx] == h[{0: idx}] == h[{"x": idx}] == 0
+            assert h[idx, idx] == 0
+            with pytest.raises(Exception):
+                h[{0: idx, 1: idx}] == 0
 
     # with named axes
     assert NamedHist(
@@ -49,6 +58,20 @@ def test_named_init():
     assert NamedHist(
         axis.StrCategory(["F", "T"], name="x"), axis.StrCategory("FT", name="y")
     ).fill(y=["T", "F", "T"], x=["T", "F", "T"])
+
+    # cannot access via index
+    h = NamedHist(axis.Regular(10, 0, 1, name="x")).fill(x=[0.35, 0.35, 0.45])
+
+    for idx in range(10):
+        if idx == 3:
+            with pytest.raises(Exception):
+                h[idx] == h[{0: idx}] == 2
+        elif idx == 4:
+            with pytest.raises(Exception):
+                h[idx] == h[{0: idx}] == 1
+        else:
+            with pytest.raises(Exception):
+                h[idx] == h[{0: idx}] == 0
 
     # with no-named axes
     with pytest.raises(Exception):
@@ -775,9 +798,37 @@ def test_named_index_access():
     )
 
     assert h[1j, 2j, "hi", True, 1] == 6
-    assert h[6, 7, bh.loc("hi"), bh.loc(True), bh.loc(1)] == 6
+    assert (
+        h[
+            {
+                "Ones": 6,
+                "Twos": 7,
+                "Greet": bh.loc("hi"),
+                "Yes": bh.loc(True),
+                "Int": bh.loc(1),
+            }
+        ]
+        == 6
+    )
     assert h[0j + 1, -2j + 4, "hi", True, 1] == 6
-    assert h[bh.loc(1, 0), bh.loc(3, -1), "hi", True, 1] == 6
+    assert (
+        h[
+            {
+                "Ones": bh.loc(1, 0),
+                "Twos": bh.loc(3, -1),
+                "Greet": "hi",
+                "Yes": True,
+                "Int": 1,
+            }
+        ]
+        == 6
+    )
+
+    with pytest.raises(Exception):
+        h[0 : bh.loc(1, 0), 1 : bh.loc(3, -1), 2:"hi", 3:True, 4:1] == 6
+
+    with pytest.raises(Exception):
+        h[0 : bh.loc(1, 0), 1 : bh.loc(3, -1), "Greet":"hi", 3:True, 4:1] == 6
 
     assert h[0:10:2j, 0:5:5j, "hello", False, 5]
     assert len(h[::2j, 0:5, :, :, :].axes[1]) == 5
