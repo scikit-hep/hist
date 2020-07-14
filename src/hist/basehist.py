@@ -155,54 +155,29 @@ class BaseHist(bh.Histogram):
         """
         Projection of axis idx.
         """
-        if len(args) == 0 or all(isinstance(x, int) for x in args):
-            return super().project(*args)
-
-        elif all(isinstance(x, (int, str)) for x in args):
-            indices: tuple = tuple()
-            for name in args:
-                key = self._name_to_index(name) if isinstance(name, str) else name
-                if key in indices:
-                    raise ValueError("Duplicate index keys are contained")
-                else:
-                    indices += (key,)
-
-            return super().project(*indices)
-
-        else:
-            raise TypeError(
-                f"Only projection by indices and names is supported for {self.__class__.__name__}"
-            )
+        int_args = [self._name_to_index(a) if isinstance(a, str) else a for a in args]
+        return super().project(*int_args)
 
     def fill(
-        self, *args, weight=None, sample=None, thread: Optional[int] = None, **kwargs
+        self, *args, weight=None, sample=None, threads: Optional[int] = None, **kwargs
     ):
         """
-            Insert data into the histogram using names and indices return \
-            a Hist object.
+        Insert data into the histogram using names and indices, return
+        a Hist object.
         """
 
-        if len(args) and not len(kwargs):
-            return super().fill(*args)
+        data_dict = {
+            self._name_to_index(k) if isinstance(k, str) else k: v
+            for k, v in kwargs.items()
+        }
 
-        elif (
-            isinstance(kwargs, dict)
-            and all(isinstance(k, str) for k in kwargs.keys())
-            and not len(args)
-        ):
-            indices: dict = {}
-            for n, v in kwargs.items():
-                indices[self._name_to_index(n)] = v
+        if set(data_dict) != set(range(len(args), self.ndim)):
+            raise TypeError("All axes must be accounted for in fill")
 
-            lst = sorted(indices.items(), key=lambda item: item[0])
-            nd = np.asarray(lst, dtype=object)
-            data = nd.ravel()[1::2]
-            return super().fill(*data)
+        data = (data_dict[i] for i in range(len(args), self.ndim))
 
-        else:
-            raise TypeError(
-                f"Only dict with keys of int and str is supported for {self.__class__.__name__}"
-            )
+        total_data = tuple(args) + tuple(data)  # Python 2 can't unpack twice
+        return super().fill(*total_data, weight=weight, sample=sample, threads=threads)
 
     def _loc_shortcut(self, x):
         """
