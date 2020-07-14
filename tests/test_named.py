@@ -778,7 +778,6 @@ def test_named_plot_pull():
         h.plot_pull(pdf, eb_ecolor=1.0, eb_mfc=1.0)  # kwargs should be str
 
 
-@pytest.mark.xfail
 def test_named_index_access():
     """
         Test named index access -- whether NamedHist can be accessed by index.
@@ -814,11 +813,13 @@ def test_named_index_access():
     assert h[0j + 1, -2j + 4, "hi", True, 1] == 6
     assert (
         h[
-            "Ones" : bh.loc(1, 0),
-            "Twos" : bh.loc(3, -1),
-            "Greet":"hi",
-            "Yes":True,
-            "Int":1,
+            {
+                "Ones": bh.loc(1, 0),
+                "Twos": bh.loc(3, -1),
+                "Greet": "hi",
+                "Yes": True,
+                "Int": 1,
+            }
         ]
         == 6
     )

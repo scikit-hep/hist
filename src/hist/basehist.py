@@ -246,27 +246,19 @@ class BaseHist(bh.Histogram):
         """
 
         if isinstance(index, dict):
-
-            if all(isinstance(k, int) for k in index.keys()):
-                return {k: self._loc_shortcut(v) for k, v in index.items()}
-
-            elif any(isinstance(k, str) for k in index.keys()):
-                indices: dict = {}
-                for n, v in list(index.items()):
-                    key = self._name_to_index(n) if isinstance(n, str) else n
-                    if key in indices:
-                        raise ValueError("Duplicate index keys are contained")
-                    else:
-                        indices[key] = self._loc_shortcut(v)
-
-                return indices
-
-            else:
-                raise TypeError(
-                    f"Only dict with keys of int and str is supported for {self.__class__.__name__}"
+            new_indices = {
+                (
+                    self._name_to_index(k) if isinstance(k, str) else k
+                ): self._loc_shortcut(v)
+                for k, v in index.items()
+            }
+            if len(new_indices) != len(index):
+                raise ValueError(
+                    "Duplicate index keys, numbers and names cannot overlap"
                 )
+            return new_indices
 
-        if not hasattr(index, "__iter__"):
+        elif not hasattr(index, "__iter__"):
             index = (index,)
 
         return tuple(self._loc_shortcut(v) for v in index)
@@ -444,7 +436,7 @@ class BaseHist(bh.Histogram):
         for k in side_kwargs:
             kwargs.pop("side_" + k)
 
-        # judge whether some arguements left
+        # judge whether some arguments left
         if len(kwargs):
             raise ValueError(f"'{list(kwargs.keys())[0]}' not needed")
 
