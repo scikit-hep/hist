@@ -198,7 +198,7 @@ class BaseHist(bh.Histogram):
 
         else:
             raise TypeError(
-                f"Only dict with keys of int or str is supported for {self.__class__.__name__}"
+                f"Only dict with keys of int and str is supported for {self.__class__.__name__}"
             )
 
     def _loc_shortcut(self, x):
@@ -250,15 +250,17 @@ class BaseHist(bh.Histogram):
             elif any(isinstance(k, str) for k in index.keys()):
                 indices: dict = {}
                 for n, v in list(index.items()):
-                    indices[
-                        self._name_to_index(n) if isinstance(n, str) else n
-                    ] = self._loc_shortcut(v)
+                    key = self._name_to_index(n) if isinstance(n, str) else n
+                    if key in indices:
+                        raise ValueError("Duplicate index keys are contained")
+                    else:
+                        indices[key] = self._loc_shortcut(v)
 
                 return indices
 
             else:
                 raise TypeError(
-                    f"Only dict with keys of int or str is supported for {self.__class__.__name__}"
+                    f"Only dict with keys of int and str is supported for {self.__class__.__name__}"
                 )
 
         if not hasattr(index, "__iter__"):
