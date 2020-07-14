@@ -284,33 +284,23 @@ class BaseHist(bh.Histogram):
         if self.ndim != 1:
             raise TypeError("Only 1D-histogram has plot1d")
 
-        """
-        Default Figure: construct the figure and axes
-        """
+        # Default Figure: construct the figure and axes
         if fig is None:
             fig = plt.figure(figsize=(8, 8))
             grid = fig.add_gridspec(4, 4, hspace=0, wspace=0)
 
         if ax is None:
             ax = fig.add_subplot(grid[:, :])
+            fig.add_axes(ax)
 
-        """
-        Plot: plot the 1d-histogram
-        """
-        if self.axes[0].name:
-            ax.step(
-                self.axes.edges[0][:-1],
-                self.project(self.axes[0].name).view(),
-                **kwargs,
-            )
-        else:
-            ax.step(self.axes.edges[0][:-1], self.project(0).view(), **kwargs)
+        ax.step(
+            self.axes.edges[0][:-1],
+            self.project(self.axes[0].name or 0).view(),
+            **kwargs,
+        )
 
         ax.set_xlabel(self.axes[0].title)
-
         ax.set_ylabel("Counts")
-
-        fig.add_axes(ax)
 
         return fig, ax
 
@@ -327,26 +317,28 @@ class BaseHist(bh.Histogram):
         if self.ndim != 2:
             raise TypeError("Only 2D-histogram has plot2d")
 
-        """
-        Default Figure: construct the figure and axes
-        """
-        if fig is None:
-            fig = plt.figure(figsize=(8, 8))
-            grid = fig.add_gridspec(4, 4, hspace=0, wspace=0)
+        # Default Figure: construct the figure and axes
+        if fig is not None and ax is not None:
+            if fig != ax.figure:
+                raise TypeError(
+                    "You cannot pass both a figure and axes that are not shared!"
+                )
 
-        if ax is None:
-            ax = fig.add_subplot(grid[:, :])
+        elif fig is None and ax is None:
+            fig, ax = plt.subplots(1, 1, figsize=(8, 8))
 
-        """
-        Plot: plot the 2d-histogram
-        """
+        elif fig is not None:
+            ax = fig.add_subplot(111)
+
+        elif ax is not None:
+            fig = ax.figure
+
+        # Plot: plot the 2d-histogram
         X, Y = self.axes.edges
         ax.pcolormesh(X.T, Y.T, self.view().T, **kwargs)
 
         ax.set_xlabel(self.axes[0].title)
         ax.set_ylabel(self.axes[1].title)
-
-        fig.add_axes(ax)
 
         return fig, ax
 
@@ -614,7 +606,7 @@ class BaseHist(bh.Histogram):
         for k in pp_kwargs:
             kwargs.pop("pp_" + k)
 
-        # judge whether some arguements left
+        # judge whether some arguments left
         if kwargs:
             raise ValueError(f"'{list(kwargs.keys())[0]}' not needed")
 
