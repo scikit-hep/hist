@@ -698,9 +698,9 @@ def test_general_index_access():
     plt.close("all")
 
 
-def test_general_proxy():
+def test_general_hist_proxy():
     """
-        Test general proxy -- whether Hist proxy works properly.
+        Test general hist proxy -- whether Hist hist proxy works properly.
     """
 
     h = Hist.Reg(10, 0, 1, name="x").fill([0.5, 0.5])

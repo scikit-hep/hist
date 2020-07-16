@@ -870,9 +870,9 @@ def test_named_index_access():
         h[0:10:20j, 0:5:10j, "hello", False, 5]
 
 
-def test_named_proxy():
+def test_named_hist_proxy():
     """
-        Test named proxy -- whether NamedHist proxy works properly.
+        Test named hist proxy -- whether NamedHist hist proxy works properly.
     """
 
     h = NamedHist.Reg(10, 0, 1, name="x").fill(x=[0.5, 0.5])
