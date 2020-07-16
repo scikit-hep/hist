@@ -101,6 +101,42 @@ class BaseHist(bh.Histogram):
         return self
 
     @always_normal_method
+    def Sqrt(self, *args, **kwargs):
+        if self._hist:
+            raise RuntimeError("Cannot add an axis to an existing histogram")
+        self._ax.append(Regular(*args, transform=hist.axis.transform.sqrt, **kwargs))
+        return self
+
+    @always_normal_method
+    def Log(self, *args, **kwargs):
+        if self._hist:
+            raise RuntimeError("Cannot add an axis to an existing histogram")
+        self._ax.append(Regular(*args, transform=hist.axis.transform.log, **kwargs))
+        return self
+
+    @always_normal_method
+    def Pow(self, *args, power, **kwargs):
+        if self._hist:
+            raise RuntimeError("Cannot add an axis to an existing histogram")
+        self._ax.append(
+            Regular(*args, transform=hist.axis.transform.Pow(power), **kwargs)
+        )
+        return self
+
+    @always_normal_method
+    def Func(self, *args, forward, inverse, **kwargs):
+        if self._hist:
+            raise RuntimeError("Cannot add an axis to an existing histogram")
+        self._ax.append(
+            Regular(
+                *args,
+                transform=hist.axis.transform.Function(forward, inverse),
+                **kwargs,
+            )
+        )
+        return self
+
+    @always_normal_method
     def Bool(self, *args, **kwargs):
         if self._hist:
             raise RuntimeError("Cannot add an axis to an existing histogram")
