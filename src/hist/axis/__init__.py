@@ -5,6 +5,7 @@ import sys
 import re
 import boost_histogram.axis as bha
 import hist.utils
+from hist.axestuple import NamedAxesTuple, ArrayTuple
 
 if sys.version_info >= (3, 8):
     from typing import Protocol
@@ -25,6 +26,8 @@ __all__ = (
     "StrCategory",
     "Boolean",
     "transform",
+    "NamedAxesTuple",
+    "ArrayTuple",
 )
 
 
