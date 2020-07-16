@@ -25,3 +25,14 @@ __all__ = (
     "utils",
     "storage",
 )
+
+
+# Python 3.7 only
+def __getattr__(name: str):
+    import warnings
+
+    if name == "axes":
+        msg = f"Misspelling error, '{name}' should be 'axis'"
+        warnings.warn(msg)
+        return axis
+    raise AttributeError(f"module {__name__} has no attribute {name}")
