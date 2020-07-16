@@ -7,3 +7,6 @@ User Guide
    :maxdepth: 2
    :titlesonly:
    :glob:
+
+   Axis
+   Histogram
