@@ -18,20 +18,18 @@ from .axis import Regular, Boolean, Variable, Integer, IntCategory, StrCategory
 from .axestuple import NamedAxesTuple
 
 # typing alias
-Plot1D_RetType = Tuple[matplotlib.figure.Figure, matplotlib.axes._subplots.SubplotBase]
+Plot1D_RetType = Tuple[matplotlib.figure.Figure, matplotlib.axes.Axes]
 Plot2D_RetType = Tuple[
-    matplotlib.figure.Figure, matplotlib.axes._subplots.SubplotBase,
+    matplotlib.figure.Figure, matplotlib.axes.Axes,
 ]
 Plot2DFull_RetType = Tuple[
     matplotlib.figure.Figure,
-    matplotlib.axes._subplots.SubplotBase,
-    matplotlib.axes._subplots.SubplotBase,
-    matplotlib.axes._subplots.SubplotBase,
+    matplotlib.axes.Axes,
+    matplotlib.axes.Axes,
+    matplotlib.axes.Axes,
 ]
 PlotPull_RetType = Tuple[
-    matplotlib.figure.Figure,
-    matplotlib.axes._subplots.SubplotBase,
-    matplotlib.axes._subplots.SubplotBase,
+    matplotlib.figure.Figure, matplotlib.axes.Axes, matplotlib.axes.Axes,
 ]
 
 
