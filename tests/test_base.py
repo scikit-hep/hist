@@ -5,6 +5,7 @@ import boost_histogram as bh
 import pytest
 import numpy as np
 from uncertainties import unumpy as unp
+import matplotlib.pyplot as plt
 
 # ToDo: specify what error is raised
 
@@ -588,6 +589,8 @@ def test_base_plot_pull():
     with pytest.raises(Exception):
         hh.plot_pull(pdf)
 
+    plt.close("all")
+
     # not callable
     with pytest.raises(Exception):
         h.plot_pull("1")
@@ -607,12 +610,16 @@ def test_base_plot_pull():
     with pytest.raises(Exception):
         h.plot_pull({"a": 1})
 
+    plt.close("all")
+
     # wrong kwargs names
     with pytest.raises(Exception):
         h.plot_pull(pdf, abc="crimson", xyz="crimson")
 
     with pytest.raises(Exception):
         h.plot_pull(pdf, ecolor="crimson", mfc="crimson")
+
+    plt.close("all")
 
     # disabled params
     with pytest.raises(Exception):
@@ -642,6 +649,8 @@ def test_base_plot_pull():
     # wrong kwargs types
     with pytest.raises(Exception):
         h.plot_pull(pdf, eb_ecolor=1.0, eb_mfc=1.0)  # kwargs should be str
+
+    plt.close("all")
 
 
 def test_base_index_access():
