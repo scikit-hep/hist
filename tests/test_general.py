@@ -4,6 +4,7 @@ import boost_histogram as bh
 import pytest
 import numpy as np
 from uncertainties import unumpy as unp
+import matplotlib.pyplot as plt
 
 # ToDo: specify what error is raised
 
@@ -359,6 +360,7 @@ def test_general_plot1d():
     ).fill(np.random.normal(size=10))
 
     assert h.plot1d(color="green", ls="--", lw=3)
+    plt.close("all")
 
     # dimension error
     h = Hist(
@@ -380,6 +382,8 @@ def test_general_plot1d():
     # wrong kwargs type
     with pytest.raises(Exception):
         h.project("B").plot1d(ls="red")
+
+    plt.close("all")
 
 
 def test_general_plot2d():
@@ -418,6 +422,8 @@ def test_general_plot2d():
     # wrong kwargs type
     with pytest.raises(Exception):
         h.plot2d(cmap=0.1)
+
+    plt.close("all")
 
 
 def test_general_plot2d_full():
@@ -467,6 +473,8 @@ def test_general_plot2d_full():
     # wrong kwargs type
     with pytest.raises(Exception):
         h.plot2d_full(main_cmap=0.1, side_lw="autumn")
+
+    plt.close("all")
 
 
 def test_general_plot():
@@ -524,6 +532,8 @@ def test_general_plot():
 
     with pytest.raises(Exception):
         h.project("A", "C").plot(cmap=0.1)
+
+    plt.close("all")
 
 
 def test_general_plot_pull():
@@ -634,6 +644,8 @@ def test_general_plot_pull():
     with pytest.raises(Exception):
         h.plot_pull(pdf, eb_ecolor=1.0, eb_mfc=1.0)  # kwargs should be str
 
+    plt.close("all")
+
 
 def test_general_index_access():
     """
@@ -682,6 +694,8 @@ def test_general_index_access():
 
     with pytest.raises(Exception):
         h[0:10:20j, 0:5:10j, "hello", False, 5]
+
+    plt.close("all")
 
 
 def test_general_proxy():

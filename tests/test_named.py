@@ -4,6 +4,7 @@ import boost_histogram as bh
 import pytest
 import numpy as np
 from uncertainties import unumpy as unp
+import matplotlib.pyplot as plt
 
 # ToDo: specify what error is raised
 
@@ -500,6 +501,7 @@ def test_named_plot1d():
     ).fill(A=np.random.normal(size=10))
 
     assert h.plot1d(color="green", ls="--", lw=3)
+    plt.close("all")
 
     # dimension error
     h = NamedHist(
@@ -522,6 +524,8 @@ def test_named_plot1d():
     with pytest.raises(Exception):
         h.project("B").plot1d(ls="red")
 
+    plt.close("all")
+
 
 def test_named_plot2d():
     """
@@ -538,6 +542,7 @@ def test_named_plot2d():
     ).fill(B=np.random.normal(size=10), A=np.random.normal(size=10))
 
     assert h.plot2d(cmap="cividis")
+    plt.close("all")
 
     # dimension error
     h = NamedHist(
@@ -559,6 +564,8 @@ def test_named_plot2d():
     # wrong kwargs type
     with pytest.raises(Exception):
         h.plot2d(cmap=0.1)
+
+    plt.close("all")
 
 
 def test_named_plot2d_full():
@@ -584,6 +591,7 @@ def test_named_plot2d_full():
         side_lw=1,
         side_color="steelblue",
     )
+    plt.close("all")
 
     # dimension error
     h = NamedHist(
@@ -609,6 +617,8 @@ def test_named_plot2d_full():
     with pytest.raises(Exception):
         h.plot2d_full(main_cmap=0.1, side_lw="autumn")
 
+    plt.close("all")
+
 
 def test_named_plot():
     """
@@ -633,6 +643,7 @@ def test_named_plot():
     ).fill(B=np.random.normal(size=10), A=np.random.normal(size=10))
 
     assert h.plot(cmap="cividis")
+    plt.close("all")
 
     # dimension error
     h = NamedHist(
@@ -667,6 +678,8 @@ def test_named_plot():
 
     with pytest.raises(Exception):
         h.project("A", "C").plot(cmap=0.1)
+
+    plt.close("all")
 
 
 def test_named_plot_pull():
@@ -740,6 +753,7 @@ def test_named_plot_pull():
 
     with pytest.raises(Exception):
         h.plot_pull({"a": 1})
+    plt.close("all")
 
     # wrong kwargs names
     with pytest.raises(Exception):
@@ -761,6 +775,8 @@ def test_named_plot_pull():
     with pytest.raises(Exception):
         h.plot_pull(pdf, ub_label="value")
 
+    plt.close("all")
+
     with pytest.raises(Exception):
         h.plot_pull(pdf, bar_label="value")
 
@@ -776,6 +792,8 @@ def test_named_plot_pull():
     # wrong kwargs types
     with pytest.raises(Exception):
         h.plot_pull(pdf, eb_ecolor=1.0, eb_mfc=1.0)  # kwargs should be str
+
+    plt.close("all")
 
 
 def test_named_index_access():
