@@ -9,4 +9,5 @@ User Guide
    :glob:
 
    Axis
+   Storage
    Histogram
