@@ -7,11 +7,21 @@
 # Convenient access to the version number
 from .version import version as __version__
 
-from . import axis
+from . import axis, numpy, tag, accumulators, utils, storage
+
 from .hist import Hist
 from .namedhist import NamedHist
 from .basehist import BaseHist
-from . import numpy
 
-
-__all__ = ("__version__", "axis", "Hist", "NamedHist", "BaseHist", "numpy")
+__all__ = (
+    "__version__",
+    "axis",
+    "Hist",
+    "NamedHist",
+    "BaseHist",
+    "numpy",
+    "tag",
+    "accumulators",
+    "utils",
+    "storage",
+)
