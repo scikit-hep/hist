@@ -9,6 +9,8 @@ import warnings
 from scipy.optimize import curve_fit
 from uncertainties import correlated_values, unumpy
 from typing import Callable, Optional, Tuple, Union, List, Any
+import functools
+import operator
 
 import hist.utils
 import hist.storage
@@ -63,16 +65,13 @@ class BaseHist(bh.Histogram):
         if len(args):
             self._hist = None
             self._ax = []
-            kwargs = {}  # Only needed for boost-histogram < 0.10.0
-            if storage is not None:
-                if isinstance(storage, type):
-                    msg = f"Please use '{storage.__name__}()' instead of '{storage.__name__}'"
-                    warnings.warn(msg)
-                    storage = storage()
-                kwargs["storage"] = storage
-            if metadata is not None:
-                kwargs["metadata"] = metadata
-            super().__init__(*args, **kwargs)
+            if isinstance(storage, type):
+                msg = (
+                    f"Please use '{storage.__name__}()' instead of '{storage.__name__}'"
+                )
+                warnings.warn(msg)
+                storage = storage()
+            super().__init__(*args, storage=storage, metadata=metadata)
             valid_names = [ax.name for ax in self.axes if ax.name]
             if len(valid_names) != len(set(valid_names)):
                 raise KeyError(
@@ -375,7 +374,9 @@ class BaseHist(bh.Histogram):
         """
         # ToDo: maybe should not be filled
         # ToDo: flow should be removed
-        return self.view() / self.sum() / np.prod(self.axes.widths, axis=0)
+        return self.view() / (
+            self.sum() * functools.reduce(operator.mul, self.axes.widths)
+        )
 
     def plot(self, *args, **kwargs) -> Union[Plot1D_RetType, Plot2D_RetType]:
         """

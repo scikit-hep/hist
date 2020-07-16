@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-from boost_histogram._internal.axistuple import (
-    AxesTuple,
-)  # Update to nicer location when one exists
+from boost_histogram.axis import AxesTuple, ArrayTuple
 
 from typing import Any, Union, Tuple
+
+__all__ = ("NamedAxesTuple", "AxesTuple", "ArrayTuple")
 
 
 class NamedAxesTuple(AxesTuple):
