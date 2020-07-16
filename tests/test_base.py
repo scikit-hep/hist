@@ -298,6 +298,10 @@ def test_base_access():
 
     assert h[0j, -0j + 2, "hi", True, 1]
 
+    # mis-match dimension
+    with pytest.raises(Exception):
+        h[0j, -0j + 2, "hi", True]
+
 
 def test_base_project():
     """
@@ -705,11 +709,7 @@ class test_base_storage_proxy:
         works properly.
     """
 
-    def test_int(self):
-        h = BaseHist.Reg(10, 0, 1, name="x").Int64().fill([0.5, 0.5])
-        assert h[0.5j] == 2
-        assert isinstance(h[0.5j], int)
-
+    def test_double(self):
         h = (
             BaseHist()
             .Reg(10, 0, 1, name="x")
@@ -720,7 +720,65 @@ class test_base_storage_proxy:
 
         assert h[0.5j, 0.2j] == 1
         assert h[bh.loc(0.5), bh.loc(0.6)] == 1
+        assert isinstance(h[0.5j, 0.5j], int)
+
+        # add storage to existing storage
+        with pytest.raises(Exception):
+            h.Double()
+
+    def test_int64(self):
+        h = BaseHist.Reg(10, 0, 1, name="x").Int64().fill([0.5, 0.5])
+        assert h[0.5j] == 2
+        assert isinstance(h[0.5j], float)
+
+        # add storage to existing storage
+        with pytest.raises(Exception):
+            h.Int64()
+
+    def test_automic_int64(self):
+        h = BaseHist(axis.Regular(10, 0, 1, name="x")).AutomicInt64().fill([0.5, 0.5])
+        assert h[0.5j] == 2
         assert isinstance(h[0.5j], int)
+
+        # add storage to existing storage
+        with pytest.raises(Exception):
+            h.AutomicInt64()
+
+    def test_weight(self):
+        h = BaseHist.Reg(10, 0, 1, name="x").Weight().fill([0.5, 0.5])
+        assert h[0.5j] == 2
+        assert isinstance(h[0.5j], float)
+
+        # add storage to existing storage
+        with pytest.raises(Exception):
+            h.Weight()
+
+    def test_mean(self):
+        h = BaseHist(axis.Regular(10, 0, 1, name="x")).Mean().fill([0.5, 0.5])
+        assert h[0.5j] == 2
+        assert isinstance(h[0.5j], float)
+
+        # add storage to existing storage
+        with pytest.raises(Exception):
+            h.Mean()
+
+    def test_weighted_mean(self):
+        h = BaseHist.Reg(10, 0, 1, name="x").WeightedMean().fill([0.5, 0.5])
+        assert h[0.5j] == 2
+        assert isinstance(h[0.5j], float)
+
+        # add storage to existing storage
+        with pytest.raises(Exception):
+            h.WeightedMean()
+
+    def test_unlimited(self):
+        h = BaseHist(axis.Regular(10, 0, 1, name="x")).Unlimited().fill([0.5, 0.5])
+        assert h[0.5j] == 2
+        assert isinstance(h[0.5j], any)
+
+        # add storage to existing storage
+        with pytest.raises(Exception):
+            h.Unlimited()
 
 
 def test_base_hist_proxy():
