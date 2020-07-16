@@ -690,6 +690,23 @@ def test_base_index_access():
         h[0:10:20j, 0:5:10j, "hello", False, 5]
 
 
+def test_storage_proxy_int():
+    h = BaseHist.Reg(10, 0, 1, name="x").Int64().fill([0.5, 0.5])
+    assert h[0.5j] == 2
+    print(repr(h))
+    assert isinstance(h[0.5j], int)
+
+    h = (
+        BaseHist()
+        .Reg(10, 0, 1, name="x")
+        .Reg(10, 0, 1, name="y")
+        .fill([0.5, 0.5], [0.2, 0.6])
+    )
+
+    assert h[0.5j, 0.2j] == 1
+    assert h[bh.loc(0.5), bh.loc(0.6)] == 1
+
+
 def test_base_proxy():
     """
         Test base proxy -- whether BaseHist proxy works properly.
