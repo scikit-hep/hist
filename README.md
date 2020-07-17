@@ -63,6 +63,60 @@ h.plot_pull(Callable)
 
 See [CONTRIBUTING.md](./.github/CONTRIBUTING.md) for information on setting up a development environment.
 
+
+```bash
+python -m pip install hist
+```
+
+## Usage
+
+```python
+import hist
+
+# You can create a histogram like this.
+h = (
+  hist.Hist()
+  .Reg(10, 0 ,1, name="x", title="x-axis")
+  .Variable(range(10), name="y", title="y-axis")
+  .Int64()
+)
+
+# Filling by names is allowed in hist.
+hist.fill(y=[1, 4, 6], x=[3, 5, 2])
+
+# New ways to manipulate the histogram.
+h.project("x")
+h[{"y": 1j + 3, "x": 5j}]
+...
+
+# Elegant plotting functions.
+h.plot()
+h.plot2d_full()
+h.plot_pull(Callable)
+...
+```
+
+## Features
+
+- Hist augments metadata by adding names to axes; these are *highly* recommend and will help you track axes. There is also a special `NamedHist`, which will enforce all hist axes have names, and all axes will require named access.
+  - `	name=` is a unique label describing each axis
+  - `title=` is an optional string that is used in plotting (defaults to name if not provided)
+  - Indexing, projection, and more support named axes.
+
+- The `Hist` class augments the `bh.Histogram` class with the following shortcuts, designed for interactive exploration without extensive imports:
+  - Optional import-free construction system
+  - Quick import-free data-coordinates and rebin syntax (use a j suffix for numbers, or strings directly in indexing expressions)
+
+- Quick plotting routines encourage exploration:
+
+  - `.plot()` provides 1D and 2D plots
+  - `.plot2d_full()` shows 1D projects around a 2D plot
+  - `.plot_pull(...)` performs a pull plot
+
+## Development
+
+See [CONTRIBUTING.md](./.github/CONTRIBUTING.md) for information on setting up a development environment.
+
 ## Contributors
 
 We would like to acknowledge the contributors that made this project possible ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
@@ -73,7 +127,7 @@ We would like to acknowledge the contributors that made this project possible ([
 <table>
   <tr>
     <td align="center"><a href="http://iscinumpy.gitlab.io"><img src="https://avatars1.githubusercontent.com/u/4616906?v=4" width="100px;" alt=""/><br /><sub><b>Henry Schreiner</b></sub></a><br /><a href="#maintenance-henryiii" title="Maintenance">🚧</a> <a href="https://github.com/scikit-hep/boost-histogram/commits?author=henryiii" title="Code">💻</a> <a href="https://github.com/scikit-hep/boost-histogram/commits?author=henryiii" title="Documentation">📖</a></td>
-    <td align="center"><a href="https://github.com/lovelybuggies"><img src="https://avatars3.githubusercontent.com/u/29083689?v=4" width="100px;" alt=""/><br /><sub><b>Nino Lau</b></sub></a><br /><a href="#maintenance-HDembinski" title="Maintenance">🚧</a> <a href="https://github.com/scikit-hep/boost-histogram/commits?author=HDembinski" title="Code">💻</a><a href="https://github.com/scikit-hep/boost-histogram/commits?author=henryiii" title="Documentation">📖</a></td>
+    <td align="center"><a href="https://github.com/lovelybuggies"><img src="https://avatars3.githubusercontent.com/u/29083689?v=4" width="100px;" alt=""/><br /><sub><b>Nino Lau</b></sub></a><br /><a href="#maintenance-lovelybuggies" title="Maintenance">🚧</a> <a href="https://github.com/scikit-hep/hist/commits?author=lovelybuggies" title="Code">💻</a><a href="https://github.com/scikit-hep/hist/commits?author=lovelybuggies" title="Documentation">📖</a></td>
   </tr>
 </table>
 
