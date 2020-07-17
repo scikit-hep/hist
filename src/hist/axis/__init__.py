@@ -2,7 +2,6 @@
 from typing import Dict, List, Union, Any
 
 import sys
-import re
 import boost_histogram.axis as bha
 import hist.utils
 from hist.axestuple import NamedAxesTuple, ArrayTuple
@@ -84,14 +83,7 @@ class Regular(bha.Regular, AxesMixin):
         circular: bool = False,
         transform: bha.transform.Function = None
     ) -> None:
-        metadata: Dict = dict()
-        if not name:
-            metadata["name"] = ""
-        elif re.match(r"^[a-zA-Z][a-zA-Z0-9_]*$", name):
-            metadata["name"] = name
-        else:
-            raise Exception("Name should be a valid Python identifier")
-        metadata["title"] = title
+        metadata: Dict[str, Any] = {"name": name or "", "title": title or ""}
         super().__init__(
             bins,
             start,
@@ -110,14 +102,7 @@ class Boolean(bha.Boolean, AxesMixin):
     __slots__ = ()
 
     def __init__(self, *, name: str = None, title: str = None) -> None:
-        metadata: Dict = dict()
-        if not name:
-            metadata["name"] = ""
-        elif re.match(r"^[a-zA-Z][a-zA-Z0-9_]*$", name):
-            metadata["name"] = name
-        else:
-            raise Exception("Name should be a valid Python identifier")
-        metadata["title"] = title
+        metadata: Dict[str, Any] = {"name": name or "", "title": title or ""}
         super().__init__(metadata=metadata)
 
 
@@ -135,14 +120,7 @@ class Variable(bha.Variable, AxesMixin):
         overflow: bool = True,
         growth: bool = False
     ) -> None:
-        metadata: Dict = dict()
-        if not name:
-            metadata["name"] = ""
-        elif re.match(r"^[a-zA-Z][a-zA-Z0-9_]*$", name):
-            metadata["name"] = name
-        else:
-            raise Exception("Name should be a valid Python identifier")
-        metadata["title"] = title
+        metadata: Dict[str, Any] = {"name": name or "", "title": title or ""}
         super().__init__(
             edges,
             metadata=metadata,
@@ -167,14 +145,7 @@ class Integer(bha.Integer, AxesMixin):
         overflow: bool = True,
         growth: bool = False
     ) -> None:
-        metadata: Dict = dict()
-        if not name:
-            metadata["name"] = ""
-        elif re.match(r"^[a-zA-Z][a-zA-Z0-9_]*$", name):
-            metadata["name"] = name
-        else:
-            raise Exception("Name should be a valid Python identifier")
-        metadata["title"] = title
+        metadata: Dict[str, Any] = {"name": name or "", "title": title or ""}
         super().__init__(
             start,
             stop,
@@ -197,14 +168,7 @@ class IntCategory(bha.IntCategory, AxesMixin):
         title: str = None,
         growth: bool = False
     ) -> None:
-        metadata: Dict = dict()
-        if not name:
-            metadata["name"] = ""
-        elif re.match(r"^[a-zA-Z][a-zA-Z0-9_]*$", name):
-            metadata["name"] = name
-        else:
-            raise Exception("Name should be a valid Python identifier")
-        metadata["title"] = title
+        metadata: Dict[str, Any] = {"name": name or "", "title": title or ""}
         super().__init__(categories, metadata=metadata, growth=growth)
 
 
@@ -220,12 +184,5 @@ class StrCategory(bha.StrCategory, AxesMixin):
         title: str = None,
         growth: bool = False
     ) -> None:
-        metadata: Dict = dict()
-        if not name:
-            metadata["name"] = ""
-        elif re.match(r"^[a-zA-Z][a-zA-Z0-9_]*$", name):
-            metadata["name"] = name
-        else:
-            raise Exception("Name should be a valid Python identifier")
-        metadata["title"] = title
+        metadata: Dict[str, Any] = {"name": name or "", "title": title or ""}
         super().__init__(categories, metadata=metadata, growth=growth)
