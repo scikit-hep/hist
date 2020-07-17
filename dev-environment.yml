@@ -4,7 +4,7 @@ channels:
 dependencies:
   - pip >=18
   - root >=6.20.0
-  - boost-histogram >=0.8.0
+  - boost-histogram >=0.10
   - jupyterlab >=1.2
   - matplotlib >=3.1
   - pytest >=5
@@ -19,5 +19,5 @@ dependencies:
   - mypy >=0.770
   - uncertainties >=3
   - pip:
-    - mplhep>=0.1.8
+    - mplhep>=0.1.27
     - -e .
