@@ -4,7 +4,7 @@
 [![Join the chat at https://gitter.im/Scikit-HEP/hist](https://badges.gitter.im/HSF/PyHEP-histogramming.svg)](https://gitter.im/HSF/PyHEP-histogramming?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-Hist is a analyst friendly front-end for [boost-histogram][].
+Hist is a analyst friendly front-end for [boost-histogram][https://github.com/scikit-hep/boost-histogram].
 
 ## Installation
 
