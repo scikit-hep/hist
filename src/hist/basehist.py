@@ -57,7 +57,7 @@ class BaseHist(bh.Histogram):
             Initialize BaseHist object. Axis params can contain the names.
         """
         # TODO: Make a base class type Axis for Hist
-        self._ax: List[bh.axis.Axis] = []
+        self._ax: List[bh.axis.Axes] = []
         self._hist: Any = None
         self._storage_proxy: Optional[Storage] = None
         self.axes: NamedAxesTuple
@@ -378,12 +378,12 @@ class BaseHist(bh.Histogram):
             self.sum() * functools.reduce(operator.mul, self.axes.widths)
         )
 
-    def plot(self, *args, **kwargs) -> Union[Plot1D_RetType, Plot2D_RetType]:
+    def plot(self, *args, **kwargs) -> matplotlib.artist.Artist:
         """
         Plot method for BaseHist object.
         """
         if self.ndim == 1:
-            return self.plot1d(*args, **kwargs), None
+            return self.plot1d(*args, **kwargs)
         elif self.ndim == 2:
             return self.plot2d(*args, **kwargs)
         else:
@@ -392,9 +392,9 @@ class BaseHist(bh.Histogram):
     def plot1d(
         self,
         fig: Optional[matplotlib.figure.Figure] = None,
-        ax: Optional[matplotlib.axes._subplots.SubplotBase] = None,
+        ax: Optional[matplotlib.axes.Axes] = None,
         **kwargs,
-    ) -> Plot1D_RetType:
+    ) -> matplotlib.lines.Line2D:
         """
         Plot1d method for BaseHist object.
         """
@@ -403,15 +403,21 @@ class BaseHist(bh.Histogram):
             raise TypeError("Only 1D-histogram has plot1d")
 
         # Default Figure: construct the figure and axes
-        if fig is None:
-            fig = plt.figure(figsize=(8, 8))
-            grid = fig.add_gridspec(4, 4, hspace=0, wspace=0)
+        if fig is not None and ax is not None:
+            if fig != ax.figure:
+                raise TypeError(
+                    "You cannot pass both a figure and axes that are not shared!"
+                )
+        elif fig is None and ax is None:
+            fig, ax = plt.subplots(1, 1, figsize=(8, 8))
 
-        if ax is None:
-            ax = fig.add_subplot(grid[:, :])
-            fig.add_axes(ax)
+        elif fig is not None:
+            ax = fig.add_subplot(111)
 
-        ax.step(
+        elif ax is not None:
+            fig = ax.figure
+
+        (lines,) = ax.step(
             self.axes.edges[0][:-1],
             self.project(self.axes[0].name or 0).view(),
             **kwargs,
@@ -420,14 +426,14 @@ class BaseHist(bh.Histogram):
         ax.set_xlabel(self.axes[0].title)
         ax.set_ylabel("Counts")
 
-        return fig, ax
+        return lines
 
     def plot2d(
         self,
         fig: Optional[matplotlib.figure.Figure] = None,
-        ax: Optional[matplotlib.axes._subplots.SubplotBase] = None,
+        ax: Optional[matplotlib.axes.Axes] = None,
         **kwargs,
-    ) -> Plot2D_RetType:
+    ) -> matplotlib.collections.QuadMesh:
         """
         Plot2d method for BaseHist object.
         """
@@ -453,19 +459,19 @@ class BaseHist(bh.Histogram):
 
         # Plot: plot the 2d-histogram
         X, Y = self.axes.edges
-        ax.pcolormesh(X.T, Y.T, self.view().T, **kwargs)
+        res = ax.pcolormesh(X.T, Y.T, self.view().T, **kwargs)
 
         ax.set_xlabel(self.axes[0].title)
         ax.set_ylabel(self.axes[1].title)
 
-        return fig, ax
+        return res
 
     def plot2d_full(
         self,
         fig: Optional[matplotlib.figure.Figure] = None,
-        main_ax: Optional[matplotlib.axes._subplots.SubplotBase] = None,
-        top_ax: Optional[matplotlib.axes._subplots.SubplotBase] = None,
-        side_ax: Optional[matplotlib.axes._subplots.SubplotBase] = None,
+        main_ax: Optional[matplotlib.axes.Axes] = None,
+        top_ax: Optional[matplotlib.axes.Axes] = None,
+        side_ax: Optional[matplotlib.axes.Axes] = None,
         **kwargs,
     ) -> Plot2DFull_RetType:
         """
@@ -583,8 +589,8 @@ class BaseHist(bh.Histogram):
         self,
         func: Callable,
         fig: Optional[matplotlib.figure.Figure] = None,
-        ax: Optional[matplotlib.axes._subplots.SubplotBase] = None,
-        pull_ax: Optional[matplotlib.axes._subplots.SubplotBase] = None,
+        ax: Optional[matplotlib.axes.Axes] = None,
+        pull_ax: Optional[matplotlib.axes.Axes] = None,
         **kwargs,
     ) -> PlotPull_RetType:
         """
