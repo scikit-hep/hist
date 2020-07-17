@@ -127,7 +127,7 @@ We would like to acknowledge the contributors that made this project possible ([
 <table>
   <tr>
     <td align="center"><a href="http://iscinumpy.gitlab.io"><img src="https://avatars1.githubusercontent.com/u/4616906?v=4" width="100px;" alt=""/><br /><sub><b>Henry Schreiner</b></sub></a><br /><a href="#maintenance-henryiii" title="Maintenance">🚧</a> <a href="https://github.com/scikit-hep/boost-histogram/commits?author=henryiii" title="Code">💻</a> <a href="https://github.com/scikit-hep/boost-histogram/commits?author=henryiii" title="Documentation">📖</a></td>
-    <td align="center"><a href="https://github.com/lovelybuggies"><img src="https://avatars3.githubusercontent.com/u/29083689?v=4" width="100px;" alt=""/><br /><sub><b>Nino Lau</b></sub></a><br /><a href="#maintenance-HDembinski" title="Maintenance">🚧</a> <a href="https://github.com/scikit-hep/hist/commits?author=lovelybuggies" title="Code">💻</a><a href="https://github.com/scikit-hep/hist/commits?author=lovelybuggies" title="Documentation">📖</a></td>
+    <td align="center"><a href="https://github.com/lovelybuggies"><img src="https://avatars3.githubusercontent.com/u/29083689?v=4" width="100px;" alt=""/><br /><sub><b>Nino Lau</b></sub></a><br /><a href="#maintenance-lovelybuggies" title="Maintenance">🚧</a> <a href="https://github.com/scikit-hep/hist/commits?author=lovelybuggies" title="Code">💻</a><a href="https://github.com/scikit-hep/hist/commits?author=lovelybuggies" title="Documentation">📖</a></td>
   </tr>
 </table>
 
