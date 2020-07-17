@@ -4,11 +4,65 @@
 [![Join the chat at https://gitter.im/Scikit-HEP/hist](https://badges.gitter.im/HSF/PyHEP-histogramming.svg)](https://gitter.im/HSF/PyHEP-histogramming?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-Hist is a analyst friendly front-end for [boost-histogram][].
+Hist is a analyst friendly front-end for [boost-histogram](https://github.com/scikit-hep/boost-histogram).
 
 ## Installation
 
 You can install this library from [PyPI](https://pypi.org/project/hist/) with pip:
+
+```bash
+python -m pip install hist
+```
+
+## Usage
+
+```python
+import hist
+
+# You can create a histogram like this.
+h = (
+  hist.Hist()
+  .Reg(10, 0 ,1, name="x", title="x-axis")
+  .Variable(range(10), name="y", title="y-axis")
+  .Int64()
+)
+
+# Filling by names is allowed in hist.
+hist.fill(y=[1, 4, 6], x=[3, 5, 2])
+
+# New ways to manipulate the histogram.
+h.project("x")
+h[{"y": 1j + 3, "x": 5j}]
+...
+
+# Elegant plotting functions.
+h.plot()
+h.plot2d_full()
+h.plot_pull(Callable)
+...
+```
+
+## Features
+
+- Hist augments metadata by adding names to axes; these are *highly* recommend and will help you track axes. There is also a special `NamedHist`, which will enforce all hist axes have names, and all axes will require named access.
+  - `	name=` is a unique label describing each axis
+  - `title=` is an optional string that is used in plotting (defaults to name if not provided)
+  - Indexing, projection, and more support named axes.
+
+- The `Hist` class augments the `bh.Histogram` class with the following shortcuts, designed for interactive exploration without extensive imports:
+  - Optional import-free construction system
+  - Quick import-free data-coordinates and rebin syntax (use a j suffix for numbers, or strings directly in indexing expressions)
+
+- Quick plotting routines encourage exploration:
+
+  - `.plot()` provides 1D and 2D plots
+  - `.plot2d_full()` shows 1D projects around a 2D plot
+  - `.plot_pull(...)` performs a pull plot
+
+## Development
+
+See [CONTRIBUTING.md](./.github/CONTRIBUTING.md) for information on setting up a development environment.
+
 
 ```bash
 python -m pip install hist
