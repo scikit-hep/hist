@@ -1,12 +1,8 @@
 # Hist
 
-[![Gitter][gitter-badge]][gitter-link]
-[![Stack Overflow][stack-overflow-badge]][stack-overflow-link]
 [![Github Actions badge](https://github.com/scikit-hep/hist/workflows/CI/badge.svg)](https://github.com/scikit-hep/hist/actions)
 [![Join the chat at https://gitter.im/Scikit-HEP/hist](https://badges.gitter.im/HSF/PyHEP-histogramming.svg)](https://gitter.im/HSF/PyHEP-histogramming?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Documentation Status][rtd-badge]][rtd-link]
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![Scikit-HEP][sk-badge]](https://scikit-hep.org/)
 
 Hist is a analyst friendly front-end for [boost-histogram][].
 
