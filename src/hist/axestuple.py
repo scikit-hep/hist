@@ -38,9 +38,9 @@ class NamedAxesTuple(AxesTuple):
         return tuple(ax.name for ax in self)  # type: ignore
 
     @property
-    def title(self) -> Tuple[str]:
+    def label(self) -> Tuple[str]:
         """
-        The titles of the axes. Defaults to name if title not given, or Axis N
+        The labels of the axes. Defaults to name if label not given, or Axis N
         if neither was given.
         """
-        return tuple(ax.title for ax in self)  # type: ignore
+        return tuple(ax.label for ax in self)  # type: ignore

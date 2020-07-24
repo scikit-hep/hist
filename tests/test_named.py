@@ -395,7 +395,7 @@ def test_named_fill():
 
     h = NamedHist(
         axis.Regular(
-            50, -4, 4, name="X", title="s [units]", underflow=False, overflow=False
+            50, -4, 4, name="X", label="s [units]", underflow=False, overflow=False
         )
     ).fill(X=np.random.normal(size=10))
 
@@ -405,7 +405,7 @@ def test_named_access():
         Test named access -- whether NamedHist bins can be accessed.
     """
 
-    h = NamedHist(axis.Regular(10, -5, 5, name="X", title="x [units]")).fill(
+    h = NamedHist(axis.Regular(10, -5, 5, name="X", label="x [units]")).fill(
         X=np.random.normal(size=1000)
     )
 
@@ -413,8 +413,8 @@ def test_named_access():
     h[6] = h[bh.loc(1)] = h[1j] = h[0j + 1] = h[-3j + 4] = h[bh.loc(1, 0)] = 0
 
     h = NamedHist(
-        axis.Regular(50, -5, 5, name="Norm", title="normal distribution"),
-        axis.Regular(50, -5, 5, name="Unif", title="uniform distribution"),
+        axis.Regular(50, -5, 5, name="Norm", label="normal distribution"),
+        axis.Regular(50, -5, 5, name="Unif", label="uniform distribution"),
         axis.StrCategory(["hi", "hello"], name="Greet"),
         axis.Boolean(name="Yes"),
         axis.Integer(0, 1000, name="Int"),
@@ -518,13 +518,13 @@ def test_named_project():
 
     h = NamedHist(
         axis.Regular(
-            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+            50, -5, 5, name="A", label="a [units]", underflow=False, overflow=False
         ),
-        axis.Boolean(name="B", title="b [units]"),
-        axis.Variable(range(11), name="C", title="c [units]"),
-        axis.Integer(0, 10, name="D", title="d [units]"),
-        axis.IntCategory(range(10), name="E", title="e [units]"),
-        axis.StrCategory("FT", name="F", title="f [units]"),
+        axis.Boolean(name="B", label="b [units]"),
+        axis.Variable(range(11), name="C", label="c [units]"),
+        axis.Integer(0, 10, name="D", label="d [units]"),
+        axis.IntCategory(range(10), name="E", label="e [units]"),
+        axis.StrCategory("FT", name="F", label="f [units]"),
     )
 
     # via names
@@ -534,13 +534,13 @@ def test_named_project():
 
     h = NamedHist(
         axis.Regular(
-            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+            50, -5, 5, name="A", label="a [units]", underflow=False, overflow=False
         ),
-        axis.Boolean(name="B", title="b [units]"),
-        axis.Variable(range(11), name="C", title="c [units]"),
-        axis.Integer(0, 10, name="D", title="d [units]"),
-        axis.IntCategory(range(10), name="E", title="e [units]"),
-        axis.StrCategory("FT", name="F", title="f [units]"),
+        axis.Boolean(name="B", label="b [units]"),
+        axis.Variable(range(11), name="C", label="c [units]"),
+        axis.Integer(0, 10, name="D", label="d [units]"),
+        axis.IntCategory(range(10), name="E", label="e [units]"),
+        axis.StrCategory("FT", name="F", label="f [units]"),
     )
 
     # via indices
@@ -578,7 +578,7 @@ def test_named_plot1d():
 
     h = NamedHist(
         axis.Regular(
-            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+            50, -5, 5, name="A", label="a [units]", underflow=False, overflow=False
         ),
     ).fill(A=np.random.normal(size=10))
 
@@ -588,10 +588,10 @@ def test_named_plot1d():
     # dimension error
     h = NamedHist(
         axis.Regular(
-            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+            50, -5, 5, name="A", label="a [units]", underflow=False, overflow=False
         ),
         axis.Regular(
-            50, -4, 4, name="B", title="b [units]", underflow=False, overflow=False
+            50, -4, 4, name="B", label="b [units]", underflow=False, overflow=False
         ),
     ).fill(B=np.random.normal(size=10), A=np.random.normal(size=10))
 
@@ -616,10 +616,10 @@ def test_named_plot2d():
 
     h = NamedHist(
         axis.Regular(
-            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+            50, -5, 5, name="A", label="a [units]", underflow=False, overflow=False
         ),
         axis.Regular(
-            50, -4, 4, name="B", title="b [units]", underflow=False, overflow=False
+            50, -4, 4, name="B", label="b [units]", underflow=False, overflow=False
         ),
     ).fill(B=np.random.normal(size=10), A=np.random.normal(size=10))
 
@@ -629,10 +629,10 @@ def test_named_plot2d():
     # dimension error
     h = NamedHist(
         axis.Regular(
-            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+            50, -5, 5, name="A", label="a [units]", underflow=False, overflow=False
         ),
         axis.Regular(
-            50, -4, 4, name="B", title="b [units]", underflow=False, overflow=False
+            50, -4, 4, name="B", label="b [units]", underflow=False, overflow=False
         ),
     ).fill(B=np.random.normal(size=10), A=np.random.normal(size=10))
 
@@ -657,10 +657,10 @@ def test_named_plot2d_full():
 
     h = NamedHist(
         axis.Regular(
-            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+            50, -5, 5, name="A", label="a [units]", underflow=False, overflow=False
         ),
         axis.Regular(
-            50, -4, 4, name="B", title="b [units]", underflow=False, overflow=False
+            50, -4, 4, name="B", label="b [units]", underflow=False, overflow=False
         ),
     ).fill(B=np.random.normal(size=10), A=np.random.normal(size=10))
 
@@ -678,10 +678,10 @@ def test_named_plot2d_full():
     # dimension error
     h = NamedHist(
         axis.Regular(
-            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+            50, -5, 5, name="A", label="a [units]", underflow=False, overflow=False
         ),
         axis.Regular(
-            50, -4, 4, name="B", title="b [units]", underflow=False, overflow=False
+            50, -4, 4, name="B", label="b [units]", underflow=False, overflow=False
         ),
     ).fill(B=np.random.normal(size=10), A=np.random.normal(size=10))
 
@@ -709,7 +709,7 @@ def test_named_plot():
 
     h = NamedHist(
         axis.Regular(
-            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+            50, -5, 5, name="A", label="a [units]", underflow=False, overflow=False
         ),
     ).fill(A=np.random.normal(size=10))
 
@@ -717,10 +717,10 @@ def test_named_plot():
 
     h = NamedHist(
         axis.Regular(
-            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+            50, -5, 5, name="A", label="a [units]", underflow=False, overflow=False
         ),
         axis.Regular(
-            50, -4, 4, name="B", title="b [units]", underflow=False, overflow=False
+            50, -4, 4, name="B", label="b [units]", underflow=False, overflow=False
         ),
     ).fill(B=np.random.normal(size=10), A=np.random.normal(size=10))
 
@@ -730,13 +730,13 @@ def test_named_plot():
     # dimension error
     h = NamedHist(
         axis.Regular(
-            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+            50, -5, 5, name="A", label="a [units]", underflow=False, overflow=False
         ),
         axis.Regular(
-            50, -4, 4, name="B", title="b [units]", underflow=False, overflow=False
+            50, -4, 4, name="B", label="b [units]", underflow=False, overflow=False
         ),
         axis.Regular(
-            50, -4, 4, name="C", title="c [units]", underflow=False, overflow=False
+            50, -4, 4, name="C", label="c [units]", underflow=False, overflow=False
         ),
     ).fill(
         A=np.random.normal(size=10),
@@ -771,7 +771,7 @@ def test_named_plot_pull():
 
     h = NamedHist(
         axis.Regular(
-            50, -4, 4, name="S", title="s [units]", underflow=False, overflow=False
+            50, -4, 4, name="S", label="s [units]", underflow=False, overflow=False
         )
     ).fill(S=np.random.normal(size=10))
 
@@ -807,10 +807,10 @@ def test_named_plot_pull():
     # dimension error
     hh = NamedHist(
         axis.Regular(
-            50, -4, 4, name="X", title="s [units]", underflow=False, overflow=False
+            50, -4, 4, name="X", label="s [units]", underflow=False, overflow=False
         ),
         axis.Regular(
-            50, -4, 4, name="Y", title="s [units]", underflow=False, overflow=False
+            50, -4, 4, name="Y", label="s [units]", underflow=False, overflow=False
         ),
     ).fill(X=np.random.normal(size=10), Y=np.random.normal(size=10))
 
@@ -1086,13 +1086,13 @@ def test_named_axestuple():
 
     h = NamedHist(
         axis.Regular(20, 0, 12, name="A"),
-        axis.Regular(10, 1, 3, name="B", title="Beta"),
+        axis.Regular(10, 1, 3, name="B", label="Beta"),
         axis.Regular(15, 3, 5, name="C"),
-        axis.Regular(5, 3, 2, name="D", title="Axis 3"),
+        axis.Regular(5, 3, 2, name="D", label="Axis 3"),
     )
 
     assert h.axes.name == ("A", "B", "C", "D")
-    assert h.axes.title == ("A", "Beta", "C", "Axis 3")
+    assert h.axes.label == ("A", "Beta", "C", "Axis 3")
 
     assert h.axes[0].size == 20
     assert h.axes["A"].size == 20
