@@ -20,7 +20,7 @@ def main():
         help="maximum screen width",
         default=os.get_terminal_size()[0],
     )
-    parser.add_argument("-t", "--title", type=str, help="title for plot")
+    parser.add_argument("-t", "--label", type=str, help="label for plot")
     parser.add_argument("-o", "--output-image", type=str, help="save image to file")
     args = parser.parse_args()
 
@@ -40,7 +40,7 @@ def main():
         plt.savefig(args.output_image)
     else:
         print_hist(
-            h, title=args.title, summary=True,
+            h, label=args.label, summary=True,
         )
 
 

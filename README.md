@@ -22,8 +22,8 @@ import hist
 # You can create a histogram like this.
 h = (
   hist.Hist()
-  .Reg(10, 0 ,1, name="x", title="x-axis")
-  .Variable(range(10), name="y", title="y-axis")
+  .Reg(10, 0 ,1, name="x", label="x-axis")
+  .Variable(range(10), name="y", label="y-axis")
   .Int64()
 )
 
@@ -45,8 +45,8 @@ h.plot_pull(Callable)
 ## Features
 
 - Hist augments metadata by adding names to axes; these are *highly* recommend and will help you track axes. There is also a special `NamedHist`, which will enforce all hist axes have names, and all axes will require named access.
-  - `	name=` is a unique label describing each axis
-  - `title=` is an optional string that is used in plotting (defaults to name if not provided)
+  - `   name=` is a unique label describing each axis
+  - `label=` is an optional string that is used in plotting (defaults to name if not provided)
   - Indexing, projection, and more support named axes.
 
 - The `Hist` class augments the `bh.Histogram` class with the following shortcuts, designed for interactive exploration without extensive imports:
@@ -76,8 +76,8 @@ import hist
 # You can create a histogram like this.
 h = (
   hist.Hist()
-  .Reg(10, 0 ,1, name="x", title="x-axis")
-  .Variable(range(10), name="y", title="y-axis")
+  .Reg(10, 0 ,1, name="x", label="x-axis")
+  .Variable(range(10), name="y", label="y-axis")
   .Int64()
 )
 
@@ -99,8 +99,8 @@ h.plot_pull(Callable)
 ## Features
 
 - Hist augments metadata by adding names to axes; these are *highly* recommend and will help you track axes. There is also a special `NamedHist`, which will enforce all hist axes have names, and all axes will require named access.
-  - `	name=` is a unique label describing each axis
-  - `title=` is an optional string that is used in plotting (defaults to name if not provided)
+  - `   name=` is a unique label describing each axis
+  - `label=` is an optional string that is used in plotting (defaults to name if not provided)
   - Indexing, projection, and more support named axes.
 
 - The `Hist` class augments the `bh.Histogram` class with the following shortcuts, designed for interactive exploration without extensive imports:

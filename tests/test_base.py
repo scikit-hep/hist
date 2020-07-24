@@ -265,7 +265,7 @@ def test_base_fill():
 
     h = BaseHist(
         axis.Regular(
-            50, -4, 4, name="X", title="s [units]", underflow=False, overflow=False
+            50, -4, 4, name="X", label="s [units]", underflow=False, overflow=False
         )
     ).fill(np.random.normal(size=10))
 
@@ -275,7 +275,7 @@ def test_base_access():
         Test base access -- whether BaseHist bins can be accessed.
     """
 
-    h = BaseHist(axis.Regular(10, -5, 5, name="X", title="x [units]")).fill(
+    h = BaseHist(axis.Regular(10, -5, 5, name="X", label="x [units]")).fill(
         np.random.normal(size=1000)
     )
 
@@ -283,8 +283,8 @@ def test_base_access():
     h[6] = h[bh.loc(1)] = h[1j] = h[0j + 1] = h[-3j + 4] = h[bh.loc(1, 0)] = 0
 
     h = BaseHist(
-        axis.Regular(50, -5, 5, name="Norm", title="normal distribution"),
-        axis.Regular(50, -5, 5, name="Unif", title="uniform distribution"),
+        axis.Regular(50, -5, 5, name="Norm", label="normal distribution"),
+        axis.Regular(50, -5, 5, name="Unif", label="uniform distribution"),
         axis.StrCategory(["hi", "hello"], name="Greet"),
         axis.Boolean(name="Yes"),
         axis.Integer(0, 1000, name="Int"),
@@ -310,13 +310,13 @@ def test_base_project():
 
     h = BaseHist(
         axis.Regular(
-            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+            50, -5, 5, name="A", label="a [units]", underflow=False, overflow=False
         ),
-        axis.Boolean(name="B", title="b [units]"),
-        axis.Variable(range(11), name="C", title="c [units]"),
-        axis.Integer(0, 10, name="D", title="d [units]"),
-        axis.IntCategory(range(10), name="E", title="e [units]"),
-        axis.StrCategory("FT", name="F", title="f [units]"),
+        axis.Boolean(name="B", label="b [units]"),
+        axis.Variable(range(11), name="C", label="c [units]"),
+        axis.Integer(0, 10, name="D", label="d [units]"),
+        axis.IntCategory(range(10), name="E", label="e [units]"),
+        axis.StrCategory("FT", name="F", label="f [units]"),
     )
 
     # via indices
@@ -331,13 +331,13 @@ def test_base_project():
 
     h = BaseHist(
         axis.Regular(
-            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+            50, -5, 5, name="A", label="a [units]", underflow=False, overflow=False
         ),
-        axis.Boolean(name="B", title="b [units]"),
-        axis.Variable(range(11), name="C", title="c [units]"),
-        axis.Integer(0, 10, name="D", title="d [units]"),
-        axis.IntCategory(range(10), name="E", title="e [units]"),
-        axis.StrCategory("FT", name="F", title="f [units]"),
+        axis.Boolean(name="B", label="b [units]"),
+        axis.Variable(range(11), name="C", label="c [units]"),
+        axis.Integer(0, 10, name="D", label="d [units]"),
+        axis.IntCategory(range(10), name="E", label="e [units]"),
+        axis.StrCategory("FT", name="F", label="f [units]"),
     )
 
     # duplicated
@@ -368,7 +368,7 @@ def test_base_plot1d():
 
     h = BaseHist(
         axis.Regular(
-            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+            50, -5, 5, name="A", label="a [units]", underflow=False, overflow=False
         ),
     ).fill(np.random.normal(size=10))
 
@@ -377,10 +377,10 @@ def test_base_plot1d():
     # dimension error
     h = BaseHist(
         axis.Regular(
-            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+            50, -5, 5, name="A", label="a [units]", underflow=False, overflow=False
         ),
         axis.Regular(
-            50, -4, 4, name="B", title="b [units]", underflow=False, overflow=False
+            50, -4, 4, name="B", label="b [units]", underflow=False, overflow=False
         ),
     ).fill(np.random.normal(size=10), np.random.normal(size=10))
 
@@ -403,10 +403,10 @@ def test_base_plot2d():
 
     h = BaseHist(
         axis.Regular(
-            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+            50, -5, 5, name="A", label="a [units]", underflow=False, overflow=False
         ),
         axis.Regular(
-            50, -4, 4, name="B", title="b [units]", underflow=False, overflow=False
+            50, -4, 4, name="B", label="b [units]", underflow=False, overflow=False
         ),
     ).fill(np.random.normal(size=10), np.random.normal(size=10))
 
@@ -415,10 +415,10 @@ def test_base_plot2d():
     # dimension error
     h = BaseHist(
         axis.Regular(
-            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+            50, -5, 5, name="A", label="a [units]", underflow=False, overflow=False
         ),
         axis.Regular(
-            50, -4, 4, name="B", title="b [units]", underflow=False, overflow=False
+            50, -4, 4, name="B", label="b [units]", underflow=False, overflow=False
         ),
     ).fill(np.random.normal(size=10), np.random.normal(size=10))
 
@@ -441,10 +441,10 @@ def test_base_plot2d_full():
 
     h = BaseHist(
         axis.Regular(
-            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+            50, -5, 5, name="A", label="a [units]", underflow=False, overflow=False
         ),
         axis.Regular(
-            50, -4, 4, name="B", title="b [units]", underflow=False, overflow=False
+            50, -4, 4, name="B", label="b [units]", underflow=False, overflow=False
         ),
     ).fill(np.random.normal(size=10), np.random.normal(size=10))
 
@@ -461,10 +461,10 @@ def test_base_plot2d_full():
     # dimension error
     h = BaseHist(
         axis.Regular(
-            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+            50, -5, 5, name="A", label="a [units]", underflow=False, overflow=False
         ),
         axis.Regular(
-            50, -4, 4, name="B", title="b [units]", underflow=False, overflow=False
+            50, -4, 4, name="B", label="b [units]", underflow=False, overflow=False
         ),
     ).fill(np.random.normal(size=10), np.random.normal(size=10))
 
@@ -490,7 +490,7 @@ def test_base_plot():
 
     h = BaseHist(
         axis.Regular(
-            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+            50, -5, 5, name="A", label="a [units]", underflow=False, overflow=False
         ),
     ).fill(np.random.normal(size=10))
 
@@ -498,10 +498,10 @@ def test_base_plot():
 
     h = BaseHist(
         axis.Regular(
-            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+            50, -5, 5, name="A", label="a [units]", underflow=False, overflow=False
         ),
         axis.Regular(
-            50, -4, 4, name="B", title="b [units]", underflow=False, overflow=False
+            50, -4, 4, name="B", label="b [units]", underflow=False, overflow=False
         ),
     ).fill(np.random.normal(size=10), np.random.normal(size=10))
 
@@ -510,13 +510,13 @@ def test_base_plot():
     # dimension error
     h = BaseHist(
         axis.Regular(
-            50, -5, 5, name="A", title="a [units]", underflow=False, overflow=False
+            50, -5, 5, name="A", label="a [units]", underflow=False, overflow=False
         ),
         axis.Regular(
-            50, -4, 4, name="B", title="b [units]", underflow=False, overflow=False
+            50, -4, 4, name="B", label="b [units]", underflow=False, overflow=False
         ),
         axis.Regular(
-            50, -4, 4, name="C", title="c [units]", underflow=False, overflow=False
+            50, -4, 4, name="C", label="c [units]", underflow=False, overflow=False
         ),
     ).fill(
         np.random.normal(size=10), np.random.normal(size=10), np.random.normal(size=10)
@@ -547,7 +547,7 @@ def test_base_plot_pull():
 
     h = BaseHist(
         axis.Regular(
-            50, -4, 4, name="S", title="s [units]", underflow=False, overflow=False
+            50, -4, 4, name="S", label="s [units]", underflow=False, overflow=False
         )
     ).fill(np.random.normal(size=10))
 
@@ -583,10 +583,10 @@ def test_base_plot_pull():
     # dimension error
     hh = BaseHist(
         axis.Regular(
-            50, -4, 4, name="X", title="s [units]", underflow=False, overflow=False
+            50, -4, 4, name="X", label="s [units]", underflow=False, overflow=False
         ),
         axis.Regular(
-            50, -4, 4, name="Y", title="s [units]", underflow=False, overflow=False
+            50, -4, 4, name="Y", label="s [units]", underflow=False, overflow=False
         ),
     ).fill(np.random.normal(size=10), np.random.normal(size=10))
 
@@ -913,14 +913,14 @@ def test_base_axestuple():
     """
 
     h = BaseHist(
-        axis.Regular(20, 0, 12, name="A", title="alpha"),
+        axis.Regular(20, 0, 12, name="A", label="alpha"),
         axis.Regular(10, 1, 3, name="B"),
-        axis.Regular(15, 3, 5, title="other"),
+        axis.Regular(15, 3, 5, label="other"),
         axis.Regular(5, 3, 2),
     )
 
     assert h.axes.name == ("A", "B", "", "")
-    assert h.axes.title == ("alpha", "B", "other", "Axis 3")
+    assert h.axes.label == ("alpha", "B", "other", "Axis 3")
 
     assert h.axes[0].size == 20
     assert h.axes["A"].size == 20

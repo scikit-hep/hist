@@ -33,7 +33,7 @@ __all__ = (
 class AxisProtocol(Protocol):
     metadata: Any
     name: str
-    title: str
+    label: str
 
 
 class AxesMixin:
@@ -51,18 +51,18 @@ class AxesMixin:
         self.metadata["name"] = value
 
     @property
-    def title(self: AxisProtocol) -> str:
+    def label(self: AxisProtocol) -> str:
         """
-        Get or set the title for the Regular axis
+        Get or set the label for the Regular axis
         """
-        title = (
-            self.metadata.get("title", "") if isinstance(self.metadata, dict) else ""
+        label = (
+            self.metadata.get("label", "") if isinstance(self.metadata, dict) else ""
         )
-        return title or self.name
+        return label or self.name
 
-    @title.setter
-    def title(self: AxisProtocol, value: str) -> None:
-        self.metadata["title"] = value
+    @label.setter
+    def label(self: AxisProtocol, value: str) -> None:
+        self.metadata["label"] = value
 
 
 @hist.utils.set_family(hist.utils.HIST_FAMILY)
@@ -76,14 +76,14 @@ class Regular(bha.Regular, AxesMixin):
         stop: float,
         *,
         name: str = None,
-        title: str = None,
+        label: str = None,
         underflow: bool = True,
         overflow: bool = True,
         growth: bool = False,
         circular: bool = False,
         transform: bha.transform.Function = None
     ) -> None:
-        metadata: Dict[str, Any] = {"name": name or "", "title": title or ""}
+        metadata: Dict[str, Any] = {"name": name or "", "label": label or ""}
         super().__init__(
             bins,
             start,
@@ -101,8 +101,8 @@ class Regular(bha.Regular, AxesMixin):
 class Boolean(bha.Boolean, AxesMixin):
     __slots__ = ()
 
-    def __init__(self, *, name: str = None, title: str = None) -> None:
-        metadata: Dict[str, Any] = {"name": name or "", "title": title or ""}
+    def __init__(self, *, name: str = None, label: str = None) -> None:
+        metadata: Dict[str, Any] = {"name": name or "", "label": label or ""}
         super().__init__(metadata=metadata)
 
 
@@ -115,12 +115,12 @@ class Variable(bha.Variable, AxesMixin):
         edges: Union[range, List[float]],
         *,
         name: str = None,
-        title: str = None,
+        label: str = None,
         underflow: bool = True,
         overflow: bool = True,
         growth: bool = False
     ) -> None:
-        metadata: Dict[str, Any] = {"name": name or "", "title": title or ""}
+        metadata: Dict[str, Any] = {"name": name or "", "label": label or ""}
         super().__init__(
             edges,
             metadata=metadata,
@@ -140,12 +140,12 @@ class Integer(bha.Integer, AxesMixin):
         stop: int,
         *,
         name: str = None,
-        title: str = None,
+        label: str = None,
         underflow: bool = True,
         overflow: bool = True,
         growth: bool = False
     ) -> None:
-        metadata: Dict[str, Any] = {"name": name or "", "title": title or ""}
+        metadata: Dict[str, Any] = {"name": name or "", "label": label or ""}
         super().__init__(
             start,
             stop,
@@ -165,10 +165,10 @@ class IntCategory(bha.IntCategory, AxesMixin):
         categories: Union[range, List[int]] = None,
         *,
         name: str = None,
-        title: str = None,
+        label: str = None,
         growth: bool = False
     ) -> None:
-        metadata: Dict[str, Any] = {"name": name or "", "title": title or ""}
+        metadata: Dict[str, Any] = {"name": name or "", "label": label or ""}
         super().__init__(categories, metadata=metadata, growth=growth)
 
 
@@ -181,8 +181,8 @@ class StrCategory(bha.StrCategory, AxesMixin):
         categories: Union[str, List[str]] = None,
         *,
         name: str = None,
-        title: str = None,
+        label: str = None,
         growth: bool = False
     ) -> None:
-        metadata: Dict[str, Any] = {"name": name or "", "title": title or ""}
+        metadata: Dict[str, Any] = {"name": name or "", "label": label or ""}
         super().__init__(categories, metadata=metadata, growth=growth)

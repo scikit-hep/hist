@@ -63,9 +63,9 @@ class BaseHist(bh.Histogram):
                     f"{self.__class__.__name__} instance cannot contain axes with duplicated names"
                 )
             for i, ax in enumerate(self.axes):
-                # title will return name if title is not set, so this is safe
-                if not ax.title:
-                    ax.title = f"Axis {i}"
+                # label will return name if label is not set, so this is safe
+                if not ax.label:
+                    ax.label = f"Axis {i}"
 
     def _generate_axes_(self) -> NamedAxesTuple:
         """
@@ -410,7 +410,7 @@ class BaseHist(bh.Histogram):
             **kwargs,
         )
 
-        ax.set_xlabel(self.axes[0].title)
+        ax.set_xlabel(self.axes[0].label)
         ax.set_ylabel("Counts")
 
         return lines
@@ -452,8 +452,8 @@ class BaseHist(bh.Histogram):
         X, Y = self.axes.edges
         res = ax.pcolormesh(X.T, Y.T, self.view().T, **kwargs)
 
-        ax.set_xlabel(self.axes[0].title)
-        ax.set_ylabel(self.axes[1].title)
+        ax.set_xlabel(self.axes[0].label)
+        ax.set_ylabel(self.axes[1].label)
 
         return res
 
@@ -552,8 +552,8 @@ class BaseHist(bh.Histogram):
         X, Y = self.axes.edges
         main_res = main_ax.pcolormesh(X.T, Y.T, self.view().T, **main_kwargs)
 
-        main_ax.set_xlabel(self.axes[0].title)
-        main_ax.set_ylabel(self.axes[1].title)
+        main_ax.set_xlabel(self.axes[0].label)
+        main_ax.set_ylabel(self.axes[1].label)
 
         # top plot
         top_res = top_ax.step(
@@ -799,7 +799,7 @@ class BaseHist(bh.Histogram):
             pull_ax.add_patch(downRect)
         plt.xlim(left_edge, right_edge)
 
-        pull_ax.set_xlabel(self.axes[0].title)
+        pull_ax.set_xlabel(self.axes[0].label)
         pull_ax.set_ylabel("Pull")
 
         return main_res, pull_res
