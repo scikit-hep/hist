@@ -11,6 +11,7 @@ from uncertainties import correlated_values, unumpy
 from typing import Callable, Optional, Tuple, Union, Dict, List, Any
 import functools
 import operator
+import histoprint
 
 import hist.utils
 import hist.storage
@@ -355,13 +356,20 @@ class BaseHist(bh.Histogram):
 
     def density(self):
         """
-        Density Histogram.
+        Density numpy array.
         """
         # ToDo: maybe should not be filled
         # ToDo: flow should be removed
         return self.view() / (
             self.sum() * functools.reduce(operator.mul, self.axes.widths)
         )
+
+    def show(self):
+        """
+        Pretty print histograms to the console.
+        """
+
+        return histoprint.print_hist(self)
 
     def plot(self, *args, **kwargs) -> matplotlib.artist.Artist:
         """
