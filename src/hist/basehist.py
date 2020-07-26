@@ -364,12 +364,12 @@ class BaseHist(bh.Histogram):
             self.sum() * functools.reduce(operator.mul, self.axes.widths)
         )
 
-    def show(self):
+    def show(self, *args, **kwargs):
         """
         Pretty print histograms to the console.
         """
 
-        return histoprint.print_hist(self)
+        return histoprint.print_hist(self, *args, **kwargs)
 
     def plot(self, *args, **kwargs) -> matplotlib.artist.Artist:
         """
