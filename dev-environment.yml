@@ -20,4 +20,5 @@ dependencies:
   - uncertainties >=3
   - pip:
     - mplhep>=0.1.27
+    - histoprint>=1.4.0
     - -e .
