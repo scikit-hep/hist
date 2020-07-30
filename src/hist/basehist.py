@@ -1,24 +1,25 @@
 # -*- coding: utf-8 -*-
+from .axis import Regular, Boolean, Variable, Integer, IntCategory, StrCategory
+from .axestuple import NamedAxesTuple
+
+import hist.utils
+from hist.storage import Storage
+
+import warnings
+import functools
+import operator
+import histoprint
+
 import numpy as np
 import boost_histogram as bh
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-from matplotlib import transforms
-import warnings
+import matplotlib.transforms as transforms
+import mplhep
 from scipy.optimize import curve_fit
 from uncertainties import correlated_values, unumpy
 from typing import Callable, Optional, Tuple, Union, Dict, List, Any
-import functools
-import operator
-import histoprint
-
-import hist.utils
-import hist.storage
-from hist.storage import Storage
-
-from .axis import Regular, Boolean, Variable, Integer, IntCategory, StrCategory
-from .axestuple import NamedAxesTuple
 from .svgplots import html_hist, svg_hist_1d, svg_hist_1d_c, svg_hist_2d, svg_hist_nd
 
 
@@ -381,7 +382,7 @@ class BaseHist(bh.Histogram):
 
         return histoprint.print_hist(self, **kwargs)
 
-    def plot(self, *args, **kwargs) -> matplotlib.artist.Artist:
+    def plot(self, *args, **kwargs) -> matplotlib.axes.Axes:
         """
         Plot method for BaseHist object.
         """
@@ -395,85 +396,26 @@ class BaseHist(bh.Histogram):
     def plot1d(
         self,
         *,
-        fig: Optional[matplotlib.figure.Figure] = None,
         ax: Optional[matplotlib.axes.Axes] = None,
         **kwargs,
-    ) -> matplotlib.lines.Line2D:
+    ) -> matplotlib.axes.Axes:
         """
         Plot1d method for BaseHist object.
         """
-        # Type judgement
-        if self.ndim != 1:
-            raise TypeError("Only 1D-histogram has plot1d")
 
-        # Default Figure: construct the figure and axes
-        if fig is not None and ax is not None:
-            if fig != ax.figure:
-                raise TypeError(
-                    "You cannot pass both a figure and axes that are not shared!"
-                )
-
-        elif fig is None and ax is None:
-            fig, ax = plt.subplots(1, 1, figsize=(8, 8))
-
-        elif fig is not None:
-            ax = fig.add_subplot(111)
-
-        elif ax is not None:
-            fig = ax.figure
-
-        (lines,) = ax.step(
-            self.axes.edges[0][:-1],
-            self.project(self.axes[0].name or 0).view(),
-            **kwargs,
-        )
-
-        ax.set_xlabel(self.axes[0].label)
-        ax.set_ylabel("Counts")
-
-        return lines
+        return mplhep.histplot(self, ax=ax, **kwargs)
 
     def plot2d(
         self,
         *,
-        fig: Optional[matplotlib.figure.Figure] = None,
         ax: Optional[matplotlib.axes.Axes] = None,
         **kwargs,
-    ) -> matplotlib.collections.QuadMesh:
+    ) -> matplotlib.axes.Axes:
         """
         Plot2d method for BaseHist object.
         """
-        # Type judgement
-        if self.ndim != 2:
-            raise TypeError("Only 2D-histogram has plot2d")
 
-        # Default Figure: construct the figure and axes
-        if fig is not None and ax is not None:
-            if fig != ax.figure:
-                raise TypeError(
-                    "You cannot pass both a figure and axes that are not shared!"
-                )
-
-        elif fig is None and ax is None:
-            fig, ax = plt.subplots(1, 1, figsize=(8, 8))
-
-        elif fig is not None:
-            ax = fig.add_subplot(111)
-
-        elif ax is not None:
-            fig = ax.figure
-
-        else:
-            pass
-
-        # Plot: plot the 2d-histogram
-        X, Y = self.axes.edges
-        res = ax.pcolormesh(X.T, Y.T, self.view().T, **kwargs)
-
-        ax.set_xlabel(self.axes[0].label)
-        ax.set_ylabel(self.axes[1].label)
-
-        return res
+        return mplhep.hist2dplot(self, ax=ax, **kwargs)
 
     def plot2d_full(
         self,
@@ -481,11 +423,7 @@ class BaseHist(bh.Histogram):
         fig: Optional[matplotlib.figure.Figure] = None,
         ax_dict: Optional[Dict[str, matplotlib.axes.Axes]] = None,
         **kwargs,
-    ) -> Tuple[
-        matplotlib.collections.QuadMesh,
-        matplotlib.lines.Line2D,
-        matplotlib.lines.Line2D,
-    ]:
+    ) -> Tuple[matplotlib.axes.Axes, matplotlib.axes.Axes, matplotlib.axes.Axes,]:
         """
         Plot2d_full method for BaseHist object.
         """
@@ -537,6 +475,9 @@ class BaseHist(bh.Histogram):
         main_kwargs = dict()
         for kw in kwargs.keys():
             if kw[:4] == "main":
+                # disabled argument
+                if kw == "main_cbar":
+                    pass
                 main_kwargs[kw[5:]] = kwargs[kw]
 
         for k in main_kwargs:
@@ -568,15 +509,12 @@ class BaseHist(bh.Histogram):
 
         # main plot
         X, Y = self.axes.edges
-        main_res = main_ax.pcolormesh(X.T, Y.T, self.view().T, **main_kwargs)
-
-        main_ax.set_xlabel(self.axes[0].label)
-        main_ax.set_ylabel(self.axes[1].label)
+        main_ax = mplhep.hist2dplot(self, ax=main_ax, cbar=False, **main_kwargs)
 
         # top plot
-        top_res = top_ax.step(
-            self.axes[0].edges[:-1],
-            self.project(self.axes[0].name or 0).view(),
+        top_ax = mplhep.histplot(
+            self.project(self.axes[0].name or 0),
+            ax=top_ax,
             **top_kwargs,
         )
 
@@ -590,9 +528,9 @@ class BaseHist(bh.Histogram):
         base = plt.gca().transData
         rot = transforms.Affine2D().rotate_deg(90)
 
-        side_res = side_ax.step(
-            self.axes[1].edges[:-1],
-            -self.project(self.axes[1].name or 1).view(),
+        side_ax = mplhep.histplot(
+            self.project(self.axes[1].name or 1),
+            ax=side_ax,
             transform=rot + base,
             **side_kwargs,
         )
@@ -602,7 +540,7 @@ class BaseHist(bh.Histogram):
         side_ax.yaxis.set_visible(False)
         side_ax.set_xlabel("Counts")
 
-        return main_res, top_res, side_res
+        return main_ax, top_ax, side_ax
 
     def plot_pull(
         self,
@@ -611,7 +549,7 @@ class BaseHist(bh.Histogram):
         fig: Optional[matplotlib.figure.Figure] = None,
         ax_dict: Optional[Dict[str, matplotlib.axes.Axes]] = None,
         **kwargs,
-    ) -> Tuple[matplotlib.collections.QuadMesh, matplotlib.lines.Line2D,]:
+    ) -> Tuple[matplotlib.axes.Axes, matplotlib.axes.Axes,]:
         """
         Plot_pull method for BaseHist object.
         """
@@ -771,13 +709,13 @@ class BaseHist(bh.Histogram):
             raise ValueError(f"'{list(kwargs.keys())[0]}' not needed")
 
         # Main: plot the pulls using Matplotlib errorbar and plot methods
-        main_res = main_ax.errorbar(
+        main_ax.errorbar(
             self.axes.centers[0], self.view(), yerr, label="Histogram Data", **eb_kwargs
         )
         (line,) = main_ax.plot(
             self.axes.centers[0], fit, label="Fitting Value", **fp_kwargs
         )
-        main_res = main_ax.fill_between(
+        main_ax.fill_between(
             self.axes.centers[0],
             y_nv - y_sd,
             y_nv + y_sd,
@@ -792,7 +730,7 @@ class BaseHist(bh.Histogram):
         left_edge = self.axes.edges[0][0]
         right_edge = self.axes.edges[-1][-1]
         width = (right_edge - left_edge) / len(pulls)
-        pull_res = pull_ax.bar(self.axes.centers[0], pulls, width=width, **bar_kwargs)
+        pull_ax.bar(self.axes.centers[0], pulls, width=width, **bar_kwargs)
 
         patch_height = max(np.abs(pulls)) / pp_num
         patch_width = width * len(pulls)
@@ -818,4 +756,4 @@ class BaseHist(bh.Histogram):
         pull_ax.set_xlabel(self.axes[0].label)
         pull_ax.set_ylabel("Pull")
 
-        return main_res, pull_res
+        return main_ax, pull_ax
