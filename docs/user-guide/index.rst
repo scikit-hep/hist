@@ -8,6 +8,6 @@ User Guide
    :titlesonly:
    :glob:
 
-   Axis
-   Storage
-   Histogram
+   notebooks/Axis
+   notebooks/Storage
+   notebooks/Histogram
