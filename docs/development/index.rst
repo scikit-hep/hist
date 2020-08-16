@@ -1,11 +1,32 @@
 .. _development:
 
 Development
-===========
+===========================
 
-.. toctree::
-   :maxdepth: 4
-   :titlesonly:
-   :glob:
+Installation
+--------------------
 
-   dev
+PyPI
+~~~~~~~~~~~~~~~~~~~~
+
+You can set up a development environment using PyPI.
+
+.. code-block:: bash
+
+   python3 -m venv .env            # Make a new environment in ./.env/
+   source .env/bin/activate        # Use the new environment
+   (.env)$ pip install -e .[dev]
+   (.env)$ python -m ipykernel install --user --name hist
+
+*You should have pip 10 or later*.
+
+Conda
+~~~~~~~~~~~~~~~~~~~~
+
+You can also set up a development environment using Conda. With Conda, you can search some channels for development.
+
+.. code-block:: bash
+
+   $ conda env create -f dev-environment.yml -n hist
+   $ conda activate hist
+   (hist)$ python -m ipykernel install --name hist
