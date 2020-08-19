@@ -6,7 +6,7 @@ Development
 Installation
 --------------------
 
-PyPI
+Pip
 ~~~~~~~~~~~~~~~~~~~~
 
 You can set up a development environment using PyPI.
