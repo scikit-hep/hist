@@ -10,4 +10,5 @@ User Guide
 
    notebooks/Axis
    notebooks/Storage
+   notebooks/Transform
    notebooks/Histogram
