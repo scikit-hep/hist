@@ -6,10 +6,10 @@ Development
 Installation
 --------------------
 
-PyPI
+Pip
 ~~~~~~~~~~~~~~~~~~~~
 
-You can set up a development environment using PyPI.
+You can set up a development environment using pip.
 
 .. code-block:: bash
 
