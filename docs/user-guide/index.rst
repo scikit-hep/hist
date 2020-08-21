@@ -12,3 +12,4 @@ User Guide
    notebooks/Storage
    notebooks/Transform
    notebooks/Histogram
+   notebooks/Plots
