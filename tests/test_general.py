@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import hist
 from hist import Hist, axis
 import boost_histogram as bh
 import pytest
@@ -785,9 +784,9 @@ class test_general_storage_proxy:
             h.Unlimited()
 
 
-def test_hist_transform_proxy():
+def test_general_transform_proxy():
     """
-        Test hist transform proxy -- whether Hist transform proxy works properly.
+        Test general transform proxy -- whether Hist transform proxy works properly.
     """
 
     h0 = Hist().Sqrt(3, 4, 25).Sqrt(4, 25, 81)
@@ -797,12 +796,28 @@ def test_hist_transform_proxy():
     assert h0[2, 2] == 1
     assert h0[2, 3] == 1
 
+    # based on existing axis
+    with pytest.raises(Exception):
+        Hist().Regular(3, 4, 25).Sqrt()
+
+    # wrong value
+    with pytest.raises(Exception):
+        Hist().Sqrt(3, -4, 25)
+
     h1 = Hist().Log(4, 1, 10_000).Log(3, 1 / 1_000, 1)
     h1.fill([2, 11, 101, 1_001], [1 / 999, 1 / 99, 1 / 9, 1 / 9])
     assert h1[0, 0] == 1
     assert h1[1, 1] == 1
     assert h1[2, 2] == 1
     assert h1[3, 2] == 1
+
+    # based on existing axis
+    with pytest.raises(Exception):
+        Hist().Regular(4, 1, 10_000).Log()
+
+    # wrong value
+    with pytest.raises(Exception):
+        Hist().Log(3, -1, 10_000)
 
     h2 = Hist().Pow(24, 1, 5, power=2).Pow(124, 1, 5, power=3)
     h2.fill([1, 2, 3, 4], [1, 2, 3, 4])
@@ -811,9 +826,21 @@ def test_hist_transform_proxy():
     assert h2[8, 26] == 1
     assert h2[15, 63] == 1
 
+    # based on existing axis
+    with pytest.raises(Exception):
+        Hist().Regular(24, 1, 5).Pow(2)
+
+    # wrong value
+    with pytest.raises(Exception):
+        Hist().Pow(24, -1, 5, power=1 / 2)
+
+    # lack args
+    with pytest.raises(Exception):
+        Hist().Pow(24, 1, 5)
+
     ftype = ctypes.CFUNCTYPE(ctypes.c_double, ctypes.c_double)
     h3 = (
-        hist.Hist()
+        Hist()
         .Func(4, 1, 5, forward=ftype(math.log), inverse=ftype(math.exp))
         .Func(4, 1, 5, forward=ftype(np.log), inverse=ftype(np.exp))
     )
@@ -822,6 +849,19 @@ def test_hist_transform_proxy():
     assert h3[1, 1] == 1
     assert h3[2, 2] == 1
     assert h3[3, 3] == 1
+
+    # based on existing axis
+    with pytest.raises(Exception):
+        Hist().Regular(24, 1, 5).Func(ftype(math.log), ftype(math.exp))
+
+    # wrong value
+    assert Hist().Func(4, -1, 5, forward=ftype(math.log), inverse=ftype(math.log))
+    with pytest.raises(Exception):
+        Hist().Func(4, -1, 5, forward=ftype(np.log), inverse=ftype(np.log))
+
+    # lack args
+    with pytest.raises(Exception):
+        Hist().Func(4, 1, 5)
 
 
 def test_general_hist_proxy():
