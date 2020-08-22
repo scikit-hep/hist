@@ -1,17 +1,14 @@
 # -*- coding: utf-8 -*-
-import hist
 from hist import axis, BaseHist
 import boost_histogram as bh
 import pytest
 import numpy as np
+import ctypes
+import math
 from uncertainties import unumpy as unp
 import matplotlib.pyplot as plt
 
 # ToDo: specify what error is raised
-
-
-def test_version():
-    assert hist.__version__ is not None
 
 
 def test_base_init():
@@ -779,6 +776,86 @@ class test_base_storage_proxy:
         # add storage to existing storage
         with pytest.raises(Exception):
             h.Unlimited()
+
+
+def test_base_transform_proxy():
+    """
+        Test base transform proxy -- whether BaseHist transform proxy works properly.
+    """
+
+    h0 = BaseHist().Sqrt(3, 4, 25).Sqrt(4, 25, 81)
+    h0.fill([5, 10, 17, 17], [26, 37, 50, 65])
+    assert h0[0, 0] == 1
+    assert h0[1, 1] == 1
+    assert h0[2, 2] == 1
+    assert h0[2, 3] == 1
+
+    # based on existing axis
+    with pytest.raises(Exception):
+        BaseHist().Regular(3, 4, 25).Sqrt()
+
+    # wrong value
+    with pytest.raises(Exception):
+        BaseHist().Sqrt(3, -4, 25)
+
+    h1 = BaseHist().Log(4, 1, 10_000).Log(3, 1 / 1_000, 1)
+    h1.fill([2, 11, 101, 1_001], [1 / 999, 1 / 99, 1 / 9, 1 / 9])
+    assert h1[0, 0] == 1
+    assert h1[1, 1] == 1
+    assert h1[2, 2] == 1
+    assert h1[3, 2] == 1
+
+    # based on existing axis
+    with pytest.raises(Exception):
+        BaseHist().Regular(4, 1, 10_000).Log()
+
+    # wrong value
+    with pytest.raises(Exception):
+        BaseHist().Log(3, -1, 10_000)
+
+    h2 = BaseHist().Pow(24, 1, 5, power=2).Pow(124, 1, 5, power=3)
+    h2.fill([1, 2, 3, 4], [1, 2, 3, 4])
+    assert h2[0, 0] == 1
+    assert h2[3, 7] == 1
+    assert h2[8, 26] == 1
+    assert h2[15, 63] == 1
+
+    # based on existing axis
+    with pytest.raises(Exception):
+        BaseHist().Regular(24, 1, 5).Pow(2)
+
+    # wrong value
+    with pytest.raises(Exception):
+        BaseHist().Pow(24, -1, 5, power=1 / 2)
+
+    # lack args
+    with pytest.raises(Exception):
+        BaseHist().Pow(24, 1, 5)
+
+    ftype = ctypes.CFUNCTYPE(ctypes.c_double, ctypes.c_double)
+    h3 = (
+        BaseHist()
+        .Func(4, 1, 5, forward=ftype(math.log), inverse=ftype(math.exp))
+        .Func(4, 1, 5, forward=ftype(np.log), inverse=ftype(np.exp))
+    )
+    h3.fill([1, 2, 3, 4], [1, 2, 3, 4])
+    assert h3[0, 0] == 1
+    assert h3[1, 1] == 1
+    assert h3[2, 2] == 1
+    assert h3[3, 3] == 1
+
+    # based on existing axis
+    with pytest.raises(Exception):
+        BaseHist().Regular(24, 1, 5).Func(ftype(math.log), ftype(math.exp))
+
+    # wrong value
+    assert BaseHist().Func(4, -1, 5, forward=ftype(math.log), inverse=ftype(math.log))
+    with pytest.raises(Exception):
+        BaseHist().Func(4, -1, 5, forward=ftype(np.log), inverse=ftype(np.log))
+
+    # lack args
+    with pytest.raises(Exception):
+        BaseHist().Func(4, 1, 5)
 
 
 def test_base_hist_proxy():

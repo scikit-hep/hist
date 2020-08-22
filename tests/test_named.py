@@ -3,6 +3,8 @@ from hist import axis, NamedHist
 import boost_histogram as bh
 import pytest
 import numpy as np
+import ctypes
+import math
 from uncertainties import unumpy as unp
 import matplotlib.pyplot as plt
 
@@ -950,6 +952,90 @@ def test_named_index_access():
 
     with pytest.raises(Exception):
         h[0:10:20j, 0:5:10j, "hello", False, 5]
+
+
+def test_named_transform_proxy():
+    """
+        Test named transform proxy -- whether NamedHist transform proxy works properly.
+    """
+
+    h0 = NamedHist().Sqrt(3, 4, 25, name="x").Sqrt(4, 25, 81, name="y")
+    h0.fill(x=[5, 10, 17, 17], y=[26, 37, 50, 65])
+    assert h0[0, 0] == 1
+    assert h0[1, 1] == 1
+    assert h0[2, 2] == 1
+    assert h0[2, 3] == 1
+
+    # based on existing axis
+    with pytest.raises(Exception):
+        NamedHist().Regular(3, 4, 25, name="x").Sqrt()
+
+    # wrong value
+    with pytest.raises(Exception):
+        NamedHist().Sqrt(3, -4, 25, name="x")
+
+    h1 = NamedHist().Log(4, 1, 10_000, name="x").Log(3, 1 / 1_000, 1, name="y")
+    h1.fill(x=[2, 11, 101, 1_001], y=[1 / 999, 1 / 99, 1 / 9, 1 / 9])
+    assert h1[0, 0] == 1
+    assert h1[1, 1] == 1
+    assert h1[2, 2] == 1
+    assert h1[3, 2] == 1
+
+    # based on existing axis
+    with pytest.raises(Exception):
+        NamedHist().Regular(4, 1, 10_000, name="x").Log()
+
+    # wrong value
+    with pytest.raises(Exception):
+        NamedHist().Log(3, -1, 10_000, name="x")
+
+    h2 = NamedHist().Pow(24, 1, 5, power=2, name="x").Pow(124, 1, 5, power=3, name="y")
+    h2.fill(x=[1, 2, 3, 4], y=[1, 2, 3, 4])
+    assert h2[0, 0] == 1
+    assert h2[3, 7] == 1
+    assert h2[8, 26] == 1
+    assert h2[15, 63] == 1
+
+    # based on existing axis
+    with pytest.raises(Exception):
+        NamedHist().Regular(24, 1, 5, name="x").Pow(2)
+
+    # wrong value
+    with pytest.raises(Exception):
+        NamedHist().Pow(24, -1, 5, power=1 / 2, name="x")
+
+    # lack args
+    with pytest.raises(Exception):
+        NamedHist().Pow(24, 1, 5, name="x")
+
+    ftype = ctypes.CFUNCTYPE(ctypes.c_double, ctypes.c_double)
+    h3 = (
+        NamedHist()
+        .Func(4, 1, 5, forward=ftype(math.log), inverse=ftype(math.exp), name="x")
+        .Func(4, 1, 5, forward=ftype(np.log), inverse=ftype(np.exp), name="y")
+    )
+    h3.fill(x=[1, 2, 3, 4], y=[1, 2, 3, 4])
+    assert h3[0, 0] == 1
+    assert h3[1, 1] == 1
+    assert h3[2, 2] == 1
+    assert h3[3, 3] == 1
+
+    # based on existing axis
+    with pytest.raises(Exception):
+        NamedHist().Regular(24, 1, 5, name="x").Func(ftype(math.log), ftype(math.exp))
+
+    # wrong value
+    assert NamedHist().Func(
+        4, -1, 5, name="x", forward=ftype(math.log), inverse=ftype(math.log)
+    )
+    with pytest.raises(Exception):
+        NamedHist().Func(
+            4, -1, 5, name="x", forward=ftype(np.log), inverse=ftype(np.log)
+        )
+
+    # lack args
+    with pytest.raises(Exception):
+        NamedHist().Func(4, 1, 5, name="x")
 
 
 def test_named_hist_proxy():
