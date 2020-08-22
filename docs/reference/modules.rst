@@ -3,5 +3,7 @@
 Hist API
 =================
 
-.. toctree::
-   :maxdepth: 2
+.. automodule:: hist.namedhist
+   :members:
+   :undoc-members:
+   :show-inheritance:
