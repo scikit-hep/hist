@@ -90,7 +90,7 @@ This project follows the [all-contributors](https://github.com/all-contributors/
 ## Talks
 
 * [2020-07-07 SciPy Proceedings](https://www.youtube.com/watch?v=ERraTfHkPd0&list=PLYx7XA2nY5GfY4WWJjG5cQZDc7DIUmn6Z&index=4)
-* [2020-07-17 PyHEP2020](https://indico.cern.ch/event/882824/contributions/3931299/) (UPCOMING)
+* [2020-07-17 PyHEP2020](https://indico.cern.ch/event/882824/contributions/3931299/)
 
 ---
 
