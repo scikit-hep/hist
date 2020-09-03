@@ -565,7 +565,7 @@ class BaseHist(bh.Histogram):
 
         # top plot
         top_res = top_ax.step(
-            self.axes.edges[1][0][:-1],
+            self.axes[0].edges[:-1],
             self.project(self.axes[0].name or 0).view(),
             **top_kwargs,
         )
@@ -581,7 +581,7 @@ class BaseHist(bh.Histogram):
         rot = transforms.Affine2D().rotate_deg(90)
 
         side_res = side_ax.step(
-            self.axes.edges[1][0][:-1],
+            self.axes[1].edges[:-1],
             -self.project(self.axes[1].name or 1).view(),
             transform=rot + base,
             **side_kwargs,
