@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 
 def test_general_init():
     """
-        Test general init -- whether Hist can be properly initialized.
+    Test general init -- whether Hist can be properly initialized.
     """
     np.random.seed(42)
 
@@ -71,7 +71,10 @@ def test_general_init():
 
     assert Hist(axis.Integer(-3, 3), axis.Integer(-3, 3))
 
-    assert Hist(axis.IntCategory(range(-3, 3)), axis.IntCategory(range(-3, 3)),)
+    assert Hist(
+        axis.IntCategory(range(-3, 3)),
+        axis.IntCategory(range(-3, 3)),
+    )
 
     assert Hist(axis.StrCategory("TF"), axis.StrCategory(["T", "F"]))
 
@@ -102,7 +105,7 @@ def test_general_init():
 
 def test_general_fill():
     """
-        Test general fill -- whether Hist can be properly filled.
+    Test general fill -- whether Hist can be properly filled.
     """
 
     # Regular
@@ -130,7 +133,9 @@ def test_general_fill():
 
     # Boolean
     h = Hist(
-        axis.Boolean(name="x"), axis.Boolean(name="y"), axis.Boolean(name="z"),
+        axis.Boolean(name="x"),
+        axis.Boolean(name="y"),
+        axis.Boolean(name="z"),
     ).fill(
         [True, True, True, True, True, False, True],
         [False, True, True, False, False, True, False],
@@ -268,7 +273,7 @@ def test_general_fill():
 
 def test_general_access():
     """
-        Test general access -- whether Hist bins can be accessed.
+    Test general access -- whether Hist bins can be accessed.
     """
 
     h = Hist(axis.Regular(10, -5, 5, name="X", label="x [units]")).fill(
@@ -301,7 +306,7 @@ def test_general_access():
 
 def test_general_project():
     """
-        Test general project -- whether Hist can be projected properly.
+    Test general project -- whether Hist can be projected properly.
     """
     h = Hist(
         axis.Regular(
@@ -358,7 +363,7 @@ def test_general_project():
 
 def test_general_plot1d():
     """
-        Test general plot1d -- whether 1d-Hist can be plotted properly.
+    Test general plot1d -- whether 1d-Hist can be plotted properly.
     """
 
     h = Hist(
@@ -396,7 +401,7 @@ def test_general_plot1d():
 
 def test_general_plot2d():
     """
-        Test general plot2d -- whether 2d-Hist can be plotted properly.
+    Test general plot2d -- whether 2d-Hist can be plotted properly.
     """
 
     h = Hist(
@@ -436,7 +441,7 @@ def test_general_plot2d():
 
 def test_general_plot2d_full():
     """
-        Test general plot2d_full -- whether 2d-Hist can be fully plotted properly.
+    Test general plot2d_full -- whether 2d-Hist can be fully plotted properly.
     """
 
     h = Hist(
@@ -487,7 +492,7 @@ def test_general_plot2d_full():
 
 def test_general_plot():
     """
-        Test general plot -- whether Hist can be plotted properly.
+    Test general plot -- whether Hist can be plotted properly.
     """
 
     h = Hist(
@@ -546,7 +551,7 @@ def test_general_plot():
 
 def test_general_plot_pull():
     """
-        Test general plot_pull -- whether 1d-Hist can be plotted pull properly.
+    Test general plot_pull -- whether 1d-Hist can be plotted pull properly.
     """
 
     h = Hist(
@@ -657,7 +662,7 @@ def test_general_plot_pull():
 
 def test_general_index_access():
     """
-        Test general index access -- whether Hist can be accessed by index.
+    Test general index access -- whether Hist can be accessed by index.
     """
 
     h = Hist(
@@ -786,7 +791,7 @@ class test_general_storage_proxy:
 
 def test_general_transform_proxy():
     """
-        Test general transform proxy -- whether Hist transform proxy works properly.
+    Test general transform proxy -- whether Hist transform proxy works properly.
     """
 
     h0 = Hist().Sqrt(3, 4, 25).Sqrt(4, 25, 81)
@@ -866,7 +871,7 @@ def test_general_transform_proxy():
 
 def test_general_hist_proxy():
     """
-        Test general hist proxy -- whether Hist hist proxy works properly.
+    Test general hist proxy -- whether Hist hist proxy works properly.
     """
 
     h = Hist.Reg(10, 0, 1, name="x").fill([0.5, 0.5])
@@ -976,7 +981,7 @@ def test_general_hist_proxy():
 
 def test_general_density():
     """
-        Test general density -- whether Hist density work properly.
+    Test general density -- whether Hist density work properly.
     """
 
     for data in range(10, 20, 10):
@@ -986,7 +991,7 @@ def test_general_density():
 
 def test_general_axestuple():
     """
-        Test general axes tuple -- whether Hist axes tuple work properly.
+    Test general axes tuple -- whether Hist axes tuple work properly.
     """
 
     h = Hist(

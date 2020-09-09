@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 
 def test_named_init():
     """
-        Test named init -- whether NamedHist can be properly initialized.
+    Test named init -- whether NamedHist can be properly initialized.
     """
 
     # basic
@@ -98,9 +98,10 @@ def test_named_init():
         )
 
     with pytest.raises(Exception):
-        NamedHist(axis.IntCategory(range(-3, 3)), axis.IntCategory(range(-3, 3)),).fill(
-            x=np.random.randn(10), y=np.random.randn(10)
-        )
+        NamedHist(
+            axis.IntCategory(range(-3, 3)),
+            axis.IntCategory(range(-3, 3)),
+        ).fill(x=np.random.randn(10), y=np.random.randn(10))
 
     with pytest.raises(Exception):
         NamedHist(axis.StrCategory(["F", "T"]), axis.StrCategory("FT")).fill(
@@ -136,7 +137,7 @@ def test_named_init():
 
 def test_named_fill():
     """
-        Test named fill -- whether NamedHist can be properly filled.
+    Test named fill -- whether NamedHist can be properly filled.
     """
 
     # Regular
@@ -180,7 +181,9 @@ def test_named_fill():
 
     # Boolean
     h = NamedHist(
-        axis.Boolean(name="x"), axis.Boolean(name="y"), axis.Boolean(name="z"),
+        axis.Boolean(name="x"),
+        axis.Boolean(name="y"),
+        axis.Boolean(name="z"),
     ).fill(
         x=[True, True, True, True, True, False, True],
         y=[False, True, True, False, False, True, False],
@@ -404,7 +407,7 @@ def test_named_fill():
 
 def test_named_access():
     """
-        Test named access -- whether NamedHist bins can be accessed.
+    Test named access -- whether NamedHist bins can be accessed.
     """
 
     h = NamedHist(axis.Regular(10, -5, 5, name="X", label="x [units]")).fill(
@@ -515,7 +518,7 @@ class test_named_storage_proxy:
 
 def test_named_project():
     """
-        Test named project -- whether NamedHist can be projected properly.
+    Test named project -- whether NamedHist can be projected properly.
     """
 
     h = NamedHist(
@@ -575,7 +578,7 @@ def test_named_project():
 
 def test_named_plot1d():
     """
-        Test named plot1d -- whether 1d-NamedHist can be plotted properly.
+    Test named plot1d -- whether 1d-NamedHist can be plotted properly.
     """
 
     h = NamedHist(
@@ -613,7 +616,7 @@ def test_named_plot1d():
 
 def test_named_plot2d():
     """
-        Test named plot2d -- whether 2d-NamedHist can be plotted properly.
+    Test named plot2d -- whether 2d-NamedHist can be plotted properly.
     """
 
     h = NamedHist(
@@ -654,7 +657,7 @@ def test_named_plot2d():
 
 def test_named_plot2d_full():
     """
-        Test named plot2d_full -- whether 2d-NamedHist can be fully plotted properly.
+    Test named plot2d_full -- whether 2d-NamedHist can be fully plotted properly.
     """
 
     h = NamedHist(
@@ -706,7 +709,7 @@ def test_named_plot2d_full():
 
 def test_named_plot():
     """
-        Test named plot -- whether NamedHist can be plotted properly.
+    Test named plot -- whether NamedHist can be plotted properly.
     """
 
     h = NamedHist(
@@ -768,7 +771,7 @@ def test_named_plot():
 
 def test_named_plot_pull():
     """
-        Test named plot_pull -- whether 1d-NamedHist can be plotted pull properly.
+    Test named plot_pull -- whether 1d-NamedHist can be plotted pull properly.
     """
 
     h = NamedHist(
@@ -882,7 +885,7 @@ def test_named_plot_pull():
 
 def test_named_index_access():
     """
-        Test named index access -- whether NamedHist can be accessed by index.
+    Test named index access -- whether NamedHist can be accessed by index.
     """
 
     h = NamedHist(
@@ -956,7 +959,7 @@ def test_named_index_access():
 
 def test_named_transform_proxy():
     """
-        Test named transform proxy -- whether NamedHist transform proxy works properly.
+    Test named transform proxy -- whether NamedHist transform proxy works properly.
     """
 
     h0 = NamedHist().Sqrt(3, 4, 25, name="x").Sqrt(4, 25, 81, name="y")
@@ -1040,7 +1043,7 @@ def test_named_transform_proxy():
 
 def test_named_hist_proxy():
     """
-        Test named hist proxy -- whether NamedHist hist proxy works properly.
+    Test named hist proxy -- whether NamedHist hist proxy works properly.
     """
 
     h = NamedHist.Reg(10, 0, 1, name="x").fill(x=[0.5, 0.5])
@@ -1157,7 +1160,7 @@ def test_named_hist_proxy():
 
 def test_named_density():
     """
-        Test named density -- whether NamedHist density work properly.
+    Test named density -- whether NamedHist density work properly.
     """
 
     for data in range(10, 20, 10):
@@ -1167,7 +1170,7 @@ def test_named_density():
 
 def test_named_axestuple():
     """
-        Test named axes tuple -- whether NamedHist axes tuple work properly.
+    Test named axes tuple -- whether NamedHist axes tuple work properly.
     """
 
     h = NamedHist(

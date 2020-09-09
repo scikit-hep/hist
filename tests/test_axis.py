@@ -4,7 +4,7 @@ from hist import axis
 
 def test_axis_names():
     """
-        Test axis names -- whether axis names work.
+    Test axis names -- whether axis names work.
     """
 
     assert axis.Regular(50, -3, 3, name="x0")

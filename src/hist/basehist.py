@@ -41,7 +41,7 @@ class BaseHist(bh.Histogram):
 
     def __init__(self, *args, storage: Optional[Storage] = None, metadata=None):
         """
-            Initialize BaseHist object. Axis params can contain the names.
+        Initialize BaseHist object. Axis params can contain the names.
         """
         # TODO: Make a base class type Axis for Hist
         self._ax: List[bh.axis.Axes] = []
@@ -296,7 +296,7 @@ class BaseHist(bh.Histogram):
 
     def _loc_shortcut(self, x):
         """
-            Convert some specific indices to location.
+        Convert some specific indices to location.
         """
 
         if isinstance(x, slice):
@@ -317,7 +317,7 @@ class BaseHist(bh.Histogram):
 
     def _step_shortcut(self, x):
         """
-            Convert some specific indices to step.
+        Convert some specific indices to step.
         """
 
         if isinstance(x, complex):
@@ -332,7 +332,7 @@ class BaseHist(bh.Histogram):
 
     def _index_transform(self, index):
         """
-            Auxiliary function for __getitem__ and __setitem__.
+        Auxiliary function for __getitem__ and __setitem__.
         """
 
         if isinstance(index, dict):
@@ -355,14 +355,14 @@ class BaseHist(bh.Histogram):
 
     def __getitem__(self, index):
         """
-            Get histogram item.
+        Get histogram item.
         """
 
         return super().__getitem__(self._index_transform(index))
 
     def __setitem__(self, index, value):
         """
-            Set histogram item.
+        Set histogram item.
         """
 
         return super().__setitem__(self._index_transform(index), value)
@@ -614,9 +614,7 @@ class BaseHist(bh.Histogram):
         fig: Optional[matplotlib.figure.Figure] = None,
         ax_dict: Optional[Dict[str, matplotlib.axes.Axes]] = None,
         **kwargs,
-    ) -> Tuple[
-        matplotlib.collections.QuadMesh, matplotlib.lines.Line2D,
-    ]:
+    ) -> Tuple[matplotlib.collections.QuadMesh, matplotlib.lines.Line2D,]:
         """
         Plot_pull method for BaseHist object.
         """

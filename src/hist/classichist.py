@@ -40,7 +40,9 @@ def main():
         plt.savefig(args.output_image)
     else:
         print_hist(
-            h, label=args.label, summary=True,
+            h,
+            label=args.label,
+            summary=True,
         )
 
 

@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 
 def test_base_init():
     """
-        Test base init -- whether BaseHist can be properly initialized.
+    Test base init -- whether BaseHist can be properly initialized.
     """
 
     # basic
@@ -70,7 +70,10 @@ def test_base_init():
 
     assert BaseHist(axis.Integer(-3, 3), axis.Integer(-3, 3))
 
-    assert BaseHist(axis.IntCategory(range(-3, 3)), axis.IntCategory(range(-3, 3)),)
+    assert BaseHist(
+        axis.IntCategory(range(-3, 3)),
+        axis.IntCategory(range(-3, 3)),
+    )
 
     assert BaseHist(axis.StrCategory("TF"), axis.StrCategory(["T", "F"]))
 
@@ -103,7 +106,7 @@ def test_base_init():
 
 def test_base_fill():
     """
-        Test base fill -- whether BaseHist can be properly filled.
+    Test base fill -- whether BaseHist can be properly filled.
     """
 
     # Regular
@@ -131,7 +134,9 @@ def test_base_fill():
 
     # Boolean
     h = BaseHist(
-        axis.Boolean(name="x"), axis.Boolean(name="y"), axis.Boolean(name="z"),
+        axis.Boolean(name="x"),
+        axis.Boolean(name="y"),
+        axis.Boolean(name="z"),
     ).fill(
         [True, True, True, True, True, False, True],
         [False, True, True, False, False, True, False],
@@ -269,7 +274,7 @@ def test_base_fill():
 
 def test_base_access():
     """
-        Test base access -- whether BaseHist bins can be accessed.
+    Test base access -- whether BaseHist bins can be accessed.
     """
 
     h = BaseHist(axis.Regular(10, -5, 5, name="X", label="x [units]")).fill(
@@ -302,7 +307,7 @@ def test_base_access():
 
 def test_base_project():
     """
-        Test base project -- whether BaseHist can be projected properly.
+    Test base project -- whether BaseHist can be projected properly.
     """
 
     h = BaseHist(
@@ -360,7 +365,7 @@ def test_base_project():
 
 def test_base_plot1d():
     """
-        Test base plot1d -- whether 1d-BaseHist can be plotted properly.
+    Test base plot1d -- whether 1d-BaseHist can be plotted properly.
     """
 
     h = BaseHist(
@@ -395,7 +400,7 @@ def test_base_plot1d():
 
 def test_base_plot2d():
     """
-        Test base plot2d -- whether 2d-BaseHist can be plotted properly.
+    Test base plot2d -- whether 2d-BaseHist can be plotted properly.
     """
 
     h = BaseHist(
@@ -433,7 +438,7 @@ def test_base_plot2d():
 
 def test_base_plot2d_full():
     """
-        Test base plot2d_full -- whether 2d-BaseHist can be fully plotted properly.
+    Test base plot2d_full -- whether 2d-BaseHist can be fully plotted properly.
     """
 
     h = BaseHist(
@@ -482,7 +487,7 @@ def test_base_plot2d_full():
 
 def test_base_plot():
     """
-        Test base plot -- whether BaseHist can be plotted properly.
+    Test base plot -- whether BaseHist can be plotted properly.
     """
 
     h = BaseHist(
@@ -539,7 +544,7 @@ def test_base_plot():
 
 def test_base_plot_pull():
     """
-        Test base plot_pull -- whether 1d-BaseHist can be plotted pull properly.
+    Test base plot_pull -- whether 1d-BaseHist can be plotted pull properly.
     """
 
     h = BaseHist(
@@ -656,7 +661,7 @@ def test_base_plot_pull():
 
 def test_base_index_access():
     """
-        Test base index access -- whether BaseHist can be accessed by index.
+    Test base index access -- whether BaseHist can be accessed by index.
     """
 
     h = BaseHist(
@@ -780,7 +785,7 @@ class test_base_storage_proxy:
 
 def test_base_transform_proxy():
     """
-        Test base transform proxy -- whether BaseHist transform proxy works properly.
+    Test base transform proxy -- whether BaseHist transform proxy works properly.
     """
 
     h0 = BaseHist().Sqrt(3, 4, 25).Sqrt(4, 25, 81)
@@ -860,7 +865,7 @@ def test_base_transform_proxy():
 
 def test_base_hist_proxy():
     """
-        Test base hist proxy -- whether BaseHist hist proxy works properly.
+    Test base hist proxy -- whether BaseHist hist proxy works properly.
     """
     h = BaseHist.Reg(10, 0, 1, name="x").fill([0.5, 0.5])
     assert h[0.5j] == 2
@@ -976,7 +981,7 @@ def test_base_hist_proxy():
 
 def test_base_density():
     """
-        Test base density -- whether BaseHist density work properly.
+    Test base density -- whether BaseHist density work properly.
     """
 
     for data in range(10, 20, 10):
@@ -986,7 +991,7 @@ def test_base_density():
 
 def test_base_axestuple():
     """
-        Test base axes tuple -- whether BaseHist axes tuple work properly.
+    Test base axes tuple -- whether BaseHist axes tuple work properly.
     """
 
     h = BaseHist(
