@@ -371,11 +371,8 @@ class BaseHist(bh.Histogram):
         """
         Density numpy array.
         """
-        # ToDo: maybe should not be filled
-        # ToDo: flow should be removed
-        return self.view() / (
-            self.sum() * functools.reduce(operator.mul, self.axes.widths)
-        )
+        total = self.sum() * functools.reduce(operator.mul, self.axes.widths)
+        return self.view() / np.where(total > 0, total, 1)
 
     def show(self, **kwargs):
         """
