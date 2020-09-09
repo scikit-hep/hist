@@ -81,7 +81,7 @@ class Regular(bha.Regular, AxesMixin):
         overflow: bool = True,
         growth: bool = False,
         circular: bool = False,
-        transform: bha.transform.Function = None
+        transform: bha.transform.Function = None,
     ) -> None:
         metadata: Dict[str, Any] = {"name": name or "", "label": label or ""}
         super().__init__(
@@ -95,6 +95,29 @@ class Regular(bha.Regular, AxesMixin):
             circular=circular,
             transform=transform,
         )
+
+    def _repr_kwargs(self):
+        """
+        Return options for use in repr.
+        """
+
+        ret = ""
+        if self.options.growth:
+            ret += ", growth=True"
+        elif self.options.circular:
+            ret += ", circular=True"
+        else:
+            if not self.options.underflow:
+                ret += ", underflow=False"
+            if not self.options.overflow:
+                ret += ", overflow=False"
+
+        if self.name:
+            ret += f", name={self.name!r}"
+        if self.label:
+            ret += f", label={self.label!r}"
+
+        return ret
 
 
 @hist.utils.set_family(hist.utils.HIST_FAMILY)
@@ -118,7 +141,7 @@ class Variable(bha.Variable, AxesMixin):
         label: str = None,
         underflow: bool = True,
         overflow: bool = True,
-        growth: bool = False
+        growth: bool = False,
     ) -> None:
         metadata: Dict[str, Any] = {"name": name or "", "label": label or ""}
         super().__init__(
@@ -143,7 +166,7 @@ class Integer(bha.Integer, AxesMixin):
         label: str = None,
         underflow: bool = True,
         overflow: bool = True,
-        growth: bool = False
+        growth: bool = False,
     ) -> None:
         metadata: Dict[str, Any] = {"name": name or "", "label": label or ""}
         super().__init__(
@@ -166,7 +189,7 @@ class IntCategory(bha.IntCategory, AxesMixin):
         *,
         name: str = None,
         label: str = None,
-        growth: bool = False
+        growth: bool = False,
     ) -> None:
         metadata: Dict[str, Any] = {"name": name or "", "label": label or ""}
         super().__init__(categories, metadata=metadata, growth=growth)
@@ -182,7 +205,7 @@ class StrCategory(bha.StrCategory, AxesMixin):
         *,
         name: str = None,
         label: str = None,
-        growth: bool = False
+        growth: bool = False,
     ) -> None:
         metadata: Dict[str, Any] = {"name": name or "", "label": label or ""}
         super().__init__(categories, metadata=metadata, growth=growth)
