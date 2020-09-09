@@ -5,9 +5,16 @@ from .svgutils import svg, html, rect, line, text, div, polyline, polygon, circl
 
 
 def desc_hist(h):
-    output = "<br/>".join(str(h) for h in h.axes)
-    output += '<br/><hr style="margin-top:.2em; margin-bottom:.2em;"/>'
-    output += f"Sum: {h.sum()} ({h.sum(flow=True)} with flow)"
+    main_sum = h.sum()
+    flow_too_sum = h.sum(flow=True)
+
+    output = "<br/>\n".join(str(h) for h in h.axes)
+    output += '<br/>\n<hr style="margin-top:.2em; margin-bottom:.2em;"/>\n'
+    output += f"{h._storage_type()} "
+    output += f"Σ {main_sum}"
+    if main_sum != flow_too_sum:
+        output += f" <em>({flow_too_sum} with flow)</em>"
+    output += "\n"
     return output
 
 
@@ -22,6 +29,20 @@ def html_hist(h, function):
     return html(container)
 
 
+def make_text(txt, **kwargs):
+    style = "fill:currentColor;"
+    kwargs["style"] = style + kwargs.get("style", "")
+    if isinstance(txt, float):
+        txt = format(txt, ".3g")
+    return text(txt, text_anchor="middle", **kwargs)
+
+
+def make_ax_text(ax, **kwargs):
+    style = "" if ax.label else "font-family: monospace;"
+    kwargs["style"] = style + kwargs.get("style", "")
+    return make_text(ax.label or ax.name, **kwargs)
+
+
 def svg_hist_1d(h):
     width = 250
     height = 100
@@ -32,32 +53,31 @@ def svg_hist_1d(h):
     (edges,) = h.axes.edges
     norm_edges = (edges - edges[0]) / (edges[-1] - edges[0])
     density = h.density()
-    norm_vals = -density / np.max(density)
+    max_dens = np.max(density) or 1
+    norm_vals = density / max_dens
 
     arr = np.empty((2, len(norm_vals) * 2 + 2), dtype=float)
-    arr[0, 0:-1:2] = arr[0, 1::2] = norm_edges * width
-    arr[1, 1:-2:2] = arr[1, 2:-1:2] = norm_vals * height
+    arr[0, 0:-1:2] = arr[0, 1::2] = width * norm_edges
+    arr[1, 1:-2:2] = arr[1, 2:-1:2] = -height * norm_vals
     arr[1, 0] = arr[1, -1] = 0
 
     points = " ".join(f"{x:3g},{y:.3g}" for x, y in arr.T)
-    bins = polyline(points=points, fill="none", stroke="black")
+    bins = polyline(points=points, style="fill:none; stroke:currentColor;")
 
     ax_line = line(
         x1=-5,
         y1=0,
         x2=width + 5,
         y2=0,
-        style="fill:none;stroke-width:2;stroke:black",
+        style="fill:none;stroke-width:2;stroke:currentColor",
     )
 
-    lower = text(format(edges[0], ".3g"), x=0, y=15, text_anchor="middle")
-    upper = text(format(edges[-1], ".3g"), x=width, y=15, text_anchor="middle")
-    label = text(
-        str(h.axes[0].name or h.axes[0].label),
+    lower = make_text(edges[0], x=0, y=15)
+    upper = make_text(edges[-1], x=width, y=15)
+    label = make_ax_text(
+        h.axes[0],
         x=width / 2,
         y=15,
-        style="font-family: monospace",
-        text_anchor="middle",
     )
 
     return svg(
@@ -82,7 +102,8 @@ def svg_hist_1d_c(h):
     (edges,) = h.axes.edges
     norm_edges = (edges - edges[0]) / (edges[-1] - edges[0]) * np.pi * 2
     density = h.density()
-    norm_vals = density / np.max(density)
+    max_dens = np.max(density) or 1
+    norm_vals = density / max_dens
 
     arr = np.empty((2, len(norm_vals) * 2), dtype=float)
     arr[0, :-1:2] = arr[0, 1::2] = norm_edges[:-1]
@@ -93,13 +114,13 @@ def svg_hist_1d_c(h):
     ys = arr[1] * np.sin(arr[0])
 
     points = " ".join(f"{x:3g},{y:.3g}" for x, y in zip(xs, ys))
-    bins = polygon(points=points, fill="none", stroke="black")
+    bins = polygon(points=points, style="fill:none; stroke:currentColor;")
 
     center = circle(
         cx="0",
         cy="0",
         r=f"{inner_radius}",
-        style="fill:none;stroke-width:2;stroke:black",
+        style="fill:none;stroke-width:2;stroke:currentColor",
     )
 
     return svg(bins, center, viewBox=f"{-width/2} {-height/2} {width} {height}")
@@ -115,7 +136,8 @@ def svg_hist_2d(h):
     ey = -(e1 - e1[0]) / (e1[-1] - e1[0]) * height
 
     density = h.density()
-    norm_vals = density / np.max(density)
+    max_dens = np.max(density) or 1
+    norm_vals = density / max_dens
 
     boxes = []
     for r, (up_edge, bottom_edge) in enumerate(zip(ey[:-1], ey[1:])):
@@ -130,28 +152,25 @@ def svg_hist_2d(h):
                     width=round(abs(wt), 3),
                     height=round(abs(ht), 3),
                     opacity=opacity,
+                    fill="currentColor",
                     stroke_width=0.1,
                 )
             )
 
     texts = [
-        text(f"{e0[0]:.3g}", x=0, y=13, text_anchor="middle"),
-        text(f"{e0[-1]:.3g}", x=width, y=13, text_anchor="middle"),
-        text(f"{e1[0]:.3g}", x=-10, y=0, text_anchor="middle"),
-        text(f"{e1[-1]:.3g}", x=-10, y=-height, text_anchor="middle"),
-        text(
-            h.axes[0].name or h.axes[0].label,
+        make_text(e0[0], x=0, y=13),
+        make_text(e0[-1], x=width, y=13),
+        make_text(e1[0], x=-10, y=0),
+        make_text(e1[-1], x=-10, y=-height),
+        make_ax_text(
+            h.axes[0],
             x=width / 2,
             y=13,
-            style="font-family: monospace",
-            text_anchor="middle",
         ),
-        text(
-            h.axes[1].name or h.axes[1].label,
+        make_ax_text(
+            h.axes[1],
             x=-10,
             y=-height / 2,
-            style="font-family: monospace",
-            text_anchor="middle",
             transform=f"rotate(-90,{-10},{-height/2})",
         ),
     ]
@@ -171,7 +190,7 @@ def svg_hist_nd(h):
             y=20 * i,
             width=width - 40,
             height=height - 40,
-            style="fill:white;stroke-width:2;stroke:black;",
+            style="fill:white;opacity:.5;stroke-width:2;stroke:currentColor;",
         )
         for i in range(3)
     ]
@@ -180,7 +199,7 @@ def svg_hist_nd(h):
         f"{h.ndim}D",
         x=height / 2 + 20,
         y=width / 2 + 20,
-        style="font-size: 26pt; font-family: verdana; font-style: bold;",
+        style="font-size: 26pt; font-family: verdana; font-style: bold; fill: black;",
         text_anchor="middle",
         alignment_baseline="middle",
     )
