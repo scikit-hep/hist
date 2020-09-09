@@ -43,7 +43,11 @@ def svg_hist_1d(h):
     bins = polyline(points=points, fill="none", stroke="black")
 
     ax_line = line(
-        x1=-5, y1=0, x2=width + 5, y2=0, style="fill:none;stroke-width:2;stroke:black",
+        x1=-5,
+        y1=0,
+        x2=width + 5,
+        y2=0,
+        style="fill:none;stroke-width:2;stroke:black",
     )
 
     lower = text(format(edges[0], ".3g"), x=0, y=15, text_anchor="middle")

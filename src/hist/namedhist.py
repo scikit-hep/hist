@@ -6,7 +6,7 @@ from typing import Union, Optional
 class NamedHist(BaseHist):
     def __init__(self, *args, **kwargs):
         """
-            Initialize NamedHist object. Axis params must contain the names.
+        Initialize NamedHist object. Axis params must contain the names.
         """
 
         super().__init__(*args, **kwargs)
@@ -47,7 +47,7 @@ class NamedHist(BaseHist):
 
     def __getitem__(self, index):
         """
-            Get histogram item.
+        Get histogram item.
         """
 
         if isinstance(index, dict):
@@ -60,7 +60,7 @@ class NamedHist(BaseHist):
 
     def __setitem__(self, index, value):
         """
-            Set histogram item.
+        Set histogram item.
         """
 
         if isinstance(index, dict):
