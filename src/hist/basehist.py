@@ -19,6 +19,7 @@ from hist.storage import Storage
 
 from .axis import Regular, Boolean, Variable, Integer, IntCategory, StrCategory
 from .axestuple import NamedAxesTuple
+from .svgplots import html_hist, svg_hist_1d, svg_hist_1d_c, svg_hist_2d, svg_hist_nd
 
 
 class always_normal_method:
@@ -75,6 +76,18 @@ class BaseHist(bh.Histogram):
         """
 
         return NamedAxesTuple(self._axis(i) for i in range(self.ndim))
+
+    def _repr_html_(self):
+        if self.ndim == 1:
+            if self.axes[0].options.circular:
+                return str(html_hist(self, svg_hist_1d_c))
+            else:
+                return str(html_hist(self, svg_hist_1d))
+        elif self.ndim == 2:
+            return str(html_hist(self, svg_hist_2d))
+        elif self.ndim > 2:
+            return str(html_hist(self, svg_hist_nd))
+        return str(self)
 
     @always_normal_method
     def Reg(self, *args, **kwargs):
