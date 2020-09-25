@@ -30,10 +30,15 @@ __all__ = (
 )
 
 
+class CoreAxisProtocol(Protocol):
+    metadata: Dict[str, Any]
+
+
 class AxisProtocol(Protocol):
     metadata: Any
     name: str
     label: str
+    _ax: CoreAxisProtocol
 
 
 class AxesMixin:
@@ -44,29 +49,35 @@ class AxesMixin:
         """
         Get or set the name for the Regular axis
         """
-        return self.metadata.get("name", "") if isinstance(self.metadata, dict) else ""
-
-    @name.setter
-    def name(self: AxisProtocol, value: str) -> None:
-        self.metadata["name"] = value
+        return self._ax.metadata.get("name", "")
 
     @property
     def label(self: AxisProtocol) -> str:
         """
         Get or set the label for the Regular axis
         """
-        label = (
-            self.metadata.get("label", "") if isinstance(self.metadata, dict) else ""
-        )
-        return label or self.name
+        return self._ax.metadata.get("label", "") or self.name
 
     @label.setter
     def label(self: AxisProtocol, value: str) -> None:
-        self.metadata["label"] = value
+        self._ax.metadata["label"] = value
+
+    def _repr_kwargs(self: AxisProtocol):
+        """
+        Return options for use in repr.
+        """
+        ret = super()._repr_kwargs()  # type: ignore
+
+        if self.name:
+            ret += f", name={self.name!r}"
+        if self.label:
+            ret += f", label={self.label!r}"
+
+        return ret
 
 
 @hist.utils.set_family(hist.utils.HIST_FAMILY)
-class Regular(bha.Regular, AxesMixin):
+class Regular(AxesMixin, bha.Regular):
     __slots__ = ()
 
     def __init__(
@@ -75,15 +86,15 @@ class Regular(bha.Regular, AxesMixin):
         start: float,
         stop: float,
         *,
-        name: str = None,
-        label: str = None,
+        name: str = "",
+        label: str = "",
+        metadata: Any = None,
         underflow: bool = True,
         overflow: bool = True,
         growth: bool = False,
         circular: bool = False,
         transform: bha.transform.Function = None,
     ) -> None:
-        metadata: Dict[str, Any] = {"name": name or "", "label": label or ""}
         super().__init__(
             bins,
             start,
@@ -95,38 +106,20 @@ class Regular(bha.Regular, AxesMixin):
             circular=circular,
             transform=transform,
         )
-
-    def _repr_kwargs(self):
-        """
-        Return options for use in repr.
-        """
-
-        ret = ""
-        if self.options.growth:
-            ret += ", growth=True"
-        elif self.options.circular:
-            ret += ", circular=True"
-        else:
-            if not self.options.underflow:
-                ret += ", underflow=False"
-            if not self.options.overflow:
-                ret += ", overflow=False"
-
-        if self.name:
-            ret += f", name={self.name!r}"
-        if self.label:
-            ret += f", label={self.label!r}"
-
-        return ret
+        self._ax.metadata["name"] = name
+        self.label = label
 
 
 @hist.utils.set_family(hist.utils.HIST_FAMILY)
-class Boolean(bha.Boolean, AxesMixin):
+class Boolean(AxesMixin, bha.Boolean):
     __slots__ = ()
 
-    def __init__(self, *, name: str = None, label: str = None) -> None:
-        metadata: Dict[str, Any] = {"name": name or "", "label": label or ""}
+    def __init__(
+        self, *, name: str = "", label: str = "", metadata: Any = None
+    ) -> None:
         super().__init__(metadata=metadata)
+        self._ax.metadata["name"] = name
+        self.label = label
 
 
 @hist.utils.set_family(hist.utils.HIST_FAMILY)
@@ -137,13 +130,13 @@ class Variable(bha.Variable, AxesMixin):
         self,
         edges: Union[range, List[float]],
         *,
-        name: str = None,
-        label: str = None,
+        name: str = "",
+        label: str = "",
         underflow: bool = True,
         overflow: bool = True,
         growth: bool = False,
+        metadata: Any = None,
     ) -> None:
-        metadata: Dict[str, Any] = {"name": name or "", "label": label or ""}
         super().__init__(
             edges,
             metadata=metadata,
@@ -151,6 +144,8 @@ class Variable(bha.Variable, AxesMixin):
             overflow=overflow,
             growth=growth,
         )
+        self._ax.metadata["name"] = name
+        self.label = label
 
 
 @hist.utils.set_family(hist.utils.HIST_FAMILY)
@@ -162,13 +157,13 @@ class Integer(bha.Integer, AxesMixin):
         start: int,
         stop: int,
         *,
-        name: str = None,
-        label: str = None,
+        name: str = "",
+        label: str = "",
         underflow: bool = True,
         overflow: bool = True,
         growth: bool = False,
+        metadata: Any = None,
     ) -> None:
-        metadata: Dict[str, Any] = {"name": name or "", "label": label or ""}
         super().__init__(
             start,
             stop,
@@ -177,6 +172,8 @@ class Integer(bha.Integer, AxesMixin):
             overflow=overflow,
             growth=growth,
         )
+        self._ax.metadata["name"] = name
+        self.label = label
 
 
 @hist.utils.set_family(hist.utils.HIST_FAMILY)
@@ -187,12 +184,14 @@ class IntCategory(bha.IntCategory, AxesMixin):
         self,
         categories: Union[range, List[int]] = None,
         *,
-        name: str = None,
-        label: str = None,
+        name: str = "",
+        label: str = "",
         growth: bool = False,
+        metadata: Any = None,
     ) -> None:
-        metadata: Dict[str, Any] = {"name": name or "", "label": label or ""}
         super().__init__(categories, metadata=metadata, growth=growth)
+        self._ax.metadata["name"] = name
+        self.label = label
 
 
 @hist.utils.set_family(hist.utils.HIST_FAMILY)
@@ -203,9 +202,11 @@ class StrCategory(bha.StrCategory, AxesMixin):
         self,
         categories: Union[str, List[str]] = None,
         *,
-        name: str = None,
-        label: str = None,
+        name: str = "",
+        label: str = "",
         growth: bool = False,
+        metadata: Any = None,
     ) -> None:
-        metadata: Dict[str, Any] = {"name": name or "", "label": label or ""}
         super().__init__(categories, metadata=metadata, growth=growth)
+        self._ax.metadata["name"] = name
+        self.label = label
