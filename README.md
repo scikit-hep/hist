@@ -3,15 +3,16 @@
 [![Github Actions badge](https://github.com/scikit-hep/hist/workflows/CI/badge.svg)](https://github.com/scikit-hep/hist/actions)
 [![Join the chat at https://gitter.im/Scikit-HEP/hist](https://badges.gitter.im/HSF/PyHEP-histogramming.svg)](https://gitter.im/HSF/PyHEP-histogramming?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Scikit-HEP][sk-badge]](https://scikit-hep.org/)
 
-Hist is a analyst friendly front-end for [boost-histogram](https://github.com/scikit-hep/boost-histogram).
+Hist is a analyst friendly front-end for [boost-histogram](https://github.com/scikit-hep/boost-histogram), written in Python 3.
 
 ## Installation
 
 You can install this library from [PyPI](https://pypi.org/project/hist/) with pip:
 
 ```bash
-python -m pip install hist
+python3 -m pip install hist
 ```
 
 ## Usage
@@ -99,3 +100,5 @@ This project follows the [all-contributors](https://github.com/all-contributors/
 This library was primarily developed by Henry Schreiner and Nino Lau.
 
 Support for this work was provided by the National Science Foundation cooperative agreement OAC-1836650 (IRIS-HEP) and OAC-1450377 (DIANA/HEP). Any opinions, findings, conclusions or recommendations expressed in this material are those of the authors and do not necessarily reflect the views of the National Science Foundation.
+
+[sk-badge]: https://scikit-hep.org/assets/images/Scikit--HEP-Project-blue.svg
