@@ -17,6 +17,7 @@ To get an idea of creating histograms in Hist looks like, you can take a look at
    :caption: Contents
    :glob:
 
+   changelog
    development/index
    user-guide/index
    examples/index
