@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from typing import Dict, List, Union, Any
+from typing import Dict, List, Union, Any, Optional
 
 import sys
 import boost_histogram.axis as bha
@@ -89,8 +89,9 @@ class Regular(AxesMixin, bha.Regular):
         name: str = "",
         label: str = "",
         metadata: Any = None,
-        underflow: bool = True,
-        overflow: bool = True,
+        flow: bool = True,
+        underflow: Optional[bool] = None,
+        overflow: Optional[bool] = None,
         growth: bool = False,
         circular: bool = False,
         transform: bha.transform.Function = None,
@@ -100,8 +101,8 @@ class Regular(AxesMixin, bha.Regular):
             start,
             stop,
             metadata=metadata,
-            underflow=underflow,
-            overflow=overflow,
+            underflow=flow if underflow is None else underflow,
+            overflow=flow if overflow is None else overflow,
             growth=growth,
             circular=circular,
             transform=transform,
@@ -132,16 +133,17 @@ class Variable(bha.Variable, AxesMixin):
         *,
         name: str = "",
         label: str = "",
-        underflow: bool = True,
-        overflow: bool = True,
+        flow: bool = True,
+        underflow: Optional[bool] = None,
+        overflow: Optional[bool] = None,
         growth: bool = False,
         metadata: Any = None,
     ) -> None:
         super().__init__(
             edges,
             metadata=metadata,
-            underflow=underflow,
-            overflow=overflow,
+            underflow=flow if underflow is None else underflow,
+            overflow=flow if overflow is None else overflow,
             growth=growth,
         )
         self._ax.metadata["name"] = name
@@ -159,8 +161,9 @@ class Integer(bha.Integer, AxesMixin):
         *,
         name: str = "",
         label: str = "",
-        underflow: bool = True,
-        overflow: bool = True,
+        flow: bool = True,
+        underflow: Optional[bool] = None,
+        overflow: Optional[bool] = None,
         growth: bool = False,
         metadata: Any = None,
     ) -> None:
@@ -168,8 +171,8 @@ class Integer(bha.Integer, AxesMixin):
             start,
             stop,
             metadata=metadata,
-            underflow=underflow,
-            overflow=overflow,
+            underflow=flow if underflow is None else underflow,
+            overflow=flow if overflow is None else overflow,
             growth=growth,
         )
         self._ax.metadata["name"] = name
