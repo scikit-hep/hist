@@ -13,3 +13,4 @@ User Guide
    notebooks/Transform
    notebooks/Histogram
    notebooks/Plots
+   notebooks/Reprs
