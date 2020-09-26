@@ -20,3 +20,35 @@ def test_axis_names():
     assert axis.Integer(-3, 3, name="")
     assert axis.IntCategory(range(-3, 3), name="")
     assert axis.StrCategory("FT")
+
+
+def test_axis_flow():
+    assert axis.Regular(9, 0, 8, flow=False) == axis.Regular(
+        9, 0, 8, underflow=False, overflow=False
+    )
+    assert axis.Variable([1, 2, 3], flow=False) == axis.Variable(
+        [1, 2, 3], underflow=False, overflow=False
+    )
+    assert axis.Integer(0, 8, flow=False) == axis.Integer(
+        0, 8, underflow=False, overflow=False
+    )
+
+    assert axis.Regular(9, 0, 8, flow=False, underflow=True) == axis.Regular(
+        9, 0, 8, overflow=False
+    )
+    assert axis.Variable([1, 2, 3], flow=False, underflow=True) == axis.Variable(
+        [1, 2, 3], overflow=False
+    )
+    assert axis.Integer(0, 8, flow=False, underflow=True) == axis.Integer(
+        0, 8, overflow=False
+    )
+
+    assert axis.Regular(9, 0, 8, flow=False, overflow=True) == axis.Regular(
+        9, 0, 8, underflow=False
+    )
+    assert axis.Variable([1, 2, 3], flow=False, overflow=True) == axis.Variable(
+        [1, 2, 3], underflow=False
+    )
+    assert axis.Integer(0, 8, flow=False, overflow=True) == axis.Integer(
+        0, 8, underflow=False
+    )
