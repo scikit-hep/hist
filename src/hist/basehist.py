@@ -437,15 +437,13 @@ class BaseHist(bh.Histogram):
     def plot2d_full(
         self,
         *,
-        fig: Optional[matplotlib.figure.Figure] = None,
         ax_dict: Optional[Dict[str, matplotlib.axes.Axes]] = None,
         **kwargs,
     ) -> Tuple[Hist2DArtists, Hist1DArtists, Hist1DArtists]:
         """
         Plot2d_full method for BaseHist object.
 
-        ``fig`` is a shortcut for plotting to an empty figure. Otherwise,
-        pass a dict of axes to ``ax_dict``.
+        Pass a dict of axes to ``ax_dict``, otherwise, the current figure will be used.
         """
         # Type judgement
         if self.ndim != 2:
@@ -454,22 +452,17 @@ class BaseHist(bh.Histogram):
         if ax_dict is None:
             ax_dict = dict()
 
-        if len(ax_dict) != 0 and len(ax_dict) != 3:
-            raise ValueError("All axes should be all given or none at all")
-
         # Default Figure: construct the figure and axes
-        if fig is not None and len(ax_dict):
-            for kw, ax in ax_dict.items():
-                if kw not in {"main_ax", "top_ax", "side_ax"}:
-                    raise TypeError(f"{kw} is not supported in the ax_dict")
-                if fig != ax.figure:
-                    raise TypeError(
-                        "You cannot pass both a figure and axes that are not shared"
-                    )
+        if ax_dict:
+            try:
+                main_ax = ax_dict["main_ax"]
+                top_ax = ax_dict["top_ax"]
+                side_ax = ax_dict["side_ax"]
+            except KeyError:
+                raise ValueError("All axes should be all given or none at all")
 
-        if not ax_dict:
-            if fig is None:
-                fig = plt.figure()
+        else:
+            fig = plt.gcf()
 
             grid = fig.add_gridspec(
                 2, 2, hspace=0, wspace=0, width_ratios=[4, 1], height_ratios=[1, 4]
@@ -477,14 +470,6 @@ class BaseHist(bh.Histogram):
             main_ax = fig.add_subplot(grid[1, 0])
             top_ax = fig.add_subplot(grid[0, 0], sharex=main_ax)
             side_ax = fig.add_subplot(grid[1, 1], sharey=main_ax)
-
-        else:
-            if fig is not None:
-                raise KeyError("Cannot pass fig and ax_dict!")
-
-            main_ax = ax_dict["main_ax"]
-            top_ax = ax_dict["top_ax"]
-            side_ax = ax_dict["side_ax"]
 
         # keyword arguments
         main_kwargs = _filter_dict(kwargs, "main_", ignore={"main_cbar"})
@@ -535,7 +520,6 @@ class BaseHist(bh.Histogram):
         self,
         func: Callable,
         *,
-        fig: Optional[matplotlib.figure.Figure] = None,
         ax_dict: Optional[Dict[str, matplotlib.axes.Axes]] = None,
         **kwargs,
     ) -> Tuple[matplotlib.axes.Axes, matplotlib.axes.Axes,]:
@@ -553,10 +537,6 @@ class BaseHist(bh.Histogram):
                 "Only 1D-histogram supports pull plot, try projecting to 1D"
             )
 
-        # Default Figure: construct the figure and axes
-        if fig is None:
-            fig = plt.figure()
-
         if ax_dict:
             try:
                 main_ax = ax_dict["main_ax"]
@@ -564,7 +544,9 @@ class BaseHist(bh.Histogram):
             except KeyError:
                 raise ValueError("All axes should be all given or none at all")
         else:
+            fig = plt.gcf()
             grid = fig.add_gridspec(2, 1, hspace=0, height_ratios=[3, 1])
+
             main_ax = fig.add_subplot(grid[0])
             pull_ax = fig.add_subplot(grid[1], sharex=main_ax)
 

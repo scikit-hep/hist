@@ -13,17 +13,24 @@ from .hist import Hist
 from .namedhist import NamedHist
 from .basehist import BaseHist
 
+from .tag import loc, rebin, sum, underflow, overflow
+
 __all__ = (
     "__version__",
-    "axis",
+    "BaseHist",
     "Hist",
     "NamedHist",
-    "BaseHist",
-    "numpy",
-    "tag",
     "accumulators",
-    "utils",
+    "axis",
+    "loc",
+    "numpy",
+    "overflow",
+    "rebin",
     "storage",
+    "sum",
+    "tag",
+    "underflow",
+    "utils",
 )
 
 

@@ -574,10 +574,6 @@ def test_general_plot_pull():
         eb_capsize=1,
         eb_capthick=2,
         eb_alpha=0.8,
-        vp_c="gold",
-        vp_ls="-",
-        vp_lw=8,
-        vp_alpha=0.6,
         fp_c="chocolate",
         fp_ls="-",
         fp_lw=3,
@@ -628,28 +624,18 @@ def test_general_plot_pull():
     with pytest.raises(Exception):
         h.plot_pull(pdf, ecolor="crimson", mfc="crimson")
 
+    # not disabled params
+    h.plot_pull(pdf, eb_label="value")
+
+    h.plot_pull(pdf, fp_label="value")
+
+    h.plot_pull(pdf, ub_label="value")
+
+    h.plot_pull(pdf, bar_label="value")
+
+    h.plot_pull(pdf, pp_label="value")
+
     # disabled params
-    with pytest.raises(Exception):
-        h.plot_pull(pdf, eb_label="value")
-
-    with pytest.raises(Exception):
-        h.plot_pull(pdf, vp_label="value")
-
-    with pytest.raises(Exception):
-        h.plot_pull(pdf, fp_label="value")
-
-    with pytest.raises(Exception):
-        h.plot_pull(pdf, ub_label="value")
-
-    with pytest.raises(Exception):
-        h.plot_pull(pdf, bar_label="value")
-
-    with pytest.raises(Exception):
-        h.plot_pull(pdf, pp_label="value")
-
-    with pytest.raises(Exception):
-        h.plot_pull(pdf, ub_color="value")
-
     with pytest.raises(Exception):
         h.plot_pull(pdf, bar_width="value")
 
