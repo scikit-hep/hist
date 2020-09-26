@@ -19,8 +19,10 @@ import matplotlib.transforms as transforms
 import mplhep
 from scipy.optimize import curve_fit
 from uncertainties import correlated_values, unumpy
-from typing import Callable, Optional, Tuple, Union, Dict, List, Any
+from typing import Callable, Optional, Tuple, Union, Dict, List, Any, Set
 from .svgplots import html_hist, svg_hist_1d, svg_hist_1d_c, svg_hist_2d, svg_hist_nd
+
+from mplhep.plot import Hist1DArtists, Hist2DArtists
 
 
 class always_normal_method:
@@ -34,6 +36,21 @@ class always_normal_method:
 
     def __call__(self, *args, **kwargs):
         return self.method(self.instance, *args, **kwargs)
+
+
+def _filter_dict(
+    dict: Dict[str, Any], prefix: str, *, ignore: Optional[Set[str]] = None
+) -> Dict[str, Any]:
+    """
+    Keyword argument conversion: convert the kwargs to several independent args, pulling
+    them out of the dict given.
+    """
+    ignore_set: Set[str] = ignore or set()
+    return {
+        key[len(prefix) :]: dict.pop(key)
+        for key in list(dict)
+        if key.startswith(prefix) and key not in ignore_set
+    }
 
 
 @hist.utils.set_family(hist.utils.HIST_FAMILY)
@@ -398,7 +415,7 @@ class BaseHist(bh.Histogram):
         *,
         ax: Optional[matplotlib.axes.Axes] = None,
         **kwargs,
-    ) -> matplotlib.axes.Axes:
+    ) -> Hist1DArtists:
         """
         Plot1d method for BaseHist object.
         """
@@ -410,7 +427,7 @@ class BaseHist(bh.Histogram):
         *,
         ax: Optional[matplotlib.axes.Axes] = None,
         **kwargs,
-    ) -> matplotlib.axes.Axes:
+    ) -> Hist2DArtists:
         """
         Plot2d method for BaseHist object.
         """
@@ -423,9 +440,12 @@ class BaseHist(bh.Histogram):
         fig: Optional[matplotlib.figure.Figure] = None,
         ax_dict: Optional[Dict[str, matplotlib.axes.Axes]] = None,
         **kwargs,
-    ) -> Tuple[matplotlib.axes.Axes, matplotlib.axes.Axes, matplotlib.axes.Axes,]:
+    ) -> Tuple[Hist2DArtists, Hist1DArtists, Hist1DArtists]:
         """
         Plot2d_full method for BaseHist object.
+
+        ``fig`` is a shortcut for plotting to an empty figure. Otherwise,
+        pass a dict of axes to ``ax_dict``.
         """
         # Type judgement
         if self.ndim != 2:
@@ -447,72 +467,39 @@ class BaseHist(bh.Histogram):
                         "You cannot pass both a figure and axes that are not shared"
                     )
 
+        if not ax_dict:
+            if fig is None:
+                fig = plt.figure(figsize=(8, 8))
+
+            grid = fig.add_gridspec(2, 2, hspace=0, wspace=0)
+            main_ax = fig.add_subplot(grid[1, 0])
+            top_ax = fig.add_subplot(grid[0, 0], sharex=main_ax)
+            side_ax = fig.add_subplot(grid[0, 1], sharey=main_ax)
+
+        else:
+            if fig is not None:
+                raise KeyError("Cannot pass fig and ax_dict!")
+
             main_ax = ax_dict["main_ax"]
             top_ax = ax_dict["top_ax"]
             side_ax = ax_dict["side_ax"]
 
-        elif fig is None and not len(ax_dict):
-            fig = plt.figure(figsize=(8, 8))
-            grid = fig.add_gridspec(4, 4, hspace=0, wspace=0)
-            main_ax = fig.add_subplot(grid[1:4, 0:3])
-            top_ax = fig.add_subplot(grid[0:1, 0:3], sharex=main_ax)
-            side_ax = fig.add_subplot(grid[1:4, 3:4], sharey=main_ax)
-
-        elif fig is not None and not len(ax_dict):
-            grid = fig.add_gridspec(4, 4, hspace=0, wspace=0)
-            main_ax = fig.add_subplot(grid[1:4, 0:3])
-            top_ax = fig.add_subplot(grid[0:1, 0:3], sharex=main_ax)
-            side_ax = fig.add_subplot(grid[1:4, 3:4], sharey=main_ax)
-
-        elif fig is None and len(ax_dict):
-            main_ax = ax_dict["main_ax"]
-            top_ax = ax_dict["top_ax"]
-            side_ax = ax_dict["side_ax"]
-
-        # Keyword Argument Conversion: convert the kwargs to several independent args
-
-        # main plot keyword arguments
-        main_kwargs = dict()
-        for kw in kwargs.keys():
-            if kw[:4] == "main":
-                # disabled argument
-                if kw == "main_cbar":
-                    pass
-                main_kwargs[kw[5:]] = kwargs[kw]
-
-        for k in main_kwargs:
-            kwargs.pop("main_" + k)
-
-        # top plot keyword arguments
-        top_kwargs = dict()
-        for kw in kwargs.keys():
-            if kw[:3] == "top":
-                top_kwargs[kw[4:]] = kwargs[kw]
-
-        for k in top_kwargs:
-            kwargs.pop("top_" + k)
-
-        # side plot keyword arguments
-        side_kwargs = dict()
-        for kw in kwargs.keys():
-            if kw[:4] == "side":
-                side_kwargs[kw[5:]] = kwargs[kw]
-
-        for k in side_kwargs:
-            kwargs.pop("side_" + k)
+        # keyword arguments
+        main_kwargs = _filter_dict(kwargs, "main_", ignore={"main_cbar"})
+        top_kwargs = _filter_dict(kwargs, "top_")
+        side_kwargs = _filter_dict(kwargs, "side_")
 
         # judge whether some arguments left
         if len(kwargs):
-            raise ValueError(f"'{list(kwargs.keys())[0]}' not needed")
+            raise ValueError(f"{set(kwargs)} not needed")
 
         # Plot: plot the 2d-histogram
 
         # main plot
-        X, Y = self.axes.edges
-        main_ax = mplhep.hist2dplot(self, ax=main_ax, cbar=False, **main_kwargs)
+        main_art = mplhep.hist2dplot(self, ax=main_ax, cbar=False, **main_kwargs)
 
         # top plot
-        top_ax = mplhep.histplot(
+        top_art = mplhep.histplot(
             self.project(self.axes[0].name or 0),
             ax=top_ax,
             **top_kwargs,
@@ -528,9 +515,9 @@ class BaseHist(bh.Histogram):
         base = plt.gca().transData
         rot = transforms.Affine2D().rotate_deg(90)
 
-        side_ax = mplhep.histplot(
-            self.project(self.axes[1].name or 1),
-            ax=side_ax,
+        side_plain_art = side_ax.step(
+            self.axes[1].edges[:-1],
+            -self.project(self.axes[1].name or 1).view(),
             transform=rot + base,
             **side_kwargs,
         )
@@ -540,7 +527,7 @@ class BaseHist(bh.Histogram):
         side_ax.yaxis.set_visible(False)
         side_ax.set_xlabel("Counts")
 
-        return main_ax, top_ax, side_ax
+        return main_art, top_art, mplhep.plot.StepArtists(side_plain_art, None, None)
 
     def plot_pull(
         self,
