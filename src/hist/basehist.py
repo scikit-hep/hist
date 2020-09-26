@@ -469,12 +469,14 @@ class BaseHist(bh.Histogram):
 
         if not ax_dict:
             if fig is None:
-                fig = plt.figure(figsize=(8, 8))
+                fig = plt.figure()
 
-            grid = fig.add_gridspec(2, 2, hspace=0, wspace=0)
+            grid = fig.add_gridspec(
+                2, 2, hspace=0, wspace=0, width_ratios=[4, 1], height_ratios=[1, 4]
+            )
             main_ax = fig.add_subplot(grid[1, 0])
             top_ax = fig.add_subplot(grid[0, 0], sharex=main_ax)
-            side_ax = fig.add_subplot(grid[0, 1], sharey=main_ax)
+            side_ax = fig.add_subplot(grid[1, 1], sharey=main_ax)
 
         else:
             if fig is not None:
@@ -512,12 +514,12 @@ class BaseHist(bh.Histogram):
         top_ax.set_ylabel("Counts")
 
         # side plot
-        base = plt.gca().transData
-        rot = transforms.Affine2D().rotate_deg(90)
+        base = side_ax.transData
+        rot = transforms.Affine2D().rotate_deg(-90)
 
-        side_plain_art = side_ax.step(
-            self.axes[1].edges[:-1],
-            -self.project(self.axes[1].name or 1).view(),
+        side_art = mplhep.histplot(
+            self.project(self.axes[1].name or 1),
+            ax=side_ax,
             transform=rot + base,
             **side_kwargs,
         )
@@ -527,7 +529,7 @@ class BaseHist(bh.Histogram):
         side_ax.yaxis.set_visible(False)
         side_ax.set_xlabel("Counts")
 
-        return main_art, top_art, mplhep.plot.StepArtists(side_plain_art, None, None)
+        return main_art, top_art, side_art
 
     def plot_pull(
         self,
@@ -543,171 +545,87 @@ class BaseHist(bh.Histogram):
 
         # Type judgement
         if not callable(func):
-            raise TypeError(
-                f"Callable parameter func is supported for {self.__class__.__name__} in plot pull"
-            )
+            msg = f"Callable parameter func is supported for {self.__class__.__name__} in plot pull"
+            raise TypeError(msg)
+
         if self.ndim != 1:
-            raise TypeError("Only 1D-histogram has pull plot")
+            raise TypeError(
+                "Only 1D-histogram supports pull plot, try projecting to 1D"
+            )
 
         # Default Figure: construct the figure and axes
-        if ax_dict is None:
-            ax_dict = {}
+        if fig is None:
+            fig = plt.figure()
 
-        if len(ax_dict) != 0 and len(ax_dict) != 2:
-            raise ValueError("All axes should be all given or none at all")
-
-        if fig is not None and len(ax_dict):
-            for kw, ax in ax_dict.items():
-                if kw not in {"main_ax", "pull_ax"}:
-                    raise TypeError(f"{kw} is not supported in the ax_dict")
-                if fig != ax.figure:
-                    raise TypeError(
-                        "You cannot pass both a figure and axes that are not shared"
-                    )
-
-            main_ax = ax_dict["main_ax"]
-            pull_ax = ax_dict["pull_ax"]
-
-        elif fig is None and not len(ax_dict):
-            fig = plt.figure(figsize=(8, 8))
+        if ax_dict:
+            try:
+                main_ax = ax_dict["main_ax"]
+                pull_ax = ax_dict["pull_ax"]
+            except KeyError:
+                raise ValueError("All axes should be all given or none at all")
+        else:
             grid = fig.add_gridspec(2, 1, hspace=0, height_ratios=[3, 1])
             main_ax = fig.add_subplot(grid[0])
             pull_ax = fig.add_subplot(grid[1], sharex=main_ax)
-
-        elif fig is not None and not len(ax_dict):
-            grid = fig.add_gridspec(2, 1, hspace=0, height_ratios=[3, 1])
-            main_ax = fig.add_subplot(grid[0])
-            pull_ax = fig.add_subplot(grid[1], sharex=main_ax)
-
-        elif fig is None and len(ax_dict):
-            main_ax = ax_dict["main_ax"]
-            pull_ax = ax_dict["pull_ax"]
 
         # Computation and Fit
-        yerr = np.sqrt(self.view())
+        view = self.view()
+        values = view.value if hasattr(view, "value") else view
+        yerr = view.variance if hasattr(view, "variance") else np.sqrt(values)
 
         # Compute fit values: using func as fit model
-        popt, pcov = curve_fit(f=func, xdata=self.axes.centers[0], ydata=self.view())
-        fit = func(self.axes.centers[0], *popt)
+        popt, pcov = curve_fit(f=func, xdata=self.axes[0].centers, ydata=values)
+        fit = func(self.axes[0].centers, *popt)
 
         # Compute uncertainty
         copt = correlated_values(popt, pcov)
-        y_unc = func(self.axes.centers[0], *copt)
+        y_unc = func(self.axes[0].centers, *copt)
         y_nv = unumpy.nominal_values(y_unc)
         y_sd = unumpy.std_devs(y_unc)
 
         # Compute pulls: containing no INF values
         with np.errstate(divide="ignore"):
-            pulls = (self.view() - y_nv) / yerr
+            pulls = (values - y_nv) / yerr
 
         pulls[np.isnan(pulls)] = 0
         pulls[np.isinf(pulls)] = 0
 
         # Keyword Argument Conversion: convert the kwargs to several independent args
+
         # error bar keyword arguments
-        eb_kwargs = dict()
-        for kw in kwargs.keys():
-            if kw[:2] == "eb":
-                # disabled argument
-                if kw == "eb_label":
-                    pass
-                else:
-                    eb_kwargs[kw[3:]] = kwargs[kw]
-
-        for k in eb_kwargs:
-            kwargs.pop("eb_" + k)
-
-        # value plot keyword arguments
-        vp_kwargs = dict()
-        for kw in kwargs.keys():
-            if kw[:2] == "vp":
-                # disabled argument
-                if kw == "vp_label":
-                    pass
-                else:
-                    vp_kwargs[kw[3:]] = kwargs[kw]
-
-        for k in vp_kwargs:
-            kwargs.pop("vp_" + k)
+        eb_kwargs = _filter_dict(kwargs, "eb_")
+        eb_kwargs.setdefault("label", "Histogram Data")
 
         # fit plot keyword arguments
-        fp_kwargs = dict()
-        for kw in kwargs.keys():
-            if kw[:2] == "fp":
-                # disabled argument
-                if kw == "fp_label":
-                    pass
-                else:
-                    fp_kwargs[kw[3:]] = kwargs[kw]
-
-        for k in fp_kwargs:
-            kwargs.pop("fp_" + k)
+        fp_kwargs = _filter_dict(kwargs, "fp_")
+        fp_kwargs.setdefault("label", "Fitting Value")
 
         # uncertainty band keyword arguments
-        ub_kwargs = dict()
-        for kw in kwargs.keys():
-            if kw[:2] == "ub":
-                # disabled arguments
-                if kw == "ub_color":
-                    pass
-                if kw == "ub_label":
-                    pass
-                else:
-                    ub_kwargs[kw[3:]] = kwargs[kw]
-
-        for k in ub_kwargs:
-            kwargs.pop("ub_" + k)
+        ub_kwargs = _filter_dict(kwargs, "ub_")
+        ub_kwargs.setdefault("label", "Uncertainty")
 
         # bar plot keyword arguments
-        bar_kwargs = dict()
-        for kw in kwargs.keys():
-            if kw[:3] == "bar":
-                # disabled arguments
-                if kw == "bar_width":
-                    pass
-                if kw == "bar_label":
-                    pass
-                else:
-                    bar_kwargs[kw[4:]] = kwargs[kw]
-
-        for k in bar_kwargs:
-            kwargs.pop("bar_" + k)
+        bar_kwargs = _filter_dict(kwargs, "bar_", ignore={"bar_width"})
 
         # patch plot keyword arguments
-        pp_kwargs, pp_num = dict(), 3
-        for kw in kwargs.keys():
-            if kw[:2] == "pp":
-                # new argument
-                if kw == "pp_num":
-                    pp_num = kwargs[kw]
-                    continue
-                # disabled argument
-                if kw == "pp_label":
-                    raise ValueError("'pp_label' not needed")
-                pp_kwargs[kw[3:]] = kwargs[kw]
+        pp_kwargs = _filter_dict(kwargs, "pp_", ignore={"pp_num"})
+        pp_num = kwargs.pop("pp_num", 3)
 
-        if "pp_num" in kwargs:
-            kwargs.pop("pp_num")
-        for k in pp_kwargs:
-            kwargs.pop("pp_" + k)
-
-        # judge whether some arguments left
+        # Judge whether some arguments are left
         if kwargs:
-            raise ValueError(f"'{list(kwargs.keys())[0]}' not needed")
+            raise ValueError(f"{set(kwargs)}' not needed")
 
         # Main: plot the pulls using Matplotlib errorbar and plot methods
-        main_ax.errorbar(
-            self.axes.centers[0], self.view(), yerr, label="Histogram Data", **eb_kwargs
-        )
-        (line,) = main_ax.plot(
-            self.axes.centers[0], fit, label="Fitting Value", **fp_kwargs
-        )
+        main_ax.errorbar(self.axes.centers[0], values, yerr, **eb_kwargs)
+
+        (line,) = main_ax.plot(self.axes.centers[0], fit, **fp_kwargs)
+
+        # Uncertainty band
+        ub_kwargs.setdefault("color", line.get_color())
         main_ax.fill_between(
             self.axes.centers[0],
             y_nv - y_sd,
             y_nv + y_sd,
-            color=line.get_color(),
-            label="Uncertainty",
             **ub_kwargs,
         )
         main_ax.legend(loc=0)
