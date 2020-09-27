@@ -946,7 +946,7 @@ def test_named_transform_proxy():
     Test named transform proxy -- whether NamedHist transform proxy works properly.
     """
 
-    h0 = NamedHist().Sqrt(3, 4, 25, name="x").Sqrt(4, 25, 81, name="y")
+    h0 = NamedHist.new.Sqrt(3, 4, 25, name="x").Sqrt(4, 25, 81, name="y").Double()
     h0.fill(x=[5, 10, 17, 17], y=[26, 37, 50, 65])
     assert h0[0, 0] == 1
     assert h0[1, 1] == 1
@@ -955,28 +955,36 @@ def test_named_transform_proxy():
 
     # based on existing axis
     with pytest.raises(Exception):
-        NamedHist().Regular(3, 4, 25, name="x").Sqrt()
+        NamedHist.new.Regular(3, 4, 25, name="x").Sqrt()
 
     # wrong value
     with pytest.raises(Exception):
-        NamedHist().Sqrt(3, -4, 25, name="x")
+        NamedHist.new.Sqrt(3, -4, 25, name="x")
 
-    h1 = NamedHist().Log(4, 1, 10_000, name="x").Log(3, 1 / 1_000, 1, name="y")
+    h1 = (
+        NamedHist.new.Log(4, 1, 10_000, name="x")
+        .Log(3, 1 / 1_000, 1, name="y")
+        .Double()
+    )
     h1.fill(x=[2, 11, 101, 1_001], y=[1 / 999, 1 / 99, 1 / 9, 1 / 9])
     assert h1[0, 0] == 1
     assert h1[1, 1] == 1
     assert h1[2, 2] == 1
     assert h1[3, 2] == 1
 
-    # based on existing axis
+    # wrong value
     with pytest.raises(Exception):
-        NamedHist().Regular(4, 1, 10_000, name="x").Log()
+        NamedHist.new.Regular(4, 1, 10_000, name="x").Log()
 
     # wrong value
     with pytest.raises(Exception):
-        NamedHist().Log(3, -1, 10_000, name="x")
+        NamedHist.new.Log(3, -1, 10_000, name="x")
 
-    h2 = NamedHist().Pow(24, 1, 5, power=2, name="x").Pow(124, 1, 5, power=3, name="y")
+    h2 = (
+        NamedHist.new.Pow(24, 1, 5, power=2, name="x")
+        .Pow(124, 1, 5, power=3, name="y")
+        .Double()
+    )
     h2.fill(x=[1, 2, 3, 4], y=[1, 2, 3, 4])
     assert h2[0, 0] == 1
     assert h2[3, 7] == 1
@@ -985,21 +993,23 @@ def test_named_transform_proxy():
 
     # based on existing axis
     with pytest.raises(Exception):
-        NamedHist().Regular(24, 1, 5, name="x").Pow(2)
+        NamedHist.new.Regular(24, 1, 5, name="x").Pow(2)
 
     # wrong value
     with pytest.raises(Exception):
-        NamedHist().Pow(24, -1, 5, power=1 / 2, name="x")
+        NamedHist.new.Pow(24, -1, 5, power=1 / 2, name="x")
 
     # lack args
     with pytest.raises(Exception):
-        NamedHist().Pow(24, 1, 5, name="x")
+        NamedHist.new.Pow(24, 1, 5, name="x")
 
     ftype = ctypes.CFUNCTYPE(ctypes.c_double, ctypes.c_double)
     h3 = (
-        NamedHist()
-        .Func(4, 1, 5, forward=ftype(math.log), inverse=ftype(math.exp), name="x")
+        NamedHist.new.Func(
+            4, 1, 5, forward=ftype(math.log), inverse=ftype(math.exp), name="x"
+        )
         .Func(4, 1, 5, forward=ftype(np.log), inverse=ftype(np.exp), name="y")
+        .Double()
     )
     h3.fill(x=[1, 2, 3, 4], y=[1, 2, 3, 4])
     assert h3[0, 0] == 1
@@ -1009,20 +1019,20 @@ def test_named_transform_proxy():
 
     # based on existing axis
     with pytest.raises(Exception):
-        NamedHist().Regular(24, 1, 5, name="x").Func(ftype(math.log), ftype(math.exp))
+        NamedHist.new.Regular(24, 1, 5, name="x").Func(ftype(math.log), ftype(math.exp))
 
     # wrong value
-    assert NamedHist().Func(
+    assert NamedHist.new.Func(
         4, -1, 5, name="x", forward=ftype(math.log), inverse=ftype(math.log)
     )
     with pytest.raises(Exception):
-        NamedHist().Func(
+        NamedHist.new.Func(
             4, -1, 5, name="x", forward=ftype(np.log), inverse=ftype(np.log)
         )
 
     # lack args
     with pytest.raises(Exception):
-        NamedHist().Func(4, 1, 5, name="x")
+        NamedHist.new.Func(4, 1, 5, name="x")
 
 
 def test_named_hist_proxy():
@@ -1030,116 +1040,88 @@ def test_named_hist_proxy():
     Test named hist proxy -- whether NamedHist hist proxy works properly.
     """
 
-    h = NamedHist.Reg(10, 0, 1, name="x").fill(x=[0.5, 0.5])
+    h = NamedHist.new.Reg(10, 0, 1, name="x").Double().fill(x=[0.5, 0.5])
     assert h[0.5j] == 2
 
+    assert type(h) == NamedHist
+
+    with pytest.raises(AttributeError):
+        NamedHist().new
+
     h = (
-        NamedHist()
-        .Reg(10, 0, 1, name="x")
+        NamedHist.new.Reg(10, 0, 1, name="x")
         .Reg(10, 0, 1, name="y")
+        .Double()
         .fill(x=[0.5, 0.5], y=[0.2, 0.6])
     )
 
     assert h[0.5j, 0.2j] == 1
     assert h[bh.loc(0.5), bh.loc(0.6)] == 1
 
-    h = NamedHist.Bool(name="x").fill(x=[True, True])
+    h = NamedHist.new.Bool(name="x").Double().fill(x=[True, True])
     assert h[bh.loc(True)] == 2
 
-    h = NamedHist().Bool(name="x").Bool(name="y").fill(x=[True, True], y=[True, False])
+    h = (
+        NamedHist.new.Bool(name="x")
+        .Bool(name="y")
+        .Double()
+        .fill(x=[True, True], y=[True, False])
+    )
 
     assert h[True, True] == 1
     assert h[True, False] == 1
 
-    h = NamedHist.Var(range(10), name="x").fill(x=[5, 5])
+    h = NamedHist.new.Var(range(10), name="x").Double().fill(x=[5, 5])
     assert h[5j] == 2
 
     h = (
-        NamedHist()
-        .Var(range(10), name="x")
+        NamedHist.new.Var(range(10), name="x")
         .Var(range(10), name="y")
+        .Double()
         .fill(x=[5, 5], y=[2, 6])
     )
 
     assert h[5j, 2j] == 1
     assert h[bh.loc(5), bh.loc(6)] == 1
 
-    h = NamedHist.Int(0, 10, name="x").fill(x=[5, 5])
-    assert h[5j] == 2
-
-    h = NamedHist().Int(0, 10, name="x").Int(0, 10, name="y").fill(x=[5, 5], y=[2, 6])
-
-    assert h[5j, 2j] == 1
-    assert h[bh.loc(5), bh.loc(6)] == 1
-
-    h = NamedHist.IntCat(range(10), name="x").fill(x=[5, 5])
+    h = NamedHist.new.Int(0, 10, name="x").Double().fill(x=[5, 5])
     assert h[5j] == 2
 
     h = (
-        NamedHist()
-        .IntCat(range(10), name="x")
-        .IntCat(range(10), name="y")
+        NamedHist.new.Int(0, 10, name="x")
+        .Int(0, 10, name="y")
+        .Double()
         .fill(x=[5, 5], y=[2, 6])
     )
 
     assert h[5j, 2j] == 1
     assert h[bh.loc(5), bh.loc(6)] == 1
 
-    h = NamedHist.StrCat("TF", name="x").fill(x=["T", "T"])
+    h = NamedHist.new.IntCat(range(10), name="x").Double().fill(x=[5, 5])
+    assert h[5j] == 2
+
+    h = (
+        NamedHist.new.IntCat(range(10), name="x")
+        .IntCat(range(10), name="y")
+        .Double()
+        .fill(x=[5, 5], y=[2, 6])
+    )
+
+    assert h[5j, 2j] == 1
+    assert h[bh.loc(5), bh.loc(6)] == 1
+
+    h = NamedHist.new.StrCat("TF", name="x").Double().fill(x=["T", "T"])
     assert h["T"] == 2
 
     h = (
-        NamedHist()
-        .StrCat("TF", name="x")
+        NamedHist.new.StrCat("TF", name="x")
         .StrCat("TF", name="y")
+        .Double()
         .fill(x=["T", "T"], y=["T", "F"])
     )
 
     assert h["T", "T"] == 1
     assert h["T", "F"] == 1
-
-    # add axes to existing histogram
-    with pytest.raises(Exception):
-        NamedHist().Reg(10, 0, 1, name="x").fill(x=[0.5, 0.5]).Reg(10, -1, 1, name="y")
-
-    with pytest.raises(Exception):
-        NamedHist(axis.Reg(10, 0, 1, name="x")).Reg(10, -1, 1, name="y")
-
-    with pytest.raises(Exception):
-        NamedHist().Bool(name="x").fill(x=[True, True]).Bool(name="y")
-
-    with pytest.raises(Exception):
-        NamedHist(axis.Bool(name="x")).Bool(name="y")
-
-    with pytest.raises(Exception):
-        NamedHist().Var(range(0, 1, 10), name="x").fill(x=[0.5, 0.5]).Var(
-            range(0, 1, 10), name="y"
-        )
-
-    with pytest.raises(Exception):
-        NamedHist(axis.Var(range(0, 1, 10), name="x")).Var(range(0, 1, 10), name="y")
-
-    with pytest.raises(Exception):
-        NamedHist().Int(0, 10, name="x").fill(x=[0.5, 0.5]).Int(0, 10, name="y")
-
-    with pytest.raises(Exception):
-        NamedHist(axis.Int(0, 10, name="x")).Int(0, 10, name="y")
-
-    with pytest.raises(Exception):
-        NamedHist().IntCat(range(0, 1, 10), name="x").fill(x=[0.5, 0.5]).IntCat(
-            range(0, 1, 10), name="y"
-        )
-
-    with pytest.raises(Exception):
-        NamedHist(axis.IntCat(range(0, 1, 10), name="x")).IntCat(
-            range(0, 1, 10), name="y"
-        )
-
-    with pytest.raises(Exception):
-        NamedHist().StrCat("TF", name="x").fill(x=["T", "T"]).StrCat("TF", name="y")
-
-    with pytest.raises(Exception):
-        NamedHist(axis.StrCat("TF", name="x")).StrCat("TF", name="y")
 
 
 def test_named_density():

@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
-from .axis import Regular, Boolean, Variable, Integer, IntCategory, StrCategory
 from .axestuple import NamedAxesTuple
-
-import hist.utils
-from hist.storage import Storage
+from .quick_construct import MetaConstructor
+from .utils import set_family, HIST_FAMILY
+from .storage import Storage
 
 import warnings
 import functools
@@ -12,30 +11,18 @@ import histoprint
 
 import numpy as np
 import boost_histogram as bh
-import matplotlib
+
+import matplotlib.axes
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import matplotlib.transforms as transforms
 import mplhep
 from scipy.optimize import curve_fit
 from uncertainties import correlated_values, unumpy
-from typing import Callable, Optional, Tuple, Union, Dict, List, Any, Set
+from typing import Callable, Optional, Tuple, Union, Dict, Any, Set
 from .svgplots import html_hist, svg_hist_1d, svg_hist_1d_c, svg_hist_2d, svg_hist_nd
 
 from mplhep.plot import Hist1DArtists, Hist2DArtists
-
-
-class always_normal_method:
-    def __get__(self, instance, owner=None):
-        self.instance = instance or owner()
-        return self
-
-    def __init__(self, method):
-        self.method = method
-        self.instance = None
-
-    def __call__(self, *args, **kwargs):
-        return self.method(self.instance, *args, **kwargs)
 
 
 def _filter_dict(
@@ -53,23 +40,18 @@ def _filter_dict(
     }
 
 
-@hist.utils.set_family(hist.utils.HIST_FAMILY)
-class BaseHist(bh.Histogram):
-    __slots__ = ("_ax", "_storage_proxy")
+@set_family(HIST_FAMILY)
+class BaseHist(bh.Histogram, metaclass=MetaConstructor):
+    __slots__ = ()
 
     def __init__(self, *args, storage: Optional[Storage] = None, metadata=None):
         """
         Initialize BaseHist object. Axis params can contain the names.
         """
-        # TODO: Make a base class type Axis for Hist
-        self._ax: List[bh.axis.Axes] = []
         self._hist: Any = None
-        self._storage_proxy: Optional[Storage] = None
         self.axes: NamedAxesTuple
 
         if len(args):
-            self._hist = None
-            self._ax = []
             if isinstance(storage, type):
                 msg = (
                     f"Please use '{storage.__name__}()' instead of '{storage.__name__}'"
@@ -106,172 +88,6 @@ class BaseHist(bh.Histogram):
         elif self.ndim > 2:
             return str(html_hist(self, svg_hist_nd))
         return str(self)
-
-    @always_normal_method
-    def Reg(self, *args, **kwargs):
-        if self._hist:
-            raise RuntimeError("Cannot add an axis to an existing histogram")
-        self._ax.append(Regular(*args, **kwargs))
-        return self
-
-    @always_normal_method
-    def Sqrt(self, *args, **kwargs):
-        if self._hist:
-            raise RuntimeError("Cannot add an axis to an existing histogram")
-        self._ax.append(Regular(*args, transform=hist.axis.transform.sqrt, **kwargs))
-        return self
-
-    @always_normal_method
-    def Log(self, *args, **kwargs):
-        if self._hist:
-            raise RuntimeError("Cannot add an axis to an existing histogram")
-        self._ax.append(Regular(*args, transform=hist.axis.transform.log, **kwargs))
-        return self
-
-    @always_normal_method
-    def Pow(self, *args, power, **kwargs):
-        if self._hist:
-            raise RuntimeError("Cannot add an axis to an existing histogram")
-        self._ax.append(
-            Regular(*args, transform=hist.axis.transform.Pow(power), **kwargs)
-        )
-        return self
-
-    @always_normal_method
-    def Func(self, *args, forward, inverse, **kwargs):
-        if self._hist:
-            raise RuntimeError("Cannot add an axis to an existing histogram")
-        self._ax.append(
-            Regular(
-                *args,
-                transform=hist.axis.transform.Function(forward, inverse),
-                **kwargs,
-            )
-        )
-        return self
-
-    @always_normal_method
-    def Bool(self, *args, **kwargs):
-        if self._hist:
-            raise RuntimeError("Cannot add an axis to an existing histogram")
-        self._ax.append(Boolean(*args, **kwargs))
-        return self
-
-    @always_normal_method
-    def Var(self, *args, **kwargs):
-        if self._hist:
-            raise RuntimeError("Cannot add an axis to an existing histogram")
-        self._ax.append(Variable(*args, **kwargs))
-        return self
-
-    @always_normal_method
-    def Int(self, *args, **kwargs):
-        if self._hist:
-            raise RuntimeError("Cannot add an axis to an existing histogram")
-        self._ax.append(Integer(*args, **kwargs))
-        return self
-
-    @always_normal_method
-    def IntCat(self, *args, **kwargs):
-        if self._hist:
-            raise RuntimeError("Cannot add an axis to an existing histogram")
-        self._ax.append(IntCategory(*args, **kwargs))
-        return self
-
-    @always_normal_method
-    def StrCat(self, *args, **kwargs):
-        if self._hist:
-            raise RuntimeError("Cannot add an axis to an existing histogram")
-        self._ax.append(StrCategory(*args, **kwargs))
-        return self
-
-    @always_normal_method
-    def Double(self):
-        if self._hist:
-            raise RuntimeError("Cannot add a storage to an existing histogram")
-        elif self._storage_proxy:
-            raise RuntimeError("Cannot add another storage")
-
-        self._storage_proxy = hist.storage.Double()
-        return self
-
-    @always_normal_method
-    def Int64(self):
-        if self._hist:
-            raise RuntimeError("Cannot add a storage to an existing histogram")
-        elif self._storage_proxy:
-            raise RuntimeError("Cannot add another storage")
-
-        self._storage_proxy = hist.storage.Int64()
-        return self
-
-    @always_normal_method
-    def AtomicInt64(self):
-        if self._hist:
-            raise RuntimeError("Cannot add a storage to an existing histogram")
-        elif self._storage_proxy:
-            raise RuntimeError("Cannot add another storage")
-
-        self._storage_proxy = hist.storage.AtomicInt64()
-        return self
-
-    @always_normal_method
-    def Weight(self):
-        if self._hist:
-            raise RuntimeError("Cannot add a storage to an existing histogram")
-        elif self._storage_proxy:
-            raise RuntimeError("Cannot add another storage")
-
-        self._storage_proxy = hist.storage.Weight()
-        return self
-
-    @always_normal_method
-    def Mean(self):
-        if self._hist:
-            raise RuntimeError("Cannot add a storage to an existing histogram")
-        elif self._storage_proxy:
-            raise RuntimeError("Cannot add another storage")
-
-        self._storage_proxy = hist.storage.Mean()
-        return self
-
-    @always_normal_method
-    def WeightedMean(self):
-        if self._hist:
-            raise RuntimeError("Cannot add a storage to an existing histogram")
-        elif self._storage_proxy:
-            raise RuntimeError("Cannot add another storage")
-
-        self._storage_proxy = hist.storage.WeightedMean()
-        return self
-
-    @always_normal_method
-    def Unlimited(self):
-        if self._hist:
-            raise RuntimeError("Cannot add a storage to an existing histogram")
-        elif self._storage_proxy:
-            raise RuntimeError("Cannot add another storage")
-
-        self._storage_proxy = hist.storage.Unlimited()
-        return self
-
-    def __getattribute__(self, item):
-
-        if (
-            not object.__getattribute__(self, "_hist")
-            and not isinstance(
-                object.__getattribute__(self, item), always_normal_method
-            )
-            and item not in {"_hist", "_ax", "_storage_proxy"}
-        ):
-            # Make histogram real here
-            ax = object.__getattribute__(self, "_ax")
-            storage = (
-                object.__getattribute__(self, "_storage_proxy") or bh.storage.Double()
-            )
-            object.__getattribute__(self, "__init__")(*ax, storage=storage)
-
-        return object.__getattribute__(self, item)
 
     def _name_to_index(self, name: str) -> int:
         """
@@ -385,7 +201,7 @@ class BaseHist(bh.Histogram):
 
         return super().__setitem__(self._index_transform(index), value)
 
-    def density(self):
+    def density(self) -> np.ndarray:
         """
         Density numpy array.
         """
@@ -628,12 +444,12 @@ class BaseHist(bh.Histogram):
             else:
                 pp_kwargs["alpha"] = 0.618 * np.power(0.618, i)
 
-            upRect_startpoint = [left_edge, i * patch_height]
+            upRect_startpoint = (left_edge, i * patch_height)
             upRect = patches.Rectangle(
                 upRect_startpoint, patch_width, patch_height, **pp_kwargs
             )
             pull_ax.add_patch(upRect)
-            downRect_startpoint = [left_edge, -(i + 1) * patch_height]
+            downRect_startpoint = (left_edge, -(i + 1) * patch_height)
             downRect = patches.Rectangle(
                 downRect_startpoint, patch_width, patch_height, **pp_kwargs
             )

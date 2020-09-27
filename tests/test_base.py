@@ -769,200 +769,172 @@ class test_base_storage_proxy:
             h.Unlimited()
 
 
-def test_base_transform_proxy():
+def test_general_transform_proxy():
     """
-    Test base transform proxy -- whether BaseHist transform proxy works properly.
+    Test general transform proxy -- whether BaseHist transform proxy works properly.
     """
 
-    h0 = BaseHist().Sqrt(3, 4, 25).Sqrt(4, 25, 81)
+    h0 = BaseHist.new.Sqrt(3, 4, 25).Sqrt(4, 25, 81).Double()
     h0.fill([5, 10, 17, 17], [26, 37, 50, 65])
     assert h0[0, 0] == 1
     assert h0[1, 1] == 1
     assert h0[2, 2] == 1
     assert h0[2, 3] == 1
 
-    # based on existing axis
-    with pytest.raises(Exception):
-        BaseHist().Regular(3, 4, 25).Sqrt()
-
     # wrong value
     with pytest.raises(Exception):
-        BaseHist().Sqrt(3, -4, 25)
+        BaseHist.new.Sqrt(3, -4, 25)
 
-    h1 = BaseHist().Log(4, 1, 10_000).Log(3, 1 / 1_000, 1)
+    h1 = BaseHist.new.Log(4, 1, 10_000).Log(3, 1 / 1_000, 1).Double()
     h1.fill([2, 11, 101, 1_001], [1 / 999, 1 / 99, 1 / 9, 1 / 9])
     assert h1[0, 0] == 1
     assert h1[1, 1] == 1
     assert h1[2, 2] == 1
     assert h1[3, 2] == 1
 
-    # based on existing axis
+    # Missing arguments
     with pytest.raises(Exception):
-        BaseHist().Regular(4, 1, 10_000).Log()
+        BaseHist.new.Regular(4, 1, 10_000).Log()
 
     # wrong value
     with pytest.raises(Exception):
-        BaseHist().Log(3, -1, 10_000)
+        BaseHist.new.Log(3, -1, 10_000)
 
-    h2 = BaseHist().Pow(24, 1, 5, power=2).Pow(124, 1, 5, power=3)
+    h2 = BaseHist.new.Pow(24, 1, 5, power=2).Pow(124, 1, 5, power=3).Int64()
     h2.fill([1, 2, 3, 4], [1, 2, 3, 4])
     assert h2[0, 0] == 1
     assert h2[3, 7] == 1
     assert h2[8, 26] == 1
     assert h2[15, 63] == 1
 
-    # based on existing axis
+    # wrong value
     with pytest.raises(Exception):
-        BaseHist().Regular(24, 1, 5).Pow(2)
+        BaseHist.new.Regular(24, 1, 5).Pow(2)
 
     # wrong value
     with pytest.raises(Exception):
-        BaseHist().Pow(24, -1, 5, power=1 / 2)
+        BaseHist.new.Pow(24, -1, 5, power=0.5)
 
     # lack args
     with pytest.raises(Exception):
-        BaseHist().Pow(24, 1, 5)
+        BaseHist.new.Pow(24, 1, 5)
 
     ftype = ctypes.CFUNCTYPE(ctypes.c_double, ctypes.c_double)
     h3 = (
-        BaseHist()
-        .Func(4, 1, 5, forward=ftype(math.log), inverse=ftype(math.exp))
-        .Func(4, 1, 5, forward=ftype(np.log), inverse=ftype(np.exp))
-    )
+        BaseHist.new.Func(
+            4, 1, 5, forward=ftype(math.log), inverse=ftype(math.exp)
+        ).Func(4, 1, 5, forward=ftype(np.log), inverse=ftype(np.exp))
+    ).Int64()
     h3.fill([1, 2, 3, 4], [1, 2, 3, 4])
     assert h3[0, 0] == 1
     assert h3[1, 1] == 1
     assert h3[2, 2] == 1
     assert h3[3, 3] == 1
 
-    # based on existing axis
+    # wrong value
     with pytest.raises(Exception):
         BaseHist().Regular(24, 1, 5).Func(ftype(math.log), ftype(math.exp))
 
     # wrong value
-    assert BaseHist().Func(4, -1, 5, forward=ftype(math.log), inverse=ftype(math.log))
+    assert BaseHist.new.Func(
+        4, -1, 5, forward=ftype(math.log), inverse=ftype(math.log)
+    ).Double()
     with pytest.raises(Exception):
-        BaseHist().Func(4, -1, 5, forward=ftype(np.log), inverse=ftype(np.log))
+        BaseHist.new.Func(4, -1, 5, forward=ftype(np.log), inverse=ftype(np.log))
 
     # lack args
     with pytest.raises(Exception):
-        BaseHist().Func(4, 1, 5)
+        BaseHist.new.Func(4, 1, 5)
 
 
-def test_base_hist_proxy():
+def test_general_hist_proxy():
     """
-    Test base hist proxy -- whether BaseHist hist proxy works properly.
+    Test general hist proxy -- whether BaseHist hist proxy works properly.
     """
-    h = BaseHist.Reg(10, 0, 1, name="x").fill([0.5, 0.5])
+
+    h = BaseHist.new.Reg(10, 0, 1, name="x").Double().fill([0.5, 0.5])
     assert h[0.5j] == 2
 
+    assert type(h) == BaseHist
+
+    # .new not allowed on an instance
+    with pytest.raises(AttributeError):
+        BaseHist().new
+
     h = (
-        BaseHist()
-        .Reg(10, 0, 1, name="x")
+        BaseHist.new.Reg(10, 0, 1, name="x")
         .Reg(10, 0, 1, name="y")
+        .Double()
         .fill([0.5, 0.5], [0.2, 0.6])
     )
 
     assert h[0.5j, 0.2j] == 1
     assert h[bh.loc(0.5), bh.loc(0.6)] == 1
 
-    h = BaseHist.Bool(name="x").fill([True, True])
+    h = BaseHist.new.Bool(name="x").Double().fill([True, True])
     assert h[bh.loc(True)] == 2
 
-    h = BaseHist().Bool(name="x").Bool(name="y").fill([True, True], [True, False])
+    h = (
+        BaseHist.new.Bool(name="x")
+        .Bool(name="y")
+        .Int64()
+        .fill([True, True], [True, False])
+    )
 
     assert h[True, True] == 1
     assert h[True, False] == 1
 
-    h = BaseHist.Var(range(10), name="x").fill([5, 5])
+    h = BaseHist.new.Var(range(10), name="x").Double().fill([5, 5])
     assert h[5j] == 2
 
     h = (
-        BaseHist()
-        .Var(range(10), name="x")
+        BaseHist.new.Var(range(10), name="x")
         .Var(range(10), name="y")
+        .Double()
         .fill([5, 5], [2, 6])
     )
 
     assert h[5j, 2j] == 1
     assert h[bh.loc(5), bh.loc(6)] == 1
 
-    h = BaseHist.Int(0, 10, name="x").fill([5, 5])
-    assert h[5j] == 2
-
-    h = BaseHist().Int(0, 10, name="x").Int(0, 10, name="y").fill([5, 5], [2, 6])
-
-    assert h[5j, 2j] == 1
-    assert h[bh.loc(5), bh.loc(6)] == 1
-
-    h = BaseHist.IntCat(range(10), name="x").fill([5, 5])
+    h = BaseHist.new.Int(0, 10, name="x").Int64().fill([5, 5])
     assert h[5j] == 2
 
     h = (
-        BaseHist()
-        .IntCat(range(10), name="x")
-        .IntCat(range(10), name="y")
+        BaseHist.new.Int(0, 10, name="x")
+        .Int(0, 10, name="y")
+        .Int64()
         .fill([5, 5], [2, 6])
     )
 
     assert h[5j, 2j] == 1
     assert h[bh.loc(5), bh.loc(6)] == 1
 
-    h = BaseHist.StrCat("TF", name="x").fill(["T", "T"])
+    h = BaseHist.new.IntCat(range(10), name="x").Double().fill([5, 5])
+    assert h[5j] == 2
+
+    h = (
+        BaseHist.new.IntCat(range(10), name="x")
+        .IntCat(range(10), name="y")
+        .Double()
+        .fill([5, 5], [2, 6])
+    )
+
+    assert h[5j, 2j] == 1
+    assert h[bh.loc(5), bh.loc(6)] == 1
+
+    h = BaseHist.new.StrCat("TF", name="x").Int64().fill(["T", "T"])
     assert h["T"] == 2
 
     h = (
-        BaseHist()
-        .StrCat("TF", name="x")
+        BaseHist.new.StrCat("TF", name="x")
         .StrCat("TF", name="y")
+        .Int64()
         .fill(["T", "T"], ["T", "F"])
     )
 
     assert h["T", "T"] == 1
     assert h["T", "F"] == 1
-
-    # add axes to existing histogram
-    with pytest.raises(Exception):
-        BaseHist().Reg(10, 0, 1, name="x").fill([0.5, 0.5]).Reg(10, -1, 1, name="y")
-
-    with pytest.raises(Exception):
-        BaseHist(axis.Reg(10, 0, 1, name="x")).Reg(10, -1, 1, name="y")
-
-    with pytest.raises(Exception):
-        BaseHist().Bool(name="x").fill([True, True]).Bool(name="y")
-
-    with pytest.raises(Exception):
-        BaseHist(axis.Bool(name="x")).Bool(name="y")
-
-    with pytest.raises(Exception):
-        BaseHist().Var(range(0, 1, 10), name="x").fill([0.5, 0.5]).Var(
-            range(0, 1, 10), name="y"
-        )
-
-    with pytest.raises(Exception):
-        BaseHist(axis.Var(range(0, 1, 10), name="x")).Var(range(0, 1, 10), name="y")
-
-    with pytest.raises(Exception):
-        BaseHist().Int(0, 10, name="x").fill([0.5, 0.5]).Int(0, 10, name="y")
-
-    with pytest.raises(Exception):
-        BaseHist(axis.Int(0, 10, name="x")).Int(0, 10, name="y")
-
-    with pytest.raises(Exception):
-        BaseHist().IntCat(range(0, 1, 10), name="x").fill([0.5, 0.5]).IntCat(
-            range(0, 1, 10), name="y"
-        )
-
-    with pytest.raises(Exception):
-        BaseHist(axis.IntCat(range(0, 1, 10), name="x")).IntCat(
-            range(0, 1, 10), name="y"
-        )
-
-    with pytest.raises(Exception):
-        BaseHist().StrCat("TF", name="x").fill(["T", "T"]).StrCat("TF", name="y")
-
-    with pytest.raises(Exception):
-        BaseHist(axis.StrCat("TF", name="x")).StrCat("TF", name="y")
 
 
 def test_base_density():

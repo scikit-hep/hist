@@ -1,3 +1,4 @@
 include LICENSE pyproject.toml README.md setup.py setup.cfg
 recursive-include tests *.py
 recursive-include src *.py
+recursive-include src py.typed
