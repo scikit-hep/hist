@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from .axestuple import NamedAxesTuple
-from .quick_construct import QuickConstruct
+from .quick_construct import MetaConstructor
 from .utils import set_family, HIST_FAMILY
 from .storage import Storage
 
@@ -41,11 +41,8 @@ def _filter_dict(
 
 
 @set_family(HIST_FAMILY)
-class BaseHist(bh.Histogram):
+class BaseHist(bh.Histogram, metaclass=MetaConstructor):
     __slots__ = ()
-
-    # Quick construct system
-    new = QuickConstruct()
 
     def __init__(self, *args, storage: Optional[Storage] = None, metadata=None):
         """

@@ -861,6 +861,11 @@ def test_general_hist_proxy():
     h = Hist.new.Reg(10, 0, 1, name="x").Double().fill([0.5, 0.5])
     assert h[0.5j] == 2
 
+    assert type(h) == Hist
+
+    with pytest.raises(AttributeError):
+        Hist().new
+
     h = (
         Hist.new.Reg(10, 0, 1, name="x")
         .Reg(10, 0, 1, name="y")
@@ -903,10 +908,8 @@ def test_general_hist_proxy():
     h = Hist.new.IntCat(range(10), name="x").Double().fill([5, 5])
     assert h[5j] == 2
 
-    # .new always creates a new proxy chain
     h = (
-        Hist()
-        .new.IntCat(range(10), name="x")
+        Hist.new.IntCat(range(10), name="x")
         .IntCat(range(10), name="y")
         .Double()
         .fill([5, 5], [2, 6])

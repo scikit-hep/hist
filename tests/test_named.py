@@ -1043,6 +1043,11 @@ def test_named_hist_proxy():
     h = NamedHist.new.Reg(10, 0, 1, name="x").Double().fill(x=[0.5, 0.5])
     assert h[0.5j] == 2
 
+    assert type(h) == NamedHist
+
+    with pytest.raises(AttributeError):
+        NamedHist().new
+
     h = (
         NamedHist.new.Reg(10, 0, 1, name="x")
         .Reg(10, 0, 1, name="y")

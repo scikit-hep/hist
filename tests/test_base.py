@@ -855,6 +855,12 @@ def test_general_hist_proxy():
     h = BaseHist.new.Reg(10, 0, 1, name="x").Double().fill([0.5, 0.5])
     assert h[0.5j] == 2
 
+    assert type(h) == BaseHist
+
+    # .new not allowed on an instance
+    with pytest.raises(AttributeError):
+        BaseHist().new
+
     h = (
         BaseHist.new.Reg(10, 0, 1, name="x")
         .Reg(10, 0, 1, name="y")
@@ -907,10 +913,8 @@ def test_general_hist_proxy():
     h = BaseHist.new.IntCat(range(10), name="x").Double().fill([5, 5])
     assert h[5j] == 2
 
-    # .new always creates a new proxy chain
     h = (
-        BaseHist()
-        .new.IntCat(range(10), name="x")
+        BaseHist.new.IntCat(range(10), name="x")
         .IntCat(range(10), name="y")
         .Double()
         .fill([5, 5], [2, 6])
