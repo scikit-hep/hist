@@ -7,7 +7,7 @@ import boost_histogram as bh
 from histoprint import print_hist
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-i", "--input", type=str, help="input file to read from (stdin by default)"

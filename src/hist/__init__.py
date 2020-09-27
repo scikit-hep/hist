@@ -4,6 +4,8 @@
 # Distributed under the 3-clause BSD license, see accompanying file LICENSE
 # or https://github.com/scikit-hep/hist for details.
 
+from types import ModuleType
+
 # Convenient access to the version number
 from .version import version as __version__
 
@@ -14,6 +16,7 @@ from .namedhist import NamedHist
 from .basehist import BaseHist
 
 from .tag import loc, rebin, sum, underflow, overflow
+
 
 __all__ = (
     "__version__",
@@ -35,7 +38,7 @@ __all__ = (
 
 
 # Python 3.7 only
-def __getattr__(name: str):
+def __getattr__(name: str) -> ModuleType:
     import warnings
 
     if name == "axes":

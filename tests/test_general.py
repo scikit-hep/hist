@@ -780,79 +780,77 @@ def test_general_transform_proxy():
     Test general transform proxy -- whether Hist transform proxy works properly.
     """
 
-    h0 = Hist().Sqrt(3, 4, 25).Sqrt(4, 25, 81)
+    h0 = Hist.new.Sqrt(3, 4, 25).Sqrt(4, 25, 81).Double()
     h0.fill([5, 10, 17, 17], [26, 37, 50, 65])
     assert h0[0, 0] == 1
     assert h0[1, 1] == 1
     assert h0[2, 2] == 1
     assert h0[2, 3] == 1
 
-    # based on existing axis
-    with pytest.raises(Exception):
-        Hist().Regular(3, 4, 25).Sqrt()
-
     # wrong value
     with pytest.raises(Exception):
-        Hist().Sqrt(3, -4, 25)
+        Hist.new.Sqrt(3, -4, 25)
 
-    h1 = Hist().Log(4, 1, 10_000).Log(3, 1 / 1_000, 1)
+    h1 = Hist.new.Log(4, 1, 10_000).Log(3, 1 / 1_000, 1).Double()
     h1.fill([2, 11, 101, 1_001], [1 / 999, 1 / 99, 1 / 9, 1 / 9])
     assert h1[0, 0] == 1
     assert h1[1, 1] == 1
     assert h1[2, 2] == 1
     assert h1[3, 2] == 1
 
-    # based on existing axis
+    # Missing arguments
     with pytest.raises(Exception):
-        Hist().Regular(4, 1, 10_000).Log()
+        Hist.new.Regular(4, 1, 10_000).Log()
 
     # wrong value
     with pytest.raises(Exception):
-        Hist().Log(3, -1, 10_000)
+        Hist.new.Log(3, -1, 10_000)
 
-    h2 = Hist().Pow(24, 1, 5, power=2).Pow(124, 1, 5, power=3)
+    h2 = Hist.new.Pow(24, 1, 5, power=2).Pow(124, 1, 5, power=3).Int64()
     h2.fill([1, 2, 3, 4], [1, 2, 3, 4])
     assert h2[0, 0] == 1
     assert h2[3, 7] == 1
     assert h2[8, 26] == 1
     assert h2[15, 63] == 1
 
-    # based on existing axis
+    # wrong value
     with pytest.raises(Exception):
-        Hist().Regular(24, 1, 5).Pow(2)
+        Hist.new.Regular(24, 1, 5).Pow(2)
 
     # wrong value
     with pytest.raises(Exception):
-        Hist().Pow(24, -1, 5, power=1 / 2)
+        Hist.new.Pow(24, -1, 5, power=0.5)
 
     # lack args
     with pytest.raises(Exception):
-        Hist().Pow(24, 1, 5)
+        Hist.new.Pow(24, 1, 5)
 
     ftype = ctypes.CFUNCTYPE(ctypes.c_double, ctypes.c_double)
     h3 = (
-        Hist()
-        .Func(4, 1, 5, forward=ftype(math.log), inverse=ftype(math.exp))
-        .Func(4, 1, 5, forward=ftype(np.log), inverse=ftype(np.exp))
-    )
+        Hist.new.Func(4, 1, 5, forward=ftype(math.log), inverse=ftype(math.exp)).Func(
+            4, 1, 5, forward=ftype(np.log), inverse=ftype(np.exp)
+        )
+    ).Int64()
     h3.fill([1, 2, 3, 4], [1, 2, 3, 4])
     assert h3[0, 0] == 1
     assert h3[1, 1] == 1
     assert h3[2, 2] == 1
     assert h3[3, 3] == 1
 
-    # based on existing axis
+    # wrong value
     with pytest.raises(Exception):
         Hist().Regular(24, 1, 5).Func(ftype(math.log), ftype(math.exp))
 
     # wrong value
-    assert Hist().Func(4, -1, 5, forward=ftype(math.log), inverse=ftype(math.log))
+    assert Hist.new.Func(
+        4, -1, 5, forward=ftype(math.log), inverse=ftype(math.log)
+    ).Double()
     with pytest.raises(Exception):
-        Hist().Func(4, -1, 5, forward=ftype(np.log), inverse=ftype(np.log))
+        Hist.new.Func(4, -1, 5, forward=ftype(np.log), inverse=ftype(np.log))
 
     # lack args
     with pytest.raises(Exception):
-        Hist().Func(4, 1, 5)
+        Hist.new.Func(4, 1, 5)
 
 
 def test_general_hist_proxy():
@@ -860,109 +858,75 @@ def test_general_hist_proxy():
     Test general hist proxy -- whether Hist hist proxy works properly.
     """
 
-    h = Hist.Reg(10, 0, 1, name="x").fill([0.5, 0.5])
+    h = Hist.new.Reg(10, 0, 1, name="x").Double().fill([0.5, 0.5])
     assert h[0.5j] == 2
 
     h = (
-        Hist()
-        .Reg(10, 0, 1, name="x")
+        Hist.new.Reg(10, 0, 1, name="x")
         .Reg(10, 0, 1, name="y")
+        .Double()
         .fill([0.5, 0.5], [0.2, 0.6])
     )
 
     assert h[0.5j, 0.2j] == 1
     assert h[bh.loc(0.5), bh.loc(0.6)] == 1
 
-    h = Hist.Bool(name="x").fill([True, True])
+    h = Hist.new.Bool(name="x").Double().fill([True, True])
     assert h[bh.loc(True)] == 2
 
-    h = Hist().Bool(name="x").Bool(name="y").fill([True, True], [True, False])
+    h = Hist.new.Bool(name="x").Bool(name="y").Int64().fill([True, True], [True, False])
 
     assert h[True, True] == 1
     assert h[True, False] == 1
 
-    h = Hist.Var(range(10), name="x").fill([5, 5])
-    assert h[5j] == 2
-
-    h = Hist().Var(range(10), name="x").Var(range(10), name="y").fill([5, 5], [2, 6])
-
-    assert h[5j, 2j] == 1
-    assert h[bh.loc(5), bh.loc(6)] == 1
-
-    h = Hist.Int(0, 10, name="x").fill([5, 5])
-    assert h[5j] == 2
-
-    h = Hist().Int(0, 10, name="x").Int(0, 10, name="y").fill([5, 5], [2, 6])
-
-    assert h[5j, 2j] == 1
-    assert h[bh.loc(5), bh.loc(6)] == 1
-
-    h = Hist.IntCat(range(10), name="x").fill([5, 5])
+    h = Hist.new.Var(range(10), name="x").Double().fill([5, 5])
     assert h[5j] == 2
 
     h = (
-        Hist()
-        .IntCat(range(10), name="x")
-        .IntCat(range(10), name="y")
+        Hist.new.Var(range(10), name="x")
+        .Var(range(10), name="y")
+        .Double()
         .fill([5, 5], [2, 6])
     )
 
     assert h[5j, 2j] == 1
     assert h[bh.loc(5), bh.loc(6)] == 1
 
-    h = Hist.StrCat("TF", name="x").fill(["T", "T"])
+    h = Hist.new.Int(0, 10, name="x").Int64().fill([5, 5])
+    assert h[5j] == 2
+
+    h = Hist.new.Int(0, 10, name="x").Int(0, 10, name="y").Int64().fill([5, 5], [2, 6])
+
+    assert h[5j, 2j] == 1
+    assert h[bh.loc(5), bh.loc(6)] == 1
+
+    h = Hist.new.IntCat(range(10), name="x").Double().fill([5, 5])
+    assert h[5j] == 2
+
+    # .new always creates a new proxy chain
+    h = (
+        Hist()
+        .new.IntCat(range(10), name="x")
+        .IntCat(range(10), name="y")
+        .Double()
+        .fill([5, 5], [2, 6])
+    )
+
+    assert h[5j, 2j] == 1
+    assert h[bh.loc(5), bh.loc(6)] == 1
+
+    h = Hist.new.StrCat("TF", name="x").Int64().fill(["T", "T"])
     assert h["T"] == 2
 
     h = (
-        Hist()
-        .StrCat("TF", name="x")
+        Hist.new.StrCat("TF", name="x")
         .StrCat("TF", name="y")
+        .Int64()
         .fill(["T", "T"], ["T", "F"])
     )
 
     assert h["T", "T"] == 1
     assert h["T", "F"] == 1
-
-    # add axes to existing histogram
-    with pytest.raises(Exception):
-        Hist().Reg(10, 0, 1, name="x").fill([0.5, 0.5]).Reg(10, -1, 1, name="y")
-
-    with pytest.raises(Exception):
-        Hist(axis.Reg(10, 0, 1, name="x")).Reg(10, -1, 1, name="y")
-
-    with pytest.raises(Exception):
-        Hist().Bool(name="x").fill([True, True]).Bool(name="y")
-
-    with pytest.raises(Exception):
-        Hist(axis.Bool(name="x")).Bool(name="y")
-
-    with pytest.raises(Exception):
-        Hist().Var(range(0, 1, 10), name="x").fill([0.5, 0.5]).Var(
-            range(0, 1, 10), name="y"
-        )
-
-    with pytest.raises(Exception):
-        Hist(axis.Var(range(0, 1, 10), name="x")).Var(range(0, 1, 10), name="y")
-
-    with pytest.raises(Exception):
-        Hist().Int(0, 10, name="x").fill([0.5, 0.5]).Int(0, 10, name="y")
-
-    with pytest.raises(Exception):
-        Hist(axis.Int(0, 10, name="x")).Int(0, 10, name="y")
-
-    with pytest.raises(Exception):
-        Hist().IntCat(range(0, 1, 10), name="x").fill([0.5, 0.5]).IntCat(
-            range(0, 1, 10), name="y"
-        )
-
-    with pytest.raises(Exception):
-        Hist(axis.IntCat(range(0, 1, 10), name="x")).IntCat(range(0, 1, 10), name="y")
-
-    with pytest.raises(Exception):
-        Hist().StrCat("TF", name="x").fill(["T", "T"]).StrCat("TF", name="y")
-
-    with pytest.raises(Exception):
-        Hist(axis.StrCat("TF", name="x")).StrCat("TF", name="y")
 
 
 def test_general_density():

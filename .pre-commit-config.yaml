@@ -30,7 +30,7 @@ repos:
   rev: v0.782
   hooks:
   - id: mypy
-    files: src
+    files: ^src
 
 - repo: https://github.com/mgedmin/check-manifest
   rev: "0.43"
