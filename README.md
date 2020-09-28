@@ -3,6 +3,7 @@
 [![Github Actions badge](https://github.com/scikit-hep/hist/workflows/CI/badge.svg)](https://github.com/scikit-hep/hist/actions)
 [![Join the chat at https://gitter.im/Scikit-HEP/hist](https://badges.gitter.im/HSF/PyHEP-histogramming.svg)](https://gitter.im/HSF/PyHEP-histogramming?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![DOI](https://zenodo.org/badge/239605861.svg)](https://zenodo.org/badge/latestdoi/239605861)
 [![Scikit-HEP][sk-badge]](https://scikit-hep.org/)
 
 Hist is a analyst friendly front-end for
@@ -17,7 +18,7 @@ You can install this library from [PyPI](https://pypi.org/project/hist/) with pi
 python3 -m pip install "hist[plot]"
 ```
 
-If you do not need the plotting features, you can skip the `[plot]` extra:
+If you do not need the plotting features, you can skip the `[plot]` extra.
 
 ## Features
 
