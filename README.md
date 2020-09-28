@@ -9,6 +9,16 @@ Hist is a analyst friendly front-end for
 [boost-histogram](https://github.com/scikit-hep/boost-histogram), designed for
 Python 3.6+.
 
+## Installation
+
+You can install this library from [PyPI](https://pypi.org/project/hist/) with pip:
+
+```bash
+python3 -m pip install "hist[plot]"
+```
+
+If you do not need the plotting features, you can skip the `[plot]` extra:
+
 ## Features
 
 Hist currently provides everything boost-histogram provides, and the following enhancements:
@@ -36,20 +46,6 @@ Hist currently provides everything boost-histogram provides, and the following e
 
 - Notebook ready: Hist has gorgeous in-notebook representation.
   - No dependencies required
-
-## Installation
-
-You can install this library from [PyPI](https://pypi.org/project/hist/) with pip:
-
-```bash
-python3 -m pip install "hist[plot]"
-```
-
-If you do not need the plotting features, you can skip the `[plot]` extra:
-
-```bash
-python3 -m pip install hist
-```
 
 ## Usage
 
