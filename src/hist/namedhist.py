@@ -30,7 +30,7 @@ class NamedHist(BaseHist):
             )
 
     def fill(
-        self, *args, weight=None, sample=None, thread: Optional[int] = None, **kwargs
+        self, *args, weight=None, sample=None, threads: Optional[int] = None, **kwargs
     ):
         """
             Insert data into the histogram using names and return a \
@@ -38,7 +38,9 @@ class NamedHist(BaseHist):
         """
 
         if len(kwargs) and all(isinstance(k, str) for k in kwargs.keys()):
-            return super().fill(*args, **kwargs)
+            return super().fill(
+                *args, weight=weight, sample=sample, threads=threads, **kwargs
+            )
 
         else:
             raise TypeError(

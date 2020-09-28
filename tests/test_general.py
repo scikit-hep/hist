@@ -697,7 +697,7 @@ def test_general_index_access():
     plt.close("all")
 
 
-class test_general_storage_proxy:
+class Test_general_storage_proxy:
     """
         Test general storage proxy suite -- whether Hist storage proxy \
         works properly.
@@ -705,8 +705,7 @@ class test_general_storage_proxy:
 
     def test_double(self):
         h = (
-            Hist()
-            .Reg(10, 0, 1, name="x")
+            Hist.new.Reg(10, 0, 1, name="x")
             .Reg(10, 0, 1, name="y")
             .Double()
             .fill(x=[0.5, 0.5], y=[0.2, 0.6])
@@ -714,23 +713,23 @@ class test_general_storage_proxy:
 
         assert h[0.5j, 0.2j] == 1
         assert h[bh.loc(0.5), bh.loc(0.6)] == 1
-        assert isinstance(h[0.5j, 0.5j], int)
+        assert isinstance(h[0.5j, 0.5j], float)
 
         # add storage to existing storage
         with pytest.raises(Exception):
             h.Double()
 
     def test_int64(self):
-        h = Hist.Reg(10, 0, 1, name="x").Int64().fill([0.5, 0.5])
+        h = Hist.new.Reg(10, 0, 1, name="x").Int64().fill([0.5, 0.5])
         assert h[0.5j] == 2
-        assert isinstance(h[0.5j], float)
+        assert isinstance(h[0.5j], int)
 
         # add storage to existing storage
         with pytest.raises(Exception):
             h.Int64()
 
     def test_automic_int64(self):
-        h = Hist(axis.Regular(10, 0, 1, name="x")).AutomicInt64().fill([0.5, 0.5])
+        h = Hist.new.Reg(10, 0, 1, name="x").AutomicInt64().fill([0.5, 0.5])
         assert h[0.5j] == 2
         assert isinstance(h[0.5j], int)
 
@@ -739,36 +738,46 @@ class test_general_storage_proxy:
             h.AutomicInt64()
 
     def test_weight(self):
-        h = Hist.Reg(10, 0, 1, name="x").Weight().fill([0.5, 0.5])
-        assert h[0.5j] == 2
-        assert isinstance(h[0.5j], float)
+        h = Hist.new.Reg(10, 0, 1, name="x").Weight().fill([0.5, 0.5])
+        assert h[0.5j].variance == 2
+        assert h[0.5j].value == 2
 
         # add storage to existing storage
         with pytest.raises(Exception):
             h.Weight()
 
     def test_mean(self):
-        h = Hist(axis.Regular(10, 0, 1, name="x")).Mean().fill([0.5, 0.5])
-        assert h[0.5j] == 2
-        assert isinstance(h[0.5j], float)
+        h = (
+            Hist.new.Reg(10, 0, 1, name="x")
+            .Mean()
+            .fill([0.5, 0.5], weight=[1, 1], sample=[1, 1])
+        )
+        assert h[0.5j].count == 2
+        assert h[0.5j].value == 1
+        assert h[0.5j].variance == 0
 
         # add storage to existing storage
         with pytest.raises(Exception):
             h.Mean()
 
     def test_weighted_mean(self):
-        h = Hist.Reg(10, 0, 1, name="x").WeightedMean().fill([0.5, 0.5])
-        assert h[0.5j] == 2
-        assert isinstance(h[0.5j], float)
+        h = (
+            Hist.new.Reg(10, 0, 1, name="x")
+            .WeightedMean()
+            .fill([0.5, 0.5], weight=[1, 1], sample=[1, 1])
+        )
+        assert h[0.5j].sum_of_weights == 2
+        assert h[0.5j].sum_of_weights_squared == 2
+        assert h[0.5j].value == 1
+        assert h[0.5j].variance == 0
 
         # add storage to existing storage
         with pytest.raises(Exception):
             h.WeightedMean()
 
     def test_unlimited(self):
-        h = Hist(axis.Regular(10, 0, 1, name="x")).Unlimited().fill([0.5, 0.5])
+        h = Hist.new.Reg(10, 0, 1, name="x").Unlimited().fill([0.5, 0.5])
         assert h[0.5j] == 2
-        assert isinstance(h[0.5j], any)
 
         # add storage to existing storage
         with pytest.raises(Exception):
