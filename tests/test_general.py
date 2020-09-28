@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 from hist import Hist, axis
+from hist.basehist import BaseHist
+from hist.namedhist import NamedHist
+
 import boost_histogram as bh
 import pytest
 import numpy as np
@@ -8,19 +11,31 @@ import math
 from uncertainties import unumpy as unp
 import matplotlib.pyplot as plt
 
-# ToDo: specify what error is raised
+
+@pytest.fixture(params=[Hist, BaseHist, NamedHist])
+def named_hist(request):
+    yield request.param
 
 
-def test_general_init():
+@pytest.fixture(params=[Hist, BaseHist])
+def unnamed_hist(request):
+    yield request.param
+
+
+# TODO: specify what error is raised
+
+
+def test_init_and_fill(unnamed_hist):
     """
     Test general init -- whether Hist can be properly initialized.
+    Also tests filling.
     """
     np.random.seed(42)
 
     # basic
-    h = Hist(axis.Regular(10, 0, 1, name="x"), axis.Regular(10, 0, 1, name="y")).fill(
-        [0.35, 0.35, 0.45], [0.35, 0.35, 0.45]
-    )
+    h = unnamed_hist(
+        axis.Regular(10, 0, 1, name="x"), axis.Regular(10, 0, 1, name="y")
+    ).fill([0.35, 0.35, 0.45], [0.35, 0.35, 0.45])
 
     for idx in range(10):
         if idx == 3:
@@ -36,71 +51,75 @@ def test_general_init():
             assert h[{0: idx, 1: idx}] == 0
             assert h[{"x": idx, "y": idx}] == 0
 
-    # with named axes
-    assert Hist(
+    assert unnamed_hist(
         axis.Regular(50, -3, 3, name="x"), axis.Regular(50, -3, 3, name="y")
     ).fill(np.random.randn(10), np.random.randn(10))
 
-    assert Hist(axis.Boolean(name="x"), axis.Boolean(name="y")).fill(
+    assert unnamed_hist(axis.Boolean(name="x"), axis.Boolean(name="y")).fill(
         [True, False, True], [True, False, True]
     )
 
-    assert Hist(
+    assert unnamed_hist(
         axis.Variable(range(-3, 3), name="x"), axis.Variable(range(-3, 3), name="y")
     ).fill(np.random.randn(10), np.random.randn(10))
 
-    assert Hist(axis.Integer(-3, 3, name="x"), axis.Integer(-3, 3, name="y")).fill(
-        np.random.randn(10), np.random.randn(10)
-    )
+    assert unnamed_hist(
+        axis.Integer(-3, 3, name="x"), axis.Integer(-3, 3, name="y")
+    ).fill(np.random.randn(10), np.random.randn(10))
 
-    assert Hist(
+    assert unnamed_hist(
         axis.IntCategory(range(-3, 3), name="x"),
         axis.IntCategory(range(-3, 3), name="y"),
     ).fill(np.random.randn(10), np.random.randn(10))
 
-    assert Hist(
+    assert unnamed_hist(
         axis.StrCategory(["F", "T"], name="x"), axis.StrCategory("FT", name="y")
     ).fill(["T", "F", "T"], ["T", "F", "T"])
 
+
+def test_no_named_init(unnamed_hist):
     # with no-named axes
-    assert Hist(axis.Regular(50, -3, 3), axis.Regular(50, -3, 3))
+    assert unnamed_hist(axis.Regular(50, -3, 3), axis.Regular(50, -3, 3))
 
-    assert Hist(axis.Boolean(), axis.Boolean())
+    assert unnamed_hist(axis.Boolean(), axis.Boolean())
 
-    assert Hist(axis.Variable(range(-3, 3)), axis.Variable(range(-3, 3)))
+    assert unnamed_hist(axis.Variable(range(-3, 3)), axis.Variable(range(-3, 3)))
 
-    assert Hist(axis.Integer(-3, 3), axis.Integer(-3, 3))
+    assert unnamed_hist(axis.Integer(-3, 3), axis.Integer(-3, 3))
 
-    assert Hist(
+    assert unnamed_hist(
         axis.IntCategory(range(-3, 3)),
         axis.IntCategory(range(-3, 3)),
     )
 
-    assert Hist(axis.StrCategory("TF"), axis.StrCategory(["T", "F"]))
+    assert unnamed_hist(axis.StrCategory("TF"), axis.StrCategory(["T", "F"]))
 
-    # with duplicated names
-    with pytest.raises(Exception):
-        Hist(axis.Regular(50, -3, 3, name="x"), axis.Regular(50, -3, 3, name="x"))
 
+def test_duplicated_names_init(named_hist):
     with pytest.raises(Exception):
-        Hist(axis.Boolean(name="y"), axis.Boolean(name="y"))
+        named_hist(axis.Regular(50, -3, 3, name="x"), axis.Regular(50, -3, 3, name="x"))
 
     with pytest.raises(Exception):
-        Hist(
+        named_hist(axis.Boolean(name="y"), axis.Boolean(name="y"))
+
+    with pytest.raises(Exception):
+        named_hist(
             axis.Variable(range(-3, 3), name="x"), axis.Variable(range(-3, 3), name="x")
         )
 
     with pytest.raises(Exception):
-        Hist(axis.Integer(-3, 3, name="x"), axis.Integer(-3, 3, name="x"))
+        named_hist(axis.Integer(-3, 3, name="x"), axis.Integer(-3, 3, name="x"))
 
     with pytest.raises(Exception):
-        Hist(
+        named_hist(
             axis.IntCategory(range(-3, 3), name="x"),
             axis.IntCategory(range(-3, 3), name="x"),
         )
 
     with pytest.raises(Exception):
-        Hist(axis.StrCategory("TF", name="y"), axis.StrCategory(["T", "F"], name="y"))
+        named_hist(
+            axis.StrCategory("TF", name="y"), axis.StrCategory(["T", "F"], name="y")
+        )
 
 
 def test_general_fill():
@@ -862,7 +881,12 @@ def test_general_transform_proxy():
         Hist.new.Func(4, 1, 5)
 
 
-def test_general_hist_proxy():
+def test_hist_proxy_matches(named_hist):
+    h = named_hist.new.Reg(10, 0, 1, name="x").Double()
+    assert type(h) == named_hist
+
+
+def test_hist_proxy():
     """
     Test general hist proxy -- whether Hist hist proxy works properly.
     """

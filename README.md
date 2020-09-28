@@ -5,11 +5,47 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Scikit-HEP][sk-badge]](https://scikit-hep.org/)
 
-Hist is a analyst friendly front-end for [boost-histogram](https://github.com/scikit-hep/boost-histogram), written in Python 3.
+Hist is a analyst friendly front-end for
+[boost-histogram](https://github.com/scikit-hep/boost-histogram), designed for
+Python 3.6+.
+
+## Features
+
+Hist currently provides everything boost-histogram provides, and the following enhancements:
+
+- Hist augments axes with names:
+  - `name=` is a unique label describing each axis.
+  - `label=` is an optional string that is used in plotting (defaults to `name`
+    if not provided).
+  - Indexing, projection, and more support named axes.
+  - Experimental `NamedHist` is a `Hist` that disables most forms of positional access.
+
+- The `Hist` class augments `bh.Histogram` with reduced typing construction:
+  - Optional import-free construction system
+  - `flow=False` is a fast way to turn off flow
+
+- Hist implements UHI+; an extension to the UHI system designed for import-free interactivity:
+  - Uses `j` suffix to switch to data coordinates in access or slices
+  - Uses `j` suffix on slices to rebin
+  - Strings can be used directly to index into string category axes
+
+- Quick plotting routines encourage exploration:
+  - `.plot()` provides 1D and 2D plots
+  - `.plot2d_full()` shows 1D projects around a 2D plot
+  - `.plot_pull(...)` performs a pull plot
+
+- Notebook ready: Hist has gorgeous in-notebook representation.
+  - No dependencies required
 
 ## Installation
 
 You can install this library from [PyPI](https://pypi.org/project/hist/) with pip:
+
+```bash
+python3 -m pip install "hist[plot]"
+```
+
+If you do not need the plotting features, you can skip the `[plot]` extra:
 
 ```bash
 python3 -m pip install hist
@@ -18,52 +54,38 @@ python3 -m pip install hist
 ## Usage
 
 ```python
-import hist
+from hist import Hist
 
-# You can create a histogram like this.
+# Quick construction, no other imports needed:
 h = (
-  hist.Hist()
+  Hist.new
   .Reg(10, 0 ,1, name="x", label="x-axis")
   .Variable(range(10), name="y", label="y-axis")
   .Int64()
 )
 
-# Filling by names is allowed in hist.
+# Filling by names is allowed:
 hist.fill(y=[1, 4, 6], x=[3, 5, 2])
 
-# New ways to manipulate the histogram.
+# Names can be used to manipulate the histogram:
 h.project("x")
-h[{"y": 1j + 3, "x": 5j}]
-...
+h[{"y": 0.5j + 3, "x": 5j}]
 
-# Elegant plotting functions.
+# You can access data coordinates or rebin with a `j` suffix:
+h[.3j:, ::2j] # x from .3 to the end, y is rebinned by 2
+
+# Elegant plotting functions:
 h.plot()
 h.plot2d_full()
 h.plot_pull(Callable)
-...
 ```
-
-## Features
-
-- Hist augments metadata by adding names to axes; these are *highly* recommend and will help you track axes. There is also a special `NamedHist`, which will enforce all hist axes have names, and all axes will require named access.
-  - `   name=` is a unique label describing each axis
-  - `label=` is an optional string that is used in plotting (defaults to name if not provided)
-  - Indexing, projection, and more support named axes.
-
-- The `Hist` class augments the `bh.Histogram` class with the following shortcuts, designed for interactive exploration without extensive imports:
-  - Optional import-free construction system
-  - Quick import-free data-coordinates and rebin syntax (use a j suffix for numbers, or strings directly in indexing expressions)
-
-- Quick plotting routines encourage exploration:
-
-  - `.plot()` provides 1D and 2D plots
-  - `.plot2d_full()` shows 1D projects around a 2D plot
-  - `.plot_pull(...)` performs a pull plot
 
 ## Development
 
+From a git checkout, run:
+
 ```bash
-python -m pip install hist
+python -m pip install -e .[dev]
 ```
 
 See [CONTRIBUTING.md](./.github/CONTRIBUTING.md) for information on setting up a development environment.
