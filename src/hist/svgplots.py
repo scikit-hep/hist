@@ -143,7 +143,7 @@ def svg_hist_2d(h):
     for r, (up_edge, bottom_edge) in enumerate(zip(ey[:-1], ey[1:])):
         ht = up_edge - bottom_edge
         for c, (left_edge, right_edge) in enumerate(zip(ex[:-1], ex[1:])):
-            opacity = norm_vals[r, c]
+            opacity = norm_vals[c, r]
             wt = left_edge - right_edge
             boxes.append(
                 rect(
