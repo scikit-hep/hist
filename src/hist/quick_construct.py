@@ -103,7 +103,7 @@ class ConstructProxy(QuickConstruct):
     def Int64(self) -> "BaseHist":
         return self.hist_class(*self.axes, storage=storage.Int64())
 
-    def AutomicInt64(self) -> "BaseHist":
+    def AtomicInt64(self) -> "BaseHist":
         return self.hist_class(*self.axes, storage=storage.AtomicInt64())
 
     def Weight(self) -> "BaseHist":

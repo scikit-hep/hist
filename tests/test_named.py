@@ -438,7 +438,7 @@ def test_named_access():
         h[0j, -0j + 2, "hi", True]
 
 
-class Test_named_storage_proxy:
+class TestNamedStorageProxy:
     """
         Test named storage proxy suite -- whether NamedHist storage proxy \
         works properly.

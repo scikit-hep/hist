@@ -697,7 +697,7 @@ def test_general_index_access():
     plt.close("all")
 
 
-class Test_general_storage_proxy:
+class TestGeneralStorageProxy:
     """
         Test general storage proxy suite -- whether Hist storage proxy \
         works properly.

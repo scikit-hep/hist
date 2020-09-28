@@ -691,7 +691,7 @@ def test_base_index_access():
         h[0:10:20j, 0:5:10j, "hello", False, 5]
 
 
-class Test_base_storage_proxy:
+class TestBaseStorageProxy:
     """
         Test base storage proxy suite -- whether BaseHist storage proxy \
         works properly.
