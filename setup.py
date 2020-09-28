@@ -8,6 +8,7 @@
 from setuptools import setup
 
 extras_require = {}
+
 extras_require["plot"] = [
     "matplotlib >=3.0",
     "scipy >=1.4",
@@ -16,11 +17,10 @@ extras_require["plot"] = [
 ]
 
 extras_require["test"] = [
-    *extras_require["plot"],
     "pytest >=4.6",
 ]
-extras_require["dev"] = [*extras_require["test"], "ipykernel"]
 
+extras_require["dev"] = [*extras_require["test"], *extras_require["plot"], "ipykernel"]
 
 extras_require["docs"] = [
     *extras_require["plot"],
