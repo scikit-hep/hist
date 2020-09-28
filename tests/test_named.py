@@ -438,7 +438,7 @@ def test_named_access():
         h[0j, -0j + 2, "hi", True]
 
 
-class Test_named_storage_proxy:
+class TestNamedStorageProxy:
     """
         Test named storage proxy suite -- whether NamedHist storage proxy \
         works properly.
@@ -469,14 +469,14 @@ class Test_named_storage_proxy:
         with pytest.raises(Exception):
             h.Int64()
 
-    def test_automic_int64(self):
-        h = NamedHist.new.Reg(10, 0, 1, name="x").AutomicInt64().fill(x=[0.5, 0.5])
+    def test_atomic_int64(self):
+        h = NamedHist.new.Reg(10, 0, 1, name="x").AtomicInt64().fill(x=[0.5, 0.5])
         assert h[0.5j] == 2
         assert isinstance(h[0.5j], int)
 
         # add storage to existing storage
         with pytest.raises(Exception):
-            h.AutomicInt64()
+            h.AtomicInt64()
 
     def test_weight(self):
         h = NamedHist.new.Reg(10, 0, 1, name="x").Weight().fill(x=[0.5, 0.5])

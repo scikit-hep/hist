@@ -691,7 +691,7 @@ def test_base_index_access():
         h[0:10:20j, 0:5:10j, "hello", False, 5]
 
 
-class Test_base_storage_proxy:
+class TestBaseStorageProxy:
     """
         Test base storage proxy suite -- whether BaseHist storage proxy \
         works properly.
@@ -722,14 +722,14 @@ class Test_base_storage_proxy:
         with pytest.raises(Exception):
             h.Int64()
 
-    def test_automic_int64(self):
-        h = BaseHist.new.Reg(10, 0, 1, name="x").AutomicInt64().fill([0.5, 0.5])
+    def test_atomic_int64(self):
+        h = BaseHist.new.Reg(10, 0, 1, name="x").AtomicInt64().fill([0.5, 0.5])
         assert h[0.5j] == 2
         assert isinstance(h[0.5j], int)
 
         # add storage to existing storage
         with pytest.raises(Exception):
-            h.AutomicInt64()
+            h.AtomicInt64()
 
     def test_weight(self):
         h = BaseHist.new.Reg(10, 0, 1, name="x").Weight().fill([0.5, 0.5])

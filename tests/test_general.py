@@ -697,7 +697,7 @@ def test_general_index_access():
     plt.close("all")
 
 
-class Test_general_storage_proxy:
+class TestGeneralStorageProxy:
     """
         Test general storage proxy suite -- whether Hist storage proxy \
         works properly.
@@ -728,14 +728,14 @@ class Test_general_storage_proxy:
         with pytest.raises(Exception):
             h.Int64()
 
-    def test_automic_int64(self):
-        h = Hist.new.Reg(10, 0, 1, name="x").AutomicInt64().fill([0.5, 0.5])
+    def test_atomic_int64(self):
+        h = Hist.new.Reg(10, 0, 1, name="x").AtomicInt64().fill([0.5, 0.5])
         assert h[0.5j] == 2
         assert isinstance(h[0.5j], int)
 
         # add storage to existing storage
         with pytest.raises(Exception):
-            h.AutomicInt64()
+            h.AtomicInt64()
 
     def test_weight(self):
         h = Hist.new.Reg(10, 0, 1, name="x").Weight().fill([0.5, 0.5])
