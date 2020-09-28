@@ -6,7 +6,7 @@
 [![Scikit-HEP][sk-badge]](https://scikit-hep.org/)
 
 Hist is a analyst friendly front-end for
-[boost-histogram](https://github.com/scikit-hep/boost-histogram), written for
+[boost-histogram](https://github.com/scikit-hep/boost-histogram), designed for
 Python 3.6+.
 
 ## Features
@@ -42,17 +42,14 @@ Hist currently provides everything boost-histogram provides, and the following e
 You can install this library from [PyPI](https://pypi.org/project/hist/) with pip:
 
 ```bash
-python3 -m pip install hist
-```
-
-If you want the plotting features, you are encouraged to run:
-
-```bash
 python3 -m pip install "hist[plot]"
 ```
 
-In the future, the plotting dependencies (like mplhep, matplotlib, and scipy)
-may become optional; the second line will always include them.
+If you do not need the plotting features, you can skip the `[plot]` extra:
+
+```bash
+python3 -m pip install hist
+```
 
 ## Usage
 
