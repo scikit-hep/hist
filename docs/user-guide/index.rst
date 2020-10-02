@@ -11,6 +11,6 @@ User Guide
    notebooks/Axis
    notebooks/Storage
    notebooks/Transform
-   notebooks/Histogram
-   notebooks/Plots
    notebooks/Reprs
+   notebooks/Plots
+   notebooks/Histogram

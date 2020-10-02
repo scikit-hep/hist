@@ -4,7 +4,7 @@ import numpy as np
 from .svgutils import svg, html, rect, line, text, div, polyline, polygon, circle
 
 
-def desc_hist(h):
+def _desc_hist(h):
     main_sum = h.sum()
     flow_too_sum = h.sum(flow=True)
 
@@ -20,7 +20,7 @@ def desc_hist(h):
 
 def html_hist(h, function):
     left_column = div(function(h), style="width:290px;")
-    right_column = div(desc_hist(h), style="flex=grow:1;")
+    right_column = div(_desc_hist(h), style="flex=grow:1;")
 
     container = div(
         left_column, right_column, style="display:flex; align-items:center;"
