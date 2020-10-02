@@ -1,13 +1,11 @@
-.. _development:
-
 Development
 ===========================
 
-Installation
---------------------
+We welcome you to contribute to this project. If you want to develop this package, you can
+use the following methods.
 
 Pip
-~~~~~~~~~~~~~~~~~~~~
+------------------------
 
 You can set up a development environment using pip.
 
@@ -21,7 +19,7 @@ You can set up a development environment using pip.
 *You should have pip 10 or later*.
 
 Conda
-~~~~~~~~~~~~~~~~~~~~
+-------------------------
 
 You can also set up a development environment using Conda. With Conda, you can search some channels for development.
 

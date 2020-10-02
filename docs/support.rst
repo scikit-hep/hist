@@ -1,9 +1,7 @@
-.. _support:
-
 Support
 =======
 
-If you are stuck with a problem using Hist, please do get in touch at our `Issues <https://github.com/scikit-hep/hist/issues>`_.
+If you are stuck with a problem using Hist, please do get in touch at our `Issues <https://github.com/scikit-hep/hist/issues>`_ or `Gitter Channel <https://gitter.im/HSF/PyHEP-histogramming>`_. The developers are willing to help.
 
 You can save time by following this procedure when reporting a problem:
 
