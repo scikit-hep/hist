@@ -1,6 +1,6 @@
 # Hist
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 [![Github Actions badge](https://github.com/scikit-hep/hist/workflows/CI/badge.svg)](https://github.com/scikit-hep/hist/actions)
@@ -98,27 +98,18 @@ We would like to acknowledge the contributors that made this project possible ([
 <!-- markdownlint-disable -->
 <table>
   <tr>
-    <td align="center"><a href="https://github.com/chrisburr"><img src="https://avatars3.githubusercontent.com/u/5220533?v=4" width="100px;" alt=""/><br /><sub><b>Chris Burr</b></sub></a><br /><a href="https://github.com/scikit-hep/hist/commits?author=chrisburr" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/henryiii"><img src="https://avatars1.githubusercontent.com/u/4616906?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Henry Schreiner</b></sub></a><br /><a href="#maintenance-henryiii" title="Maintenance">🚧</a> <a href="https://github.com/scikit-hep/hist/commits?author=henryiii" title="Code">💻</a> <a href="https://github.com/scikit-hep/hist/commits?author=henryiii" title="Documentation">📖</a></td>
+    <td align="center"><a href="http://lovelybuggies.com.cn/"><img src="https://avatars3.githubusercontent.com/u/29083689?v=4?s=100" width="100px;" alt=""/><br /><sub><b>N!no</b></sub></a><br /><a href="#maintenance-LovelyBuggies" title="Maintenance">🚧</a> <a href="https://github.com/scikit-hep/hist/commits?author=LovelyBuggies" title="Code">💻</a> <a href="https://github.com/scikit-hep/hist/commits?author=LovelyBuggies" title="Documentation">📖</a></td>
+    <td align="center"><a href="https://github.com/chrisburr"><img src="https://avatars3.githubusercontent.com/u/5220533?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Chris Burr</b></sub></a><br /><a href="https://github.com/scikit-hep/hist/commits?author=chrisburr" title="Code">💻</a></td>
   </tr>
 </table>
 
-<!-- markdownlint-enable -->
+<!-- markdownlint-restore -->
 <!-- prettier-ignore-end -->
+
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
-<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-<!-- prettier-ignore-start -->
-<!-- markdownlint-disable -->
-<table>
-  <tr>
-    <td align="center"><a href="http://iscinumpy.gitlab.io"><img src="https://avatars1.githubusercontent.com/u/4616906?v=4" width="100px;" alt=""/><br /><sub><b>Henry Schreiner</b></sub></a><br /><a href="#maintenance-henryiii" title="Maintenance">🚧</a> <a href="https://github.com/scikit-hep/hist/commits?author=henryiii" title="Code">💻</a> <a href="https://github.com/scikit-hep/hist/commits?author=henryiii" title="Documentation">📖</a></td>
-    <td align="center"><a href="https://github.com/lovelybuggies"><img src="https://avatars3.githubusercontent.com/u/29083689?v=4" width="100px;" alt=""/><br /><sub><b>Nino Lau</b></sub></a><br /><a href="#maintenance-lovelybuggies" title="Maintenance">🚧</a> <a href="https://github.com/scikit-hep/hist/commits?author=lovelybuggies" title="Code">💻</a><a href="https://github.com/scikit-hep/hist/commits?author=lovelybuggies" title="Documentation">📖</a></td>
-  </tr>
-</table>
 
-<!-- markdownlint-enable -->
-<!-- prettier-ignore-end -->
-<!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification.
 

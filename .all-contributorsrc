@@ -1,10 +1,37 @@
 {
+  "projectName": "hist",
+  "projectOwner": "scikit-hep",
+  "repoType": "github",
+  "repoHost": "https://github.com",
   "files": [
     "README.md"
   ],
   "imageSize": 100,
   "commit": false,
+  "commitConvention": "angular",
   "contributors": [
+    {
+      "login": "henryiii",
+      "name": "Henry Schreiner",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/4616906?v=4",
+      "profile": "https://github.com/henryiii",
+      "contributions": [
+        "maintenance",
+        "code",
+        "doc"
+      ]
+    },
+    {
+      "login": "LovelyBuggies",
+      "name": "N!no",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/29083689?v=4",
+      "profile": "http://lovelybuggies.com.cn/",
+      "contributions": [
+        "maintenance",
+        "code",
+        "doc"
+      ]
+    },
     {
       "login": "chrisburr",
       "name": "Chris Burr",
@@ -15,10 +42,5 @@
       ]
     }
   ],
-  "contributorsPerLine": 7,
-  "projectName": "hist",
-  "projectOwner": "scikit-hep",
-  "repoType": "github",
-  "repoHost": "https://github.com",
-  "skipCi": true
+  "contributorsPerLine": 7
 }
