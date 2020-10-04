@@ -1,7 +1,4 @@
 # Hist
-<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
-<!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 [![Github Actions badge](https://github.com/scikit-hep/hist/workflows/CI/badge.svg)](https://github.com/scikit-hep/hist/actions)
 [![Join the chat at https://gitter.im/Scikit-HEP/hist](https://badges.gitter.im/HSF/PyHEP-histogramming.svg)](https://gitter.im/HSF/PyHEP-histogramming?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
