@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import sys
-import os
+import shutil
 import argparse
 import hist
 import boost_histogram as bh
@@ -18,7 +18,7 @@ def main() -> None:
         "--screen-width",
         type=int,
         help="maximum screen width",
-        default=os.get_terminal_size()[0],
+        default=shutil.get_terminal_size()[0],
     )
     parser.add_argument("-t", "--label", type=str, help="label for plot")
     parser.add_argument("-o", "--output-image", type=str, help="save image to file")
