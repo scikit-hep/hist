@@ -1,0 +1,4 @@
+# Add 'needs changelog` label to any change to .py files as long as the `changelog` hasn't changed
+needs changelog:
+- any: ['src/**/*.py']
+  all: ['!docs/changelog.rst']
