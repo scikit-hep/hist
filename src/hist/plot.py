@@ -136,7 +136,7 @@ def plot_pull(
         from uncertainties import correlated_values, unumpy
     except ImportError:
         print(
-            "Hist requires scipy and uncertainties, please install hist[plot] or manually install dependencies",
+            "Hist.plot_pull requires scipy and uncertainties. Please install hist[plot] or manually install dependencies.",
             file=sys.stderr,
         )
         raise
@@ -203,7 +203,7 @@ def plot_pull(
 
     # patch plot keyword arguments
     pp_kwargs = _filter_dict(kwargs, "pp_", ignore={"pp_num"})
-    pp_num = kwargs.pop("pp_num", 3)
+    pp_num = kwargs.pop("pp_num", 5)
 
     # Judge whether some arguments are left
     if kwargs:
@@ -231,14 +231,14 @@ def plot_pull(
     width = (right_edge - left_edge) / len(pulls)
     pull_ax.bar(self.axes.centers[0], pulls, width=width, **bar_kwargs)
 
-    patch_height = max(np.abs(pulls)) / pp_num
+    patch_height = 5. / pp_num
     patch_width = width * len(pulls)
     for i in range(pp_num):
         # gradient color patches
         if "alpha" in pp_kwargs:
             pp_kwargs["alpha"] *= np.power(0.618, i)
         else:
-            pp_kwargs["alpha"] = 0.618 * np.power(0.618, i)
+            pp_kwargs["alpha"] = 0.5 * np.power(0.618, i)
 
         upRect_startpoint = (left_edge, i * patch_height)
         upRect = patches.Rectangle(
@@ -250,7 +250,9 @@ def plot_pull(
             downRect_startpoint, patch_width, patch_height, **pp_kwargs
         )
         pull_ax.add_patch(downRect)
+
     plt.xlim(left_edge, right_edge)
+    plt.ylim(-5, 5)
 
     pull_ax.set_xlabel(self.axes[0].label)
     pull_ax.set_ylabel("Pull")
