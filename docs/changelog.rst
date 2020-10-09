@@ -4,6 +4,10 @@ Changelog
 IN PROGRESS
 -----------
 
+
+* Fixed ``plot2d_full`` incorrectly mirroring the y-axis.
+  `#105 <https://github.com/scikit-hep/hist/pull/105>`_
+
 * `Hist.plot_pull`: more suitable bands in the pull bands 1sigma, 2 sigma, etc.
   `#102 <https://github.com/scikit-hep/hist/pull/102>`_
 

@@ -103,7 +103,7 @@ def plot2d_full(
 
     # side plot
     base = side_ax.transData
-    rot = transforms.Affine2D().rotate_deg(-90)
+    rot = transforms.Affine2D().rotate_deg(90).scale(-1, 1)
 
     side_art = histplot(
         self.project(self.axes[1].name or 1),
