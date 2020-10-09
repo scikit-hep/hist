@@ -231,7 +231,7 @@ def plot_pull(
     width = (right_edge - left_edge) / len(pulls)
     pull_ax.bar(self.axes.centers[0], pulls, width=width, **bar_kwargs)
 
-    patch_height = 5. / pp_num
+    patch_height = max(np.abs(pulls)) / pp_num
     patch_width = width * len(pulls)
     for i in range(pp_num):
         # gradient color patches
@@ -252,7 +252,6 @@ def plot_pull(
         pull_ax.add_patch(downRect)
 
     plt.xlim(left_edge, right_edge)
-    plt.ylim(-5, 5)
 
     pull_ax.set_xlabel(self.axes[0].label)
     pull_ax.set_ylabel("Pull")
