@@ -4,6 +4,9 @@ Changelog
 IN PROGRESS
 -----------
 
+* `Hist.plot_pull`: more suitable bands in the pull bands 1sigma, 2 sigma, etc.
+  `#102 <https://github.com/scikit-hep/hist/pull/102>`_
+
 * Fixed classichist's usage of `get_terminal_size` to support not running in a terminal
   `#99 <https://github.com/scikit-hep/hist/pull/99>`_
 
