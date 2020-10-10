@@ -35,7 +35,7 @@ Hist currently provides everything boost-histogram provides, and the following e
   - Optional import-free construction system
   - `flow=False` is a fast way to turn off flow
 
-- Hist implements UHI+; an extension to the UHI system designed for import-free interactivity:
+- Hist implements UHI+; an extension to the UHI (Unified Histogram Indexing) system designed for import-free interactivity:
   - Uses `j` suffix to switch to data coordinates in access or slices
   - Uses `j` suffix on slices to rebin
   - Strings can be used directly to index into string category axes
