@@ -96,11 +96,11 @@ We would like to acknowledge the contributors that made this project possible ([
 <table>
   <tr>
     <td align="center"><a href="https://github.com/henryiii"><img src="https://avatars1.githubusercontent.com/u/4616906?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Henry Schreiner</b></sub></a><br /><a href="#maintenance-henryiii" title="Maintenance">🚧</a> <a href="https://github.com/scikit-hep/hist/commits?author=henryiii" title="Code">💻</a> <a href="https://github.com/scikit-hep/hist/commits?author=henryiii" title="Documentation">📖</a></td>
-    <td align="center"><a href="http://lovelybuggies.com.cn/"><img src="https://avatars3.githubusercontent.com/u/29083689?v=4?s=100" width="100px;" alt=""/><br /><sub><b>N!no</b></sub></a><br /><a href="#maintenance-LovelyBuggies" title="Maintenance">🚧</a> <a href="https://github.com/scikit-hep/hist/commits?author=LovelyBuggies" title="Code">💻</a> <a href="https://github.com/scikit-hep/hist/commits?author=LovelyBuggies" title="Documentation">📖</a></td>
+    <td align="center"><a href="http://lovelybuggies.com.cn/"><img src="https://avatars3.githubusercontent.com/u/29083689?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Nino Lau</b></sub></a><br /><a href="#maintenance-LovelyBuggies" title="Maintenance">🚧</a> <a href="https://github.com/scikit-hep/hist/commits?author=LovelyBuggies" title="Code">💻</a> <a href="https://github.com/scikit-hep/hist/commits?author=LovelyBuggies" title="Documentation">📖</a></td>
     <td align="center"><a href="https://github.com/chrisburr"><img src="https://avatars3.githubusercontent.com/u/5220533?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Chris Burr</b></sub></a><br /><a href="https://github.com/scikit-hep/hist/commits?author=chrisburr" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/eduardo-rodrigues"><img src="https://avatars3.githubusercontent.com/u/5013581?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Eduardo Rodrigues</b></sub></a><br /><a href="https://github.com/scikit-hep/hist/commits?author=eduardo-rodrigues" title="Code">💻</a></td>
   </tr>
 </table>
-
 <!-- markdownlint-restore -->
 <!-- prettier-ignore-end -->
 
