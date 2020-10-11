@@ -4,6 +4,8 @@ Changelog
 IN PROGRESS
 -----------
 
+* Make sum of bins explicit in notebook representations.
+  `#106 <https://github.com/scikit-hep/hist/pull/106>`_
 
 * Fixed ``plot2d_full`` incorrectly mirroring the y-axis.
   `#105 <https://github.com/scikit-hep/hist/pull/105>`_
