@@ -1,8 +1,13 @@
 Changelog
-=========
+====================
 
 IN PROGRESS
------------
+--------------------
+
+
+
+Version 2.0.1
+--------------------
 
 * Make sum of bins explicit in notebook representations.
   `#106 <https://github.com/scikit-hep/hist/pull/106>`_
@@ -17,7 +22,7 @@ IN PROGRESS
   `#99 <https://github.com/scikit-hep/hist/pull/99>`_
 
 
-Version 2.0
------------
+Version 2.0.0
+--------------------
 
 First release of Hist.
