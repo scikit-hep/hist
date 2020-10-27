@@ -57,7 +57,7 @@ from hist import Hist
 h = (
   Hist.new
   .Reg(10, 0 ,1, name="x", label="x-axis")
-  .Variable(range(10), name="y", label="y-axis")
+  .Var(range(10), name="y", label="y-axis")
   .Int64()
 )
 
