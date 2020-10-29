@@ -7,3 +7,5 @@ Examples
    :maxdepth: 2
    :titlesonly:
    :glob:
+
+   HistDemo

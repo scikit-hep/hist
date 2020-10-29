@@ -29,6 +29,7 @@ extras_require["docs"] = [
     "Sphinx >=3.0.0",
     "sphinx_copybutton",
     "sphinx_rtd_theme >=0.5.0",
+    "sphinx_book_theme >=0.0.38",
     "ipython",
 ]
 
