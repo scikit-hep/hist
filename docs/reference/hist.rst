@@ -84,14 +84,6 @@ hist.tag module
    :undoc-members:
    :show-inheritance:
 
-hist.utils module
------------------
-
-.. automodule:: hist.utils
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 hist.version module
 -------------------
 
