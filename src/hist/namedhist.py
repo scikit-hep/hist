@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from .basehist import BaseHist
 from typing import Union, Optional
 

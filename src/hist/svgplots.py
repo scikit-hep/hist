@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import numpy as np
 
 from .svgutils import svg, html, rect, line, text, div, polyline, polygon, circle

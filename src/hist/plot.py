@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import sys
 from typing import Dict, Any, Optional, Set, Callable, Tuple
 import numpy as np

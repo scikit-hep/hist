@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 class XML:
     def __init__(self, *contents, **kargs):
         self.properties = kargs

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from .axestuple import NamedAxesTuple
 from .quick_construct import MetaConstructor
 from .utils import set_family, HIST_FAMILY

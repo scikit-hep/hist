@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from typing import Callable, TYPE_CHECKING, Type
 
 from .axis import AxisProtocol
