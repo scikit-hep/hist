@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 def test_1D_empty_repr(named_hist):
 
     h = named_hist.new.Reg(10, -1, 1, name="x").Double()

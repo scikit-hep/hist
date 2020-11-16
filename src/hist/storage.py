@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from boost_histogram.storage import (
     Storage,
     Int64,

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from hist import Hist, axis
 
 import boost_histogram as bh

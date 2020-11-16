@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from boost_histogram.axis import AxesTuple, ArrayTuple
 
 from typing import Any, Union, Tuple

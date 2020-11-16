@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from hist import Hist, NamedHist, axis
 
 import pytest
