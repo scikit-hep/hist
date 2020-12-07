@@ -63,15 +63,8 @@ def test_named_init():
     h = NamedHist(axis.Regular(10, 0, 1, name="x")).fill(x=[0.35, 0.35, 0.45])
 
     for idx in range(10):
-        if idx == 3:
-            with pytest.raises(Exception):
-                h[idx] == h[{0: idx}]
-        elif idx == 4:
-            with pytest.raises(Exception):
-                h[idx] == h[{0: idx}]
-        else:
-            with pytest.raises(Exception):
-                h[idx] == h[{0: idx}]
+        with pytest.raises(Exception):
+            h[{0: idx}]
 
     # with no-named axes
     with pytest.raises(Exception):
