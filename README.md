@@ -1,9 +1,16 @@
 # Hist
 
-[![Github Actions badge](https://github.com/scikit-hep/hist/workflows/CI/badge.svg)](https://github.com/scikit-hep/hist/actions)
-[![Join the chat at https://gitter.im/Scikit-HEP/hist](https://badges.gitter.im/HSF/PyHEP-histogramming.svg)](https://gitter.im/HSF/PyHEP-histogramming?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Actions Status][actions-badge]][actions-link]
+[![Documentation Status][rtd-badge]][rtd-link]
+[![Code style: black][black-badge]][black-link]
+
+[![PyPI version][pypi-version]][pypi-link]
+[![Conda-Forge][conda-badge]][conda-link]
+[![PyPI platforms][pypi-platforms]][pypi-link]
 [![DOI](https://zenodo.org/badge/239605861.svg)](https://zenodo.org/badge/latestdoi/239605861)
+
+[![GitHub Discussion][github-discussions-badge]][github-discussions-link]
+[![Gitter][gitter-badge]][gitter-link]
 [![Scikit-HEP][sk-badge]](https://scikit-hep.org/)
 
 Hist is a analyst friendly front-end for
@@ -123,4 +130,20 @@ This library was primarily developed by Henry Schreiner and Nino Lau.
 
 Support for this work was provided by the National Science Foundation cooperative agreement OAC-1836650 (IRIS-HEP) and OAC-1450377 (DIANA/HEP). Any opinions, findings, conclusions or recommendations expressed in this material are those of the authors and do not necessarily reflect the views of the National Science Foundation.
 
-[sk-badge]: https://scikit-hep.org/assets/images/Scikit--HEP-Project-blue.svg
+
+[actions-badge]:            https://github.com/scikit-hep/hist/workflows/Tests/badge.svg
+[actions-link]:             https://github.com/scikit-hep/hist/actions
+[black-badge]:              https://img.shields.io/badge/code%20style-black-000000.svg
+[black-link]:               https://github.com/psf/black
+[conda-badge]:              https://img.shields.io/conda/vn/conda-forge/hist
+[conda-link]:               https://github.com/conda-forge/hist-feedstock
+[github-discussions-badge]: https://img.shields.io/static/v1?label=Discussions&message=Ask&color=blue&logo=github
+[github-discussions-link]:  https://github.com/scikit-hep/hist/discussions
+[gitter-badge]:             https://badges.gitter.im/HSF/PyHEP-histogramming.svg
+[gitter-link]:              https://gitter.im/HSF/PyHEP-histogramming?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
+[pypi-link]:                https://pypi.org/project/hist/
+[pypi-platforms]:           https://img.shields.io/pypi/pyversions/hist
+[pypi-version]:             https://badge.fury.io/py/hist.svg
+[rtd-badge]:                https://readthedocs.org/projects/hist/badge/?version=latest
+[rtd-link]:                 https://hist.readthedocs.io/en/latest/?badge=latest
+[sk-badge]:                 https://scikit-hep.org/assets/images/Scikit--HEP-Project-blue.svg
