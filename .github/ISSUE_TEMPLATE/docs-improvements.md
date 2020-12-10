@@ -7,6 +7,8 @@ assignees: henryiii, LovelyBuggies
 
 ---
 
+<!-- Consider opening an Discussion instead! -->
+
 ## How do you want to improve the docs
 
 Report the typos and defects / Expect to new contents.

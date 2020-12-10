@@ -7,6 +7,8 @@ assignees: henryiii, LovelyBuggies
 
 ---
 
+<!-- Consider opening an Discussion instead! -->
+
 **Describe the problem, if any, that your feature request is related to**
 
 A clear and concise description of what the problem is.

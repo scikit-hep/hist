@@ -1,20 +1,14 @@
 ---
 name: Bug report
-about: Create a report to help us improve
+about: Create a report
 title: "[BUG] "
-labels: bug
-assignees: henryiii, LovelyBuggies
-
+labels: unverified-bug
 ---
 
 **Describe the bug**
 
-A clear and concise description of what the bug is.
+A clear and concise description of the bug.
 
-**To Reproduce**
+**Steps to reproduce**
 
-A clear and concise description of how this bug occurs.
-
-**Expected behavior**
-
-A clear and concise description of what you expected to happen.
+An example that highlights the broken behaviour. Include OS and system info if relevant.
