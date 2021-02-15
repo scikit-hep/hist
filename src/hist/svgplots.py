@@ -47,7 +47,7 @@ def svg_hist_1d(h):
     height = 100
 
     assert h.ndim == 1, "Must be 1D"
-    assert not h.axes[0].options.circular, "Must not be circular"
+    assert not h.axes[0].traits.circular, "Must not be circular"
 
     (edges,) = h.axes.edges
     norm_edges = (edges - edges[0]) / (edges[-1] - edges[0])
@@ -96,7 +96,7 @@ def svg_hist_1d_c(h):
     inner_radius = 20
 
     assert h.ndim == 1, "Must be 1D"
-    assert h.axes[0].options.circular, "Must be circular"
+    assert h.axes[0].traits.circular, "Must be circular"
 
     (edges,) = h.axes.edges
     norm_edges = (edges - edges[0]) / (edges[-1] - edges[0]) * np.pi * 2
