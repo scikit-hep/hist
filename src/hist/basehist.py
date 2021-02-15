@@ -59,7 +59,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor):
 
     def _repr_html_(self):
         if self.ndim == 1:
-            if self.axes[0].options.circular:
+            if self.axes[0].traits.circular:
                 return str(html_hist(self, svg_hist_1d_c))
             else:
                 return str(html_hist(self, svg_hist_1d))
