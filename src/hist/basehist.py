@@ -20,6 +20,18 @@ if TYPE_CHECKING:
     import matplotlib.axes
 
 
+# Workaround for bug in mplhep
+def _proc_kw_for_lw(kwargs):
+    return {
+        f"{k[:-3]}_linestyle"
+        if k.endswith("_ls")
+        else "linestyle"
+        if k == "ls"
+        else k: v
+        for k, v in kwargs.items()
+    }
+
+
 @set_family(HIST_FAMILY)
 class BaseHist(bh.Histogram, metaclass=MetaConstructor):
     __slots__ = ()
@@ -218,7 +230,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor):
 
         import hist.plot
 
-        return hist.plot.histplot(self, ax=ax, **kwargs)
+        return hist.plot.histplot(self, ax=ax, **_proc_kw_for_lw(kwargs))
 
     def plot2d(
         self,
@@ -232,7 +244,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor):
 
         import hist.plot
 
-        return hist.plot.hist2dplot(self, ax=ax, **kwargs)
+        return hist.plot.hist2dplot(self, ax=ax, **_proc_kw_for_lw(kwargs))
 
     def plot2d_full(
         self,
