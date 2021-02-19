@@ -21,6 +21,12 @@ except ImportError:
 __all__ = ("histplot", "hist2dplot", "plot2d_full", "plot_pull")
 
 
+def _expand_shortcuts(key: str) -> str:
+    if key == "ls":
+        return "linestyle"
+    return key
+
+
 def _filter_dict(
     dict: Dict[str, Any], prefix: str, *, ignore: Optional[Set[str]] = None
 ) -> Dict[str, Any]:
@@ -30,7 +36,7 @@ def _filter_dict(
     """
     ignore_set: Set[str] = ignore or set()
     return {
-        key[len(prefix) :]: dict.pop(key)
+        _expand_shortcuts(key[len(prefix) :]): dict.pop(key)
         for key in list(dict)
         if key.startswith(prefix) and key not in ignore_set
     }
