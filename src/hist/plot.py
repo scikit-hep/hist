@@ -168,9 +168,8 @@ def plot_pull(
         pull_ax = fig.add_subplot(grid[1], sharex=main_ax)
 
     # Computation and Fit
-    view = self.view()
-    values = view.value if hasattr(view, "value") else view
-    yerr = view.variance if hasattr(view, "variance") else np.sqrt(values)
+    values = self.values()
+    yerr = self.variances()
 
     # Compute fit values: using func as fit model
     popt, pcov = curve_fit(f=func, xdata=self.axes[0].centers, ydata=values)
