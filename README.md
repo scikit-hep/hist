@@ -41,6 +41,8 @@ Hist currently provides everything boost-histogram provides, and the following e
 - The `Hist` class augments `bh.Histogram` with reduced typing construction:
   - Optional import-free construction system
   - `flow=False` is a fast way to turn off flow
+  - Storages can be given by string
+  - `storage=` can be omitted
 
 - Hist implements UHI+; an extension to the UHI (Unified Histogram Indexing) system designed for import-free interactivity:
   - Uses `j` suffix to switch to data coordinates in access or slices

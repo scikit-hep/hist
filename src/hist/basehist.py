@@ -2,6 +2,7 @@ from .axestuple import NamedAxesTuple
 from .quick_construct import MetaConstructor
 from .utils import set_family, HIST_FAMILY
 from .storage import Storage
+from .axis import AxisProtocol
 
 import warnings
 import functools
@@ -36,15 +37,31 @@ def _proc_kw_for_lw(kwargs):
 class BaseHist(bh.Histogram, metaclass=MetaConstructor):
     __slots__ = ()
 
-    def __init__(self, *args, storage: Optional[Storage] = None, metadata=None):
+    def __init__(
+        self,
+        *args: Union[AxisProtocol, Storage, str, Tuple[int, float, float]],
+        storage: Optional[Union[Storage, str]] = None,
+        metadata=None,
+    ):
         """
         Initialize BaseHist object. Axis params can contain the names.
         """
         self._hist: Any = None
         self.axes: NamedAxesTuple
 
-        if len(args):
-            if isinstance(storage, type):
+        if args and storage is None and isinstance(args[-1], (Storage, str)):
+            storage = args[-1]
+            args = args[:-1]
+
+        if args:
+            if isinstance(storage, str):
+                storage_str = storage.title()
+                if storage_str == "Atomicint64":
+                    storage_str = "AtomicInt64"
+                elif storage_str == "Weightedmean":
+                    storage_str = "WeightedMean"
+                storage = getattr(bh.storage, storage_str)()
+            elif isinstance(storage, type):
                 msg = (
                     f"Please use '{storage.__name__}()' instead of '{storage.__name__}'"
                 )

@@ -4,12 +4,17 @@ Changelog
 Version 2.1.0
 --------------------
 
+* Support shortcuts for setting storages by string or position
+  `#129 <https://github.com/scikit-hep/hist/pull/129>`_
+
 Updated dependencies:
 
-- `boost-histogram` 0.11.0 to 0.13.0.
-    - major new features, including PlottableProtocol
-- `histoprint` >=1.4 to >=1.6.
-- `mplhep` >=0.2.16 when `[plot]` given
+* ``boost-histogram`` 0.11.0 to 0.13.0.
+    * Major new features, including PlottableProtocol
+
+* ``histoprint`` >=1.4 to >=1.6.
+
+* ``mplhep`` >=0.2.16 when ``[plot]`` given
 
 
 Version 2.0.1
