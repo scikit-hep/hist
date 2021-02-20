@@ -1,4 +1,4 @@
-from hist import Hist, axis
+from hist import Hist, axis, storage
 
 import boost_histogram as bh
 import pytest
@@ -432,6 +432,19 @@ class TestGeneralStorageProxy:
         with pytest.raises(Exception):
             h.Double()
 
+        assert (
+            Hist(axis.Regular(10, 0, 1, name="x"), "double")._storage_type
+            == storage.Double
+        )
+        assert (
+            Hist(axis.Regular(10, 0, 1, name="x"), storage="DouBle")._storage_type
+            == storage.Double
+        )
+        assert (
+            Hist(axis.Regular(10, 0, 1, name="x"), storage.Double())._storage_type
+            == storage.Double
+        )
+
     def test_int64(self):
         h = Hist.new.Reg(10, 0, 1, name="x").Int64().fill([0.5, 0.5])
         assert h[0.5j] == 2
@@ -440,6 +453,19 @@ class TestGeneralStorageProxy:
         # add storage to existing storage
         with pytest.raises(Exception):
             h.Int64()
+
+        assert (
+            Hist(axis.Regular(10, 0, 1, name="x"), "int64")._storage_type
+            == storage.Int64
+        )
+        assert (
+            Hist(axis.Regular(10, 0, 1, name="x"), storage="INT64")._storage_type
+            == storage.Int64
+        )
+        assert (
+            Hist(axis.Regular(10, 0, 1, name="x"), storage.Int64())._storage_type
+            == storage.Int64
+        )
 
     def test_atomic_int64(self):
         h = Hist.new.Reg(10, 0, 1, name="x").AtomicInt64().fill([0.5, 0.5])
@@ -450,6 +476,19 @@ class TestGeneralStorageProxy:
         with pytest.raises(Exception):
             h.AtomicInt64()
 
+        assert (
+            Hist(axis.Regular(10, 0, 1, name="x"), "atomicint64")._storage_type
+            == storage.AtomicInt64
+        )
+        assert (
+            Hist(axis.Regular(10, 0, 1, name="x"), storage="AtomicINT64")._storage_type
+            == storage.AtomicInt64
+        )
+        assert (
+            Hist(axis.Regular(10, 0, 1, name="x"), storage.AtomicInt64())._storage_type
+            == storage.AtomicInt64
+        )
+
     def test_weight(self):
         h = Hist.new.Reg(10, 0, 1, name="x").Weight().fill([0.5, 0.5])
         assert h[0.5j].variance == 2
@@ -458,6 +497,19 @@ class TestGeneralStorageProxy:
         # add storage to existing storage
         with pytest.raises(Exception):
             h.Weight()
+
+        assert (
+            Hist(axis.Regular(10, 0, 1, name="x"), "WeighT")._storage_type
+            == storage.Weight
+        )
+        assert (
+            Hist(axis.Regular(10, 0, 1, name="x"), storage="weight")._storage_type
+            == storage.Weight
+        )
+        assert (
+            Hist(axis.Regular(10, 0, 1, name="x"), storage.Weight())._storage_type
+            == storage.Weight
+        )
 
     def test_mean(self):
         h = (
@@ -472,6 +524,18 @@ class TestGeneralStorageProxy:
         # add storage to existing storage
         with pytest.raises(Exception):
             h.Mean()
+
+        assert (
+            Hist(axis.Regular(10, 0, 1, name="x"), "MEAn")._storage_type == storage.Mean
+        )
+        assert (
+            Hist(axis.Regular(10, 0, 1, name="x"), storage="mean")._storage_type
+            == storage.Mean
+        )
+        assert (
+            Hist(axis.Regular(10, 0, 1, name="x"), storage.Mean())._storage_type
+            == storage.Mean
+        )
 
     def test_weighted_mean(self):
         h = (
@@ -488,6 +552,19 @@ class TestGeneralStorageProxy:
         with pytest.raises(Exception):
             h.WeightedMean()
 
+        assert (
+            Hist(axis.Regular(10, 0, 1, name="x"), "WeighTEDMEAn")._storage_type
+            == storage.WeightedMean
+        )
+        assert (
+            Hist(axis.Regular(10, 0, 1, name="x"), storage="weightedMean")._storage_type
+            == storage.WeightedMean
+        )
+        assert (
+            Hist(axis.Regular(10, 0, 1, name="x"), storage.WeightedMean())._storage_type
+            == storage.WeightedMean
+        )
+
     def test_unlimited(self):
         h = Hist.new.Reg(10, 0, 1, name="x").Unlimited().fill([0.5, 0.5])
         assert h[0.5j] == 2
@@ -495,6 +572,19 @@ class TestGeneralStorageProxy:
         # add storage to existing storage
         with pytest.raises(Exception):
             h.Unlimited()
+
+        assert (
+            Hist(axis.Regular(10, 0, 1, name="x"), "unlimited")._storage_type
+            == storage.Unlimited
+        )
+        assert (
+            Hist(axis.Regular(10, 0, 1, name="x"), storage="UNLImited")._storage_type
+            == storage.Unlimited
+        )
+        assert (
+            Hist(axis.Regular(10, 0, 1, name="x"), storage.Unlimited())._storage_type
+            == storage.Unlimited
+        )
 
 
 def test_general_transform_proxy():
