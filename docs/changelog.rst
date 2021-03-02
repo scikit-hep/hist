@@ -1,6 +1,14 @@
 Changelog
 ====================
 
+
+Version 2.1.1
+--------------------
+
+* Fix density (and density based previews)
+  `#134 <https://github.com/scikit-hep/hist/pull/134>`_
+
+
 Version 2.1.0
 --------------------
 
@@ -26,7 +34,7 @@ Version 2.0.1
 * Fixed ``plot2d_full`` incorrectly mirroring the y-axis.
   `#105 <https://github.com/scikit-hep/hist/pull/105>`_
 
-* `Hist.plot_pull`: more suitable bands in the pull bands 1sigma, 2 sigma, etc.
+* ``Hist.plot_pull``: more suitable bands in the pull bands 1sigma, 2 sigma, etc.
   `#102 <https://github.com/scikit-hep/hist/pull/102>`_
 
 * Fixed classichist's usage of `get_terminal_size` to support not running in a terminal

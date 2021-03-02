@@ -759,6 +759,14 @@ def test_general_density():
         assert pytest.approx(sum(h.density()), 2) == pytest.approx(10 / 6, 2)
 
 
+def test_weighted_density():
+    for data in range(10, 20, 10):
+        h = Hist(axis.Regular(10, -3, 3, name="x"), storage="weight").fill(
+            np.random.randn(data)
+        )
+        assert pytest.approx(sum(h.density()), 2) == pytest.approx(10 / 6, 2)
+
+
 def test_general_axestuple():
     """
     Test general axes tuple -- whether Hist axes tuple work properly.
