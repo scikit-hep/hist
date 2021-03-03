@@ -214,7 +214,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor):
         """
         Density numpy array.
         """
-        total = self.sum() * functools.reduce(operator.mul, self.axes.widths)
+        total = np.sum(self.values()) * functools.reduce(operator.mul, self.axes.widths)
         return self.values() / np.where(total > 0, total, 1)
 
     def show(self, **kwargs):
