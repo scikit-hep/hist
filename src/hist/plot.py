@@ -1,15 +1,14 @@
 import sys
-from typing import Dict, Any, Optional, Set, Callable, Tuple
+from typing import Any, Callable, Dict, Optional, Set, Tuple
+
 import numpy as np
 
 try:
-    from mplhep.plot import histplot, hist2dplot
-    from mplhep.plot import Hist1DArtists, Hist2DArtists
-
     import matplotlib.axes
-    import matplotlib.pyplot as plt
     import matplotlib.patches as patches
+    import matplotlib.pyplot as plt
     import matplotlib.transforms as transforms
+    from mplhep.plot import Hist1DArtists, Hist2DArtists, hist2dplot, histplot
 except ImportError:
     print(
         "Hist requires mplhep to plot, either install hist[plot] or mplhep",

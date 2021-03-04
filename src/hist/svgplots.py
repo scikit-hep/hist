@@ -1,6 +1,6 @@
 import numpy as np
 
-from .svgutils import svg, html, rect, line, text, div, polyline, polygon, circle
+from .svgutils import circle, div, html, line, polygon, polyline, rect, svg, text
 
 
 def _desc_hist(h):

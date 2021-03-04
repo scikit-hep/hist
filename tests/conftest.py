@@ -1,4 +1,5 @@
 import pytest
+
 from hist import Hist, NamedHist
 from hist.hist import BaseHist
 

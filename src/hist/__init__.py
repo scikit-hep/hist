@@ -5,16 +5,13 @@
 
 from types import ModuleType
 
-# Convenient access to the version number
-from .version import version as __version__
-
-from . import axis, numpy, tag, accumulators, utils, storage
-
+from . import accumulators, axis, numpy, storage, tag, utils
 from .hist import Hist
 from .namedhist import NamedHist
+from .tag import loc, overflow, rebin, sum, underflow
 
-from .tag import loc, rebin, sum, underflow, overflow
-
+# Convenient access to the version number
+from .version import version as __version__
 
 __all__ = (
     "__version__",

@@ -1,6 +1,6 @@
-from boost_histogram.axis import AxesTuple, ArrayTuple
+from typing import Any, Tuple, Union
 
-from typing import Any, Union, Tuple
+from boost_histogram.axis import ArrayTuple, AxesTuple
 
 __all__ = ("NamedAxesTuple", "AxesTuple", "ArrayTuple")
 

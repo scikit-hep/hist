@@ -1,24 +1,22 @@
-from .axestuple import NamedAxesTuple
-from .quick_construct import MetaConstructor
-from .utils import set_family, HIST_FAMILY
-from .storage import Storage
-from .axis import AxisProtocol
-
-import warnings
 import functools
 import operator
-import histoprint
+import warnings
+from typing import TYPE_CHECKING, Any, Callable, Dict, Optional, Tuple, Union
 
-import numpy as np
 import boost_histogram as bh
+import histoprint
+import numpy as np
 
-from typing import Callable, Optional, Tuple, Union, Dict, Any, TYPE_CHECKING
+from .axestuple import NamedAxesTuple
+from .axis import AxisProtocol
+from .quick_construct import MetaConstructor
+from .storage import Storage
 from .svgplots import html_hist, svg_hist_1d, svg_hist_1d_c, svg_hist_2d, svg_hist_nd
-
+from .utils import HIST_FAMILY, set_family
 
 if TYPE_CHECKING:
-    from mplhep.plot import Hist1DArtists, Hist2DArtists
     import matplotlib.axes
+    from mplhep.plot import Hist1DArtists, Hist2DArtists
 
 
 # Workaround for bug in mplhep

@@ -1,9 +1,11 @@
-import sys
-import shutil
 import argparse
-import hist
+import shutil
+import sys
+
 import boost_histogram as bh
 from histoprint import print_hist
+
+import hist
 
 
 def main() -> None:

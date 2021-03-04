@@ -1,7 +1,7 @@
-from typing import Callable, TYPE_CHECKING, Type
+from typing import TYPE_CHECKING, Callable, Type
 
+from . import axis, storage
 from .axis import AxisProtocol
-from . import storage, axis
 
 if TYPE_CHECKING:
     from .basehist import BaseHist

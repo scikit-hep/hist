@@ -1,7 +1,7 @@
-from hist import Hist, NamedHist, axis
-
-import pytest
 import numpy as np
+import pytest
+
+from hist import Hist, NamedHist, axis
 
 unp = pytest.importorskip("uncertainties.unumpy")
 plt = pytest.importorskip("matplotlib.pyplot")
