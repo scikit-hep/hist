@@ -1,9 +1,11 @@
-from hist import axis, NamedHist
-import boost_histogram as bh
-import pytest
-import numpy as np
 import ctypes
 import math
+
+import boost_histogram as bh
+import numpy as np
+import pytest
+
+from hist import NamedHist, axis
 
 # ToDo: specify what error is raised
 

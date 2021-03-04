@@ -1,11 +1,11 @@
-from hist import Hist, axis, storage
-
-import boost_histogram as bh
-import pytest
-import numpy as np
 import ctypes
 import math
 
+import boost_histogram as bh
+import numpy as np
+import pytest
+
+from hist import Hist, axis, storage
 
 # TODO: specify what error is raised
 

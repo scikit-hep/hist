@@ -1,5 +1,6 @@
+from typing import Optional, Union
+
 from .basehist import BaseHist
-from typing import Union, Optional
 
 
 class NamedHist(BaseHist):

@@ -1,11 +1,11 @@
 from boost_histogram.storage import (
-    Storage,
-    Int64,
-    Double,
     AtomicInt64,
+    Double,
+    Int64,
+    Mean,
+    Storage,
     Unlimited,
     Weight,
-    Mean,
     WeightedMean,
 )
 

@@ -1,18 +1,17 @@
-from typing import Dict, List, Union, Any, Optional
-
 import sys
+from typing import Any, Dict, List, Optional, Union
+
 import boost_histogram.axis as bha
+
 import hist.utils
-from hist.axestuple import NamedAxesTuple, ArrayTuple
+from hist.axestuple import ArrayTuple, NamedAxesTuple
 
 if sys.version_info >= (3, 8):
     from typing import Protocol
 else:
     from typing_extensions import Protocol
 
-
 from . import transform
-
 
 __all__ = (
     "AxisProtocol",
