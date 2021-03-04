@@ -45,8 +45,7 @@ def _proc_kw_for_lw(kwargs):
     }
 
 
-@set_family(HIST_FAMILY)
-class BaseHist(bh.Histogram, metaclass=MetaConstructor):
+class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
     __slots__ = ()
 
     def __init__(

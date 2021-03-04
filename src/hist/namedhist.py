@@ -1,9 +1,11 @@
 from typing import Optional, Union
 
+import hist
+
 from .basehist import BaseHist
 
 
-class NamedHist(BaseHist):
+class NamedHist(BaseHist, family=hist):
     def __init__(self, *args, **kwargs):
         """
         Initialize NamedHist object. Axis params must contain the names.

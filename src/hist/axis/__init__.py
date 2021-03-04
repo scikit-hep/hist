@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Optional, Union
 
 import boost_histogram.axis as bha
 
-import hist.utils
+import hist
 from hist.axestuple import ArrayTuple, NamedAxesTuple
 
 if sys.version_info >= (3, 8):
@@ -42,6 +42,10 @@ class AxisProtocol(Protocol):
 class AxesMixin:
     __slots__ = ()
 
+    # Support mixing before or after a bh class
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)  # type: ignore
+
     @property
     def name(self: AxisProtocol) -> str:
         """
@@ -74,8 +78,7 @@ class AxesMixin:
         return ret
 
 
-@hist.utils.set_family(hist.utils.HIST_FAMILY)
-class Regular(AxesMixin, bha.Regular):
+class Regular(AxesMixin, bha.Regular, family=hist):
     __slots__ = ()
 
     def __init__(
@@ -109,8 +112,7 @@ class Regular(AxesMixin, bha.Regular):
         self.label = label
 
 
-@hist.utils.set_family(hist.utils.HIST_FAMILY)
-class Boolean(AxesMixin, bha.Boolean):
+class Boolean(AxesMixin, bha.Boolean, family=hist):
     __slots__ = ()
 
     def __init__(
@@ -121,8 +123,7 @@ class Boolean(AxesMixin, bha.Boolean):
         self.label = label
 
 
-@hist.utils.set_family(hist.utils.HIST_FAMILY)
-class Variable(bha.Variable, AxesMixin):
+class Variable(bha.Variable, AxesMixin, family=hist):
     __slots__ = ()
 
     def __init__(
@@ -148,8 +149,7 @@ class Variable(bha.Variable, AxesMixin):
         self.label = label
 
 
-@hist.utils.set_family(hist.utils.HIST_FAMILY)
-class Integer(bha.Integer, AxesMixin):
+class Integer(bha.Integer, AxesMixin, family=hist):
     __slots__ = ()
 
     def __init__(
@@ -177,8 +177,7 @@ class Integer(bha.Integer, AxesMixin):
         self.label = label
 
 
-@hist.utils.set_family(hist.utils.HIST_FAMILY)
-class IntCategory(bha.IntCategory, AxesMixin):
+class IntCategory(bha.IntCategory, AxesMixin, family=hist):
     __slots__ = ()
 
     def __init__(
@@ -195,8 +194,7 @@ class IntCategory(bha.IntCategory, AxesMixin):
         self.label = label
 
 
-@hist.utils.set_family(hist.utils.HIST_FAMILY)
-class StrCategory(bha.StrCategory, AxesMixin):
+class StrCategory(bha.StrCategory, AxesMixin, family=hist):
     __slots__ = ()
 
     def __init__(

@@ -11,6 +11,7 @@ from .namedhist import NamedHist
 from .tag import loc, overflow, rebin, sum, underflow
 
 # Convenient access to the version number
+# Convenient access to the version number
 from .version import version as __version__
 
 __all__ = (
@@ -28,7 +29,6 @@ __all__ = (
     "sum",
     "tag",
     "underflow",
-    "utils",
 )
 
 
