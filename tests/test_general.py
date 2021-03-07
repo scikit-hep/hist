@@ -4,6 +4,7 @@ import math
 import boost_histogram as bh
 import numpy as np
 import pytest
+from pytest import approx
 
 from hist import Hist, axis, storage
 
@@ -794,3 +795,29 @@ def test_general_axestuple():
     assert h.axes["A":"B"].size == (20,)
     assert h.axes[:"B"].size == (20,)
     assert h.axes["B":].size == (10, 15, 5)
+
+
+def test_from_columns(named_hist):
+    columns = {
+        "x": [1, 2, 3, 2, 1, 2, 1, 2, 1, 3, 1, 1],
+        "y": ["a", "b", "c", "d"] * 3,
+        "data": np.arange(12),
+    }
+
+    h = named_hist.from_columns(columns, ("x", "y"))
+    assert h.values() == approx(np.array([[3, 0, 2, 1], [0, 2, 0, 2], [0, 1, 1, 0]]))
+
+    h_w = named_hist.from_columns(columns, ("x", "y"), weight="data")
+    assert h_w.values() == approx(
+        np.array([[12, 0, 16, 11], [0, 6, 0, 10], [0, 9, 2, 0]])
+    )
+
+    h_w2 = named_hist.from_columns(
+        columns, (axis.Integer(1, 5, name="x"), "y"), weight="data"
+    )
+    assert h_w2.values() == approx(
+        np.array([[12, 0, 16, 11], [0, 6, 0, 10], [0, 9, 2, 0], [0, 0, 0, 0]])
+    )
+
+    with pytest.raises(TypeError):
+        named_hist.from_columns(columns, (axis.Integer(1, 5), "y"), weight="data")

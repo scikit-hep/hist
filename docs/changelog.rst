@@ -1,6 +1,14 @@
 Changelog
 ====================
 
+Version 2.2.0
+--------------------
+
+* Support ``Hist.from_columns``, for simple conversion of DataFrames and similar structures
+  `#140 <https://github.com/scikit-hep/hist/pull/140>`_
+
+* Support ``.plot_pie`` for quick pie plots
+  `#140 <https://github.com/scikit-hep/hist/pull/140>`_
 
 Version 2.1.1
 --------------------
