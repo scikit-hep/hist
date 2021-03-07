@@ -1,17 +1,31 @@
 import functools
 import operator
 import warnings
-from typing import TYPE_CHECKING, Any, Callable, Dict, Optional, Tuple, Union
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Dict,
+    List,
+    Mapping,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+)
 
 import boost_histogram as bh
 import histoprint
 import numpy as np
+
+import hist
 
 from .axestuple import NamedAxesTuple
 from .axis import AxisProtocol
 from .quick_construct import MetaConstructor
 from .storage import Storage
 from .svgplots import html_hist, svg_hist_1d, svg_hist_1d_c, svg_hist_2d, svg_hist_nd
+from .typing import ArrayLike
 from .utils import HIST_FAMILY, set_family
 
 if TYPE_CHECKING:
@@ -106,6 +120,40 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor):
                 return index
 
         raise ValueError("The axis names could not be found")
+
+    @classmethod
+    def from_columns(
+        cls,
+        data: Mapping[str, ArrayLike],
+        axes: Sequence[Union[str, AxisProtocol]],
+        *,
+        weight: Optional[str] = None,
+        storage: hist.storage.Storage = hist.storage.Double(),  # noqa: B008
+    ):
+        axes_list: List[Any] = list()
+        for ax in axes:
+            if isinstance(ax, str):
+                assert ax in data, f"{ax} must be present in data={list(data)}"
+                cats = set(data[ax])  # type: ignore
+                if all(isinstance(a, str) for a in cats):
+                    axes_list.append(hist.axis.StrCategory(sorted(cats), name=ax))  # type: ignore
+                elif all(isinstance(a, int) for a in cats):
+                    axes_list.append(hist.axis.IntCategory(sorted(cats), name=ax))  # type: ignore
+                else:
+                    raise TypeError(
+                        f"{ax} must be all int or strings if axis not given"
+                    )
+            else:
+                if not ax.name or ax.name not in data:
+                    raise TypeError("All axes must have names present in the data")
+                axes_list.append(ax)
+
+        weight_arr = data[weight] if weight else None
+
+        self = cls(*axes_list, storage=storage)
+        data_list = {x.name: data[x.name] for x in axes_list}
+        self.fill(**data_list, weight=weight_arr)  # type: ignore
+        return self
 
     def project(self, *args: Union[int, str]):
         """
@@ -292,3 +340,14 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor):
         import hist.plot
 
         return hist.plot.plot_pull(self, func, ax_dict=ax_dict, **kwargs)
+
+    def plot_pie(
+        self,
+        *,
+        ax: "Optional[matplotlib.axes.Axes]" = None,
+        **kwargs,
+    ) -> Any:
+
+        import hist.plot
+
+        return hist.plot.plot_pie(self, ax=ax, **kwargs)

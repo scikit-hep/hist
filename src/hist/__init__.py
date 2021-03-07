@@ -6,7 +6,7 @@
 from types import ModuleType
 
 from . import accumulators, axis, numpy, storage, tag, utils
-from .hist import Hist
+from .hist import BaseHist, Hist
 from .namedhist import NamedHist
 from .tag import loc, overflow, rebin, sum, underflow
 
@@ -16,6 +16,7 @@ from .version import version as __version__
 __all__ = (
     "__version__",
     "Hist",
+    "BaseHist",
     "NamedHist",
     "accumulators",
     "axis",

@@ -1,7 +1,9 @@
 import sys
-from typing import Any, Callable, Dict, Optional, Set, Tuple
+from typing import Any, Callable, Dict, Optional, Set, Tuple, Union
 
 import numpy as np
+
+import hist
 
 try:
     import matplotlib.axes
@@ -9,7 +11,7 @@ try:
     import matplotlib.pyplot as plt
     import matplotlib.transforms as transforms
     from mplhep.plot import Hist1DArtists, Hist2DArtists, hist2dplot, histplot
-except ImportError:
+except ModuleNotFoundError:
     print(
         "Hist requires mplhep to plot, either install hist[plot] or mplhep",
         file=sys.stderr,
@@ -17,7 +19,7 @@ except ImportError:
     raise
 
 
-__all__ = ("histplot", "hist2dplot", "plot2d_full", "plot_pull")
+__all__ = ("histplot", "hist2dplot", "plot2d_full", "plot_pull", "plot_pie")
 
 
 def _expand_shortcuts(key: str) -> str:
@@ -260,3 +262,29 @@ def plot_pull(
     pull_ax.set_ylabel("Pull")
 
     return main_ax, pull_ax
+
+
+def get_center(x: Union[str, int, Tuple[float, float]]) -> Union[str, float]:
+    if isinstance(x, tuple):
+        return (x[0] + x[1]) / 2
+    else:
+        return x
+
+
+def plot_pie(
+    self: hist.BaseHist,
+    *,
+    ax: "Optional[matplotlib.axes.Axes]" = None,
+    **kwargs,
+) -> Any:
+
+    if ax is None:
+        fig = plt.gcf()
+        ax = fig.add_subplot(111)
+
+    data = self.density()
+
+    labels = [str(get_center(x)) for x in self.axes[0]]
+
+    result = ax.pie(data, labels=labels, **kwargs)
+    return result
