@@ -1,12 +1,17 @@
-from typing import Optional, Union
+from typing import Any, Optional, TypeVar, Union
+
+import boost_histogram as bh
 
 import hist
 
-from .basehist import BaseHist
+from .basehist import BaseHist, IndexingExpr
+from .typing import ArrayLike
+
+T = TypeVar("T", bound="NamedHist")
 
 
 class NamedHist(BaseHist, family=hist):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         """
         Initialize NamedHist object. Axis params must contain the names.
         """
@@ -18,7 +23,10 @@ class NamedHist(BaseHist, family=hist):
                     f"Each axes in the {self.__class__.__name__} instance should have a name"
                 )
 
-    def project(self, *args: Union[int, str]):
+    # TODO: This can return a single value
+    def project(
+        self: T, *args: Union[int, str]
+    ) -> Union[T, float, bh.accumulators.Accumulator]:
         """
         Projection of axis idx.
         """
@@ -31,25 +39,30 @@ class NamedHist(BaseHist, family=hist):
                 f"Only projections by names are supported for {self.__class__.__name__}"
             )
 
-    def fill(
-        self, *args, weight=None, sample=None, threads: Optional[int] = None, **kwargs
-    ):
+    def fill(  # type: ignore
+        self: T,
+        weight: Optional[ArrayLike] = None,
+        sample: Optional[ArrayLike] = None,
+        threads: Optional[int] = None,
+        **kwargs: ArrayLike,
+    ) -> T:
         """
             Insert data into the histogram using names and return a \
             NamedHist object. NamedHist could only be filled by names.
         """
 
         if len(kwargs) and all(isinstance(k, str) for k in kwargs.keys()):
-            return super().fill(
-                *args, weight=weight, sample=sample, threads=threads, **kwargs
-            )
+            return super().fill(weight=weight, sample=sample, threads=threads, **kwargs)
 
         else:
             raise TypeError(
                 f"Only fill by names are supported for {self.__class__.__name__}"
             )
 
-    def __getitem__(self, index):
+    def __getitem__(  # type: ignore
+        self: T,
+        index: IndexingExpr,
+    ) -> Union[T, float, bh.accumulators.Accumulator]:
         """
         Get histogram item.
         """
@@ -60,9 +73,13 @@ class NamedHist(BaseHist, family=hist):
                     f"Only access by names are supported for {self.__class__.__name__} in dictionay"
                 )
 
-        return super().__getitem__(index)
+        return super().__getitem__(index)  # type: ignore
 
-    def __setitem__(self, index, value):
+    def __setitem__(  # type: ignore
+        self: T,
+        index: IndexingExpr,
+        value: Union[T, ArrayLike, bh.accumulators.Accumulator],
+    ) -> None:
         """
         Set histogram item.
         """
@@ -73,4 +90,4 @@ class NamedHist(BaseHist, family=hist):
                     f"Only access by names are supported for {self.__class__.__name__} in dictionay"
                 )
 
-        return super().__setitem__(index, value)
+        return super().__setitem__(index, value)  # type: ignore

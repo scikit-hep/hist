@@ -1,5 +1,5 @@
 import sys
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, Iterable, List, Optional
 
 import boost_histogram.axis as bha
 
@@ -34,7 +34,11 @@ class CoreAxisProtocol(Protocol):
 
 class AxisProtocol(Protocol):
     metadata: Any
-    name: str
+
+    @property
+    def name(self) -> str:
+        ...
+
     label: str
     _ax: CoreAxisProtocol
 
@@ -43,7 +47,7 @@ class AxesMixin:
     __slots__ = ()
 
     # Support mixing before or after a bh class
-    def __init_subclass__(cls, **kwargs):
+    def __init_subclass__(cls, **kwargs: Any) -> None:
         super().__init_subclass__(**kwargs)  # type: ignore
 
     @property
@@ -64,16 +68,16 @@ class AxesMixin:
     def label(self: AxisProtocol, value: str) -> None:
         self._ax.metadata["label"] = value
 
-    def _repr_kwargs(self: AxisProtocol):
+    def _repr_args_(self: AxisProtocol) -> List[str]:
         """
         Return options for use in repr.
         """
-        ret = super()._repr_kwargs()  # type: ignore
+        ret: List[str] = super()._repr_args_()  # type: ignore
 
         if self.name:
-            ret += f", name={self.name!r}"
+            ret.append(f"name={self.name!r}")
         if self.label:
-            ret += f", label={self.label!r}"
+            ret.append(f"label={self.label!r}")
 
         return ret
 
@@ -95,7 +99,8 @@ class Regular(AxesMixin, bha.Regular, family=hist):
         overflow: Optional[bool] = None,
         growth: bool = False,
         circular: bool = False,
-        transform: bha.transform.Function = None,
+        transform: Optional[bha.transform.AxisTransform] = None,
+        __dict__: Optional[Dict[str, Any]] = None,
     ) -> None:
         super().__init__(
             bins,
@@ -107,20 +112,29 @@ class Regular(AxesMixin, bha.Regular, family=hist):
             growth=growth,
             circular=circular,
             transform=transform,
+            __dict__=__dict__,
         )
         self._ax.metadata["name"] = name
-        self.label = label
+        self.label: str = label
 
 
 class Boolean(AxesMixin, bha.Boolean, family=hist):
     __slots__ = ()
 
     def __init__(
-        self, *, name: str = "", label: str = "", metadata: Any = None
+        self,
+        *,
+        name: str = "",
+        label: str = "",
+        metadata: Any = None,
+        __dict__: Optional[Dict[str, Any]] = None,
     ) -> None:
-        super().__init__(metadata=metadata)
+        super().__init__(
+            metadata=metadata,
+            __dict__=__dict__,
+        )
         self._ax.metadata["name"] = name
-        self.label = label
+        self.label: str = label
 
 
 class Variable(bha.Variable, AxesMixin, family=hist):
@@ -128,7 +142,7 @@ class Variable(bha.Variable, AxesMixin, family=hist):
 
     def __init__(
         self,
-        edges: Union[range, List[float]],
+        edges: Iterable[float],
         *,
         name: str = "",
         label: str = "",
@@ -136,7 +150,9 @@ class Variable(bha.Variable, AxesMixin, family=hist):
         underflow: Optional[bool] = None,
         overflow: Optional[bool] = None,
         growth: bool = False,
+        circular: bool = False,
         metadata: Any = None,
+        __dict__: Optional[Dict[str, Any]] = None,
     ) -> None:
         super().__init__(
             edges,
@@ -144,9 +160,11 @@ class Variable(bha.Variable, AxesMixin, family=hist):
             underflow=flow if underflow is None else underflow,
             overflow=flow if overflow is None else overflow,
             growth=growth,
+            circular=circular,
+            __dict__=__dict__,
         )
         self._ax.metadata["name"] = name
-        self.label = label
+        self.label: str = label
 
 
 class Integer(bha.Integer, AxesMixin, family=hist):
@@ -163,7 +181,9 @@ class Integer(bha.Integer, AxesMixin, family=hist):
         underflow: Optional[bool] = None,
         overflow: Optional[bool] = None,
         growth: bool = False,
+        circular: bool = False,
         metadata: Any = None,
+        __dict__: Optional[Dict[str, Any]] = None,
     ) -> None:
         super().__init__(
             start,
@@ -172,9 +192,11 @@ class Integer(bha.Integer, AxesMixin, family=hist):
             underflow=flow if underflow is None else underflow,
             overflow=flow if overflow is None else overflow,
             growth=growth,
+            circular=circular,
+            __dict__=__dict__,
         )
         self._ax.metadata["name"] = name
-        self.label = label
+        self.label: str = label
 
 
 class IntCategory(bha.IntCategory, AxesMixin, family=hist):
@@ -182,16 +204,22 @@ class IntCategory(bha.IntCategory, AxesMixin, family=hist):
 
     def __init__(
         self,
-        categories: Union[range, List[int]] = None,
+        categories: Iterable[int],
         *,
         name: str = "",
         label: str = "",
         growth: bool = False,
         metadata: Any = None,
+        __dict__: Optional[Dict[str, Any]] = None,
     ) -> None:
-        super().__init__(categories, metadata=metadata, growth=growth)
+        super().__init__(
+            categories,
+            metadata=metadata,
+            growth=growth,
+            __dict__=__dict__,
+        )
         self._ax.metadata["name"] = name
-        self.label = label
+        self.label: str = label
 
 
 class StrCategory(bha.StrCategory, AxesMixin, family=hist):
@@ -199,13 +227,19 @@ class StrCategory(bha.StrCategory, AxesMixin, family=hist):
 
     def __init__(
         self,
-        categories: Union[str, List[str]] = None,
+        categories: Iterable[str],
         *,
         name: str = "",
         label: str = "",
         growth: bool = False,
         metadata: Any = None,
+        __dict__: Optional[Dict[str, Any]] = None,
     ) -> None:
-        super().__init__(categories, metadata=metadata, growth=growth)
+        super().__init__(
+            categories,
+            metadata=metadata,
+            growth=growth,
+            __dict__=__dict__,
+        )
         self._ax.metadata["name"] = name
-        self.label = label
+        self.label: str = label

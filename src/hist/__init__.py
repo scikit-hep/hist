@@ -5,8 +5,9 @@
 
 from types import ModuleType
 
-from . import accumulators, axis, numpy, storage, tag, utils
-from .hist import BaseHist, Hist
+from . import accumulators, axis, numpy, storage, tag
+from .basehist import BaseHist
+from .hist import Hist
 from .namedhist import NamedHist
 from .tag import loc, overflow, rebin, sum, underflow
 

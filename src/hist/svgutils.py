@@ -1,14 +1,26 @@
+from typing import Type, TypeVar, Union
+
+from .typing import Protocol
+
+
+class SupportsStr(Protocol):
+    def __str__(self) -> str:
+        ...
+
+
 class XML:
-    def __init__(self, *contents, **kargs):
+    def __init__(
+        self, *contents: Union["XML", SupportsStr], **kargs: SupportsStr
+    ) -> None:
         self.properties = kargs
         self.contents = contents
 
     @property
-    def name(self):
+    def name(self) -> str:
         return self.__class__.__name__
 
     @property
-    def start(self):
+    def start(self) -> str:
         if self.properties:
             ending = " " + " ".join(
                 '{}="{}"'.format(a.replace("_", "-"), b)
@@ -18,7 +30,7 @@ class XML:
             ending = ""
         return self.name + ending
 
-    def __str__(self):
+    def __str__(self) -> str:
         if self.contents:
             contents = "\n".join(str(s) for s in self.contents)
             return f"<{self.start}>\n{contents}\n</{self.name}>"
@@ -27,15 +39,15 @@ class XML:
 
 
 class html(XML):
-    def _repr_xml_(self):
+    def _repr_xml_(self) -> str:
         return str(self)
 
 
 class svg(XML):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Union[XML, str], **kwargs: str) -> None:
         super().__init__(*args, xmlns="http://www.w3.org/2000/svg", **kwargs)
 
-    def _repr_svg_(self):
+    def _repr_svg_(self) -> str:
         return str(self)
 
 
@@ -55,22 +67,25 @@ class div(XML):
     pass
 
 
+T = TypeVar("T", bound="rect")
+
+
 class rect(XML):
     @classmethod
     def pad(
-        cls,
-        x,
-        y,
-        scale_x,
-        scale_y,
-        height,
-        left_edge,
-        right_edge,
-        pad_x=0,
-        pad_y=0,
-        opacity=1,
-        stroke_width=2,
-    ):
+        cls: Type[T],
+        x: float,
+        y: float,
+        scale_x: float,
+        scale_y: float,
+        height: float,
+        left_edge: float,
+        right_edge: float,
+        pad_x: float = 0,
+        pad_y: float = 0,
+        opacity: float = 1,
+        stroke_width: float = 2,
+    ) -> T:
         width = right_edge - left_edge
         top_y = y
 

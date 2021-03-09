@@ -1,7 +1,8 @@
-from typing import TYPE_CHECKING, Callable, Type
+from typing import TYPE_CHECKING, Any, Callable, Dict, Iterable, Optional, Type
 
 from . import axis, storage
 from .axis import AxisProtocol
+from .axis.transform import AxisTransform
 
 if TYPE_CHECKING:
     from .basehist import BaseHist
@@ -18,78 +19,283 @@ class QuickConstruct:
         "axes",
     )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         inside = ", ".join(repr(ax) for ax in self.axes)
         return f"{self.__class__.__name__}({self.hist_class.__name__}, {inside})"
 
-    def __init__(self, hist_class: "Type[BaseHist]", *axes: AxisProtocol):
+    def __init__(self, hist_class: "Type[BaseHist]", *axes: AxisProtocol) -> None:
         self.hist_class = hist_class
         self.axes = axes
 
-    def Reg(self, *args, **kwargs) -> "ConstructProxy":
-        return ConstructProxy(
-            self.hist_class, *self.axes, axis.Regular(*args, **kwargs)
-        )
-
-    def Sqrt(self, *args, **kwargs) -> "ConstructProxy":
-        return ConstructProxy(
-            self.hist_class,
-            *self.axes,
-            axis.Regular(*args, transform=axis.transform.sqrt, **kwargs),
-        )
-
-    def Log(self, *args, **kwargs) -> "ConstructProxy":
-        return ConstructProxy(
-            self.hist_class,
-            *self.axes,
-            axis.Regular(*args, transform=axis.transform.log, **kwargs),
-        )
-
-    def Pow(self, *args, power: float, **kwargs) -> "ConstructProxy":
-        return ConstructProxy(
-            self.hist_class,
-            *self.axes,
-            axis.Regular(*args, transform=axis.transform.Pow(power), **kwargs),
-        )
-
-    def Func(
+    def Reg(
         self,
-        *args,
-        forward: Callable[[float], float],
-        inverse: Callable[[float], float],
-        **kwargs,
+        bins: int,
+        start: float,
+        stop: float,
+        *,
+        name: str = "",
+        label: str = "",
+        metadata: Any = None,
+        flow: bool = True,
+        underflow: Optional[bool] = None,
+        overflow: Optional[bool] = None,
+        growth: bool = False,
+        circular: bool = False,
+        transform: Optional[AxisTransform] = None,
+        __dict__: Optional[Dict[str, Any]] = None,
     ) -> "ConstructProxy":
         return ConstructProxy(
             self.hist_class,
             *self.axes,
             axis.Regular(
-                *args, transform=axis.transform.Function(forward, inverse), **kwargs
+                bins,
+                start,
+                stop,
+                name=name,
+                label=label,
+                metadata=metadata,
+                underflow=underflow,
+                overflow=overflow,
+                growth=growth,
+                circular=circular,
+                transform=transform,
+                __dict__=__dict__,
             ),
         )
 
-    def Bool(self, *args, **kwargs) -> "ConstructProxy":
+    def Sqrt(
+        self,
+        bins: int,
+        start: float,
+        stop: float,
+        *,
+        name: str = "",
+        label: str = "",
+        metadata: Any = None,
+        __dict__: Optional[Dict[str, Any]] = None,
+    ) -> "ConstructProxy":
         return ConstructProxy(
-            self.hist_class, *self.axes, axis.Boolean(*args, **kwargs)
+            self.hist_class,
+            *self.axes,
+            axis.Regular(
+                bins,
+                start,
+                stop,
+                name=name,
+                label=label,
+                metadata=metadata,
+                __dict__=__dict__,
+                transform=axis.transform.sqrt,
+            ),
         )
 
-    def Var(self, *args, **kwargs) -> "ConstructProxy":
+    def Log(
+        self,
+        bins: int,
+        start: float,
+        stop: float,
+        *,
+        name: str = "",
+        label: str = "",
+        metadata: Any = None,
+        __dict__: Optional[Dict[str, Any]] = None,
+    ) -> "ConstructProxy":
         return ConstructProxy(
-            self.hist_class, *self.axes, axis.Variable(*args, **kwargs)
+            self.hist_class,
+            *self.axes,
+            axis.Regular(
+                bins,
+                start,
+                stop,
+                name=name,
+                label=label,
+                metadata=metadata,
+                __dict__=__dict__,
+                transform=axis.transform.log,
+            ),
         )
 
-    def Int(self, *args, **kwargs) -> "ConstructProxy":
+    def Pow(
+        self,
+        bins: int,
+        start: float,
+        stop: float,
+        *,
+        name: str = "",
+        label: str = "",
+        power: float,
+        metadata: Any = None,
+        __dict__: Optional[Dict[str, Any]] = None,
+    ) -> "ConstructProxy":
         return ConstructProxy(
-            self.hist_class, *self.axes, axis.Integer(*args, **kwargs)
+            self.hist_class,
+            *self.axes,
+            axis.Regular(
+                bins,
+                start,
+                stop,
+                name=name,
+                label=label,
+                metadata=metadata,
+                __dict__=__dict__,
+                transform=axis.transform.Pow(power),
+            ),
         )
 
-    def IntCat(self, *args, **kwargs) -> "ConstructProxy":
+    def Func(
+        self,
+        bins: int,
+        start: float,
+        stop: float,
+        *,
+        name: str = "",
+        label: str = "",
+        forward: Callable[[float], float],
+        inverse: Callable[[float], float],
+        metadata: Any = None,
+        __dict__: Optional[Dict[str, Any]] = None,
+    ) -> "ConstructProxy":
         return ConstructProxy(
-            self.hist_class, *self.axes, axis.IntCategory(*args, **kwargs)
+            self.hist_class,
+            *self.axes,
+            axis.Regular(
+                bins,
+                start,
+                stop,
+                name=name,
+                label=label,
+                metadata=metadata,
+                __dict__=__dict__,
+                transform=axis.transform.Function(forward, inverse),
+            ),
         )
 
-    def StrCat(self, *args, **kwargs) -> "ConstructProxy":
+    def Bool(
+        self,
+        name: str = "",
+        label: str = "",
+        metadata: Any = None,
+        __dict__: Optional[Dict[str, Any]] = None,
+    ) -> "ConstructProxy":
         return ConstructProxy(
-            self.hist_class, *self.axes, axis.StrCategory(*args, **kwargs)
+            self.hist_class,
+            *self.axes,
+            axis.Boolean(
+                name=name,
+                label=label,
+                metadata=metadata,
+                __dict__=__dict__,
+            ),
+        )
+
+    def Var(
+        self,
+        edges: Iterable[float],
+        *,
+        name: str = "",
+        label: str = "",
+        metadata: Any = None,
+        flow: bool = True,
+        underflow: Optional[bool] = None,
+        overflow: Optional[bool] = None,
+        growth: bool = False,
+        circular: bool = False,
+        __dict__: Optional[Dict[str, Any]] = None,
+    ) -> "ConstructProxy":
+        return ConstructProxy(
+            self.hist_class,
+            *self.axes,
+            axis.Variable(
+                edges,
+                name=name,
+                label=label,
+                metadata=metadata,
+                __dict__=__dict__,
+                flow=flow,
+                underflow=underflow,
+                overflow=overflow,
+                growth=growth,
+                circular=circular,
+            ),
+        )
+
+    def Int(
+        self,
+        start: int,
+        stop: int,
+        *,
+        name: str = "",
+        label: str = "",
+        metadata: Any = None,
+        flow: bool = True,
+        underflow: Optional[bool] = None,
+        overflow: Optional[bool] = None,
+        growth: bool = False,
+        circular: bool = False,
+        __dict__: Optional[Dict[str, Any]] = None,
+    ) -> "ConstructProxy":
+        return ConstructProxy(
+            self.hist_class,
+            *self.axes,
+            axis.Integer(
+                start,
+                stop,
+                name=name,
+                label=label,
+                metadata=metadata,
+                __dict__=__dict__,
+                flow=flow,
+                underflow=underflow,
+                overflow=overflow,
+                growth=growth,
+                circular=circular,
+            ),
+        )
+
+    def IntCat(
+        self,
+        categories: Iterable[int],
+        *,
+        name: str = "",
+        label: str = "",
+        metadata: Any = None,
+        growth: bool = False,
+        __dict__: Optional[Dict[str, Any]] = None,
+    ) -> "ConstructProxy":
+        return ConstructProxy(
+            self.hist_class,
+            *self.axes,
+            axis.IntCategory(
+                categories,
+                name=name,
+                label=label,
+                metadata=metadata,
+                __dict__=__dict__,
+                growth=growth,
+            ),
+        )
+
+    def StrCat(
+        self,
+        categories: Iterable[str],
+        *,
+        name: str = "",
+        label: str = "",
+        metadata: Any = None,
+        growth: bool = False,
+        __dict__: Optional[Dict[str, Any]] = None,
+    ) -> "ConstructProxy":
+        return ConstructProxy(
+            self.hist_class,
+            *self.axes,
+            axis.StrCategory(
+                categories,
+                name=name,
+                label=label,
+                metadata=metadata,
+                __dict__=__dict__,
+                growth=growth,
+            ),
         )
 
 
