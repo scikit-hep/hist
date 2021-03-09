@@ -4,6 +4,9 @@ Changelog
 Version 2.2.0
 --------------------
 
+* Support boost-histogram 1.0. Better plain reprs. Full Static Typing.
+  `#137 <https://github.com/scikit-hep/hist/pull/137>`_
+
 * Support ``Hist.from_columns``, for simple conversion of DataFrames and similar structures
   `#140 <https://github.com/scikit-hep/hist/pull/140>`_
 
