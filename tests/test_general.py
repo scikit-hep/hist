@@ -821,3 +821,32 @@ def test_from_columns(named_hist):
 
     with pytest.raises(TypeError):
         named_hist.from_columns(columns, (axis.Integer(1, 5), "y"), weight="data")
+
+
+def test_from_array(named_hist):
+    h = Hist(
+        axis.Regular(10, 1, 2, name="A"),
+        axis.Regular(7, 1, 3, name="B"),
+        data=np.ones((10, 7)),
+    )
+    assert h.values() == approx(np.ones((10, 7)))
+    assert h.sum() == approx(70)
+    assert h.sum(flow=True) == approx(70)
+
+    h = Hist(
+        axis.Regular(10, 1, 2, name="A"),
+        axis.Regular(7, 1, 3, name="B"),
+        data=np.ones((12, 9)),
+    )
+
+    assert h.values(flow=False) == approx(np.ones((10, 7)))
+    assert h.values(flow=True) == approx(np.ones((12, 9)))
+    assert h.sum() == approx(70)
+    assert h.sum(flow=True) == approx(12 * 9)
+
+    with pytest.raises(ValueError):
+        h = Hist(
+            axis.Regular(10, 1, 2, name="A"),
+            axis.Regular(7, 1, 3, name="B"),
+            data=np.ones((11, 9)),
+        )

@@ -61,6 +61,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         *args: Union[AxisProtocol, Storage, str, Tuple[int, float, float]],
         storage: Optional[Union[Storage, str]] = None,
         metadata: Any = None,
+        data: Optional[np.ndarray] = None,
     ) -> None:
         """
         Initialize BaseHist object. Axis params can contain the names.
@@ -96,6 +97,9 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
                 # label will return name if label is not set, so this is safe
                 if not ax.label:
                     ax.label = f"Axis {i}"
+
+        if data is not None:
+            self[...] = data  # type: ignore
 
     def _generate_axes_(self) -> NamedAxesTuple:
         """
