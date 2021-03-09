@@ -1,3 +1,5 @@
+<img alt="histogram" width="200" src="https://raw.githubusercontent.com/scikit-hep/hist/master/docs/_images/histlogo.png"/>
+
 # Hist
 
 [![Actions Status][actions-badge]][actions-link]
