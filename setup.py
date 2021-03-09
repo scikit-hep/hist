@@ -29,6 +29,7 @@ extras_require["docs"] = [
     "sphinx_copybutton",
     "sphinx_rtd_theme >=0.5.0",
     "ipython",
+    "pillow",
 ]
 
 extras_require["all"] = sorted(set(sum(extras_require.values(), [])))
