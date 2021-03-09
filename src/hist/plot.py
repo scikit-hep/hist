@@ -44,10 +44,10 @@ def _filter_dict(
 
 
 def plot2d_full(
-    self,
+    self: hist.BaseHist,
     *,
     ax_dict: "Optional[Dict[str, matplotlib.axes.Axes]]" = None,
-    **kwargs,
+    **kwargs: Any,
 ) -> "Tuple[Hist2DArtists, Hist1DArtists, Hist1DArtists]":
     """
     Plot2d_full method for BaseHist object.
@@ -127,11 +127,11 @@ def plot2d_full(
 
 
 def plot_pull(
-    self,
-    func: Callable,
+    self: hist.BaseHist,
+    func: Callable[[np.ndarray], np.ndarray],
     *,
     ax_dict: "Optional[Dict[str, matplotlib.axes.Axes]]" = None,
-    **kwargs,
+    **kwargs: Any,
 ) -> "Tuple[matplotlib.axes.Axes, matplotlib.axes.Axes]":
     """
     Plot_pull method for BaseHist object.
@@ -275,7 +275,7 @@ def plot_pie(
     self: hist.BaseHist,
     *,
     ax: "Optional[matplotlib.axes.Axes]" = None,
-    **kwargs,
+    **kwargs: Any,
 ) -> Any:
 
     if ax is None:

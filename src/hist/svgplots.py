@@ -1,9 +1,25 @@
+from typing import Callable, Union
+
 import numpy as np
+from boost_histogram.axis import Axis
 
-from .svgutils import circle, div, html, line, polygon, polyline, rect, svg, text
+import hist
+
+from .svgutils import (
+    SupportsStr,
+    circle,
+    div,
+    html,
+    line,
+    polygon,
+    polyline,
+    rect,
+    svg,
+    text,
+)
 
 
-def _desc_hist(h):
+def _desc_hist(h: "hist.BaseHist") -> str:
     main_sum = h.sum()
     flow_too_sum = h.sum(flow=True)
 
@@ -17,7 +33,7 @@ def _desc_hist(h):
     return output
 
 
-def html_hist(h, function):
+def html_hist(h: "hist.BaseHist", function: Callable[["hist.BaseHist"], svg]) -> html:
     left_column = div(function(h), style="width:290px;")
     right_column = div(_desc_hist(h), style="flex=grow:1;")
 
@@ -28,21 +44,21 @@ def html_hist(h, function):
     return html(container)
 
 
-def make_text(txt, **kwargs):
+def make_text(txt: Union[str, float], **kwargs: SupportsStr) -> text:
     style = "fill:currentColor;"
-    kwargs["style"] = style + kwargs.get("style", "")
+    kwargs["style"] = style + str(kwargs.get("style", ""))
     if isinstance(txt, float):
         txt = format(txt, ".3g")
     return text(txt, text_anchor="middle", **kwargs)
 
 
-def make_ax_text(ax, **kwargs):
+def make_ax_text(ax: Axis, **kwargs: SupportsStr) -> text:
     style = "" if ax.label else "font-family: monospace;"
-    kwargs["style"] = style + kwargs.get("style", "")
+    kwargs["style"] = style + str(kwargs.get("style", ""))
     return make_text(ax.label or ax.name, **kwargs)
 
 
-def svg_hist_1d(h):
+def svg_hist_1d(h: "hist.BaseHist") -> svg:
     width = 250
     height = 100
 
@@ -89,7 +105,7 @@ def svg_hist_1d(h):
     )
 
 
-def svg_hist_1d_c(h):
+def svg_hist_1d_c(h: "hist.BaseHist") -> svg:
     width = 250
     height = 250
     radius = 100
@@ -125,7 +141,7 @@ def svg_hist_1d_c(h):
     return svg(bins, center, viewBox=f"{-width/2} {-height/2} {width} {height}")
 
 
-def svg_hist_2d(h):
+def svg_hist_2d(h: "hist.BaseHist") -> svg:
     width = 250
     height = 250
     assert h.ndim == 2, "Must be 2D"
@@ -177,7 +193,7 @@ def svg_hist_2d(h):
     return svg(*texts, *boxes, viewBox=f"{-20} {-height - 20} {width+40} {height+40}")
 
 
-def svg_hist_nd(h):
+def svg_hist_nd(h: "hist.BaseHist") -> svg:
     assert h.ndim > 2, "Must be more than 2D"
 
     width = 200
