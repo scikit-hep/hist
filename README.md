@@ -17,7 +17,7 @@
 
 Hist is a analyst friendly front-end for
 [boost-histogram](https://github.com/scikit-hep/boost-histogram), designed for
-Python 3.6+.
+Python 3.6+. See [what's new](https://hist.readthedocs.io/en/latest/changelog.html).
 
 ## Installation
 
@@ -45,6 +45,8 @@ Hist currently provides everything boost-histogram provides, and the following e
   - `flow=False` is a fast way to turn off flow
   - Storages can be given by string
   - `storage=` can be omitted
+  - `data=` can initialize a histogram with existing data
+  - `Hist.from_columns` can be used to initialize with a DataFrame or dict
 
 - Hist implements UHI+; an extension to the UHI (Unified Histogram Indexing) system designed for import-free interactivity:
   - Uses `j` suffix to switch to data coordinates in access or slices
@@ -55,6 +57,7 @@ Hist currently provides everything boost-histogram provides, and the following e
   - `.plot()` provides 1D and 2D plots
   - `.plot2d_full()` shows 1D projects around a 2D plot
   - `.plot_pull(...)` performs a pull plot
+  - `.plot_pie()` makes a pie plot
 
 - Notebook ready: Hist has gorgeous in-notebook representation.
   - No dependencies required
