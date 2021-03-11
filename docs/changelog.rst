@@ -1,6 +1,12 @@
 Changelog
 ====================
 
+Version 2.2.1
+--------------------
+
+* Fix static typing with ellipses.
+  `#145 <https://github.com/scikit-hep/hist/pull/145>`_
+
 Version 2.2.0
 --------------------
 
