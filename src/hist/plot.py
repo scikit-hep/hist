@@ -1,6 +1,8 @@
 import sys
 from typing import Any, Callable, Dict, Optional, Set, Tuple, Union
 
+from .typing import ArrayLike
+
 import numpy as np
 
 import hist
@@ -41,6 +43,81 @@ def _filter_dict(
         for key in list(dict)
         if key.startswith(prefix) and key not in ignore_set
     }
+
+
+def _expr_to_lambda(expr: str) -> Callable:
+    """
+    Converts a string expression like
+        "a+b*np.exp(-c*x+math.pi)"
+    into a callable function with 1 variable and N parameters,
+        lambda x,a,b,c: "a+b*np.exp(-c*x+math.pi)"
+    `x` is assumed to be the main variable, and preventing symbols
+    like `foo.bar` or `foo(` from being considered as parameter.
+    """
+    from collections import OrderedDict
+    from io import BytesIO
+    from tokenize import tokenize, NAME
+
+    varnames = []
+    g = list(tokenize(BytesIO(expr.encode("utf-8")).readline))
+    for ix, x in enumerate(g):
+        toknum = x[0]
+        tokval = x[1]
+        if toknum != NAME:
+            continue
+        if ix > 0 and g[ix - 1][1] in ["."]:
+            continue
+        if ix < len(g) - 1 and g[ix + 1][1] in [".", "("]:
+            continue
+        varnames.append(tokval)
+    varnames = list(OrderedDict.fromkeys([name for name in varnames if name != "x"]))
+    lambdastr = f"lambda x,{','.join(varnames)}: {expr}"
+    return eval(lambdastr)
+
+
+def _curve_fit_wrapper(
+    func: Callable,
+    xdata: ArrayLike,
+    ydata: ArrayLike,
+    yerr: ArrayLike,
+    likelihood: bool = False,
+) -> Tuple[ArrayLike, ArrayLike]:
+    """
+    Wrapper around `scipy.optimize.curve_fit`. Initial parameters (`p0`)
+    can be set in the function definition with defaults for kwargs
+    (e.g., `func = lambda x,a=1.,b=2.: x+a+b`, will feed `p0 = [1.,2.]` to `curve_fit`)
+    """
+    from scipy.optimize import minimize, curve_fit
+
+    p0 = None
+    if func.__defaults__ and len(func.__defaults__) + 1 == func.__code__.co_argcount:
+        p0 = func.__defaults__
+    mask = yerr != 0.0
+    popt, pcov = curve_fit(
+        func, xdata[mask], ydata[mask], sigma=yerr[mask], absolute_sigma=True, p0=p0,
+    )
+    if likelihood:
+        from scipy.special import gammaln
+        from iminuit import Minuit
+
+        def fnll(v):
+            ypred = func(xdata, *v)
+            if (ypred <= 0.0).any():
+                return 1e6
+            return (
+                ypred.sum() - (ydata * np.log(ypred)).sum() + gammaln(ydata + 1).sum()
+            )
+
+        # Seed likelihood fit with chi2 fit parameters
+        res = minimize(fnll, popt, method="BFGS")
+        popt = res.x
+
+        # Better hessian from hesse, seeded with scipy popt
+        m = Minuit(fnll, popt)
+        m.errordef = 0.5
+        m.hesse()
+        pcov = np.array(m.covariance)
+    return popt, pcov
 
 
 def plot2d_full(
@@ -128,7 +205,8 @@ def plot2d_full(
 
 def plot_pull(
     self: hist.BaseHist,
-    func: Callable[[np.ndarray], np.ndarray],
+    func: Union[Callable[[np.ndarray], np.ndarray], str],
+    likelihood: bool = False,
     *,
     ax_dict: "Optional[Dict[str, matplotlib.axes.Axes]]" = None,
     **kwargs: Any,
@@ -139,17 +217,17 @@ def plot_pull(
 
     try:
         from scipy.optimize import curve_fit
-        from uncertainties import correlated_values, unumpy
+        from iminuit import Minuit
     except ImportError:
         print(
-            "Hist.plot_pull requires scipy and uncertainties. Please install hist[plot] or manually install dependencies.",
+            "Hist.plot_pull requires scipy and iminuit. Please install hist[plot] or manually install dependencies.",
             file=sys.stderr,
         )
         raise
 
     # Type judgement
-    if not callable(func):
-        msg = f"Callable parameter func is supported for {self.__class__.__name__} in plot pull"
+    if not callable(func) and not type(func) in [str]:
+        msg = f"Parameter func must be callable or a string for {self.__class__.__name__} in plot pull"
         raise TypeError(msg)
 
     if self.ndim != 1:
@@ -169,22 +247,31 @@ def plot_pull(
         pull_ax = fig.add_subplot(grid[1], sharex=main_ax)
 
     # Computation and Fit
-    values = self.values()
-    yerr = self.variances()
+    xdata = self.axes[0].centers
+    ydata = self.values()
+    yerr = self.variances() ** 0.5
+
+    if type(func) in [str]:
+        func = _expr_to_lambda(func)
+
+    parnames = func.__code__.co_varnames[1:]
 
     # Compute fit values: using func as fit model
-    popt, pcov = curve_fit(f=func, xdata=self.axes[0].centers, ydata=values)
-    fit = func(self.axes[0].centers, *popt)
+    popt, pcov = _curve_fit_wrapper(func, xdata, ydata, yerr, likelihood=likelihood)
+    perr = np.diag(pcov) ** 0.5
+    yfit = func(self.axes[0].centers, *popt)
 
-    # Compute uncertainty
-    copt = correlated_values(popt, pcov)
-    y_unc = func(self.axes[0].centers, *copt)
-    y_nv = unumpy.nominal_values(y_unc)
-    y_sd = unumpy.std_devs(y_unc)
+    if np.isfinite(pcov).all():
+        nsamples = 100
+        vopts = np.random.multivariate_normal(popt, pcov, nsamples)
+        sampled_ydata = np.vstack([func(xdata, *vopt).T for vopt in vopts])
+        yfiterr = np.nanstd(sampled_ydata, axis=0)
+    else:
+        yfiterr = np.zeros_like(yerr)
 
     # Compute pulls: containing no INF values
     with np.errstate(divide="ignore"):
-        pulls = (values - y_nv) / yerr
+        pulls = (ydata - yfit) / yerr
 
     pulls[np.isnan(pulls)] = 0
     pulls[np.isinf(pulls)] = 0
@@ -196,12 +283,17 @@ def plot_pull(
     eb_kwargs.setdefault("label", "Histogram Data")
 
     # fit plot keyword arguments
+    label = "Fit"
+    for name, value, error in zip(parnames, popt, perr):
+        label += "\n  "
+        label += rf"{name} = {value:.3g} $\pm$ {error:.3g}"
     fp_kwargs = _filter_dict(kwargs, "fp_")
-    fp_kwargs.setdefault("label", "Fitting Value")
+    fp_kwargs.setdefault("label", label)
 
     # uncertainty band keyword arguments
     ub_kwargs = _filter_dict(kwargs, "ub_")
     ub_kwargs.setdefault("label", "Uncertainty")
+    ub_kwargs.setdefault("alpha", 0.5)
 
     # bar plot keyword arguments
     bar_kwargs = _filter_dict(kwargs, "bar_", ignore={"bar_width"})
@@ -215,17 +307,14 @@ def plot_pull(
         raise ValueError(f"{set(kwargs)}' not needed")
 
     # Main: plot the pulls using Matplotlib errorbar and plot methods
-    main_ax.errorbar(self.axes.centers[0], values, yerr, **eb_kwargs)
+    main_ax.errorbar(self.axes.centers[0], ydata, yerr, **eb_kwargs)
 
-    (line,) = main_ax.plot(self.axes.centers[0], fit, **fp_kwargs)
+    (line,) = main_ax.plot(self.axes.centers[0], yfit, **fp_kwargs)
 
     # Uncertainty band
     ub_kwargs.setdefault("color", line.get_color())
     main_ax.fill_between(
-        self.axes.centers[0],
-        y_nv - y_sd,
-        y_nv + y_sd,
-        **ub_kwargs,
+        self.axes.centers[0], yfit - yfiterr, yfit + yfiterr, **ub_kwargs,
     )
     main_ax.legend(loc=0)
     main_ax.set_ylabel("Counts")
