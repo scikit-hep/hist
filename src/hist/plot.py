@@ -1,11 +1,11 @@
 import sys
 from typing import Any, Callable, Dict, Optional, Set, Tuple, Union
 
-from .typing import ArrayLike
-
 import numpy as np
 
 import hist
+
+from .typing import ArrayLike
 
 try:
     import matplotlib.axes
@@ -56,7 +56,7 @@ def _expr_to_lambda(expr: str) -> Callable:
     """
     from collections import OrderedDict
     from io import BytesIO
-    from tokenize import tokenize, NAME
+    from tokenize import NAME, tokenize
 
     varnames = []
     g = list(tokenize(BytesIO(expr.encode("utf-8")).readline))
@@ -87,18 +87,23 @@ def _curve_fit_wrapper(
     can be set in the function definition with defaults for kwargs
     (e.g., `func = lambda x,a=1.,b=2.: x+a+b`, will feed `p0 = [1.,2.]` to `curve_fit`)
     """
-    from scipy.optimize import minimize, curve_fit
+    from scipy.optimize import curve_fit, minimize
 
     p0 = None
     if func.__defaults__ and len(func.__defaults__) + 1 == func.__code__.co_argcount:
         p0 = func.__defaults__
     mask = yerr != 0.0
     popt, pcov = curve_fit(
-        func, xdata[mask], ydata[mask], sigma=yerr[mask], absolute_sigma=True, p0=p0,
+        func,
+        xdata[mask],
+        ydata[mask],
+        sigma=yerr[mask],
+        absolute_sigma=True,
+        p0=p0,
     )
     if likelihood:
-        from scipy.special import gammaln
         from iminuit import Minuit
+        from scipy.special import gammaln
 
         def fnll(v):
             ypred = func(xdata, *v)
@@ -216,8 +221,8 @@ def plot_pull(
     """
 
     try:
-        from scipy.optimize import curve_fit
         from iminuit import Minuit
+        from scipy.optimize import curve_fit
     except ImportError:
         print(
             "Hist.plot_pull requires scipy and iminuit. Please install hist[plot] or manually install dependencies.",
@@ -324,7 +329,10 @@ def plot_pull(
     # Uncertainty band
     ub_kwargs.setdefault("color", line.get_color())
     main_ax.fill_between(
-        self.axes.centers[0], yfit - yfiterr, yfit + yfiterr, **ub_kwargs,
+        self.axes.centers[0],
+        yfit - yfiterr,
+        yfit + yfiterr,
+        **ub_kwargs,
     )
     main_ax.legend(loc=0)
     main_ax.set_ylabel("Counts")
