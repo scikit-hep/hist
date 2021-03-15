@@ -252,7 +252,17 @@ def plot_pull(
     yerr = self.variances() ** 0.5
 
     if type(func) in [str]:
-        func = _expr_to_lambda(func)
+        if func == "gaus":
+            # gaussian with reasonable initial guesses for parameters
+            constant = ydata.max()
+            mean = (ydata * xdata).sum() / ydata.sum()
+            sigma = (ydata * (xdata - mean) ** 2.0).sum() / ydata.sum()
+
+            def func(x, constant=constant, mean=mean, sigma=sigma):
+                return constant * np.exp(-((x - mean) ** 2.0) / (2 * sigma ** 2))
+
+        else:
+            func = _expr_to_lambda(func)
 
     parnames = func.__code__.co_varnames[1:]
 
