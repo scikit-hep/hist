@@ -11,7 +11,7 @@ extras_require = {}
 extras_require["plot"] = [
     "matplotlib >=3.0",
     "scipy >=1.4",
-    "uncertainties >=3",
+    "iminuit >=2",
     "mplhep >=0.2.16",
 ]
 
