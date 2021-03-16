@@ -30,10 +30,14 @@ from .svgplots import html_hist, svg_hist_1d, svg_hist_1d_c, svg_hist_2d, svg_hi
 from .typing import ArrayLike, SupportsIndex
 
 if TYPE_CHECKING:
+    from builtins import ellipsis
+
     import matplotlib.axes
     from mplhep.plot import Hist1DArtists, Hist2DArtists
 
-InnerIndexing = Union[SupportsIndex, str, Callable[[bh.axis.Axis], int], slice]
+InnerIndexing = Union[
+    SupportsIndex, str, Callable[[bh.axis.Axis], int], slice, "ellipsis"
+]
 IndexingWithMapping = Union[InnerIndexing, Mapping[Union[int, str], InnerIndexing]]
 IndexingExpr = Union[IndexingWithMapping, Tuple[IndexingWithMapping, ...]]
 
@@ -99,7 +103,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
                     ax.label = f"Axis {i}"
 
         if data is not None:
-            self[...] = data  # type: ignore
+            self[...] = data
 
     def _generate_axes_(self) -> NamedAxesTuple:
         """
@@ -261,7 +265,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         return tuple(self._loc_shortcut(v) for v in index)  # type: ignore
 
     def __getitem__(  # type: ignore
-        self: T, index: SupportsIndex
+        self: T, index: IndexingExpr
     ) -> Union[T, float, bh.accumulators.Accumulator]:
         """
         Get histogram item.
@@ -270,7 +274,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         return super().__getitem__(self._index_transform(index))
 
     def __setitem__(  # type: ignore
-        self, index: SupportsIndex, value: Union[ArrayLike, bh.accumulators.Accumulator]
+        self, index: IndexingExpr, value: Union[ArrayLike, bh.accumulators.Accumulator]
     ) -> None:
         """
         Set histogram item.
