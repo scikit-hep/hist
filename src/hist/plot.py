@@ -210,6 +210,144 @@ def plot2d_full(
     return main_art, top_art, side_art
 
 
+def plot_ratio(
+    self: hist.BaseHist,
+    func: Callable[[np.ndarray], np.ndarray],
+    *,
+    ax_dict: "Optional[Dict[str, matplotlib.axes.Axes]]" = None,
+    **kwargs: Any,
+) -> "Tuple[matplotlib.axes.Axes, matplotlib.axes.Axes]":
+    """
+    Plot_ratio method for BaseHist object.
+    """
+
+    try:
+        from scipy.optimize import curve_fit
+        from uncertainties import correlated_values, unumpy
+    except ImportError:
+        print(
+            "Hist.plot_ratio requires scipy and uncertainties. Please install hist[plot] or manually install dependencies.",
+            file=sys.stderr,
+        )
+        raise
+
+    # Type judgement
+    if not callable(func):
+        msg = f"Callable parameter func is supported for {self.__class__.__name__} in plot ratio"
+        raise TypeError(msg)
+
+    if self.ndim != 1:
+        raise TypeError("Only 1D-histogram supports ratio plot, try projecting to 1D")
+
+    if ax_dict:
+        try:
+            main_ax = ax_dict["main_ax"]
+            ratio_ax = ax_dict["ratio_ax"]
+        except KeyError:
+            raise ValueError("All axes should be all given or none at all")
+    else:
+        fig = plt.gcf()
+        grid = fig.add_gridspec(2, 1, hspace=0, height_ratios=[3, 1])
+
+        main_ax = fig.add_subplot(grid[0])
+        ratio_ax = fig.add_subplot(grid[1], sharex=main_ax)
+
+    # Computation and Fit
+    values = self.values()
+    yerr = self.variances()
+
+    # Compute fit values: using func as fit model
+    popt, pcov = curve_fit(f=func, xdata=self.axes[0].centers, ydata=values)
+    fit = func(self.axes[0].centers, *popt)
+
+    # Compute uncertainty
+    copt = correlated_values(popt, pcov)
+    y_unc = func(self.axes[0].centers, *copt)
+    y_nv = unumpy.nominal_values(y_unc)
+    y_sd = unumpy.std_devs(y_unc)
+
+    # Compute ratios: containing no INF values
+    with np.errstate(divide="ignore"):
+        ratios = (values - y_nv) / yerr
+
+    ratios[np.isnan(ratios)] = 0
+    ratios[np.isinf(ratios)] = 0
+
+    # Keyword Argument Conversion: convert the kwargs to several independent args
+
+    # error bar keyword arguments
+    eb_kwargs = _filter_dict(kwargs, "eb_")
+    eb_kwargs.setdefault("label", "Histogram Data")
+
+    # fit plot keyword arguments
+    fp_kwargs = _filter_dict(kwargs, "fp_")
+    fp_kwargs.setdefault("label", "Fitting Value")
+
+    # uncertainty band keyword arguments
+    ub_kwargs = _filter_dict(kwargs, "ub_")
+    ub_kwargs.setdefault("label", "Uncertainty")
+
+    # bar plot keyword arguments
+    bar_kwargs = _filter_dict(kwargs, "bar_", ignore={"bar_width"})
+
+    # patch plot keyword arguments
+    pp_kwargs = _filter_dict(kwargs, "pp_", ignore={"pp_num"})
+    pp_num = kwargs.pop("pp_num", 5)
+
+    # Judge whether some arguments are left
+    if kwargs:
+        raise ValueError(f"{set(kwargs)}' not needed")
+
+    # Main: plot the ratios using Matplotlib errorbar and plot methods
+    main_ax.errorbar(self.axes.centers[0], values, yerr, **eb_kwargs)
+
+    (line,) = main_ax.plot(self.axes.centers[0], fit, **fp_kwargs)
+
+    # Uncertainty band
+    ub_kwargs.setdefault("color", line.get_color())
+    main_ax.fill_between(
+        self.axes.centers[0],
+        y_nv - y_sd,
+        y_nv + y_sd,
+        **ub_kwargs,
+    )
+    main_ax.legend(loc=0)
+    main_ax.set_ylabel("Counts")
+
+    # ratio: plot the ratios using Matplotlib bar method
+    left_edge = self.axes.edges[0][0]
+    right_edge = self.axes.edges[-1][-1]
+    width = (right_edge - left_edge) / len(ratios)
+    ratio_ax.bar(self.axes.centers[0], ratios, width=width, **bar_kwargs)
+
+    patch_height = max(np.abs(ratios)) / pp_num
+    patch_width = width * len(ratios)
+    for i in range(pp_num):
+        # gradient color patches
+        if "alpha" in pp_kwargs:
+            pp_kwargs["alpha"] *= np.power(0.618, i)
+        else:
+            pp_kwargs["alpha"] = 0.5 * np.power(0.618, i)
+
+        upRect_startpoint = (left_edge, i * patch_height)
+        upRect = patches.Rectangle(
+            upRect_startpoint, patch_width, patch_height, **pp_kwargs
+        )
+        ratio_ax.add_patch(upRect)
+        downRect_startpoint = (left_edge, -(i + 1) * patch_height)
+        downRect = patches.Rectangle(
+            downRect_startpoint, patch_width, patch_height, **pp_kwargs
+        )
+        ratio_ax.add_patch(downRect)
+
+    plt.xlim(left_edge, right_edge)
+
+    ratio_ax.set_xlabel(self.axes[0].label)
+    ratio_ax.set_ylabel("Ratio")
+
+    return main_ax, ratio_ax
+
+
 def plot_pull(
     self: hist.BaseHist,
     func: Union[Callable[[np.ndarray], np.ndarray], str],
