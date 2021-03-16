@@ -353,6 +353,21 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
         return hist.plot.plot2d_full(self, ax_dict=ax_dict, **kwargs)
 
+    def plot_ratio(
+        self,
+        func: Callable[[np.ndarray], np.ndarray],
+        *,
+        ax_dict: "Optional[Dict[str, matplotlib.axes.Axes]]" = None,
+        **kwargs: Any,
+    ) -> "Tuple[matplotlib.axes.Axes, matplotlib.axes.Axes]":
+        """
+        plot_ratio method for BaseHist object.
+        """
+
+        import hist.plot
+
+        return hist.plot.plot_ratio(self, func, ax_dict=ax_dict, **kwargs)
+
     def plot_pull(
         self,
         func: Callable[[np.ndarray], np.ndarray],
