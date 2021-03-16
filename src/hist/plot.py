@@ -20,7 +20,14 @@ except ModuleNotFoundError:
     raise
 
 
-__all__ = ("histplot", "hist2dplot", "plot2d_full", "plot_pull", "plot_pie")
+__all__ = (
+    "histplot",
+    "hist2dplot",
+    "plot2d_full",
+    "plot_ratio",
+    "plot_pull",
+    "plot_pie",
+)
 
 
 def _expand_shortcuts(key: str) -> str:
