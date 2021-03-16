@@ -170,7 +170,12 @@ def plot_pull(
 
     # Computation and Fit
     values = self.values()
-    yerr = np.sqrt(self.variances())
+    variances = self.variances()
+    if variances is None:
+        raise RuntimeError(
+            "Cannot compute from a variance-less histogram, try a Weight storage"
+        )
+    yerr = np.sqrt(variances)
 
     # Compute fit values: using func as fit model
     popt, pcov = curve_fit(f=func, xdata=self.axes[0].centers, ydata=values)
