@@ -170,7 +170,7 @@ def plot_pull(
 
     # Computation and Fit
     values = self.values()
-    yerr = self.variances() ** 0.5
+    yerr = np.sqrt(self.variances())
 
     # Compute fit values: using func as fit model
     popt, pcov = curve_fit(f=func, xdata=self.axes[0].centers, ydata=values)
