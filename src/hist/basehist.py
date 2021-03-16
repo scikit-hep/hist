@@ -355,7 +355,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
     def plot_ratio(
         self,
-        func: Callable[[np.ndarray], np.ndarray],
+        other: Callable[[np.ndarray], np.ndarray],
         *,
         ax_dict: "Optional[Dict[str, matplotlib.axes.Axes]]" = None,
         **kwargs: Any,
@@ -366,7 +366,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
         import hist.plot
 
-        return hist.plot.plot_ratio(self, func, ax_dict=ax_dict, **kwargs)
+        return hist.plot.plot_ratio(self, other, ax_dict=ax_dict, **kwargs)
 
     def plot_pull(
         self,

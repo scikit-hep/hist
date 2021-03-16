@@ -219,7 +219,7 @@ def plot2d_full(
 
 def plot_ratio(
     self: hist.BaseHist,
-    func: Callable[[np.ndarray], np.ndarray],
+    other: Callable[[np.ndarray], np.ndarray],
     *,
     ax_dict: "Optional[Dict[str, matplotlib.axes.Axes]]" = None,
     **kwargs: Any,
@@ -239,8 +239,8 @@ def plot_ratio(
         raise
 
     # Type judgement
-    if not callable(func):
-        msg = f"Callable parameter func is supported for {self.__class__.__name__} in plot ratio"
+    if not callable(other):
+        msg = f"Callable parameter other is supported for {self.__class__.__name__} in plot ratio"
         raise TypeError(msg)
 
     if self.ndim != 1:
@@ -263,19 +263,20 @@ def plot_ratio(
     values = self.values()
     yerr = self.variances()
 
-    # Compute fit values: using func as fit model
-    popt, pcov = curve_fit(f=func, xdata=self.axes[0].centers, ydata=values)
-    fit = func(self.axes[0].centers, *popt)
+    # Compute fit values: using other as fit model
+    popt, pcov = curve_fit(f=other, xdata=self.axes[0].centers, ydata=values)
+    fit = other(self.axes[0].centers, *popt)
 
     # Compute uncertainty
     copt = correlated_values(popt, pcov)
-    y_unc = func(self.axes[0].centers, *copt)
+    y_unc = other(self.axes[0].centers, *copt)
     y_nv = unumpy.nominal_values(y_unc)
     y_sd = unumpy.std_devs(y_unc)
 
     # Compute ratios: containing no INF values
     with np.errstate(divide="ignore"):
-        ratios = (values - y_nv) / yerr
+        # ratios = (values - y_nv) / yerr
+        ratios = values - y_nv
 
     ratios[np.isnan(ratios)] = 0
     ratios[np.isinf(ratios)] = 0
