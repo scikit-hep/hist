@@ -4,6 +4,9 @@ Changelog
 Version 2.2.1
 --------------------
 
+* Fix bug with `plot_pull` missing a sqrt.
+  `#150 <https://github.com/scikit-hep/hist/pull/150>`_
+
 * Fix static typing with ellipses.
   `#145 <https://github.com/scikit-hep/hist/pull/145>`_
 
