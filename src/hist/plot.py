@@ -276,7 +276,7 @@ def plot_ratio(
     copt = correlated_values(popt, pcov)
     other_unc = other(self.axes[0].centers, *copt)
     other_nv = unumpy.nominal_values(other_unc)
-    other_sd = unumpy.std_devs(other_unc)
+    # other_sd = unumpy.std_devs(other_unc)
 
     # Compute ratios: containing no INF values
     with np.errstate(divide="ignore"):
@@ -296,12 +296,12 @@ def plot_ratio(
     ub_kwargs = _filter_dict(kwargs, "ub_")
     ub_kwargs.setdefault("label", "Uncertainty")
 
-    # bar plot keyword arguments
-    bar_kwargs = _filter_dict(kwargs, "bar_", ignore={"bar_width"})
+    # # bar plot keyword arguments
+    # bar_kwargs = _filter_dict(kwargs, "bar_", ignore={"bar_width"})
 
-    # patch plot keyword arguments
-    pp_kwargs = _filter_dict(kwargs, "pp_", ignore={"pp_num"})
-    pp_num = kwargs.pop("pp_num", 5)
+    # # patch plot keyword arguments
+    # pp_kwargs = _filter_dict(kwargs, "pp_", ignore={"pp_num"})
+    # pp_num = kwargs.pop("pp_num", 5)
 
     # Judge whether some arguments are left
     if kwargs:
@@ -312,17 +312,10 @@ def plot_ratio(
 
     (line,) = main_ax.plot(self.axes.centers[0], fit, **fp_kwargs)
 
-    # PULL PLOT RELATED
-    # Uncertainty band
-    # ub_kwargs.setdefault("color", line.get_color())
-    # main_ax.fill_between(
-    #     self.axes.centers[0],
-    #     y_nv - y_sd,
-    #     y_nv + y_sd,
-    #     **ub_kwargs,
-    # )
+    # TODO: Make configurable
     main_ax.legend(loc="best")
-    # main_ax.set_ylabel("Counts")
+    # TODO: Make configurable
+    main_ax.set_ylabel("Counts")
 
     # ratio: plot the ratios using Matplotlib bar method
     left_edge = self.axes.edges[0][0]
@@ -334,43 +327,30 @@ def plot_ratio(
     ratios[ratios == 0] = np.nan
     ratios[np.isinf(ratios)] = np.nan
 
-    ratio_ax.scatter(self.axes.centers[0], ratios, **pp_kwargs)
-
-    # set nans back to 0 to find extrema
-    ratios[np.isnan(ratios)] = 0
-    # plot centered around central value with offsets of max_difference/2
+    # TODO: Make configurable
     central_value = 1.0
-    ratio_extrema = max(np.abs(ratios))
-    extrema_delta = ratio_extrema - central_value
-    scaled_offset = extrema_delta + (extrema_delta / ratio_extrema)
-    ratio_ax.set_ylim(
-        bottom=central_value - scaled_offset,
-        top=central_value + scaled_offset,
-    )
 
-    # patch_height = max(np.abs(ratios)) / pp_num
-    # patch_width = width * len(ratios)
-    # for i in range(pp_num):
-    #     # gradient color patches
-    #     if "alpha" in pp_kwargs:
-    #         pp_kwargs["alpha"] *= np.power(0.618, i)
-    #     else:
-    #         pp_kwargs["alpha"] = 0.5 * np.power(0.618, i)
+    ratio_ax.axhline(central_value, color="black", linestyle="dashed")
+    ratio_ax.scatter(self.axes.centers[0], ratios, color="black")
 
-    #     upRect_startpoint = (left_edge, i * patch_height)
-    #     upRect = patches.Rectangle(
-    #         upRect_startpoint, patch_width, patch_height, **pp_kwargs
-    #     )
-    #     ratio_ax.add_patch(upRect)
-    #     downRect_startpoint = (left_edge, -(i + 1) * patch_height)
-    #     downRect = patches.Rectangle(
-    #         downRect_startpoint, patch_width, patch_height, **pp_kwargs
-    #     )
-    #     ratio_ax.add_patch(downRect)
+    # TODO: Make configurable
+    ratio_ylim = None
+    if ratio_ylim is None:
+        # set nans back to 0 to find extrema
+        ratios[np.isnan(ratios)] = 0
+        # plot centered around central value with a scaled view range
+        ratio_extrema = max(np.abs(ratios))
+        ratio_delta = ratio_extrema - central_value
+        _alpha = 1.5  # 1.5 provides better offset than 2.0
+        scaled_offset = ratio_delta + (ratio_delta / (_alpha * ratio_extrema))
+        ratio_ylim = [central_value - scaled_offset, central_value + scaled_offset]
+
+    ratio_ax.set_ylim(bottom=ratio_ylim[0], top=ratio_ylim[1])
 
     plt.xlim(left_edge, right_edge)
 
     ratio_ax.set_xlabel(self.axes[0].label)
+    # TODO: Make configurable
     ratio_ax.set_ylabel("Ratio")
 
     return main_ax, ratio_ax
