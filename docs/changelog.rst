@@ -10,6 +10,11 @@ Version 2.2.1
 * Fix static typing with ellipses.
   `#145 <https://github.com/scikit-hep/hist/pull/145>`_
 
+* Require boost-histogram 1.0.1+, fixing typing related issues, allowing
+  subclassing Hist without a family and including a important Mean/WeighedMean
+  summing fix.
+  `#151 <https://github.com/scikit-hep/hist/pull/151>`_
+
 Version 2.2.0
 --------------------
 
