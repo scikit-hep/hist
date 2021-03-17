@@ -1,5 +1,6 @@
+import inspect
 import sys
-from typing import Any, Callable, Dict, Optional, Set, Tuple, Union
+from typing import Any, Callable, Dict, Iterable, Optional, Set, Tuple, Union
 
 import numpy as np
 
@@ -45,7 +46,7 @@ def _filter_dict(
     }
 
 
-def _expr_to_lambda(expr: str) -> Callable:
+def _expr_to_lambda(expr: str) -> Callable[..., Any]:
     """
     Converts a string expression like
         "a+b*np.exp(-c*x+math.pi)"
@@ -72,16 +73,16 @@ def _expr_to_lambda(expr: str) -> Callable:
         varnames.append(tokval)
     varnames = list(OrderedDict.fromkeys([name for name in varnames if name != "x"]))
     lambdastr = f"lambda x,{','.join(varnames)}: {expr}"
-    return eval(lambdastr)
+    return eval(lambdastr)  # type: ignore
 
 
 def _curve_fit_wrapper(
-    func: Callable,
-    xdata: ArrayLike,
-    ydata: ArrayLike,
-    yerr: ArrayLike,
+    func: Callable[..., Any],
+    xdata: np.ndarray,
+    ydata: np.ndarray,
+    yerr: np.ndarray,
     likelihood: bool = False,
-) -> Tuple[ArrayLike, ArrayLike]:
+) -> Tuple[Tuple[float, ...], ArrayLike]:
     """
     Wrapper around `scipy.optimize.curve_fit`. Initial parameters (`p0`)
     can be set in the function definition with defaults for kwargs
@@ -89,9 +90,12 @@ def _curve_fit_wrapper(
     """
     from scipy.optimize import curve_fit, minimize
 
-    p0 = None
-    if func.__defaults__ and len(func.__defaults__) + 1 == func.__code__.co_argcount:
-        p0 = func.__defaults__
+    params = list(inspect.signature(func).parameters.values())
+    p0 = [
+        1 if arg.default is inspect.Parameter.empty else arg.default
+        for arg in params[1:]
+    ]
+
     mask = yerr != 0.0
     popt, pcov = curve_fit(
         func,
@@ -105,11 +109,11 @@ def _curve_fit_wrapper(
         from iminuit import Minuit
         from scipy.special import gammaln
 
-        def fnll(v):
+        def fnll(v: Iterable[np.ndarray]) -> float:
             ypred = func(xdata, *v)
             if (ypred <= 0.0).any():
                 return 1e6
-            return (
+            return (  # type: ignore
                 ypred.sum() - (ydata * np.log(ypred)).sum() + gammaln(ydata + 1).sum()
             )
 
@@ -122,7 +126,7 @@ def _curve_fit_wrapper(
         m.errordef = 0.5
         m.hesse()
         pcov = np.array(m.covariance)
-    return popt, pcov
+    return tuple(popt), pcov
 
 
 def plot2d_full(
@@ -221,8 +225,8 @@ def plot_pull(
     """
 
     try:
-        from iminuit import Minuit
-        from scipy.optimize import curve_fit
+        from iminuit import Minuit  # noqa: F401
+        from scipy.optimize import curve_fit  # noqa: F401
     except ImportError:
         print(
             "Hist.plot_pull requires scipy and iminuit. Please install hist[plot] or manually install dependencies.",
@@ -261,20 +265,27 @@ def plot_pull(
         )
     yerr = np.sqrt(variances)
 
-    if type(func) in [str]:
+    if isinstance(func, str):
         if func == "gaus":
             # gaussian with reasonable initial guesses for parameters
-            constant = ydata.max()
+            constant = float(ydata.max())
             mean = (ydata * xdata).sum() / ydata.sum()
             sigma = (ydata * (xdata - mean) ** 2.0).sum() / ydata.sum()
 
-            def func(x, constant=constant, mean=mean, sigma=sigma):
-                return constant * np.exp(-((x - mean) ** 2.0) / (2 * sigma ** 2))
+            def func(
+                x: np.ndarray,
+                constant: float = constant,
+                mean: float = mean,
+                sigma: float = sigma,
+            ) -> np.ndarray:
+                return constant * np.exp(-((x - mean) ** 2.0) / (2 * sigma ** 2))  # type: ignore
 
         else:
             func = _expr_to_lambda(func)
 
-    parnames = func.__code__.co_varnames[1:]
+    assert not isinstance(func, str)
+
+    parnames = list(inspect.signature(func).parameters)[1:]
 
     # Compute fit values: using func as fit model
     popt, pcov = _curve_fit_wrapper(func, xdata, ydata, yerr, likelihood=likelihood)
