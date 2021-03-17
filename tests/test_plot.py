@@ -591,6 +591,7 @@ def test_named_plot_pull():
 
     plt.close("all")
 
+
 @pytest.mark.mpl_image_compare(baseline_dir="baseline")
 def test_image_plot_pull():
     """
