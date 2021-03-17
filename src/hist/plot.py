@@ -330,8 +330,18 @@ def plot_ratio(
     # TODO: Make configurable
     central_value = 1.0
 
-    ratio_ax.axhline(central_value, color="black", linestyle="dashed")
-    ratio_ax.scatter(self.axes.centers[0], ratios, color="black")
+    ratio_ax.axhline(central_value, color="black", linestyle="dashed", linewidth=1.0)
+    # TODO: Calculate this with different manners
+    # c.f. https://coffeateam.github.io/coffea/api/coffea.hist.plotratio.html#coffea.hist.plotratio
+    ratio_uncert = [0.25] * len(ratios)  # totally fake numbers for now
+    ratio_ax.errorbar(
+        self.axes.centers[0],
+        ratios,
+        yerr=ratio_uncert,
+        color="black",
+        marker="o",
+        linestyle="none",
+    )
 
     # TODO: Make configurable
     ratio_ylim = None
