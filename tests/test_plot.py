@@ -591,7 +591,8 @@ def test_named_plot_pull():
 
     plt.close("all")
 
-@pytest.mark.mpl_image_compare(baseline_dir="baseline", savefig_kwargs={"dpi":50})
+
+@pytest.mark.mpl_image_compare(baseline_dir="baseline", savefig_kwargs={"dpi": 50})
 def test_image_plot_pull():
     """
     Test plot_pull by comparing against a reference image generated via
