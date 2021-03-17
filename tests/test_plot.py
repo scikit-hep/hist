@@ -231,6 +231,10 @@ def test_general_plot_pull():
         pp_ec=None,
     )
 
+    pdf_str = "a * np.exp(-((x - x0) ** 2) / (2 * sigma ** 2)) + offset"
+
+    assert h.plot_pull(pdf_str)
+
     # dimension error
     hh = Hist(
         axis.Regular(
@@ -522,6 +526,10 @@ def test_named_plot_pull():
         pp_ec=None,
     )
 
+    pdf_str = "a * np.exp(-((x - x0) ** 2) / (2 * sigma ** 2)) + offset"
+
+    assert h.plot_pull(pdf_str)
+
     # dimension error
     hh = NamedHist(
         axis.Regular(
@@ -582,3 +590,27 @@ def test_named_plot_pull():
         h.plot_pull(pdf, eb_ecolor=1.0, eb_mfc=1.0)  # kwargs should be str
 
     plt.close("all")
+
+@pytest.mark.mpl_image_compare(baseline_dir="baseline")
+def test_image_plot_pull():
+    """
+    Test plot_pull by comparing against a reference image generated via
+    `pytest --mpl-generate-path=baseline`
+    """
+
+    np.random.seed(42)
+
+    h = Hist(
+        axis.Regular(
+            50, -4, 4, name="S", label="s [units]", underflow=False, overflow=False
+        )
+    ).fill(np.random.normal(size=100))
+
+    def pdf(x, a=1 / np.sqrt(2 * np.pi), x0=0, sigma=1, offset=0):
+        return a * np.exp(-((x - x0) ** 2) / (2 * sigma ** 2)) + offset
+
+    fig, ax = plt.subplots()
+
+    assert h.plot_pull(pdf)
+
+    return fig

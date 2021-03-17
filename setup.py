@@ -17,6 +17,7 @@ extras_require["plot"] = [
 
 extras_require["test"] = [
     "pytest >=4.6",
+    "pytest-mpl >=0.12",
 ]
 
 extras_require["dev"] = [*extras_require["test"], *extras_require["plot"], "ipykernel"]
