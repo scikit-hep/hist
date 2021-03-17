@@ -261,7 +261,12 @@ def plot_ratio(
 
     # Computation and Fit
     values = self.values()
-    yerr = self.variances()
+    variances = self.variances()
+    if variances is None:
+        raise RuntimeError(
+            "Cannot compute from a variance-less histogram, try a Weight storage"
+        )
+    yerr = np.sqrt(variances)
 
     # Compute fit values: using other as fit model
     popt, pcov = curve_fit(f=other, xdata=self.axes[0].centers, ydata=values)
