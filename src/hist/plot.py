@@ -268,19 +268,20 @@ def plot_ratio(
         )
     yerr = np.sqrt(variances)
 
+    # TODO: Make this only for callable
     # Compute fit values: using other as fit model
     popt, pcov = curve_fit(f=other, xdata=self.axes[0].centers, ydata=values)
     fit = other(self.axes[0].centers, *popt)
 
-    # Compute uncertainty
+    # Compute uncertainty on fit
     copt = correlated_values(popt, pcov)
-    other_unc = other(self.axes[0].centers, *copt)
-    other_nv = unumpy.nominal_values(other_unc)
-    # other_sd = unumpy.std_devs(other_unc)
+    fit_uncert = other(self.axes[0].centers, *copt)
+    fit_nominal = unumpy.nominal_values(fit_uncert)
+    fit_std = unumpy.std_devs(fit_uncert)
 
     # Compute ratios: containing no INF values
     with np.errstate(divide="ignore"):
-        ratios = values / other_nv
+        ratios = values / fit_nominal
 
     # Keyword Argument Conversion: convert the kwargs to several independent args
 
@@ -290,14 +291,11 @@ def plot_ratio(
 
     # fit plot keyword arguments
     fp_kwargs = _filter_dict(kwargs, "fp_")
-    fp_kwargs.setdefault("label", "Fitting Value")
+    fp_kwargs.setdefault("label", "Fitted Value")
 
     # uncertainty band keyword arguments
     ub_kwargs = _filter_dict(kwargs, "ub_")
     ub_kwargs.setdefault("label", "Uncertainty")
-
-    # # bar plot keyword arguments
-    # bar_kwargs = _filter_dict(kwargs, "bar_", ignore={"bar_width"})
 
     # # patch plot keyword arguments
     # pp_kwargs = _filter_dict(kwargs, "pp_", ignore={"pp_num"})
@@ -311,6 +309,15 @@ def plot_ratio(
     main_ax.errorbar(self.axes.centers[0], values, yerr, **eb_kwargs)
 
     (line,) = main_ax.plot(self.axes.centers[0], fit, **fp_kwargs)
+
+    # Uncertainty band for fitted function
+    ub_kwargs.setdefault("color", line.get_color())
+    main_ax.fill_between(
+        self.axes.centers[0],
+        fit_nominal - fit_std,
+        fit_nominal + fit_std,
+        **ub_kwargs,
+    )
 
     # TODO: Make configurable
     main_ax.legend(loc="best")
