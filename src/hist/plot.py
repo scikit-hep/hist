@@ -254,7 +254,12 @@ def plot_pull(
     # Computation and Fit
     xdata = self.axes[0].centers
     ydata = self.values()
-    yerr = self.variances() ** 0.5
+    variances = self.variances()
+    if variances is None:
+        raise RuntimeError(
+            "Cannot compute from a variance-less histogram, try a Weight storage"
+        )
+    yerr = np.sqrt(variances)
 
     if type(func) in [str]:
         if func == "gaus":

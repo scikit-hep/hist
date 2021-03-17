@@ -73,12 +73,12 @@ class NamedHist(BaseHist, family=hist):
                     f"Only access by names are supported for {self.__class__.__name__} in dictionay"
                 )
 
-        return super().__getitem__(index)  # type: ignore
+        return super().__getitem__(index)
 
     def __setitem__(  # type: ignore
-        self: T,
+        self,
         index: IndexingExpr,
-        value: Union[T, ArrayLike, bh.accumulators.Accumulator],
+        value: Union[ArrayLike, bh.accumulators.Accumulator],
     ) -> None:
         """
         Set histogram item.
@@ -90,4 +90,4 @@ class NamedHist(BaseHist, family=hist):
                     f"Only access by names are supported for {self.__class__.__name__} in dictionay"
                 )
 
-        return super().__setitem__(index, value)  # type: ignore
+        return super().__setitem__(index, value)
