@@ -281,7 +281,7 @@ def plot_ratio(
     # Compute ratios: containing no INF values
     with np.errstate(divide="ignore"):
         # ratios = (values - y_nv) / yerr
-        ratios = values - y_nv
+        ratios = values / y_nv
 
     ratios[np.isnan(ratios)] = 0
     ratios[np.isinf(ratios)] = 0
