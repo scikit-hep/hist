@@ -274,17 +274,13 @@ def plot_ratio(
 
     # Compute uncertainty
     copt = correlated_values(popt, pcov)
-    y_unc = other(self.axes[0].centers, *copt)
-    y_nv = unumpy.nominal_values(y_unc)
-    y_sd = unumpy.std_devs(y_unc)
+    other_unc = other(self.axes[0].centers, *copt)
+    other_nv = unumpy.nominal_values(other_unc)
+    other_sd = unumpy.std_devs(other_unc)
 
     # Compute ratios: containing no INF values
     with np.errstate(divide="ignore"):
-        # ratios = (values - y_nv) / yerr
-        ratios = values / y_nv
-
-    ratios[np.isnan(ratios)] = 0
-    ratios[np.isinf(ratios)] = 0
+        ratios = values / other_nv
 
     # Keyword Argument Conversion: convert the kwargs to several independent args
 
@@ -316,42 +312,61 @@ def plot_ratio(
 
     (line,) = main_ax.plot(self.axes.centers[0], fit, **fp_kwargs)
 
+    # PULL PLOT RELATED
     # Uncertainty band
-    ub_kwargs.setdefault("color", line.get_color())
-    main_ax.fill_between(
-        self.axes.centers[0],
-        y_nv - y_sd,
-        y_nv + y_sd,
-        **ub_kwargs,
-    )
-    main_ax.legend(loc=0)
-    main_ax.set_ylabel("Counts")
+    # ub_kwargs.setdefault("color", line.get_color())
+    # main_ax.fill_between(
+    #     self.axes.centers[0],
+    #     y_nv - y_sd,
+    #     y_nv + y_sd,
+    #     **ub_kwargs,
+    # )
+    main_ax.legend(loc="best")
+    # main_ax.set_ylabel("Counts")
 
     # ratio: plot the ratios using Matplotlib bar method
     left_edge = self.axes.edges[0][0]
     right_edge = self.axes.edges[-1][-1]
-    width = (right_edge - left_edge) / len(ratios)
-    ratio_ax.bar(self.axes.centers[0], ratios, width=width, **bar_kwargs)
+    # # width = (right_edge - left_edge) / len(ratios)
+    # ratio_ax.bar(self.axes.centers[0], ratios, width=width, **bar_kwargs)
 
-    patch_height = max(np.abs(ratios)) / pp_num
-    patch_width = width * len(ratios)
-    for i in range(pp_num):
-        # gradient color patches
-        if "alpha" in pp_kwargs:
-            pp_kwargs["alpha"] *= np.power(0.618, i)
-        else:
-            pp_kwargs["alpha"] = 0.5 * np.power(0.618, i)
+    # Set 0 and inf to nan to hide during plotting
+    ratios[ratios == 0] = np.nan
+    ratios[np.isinf(ratios)] = np.nan
 
-        upRect_startpoint = (left_edge, i * patch_height)
-        upRect = patches.Rectangle(
-            upRect_startpoint, patch_width, patch_height, **pp_kwargs
-        )
-        ratio_ax.add_patch(upRect)
-        downRect_startpoint = (left_edge, -(i + 1) * patch_height)
-        downRect = patches.Rectangle(
-            downRect_startpoint, patch_width, patch_height, **pp_kwargs
-        )
-        ratio_ax.add_patch(downRect)
+    ratio_ax.scatter(self.axes.centers[0], ratios, **pp_kwargs)
+
+    # set nans back to 0 to find extrema
+    ratios[np.isnan(ratios)] = 0
+    # plot centered around central value with offsets of max_difference/2
+    central_value = 1.0
+    ratio_extrema = max(np.abs(ratios))
+    extrema_delta = ratio_extrema - central_value
+    scaled_offset = extrema_delta + (extrema_delta / ratio_extrema)
+    ratio_ax.set_ylim(
+        bottom=central_value - scaled_offset,
+        top=central_value + scaled_offset,
+    )
+
+    # patch_height = max(np.abs(ratios)) / pp_num
+    # patch_width = width * len(ratios)
+    # for i in range(pp_num):
+    #     # gradient color patches
+    #     if "alpha" in pp_kwargs:
+    #         pp_kwargs["alpha"] *= np.power(0.618, i)
+    #     else:
+    #         pp_kwargs["alpha"] = 0.5 * np.power(0.618, i)
+
+    #     upRect_startpoint = (left_edge, i * patch_height)
+    #     upRect = patches.Rectangle(
+    #         upRect_startpoint, patch_width, patch_height, **pp_kwargs
+    #     )
+    #     ratio_ax.add_patch(upRect)
+    #     downRect_startpoint = (left_edge, -(i + 1) * patch_height)
+    #     downRect = patches.Rectangle(
+    #         downRect_startpoint, patch_width, patch_height, **pp_kwargs
+    #     )
+    #     ratio_ax.add_patch(downRect)
 
     plt.xlim(left_edge, right_edge)
 
