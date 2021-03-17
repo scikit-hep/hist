@@ -4,7 +4,9 @@
 
 [![Actions Status][actions-badge]][actions-link]
 [![Documentation Status][rtd-badge]][rtd-link]
+[![pre-commit.ci status][pre-commit-badge]][pre-commit-link]
 [![Code style: black][black-badge]][black-link]
+
 
 [![PyPI version][pypi-version]][pypi-link]
 [![Conda-Forge][conda-badge]][conda-link]
@@ -148,6 +150,8 @@ Support for this work was provided by the National Science Foundation cooperativ
 [github-discussions-link]:  https://github.com/scikit-hep/hist/discussions
 [gitter-badge]:             https://badges.gitter.im/HSF/PyHEP-histogramming.svg
 [gitter-link]:              https://gitter.im/HSF/PyHEP-histogramming?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
+[pre-commit-badge]:         https://results.pre-commit.ci/badge/github/scikit-hep/hist/master.svg
+[pre-commit-link]:          https://results.pre-commit.ci/repo/github/scikit-hep/hist
 [pypi-link]:                https://pypi.org/project/hist/
 [pypi-platforms]:           https://img.shields.io/pypi/pyversions/hist
 [pypi-version]:             https://badge.fury.io/py/hist.svg
