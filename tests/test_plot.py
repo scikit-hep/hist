@@ -3,7 +3,6 @@ import pytest
 
 from hist import Hist, NamedHist, axis
 
-unp = pytest.importorskip("uncertainties.unumpy")
 plt = pytest.importorskip("matplotlib.pyplot")
 
 
@@ -200,6 +199,8 @@ def test_general_plot_pull():
     Test general plot_pull -- whether 1d-Hist can be plotted pull properly.
     """
 
+    np.random.seed(42)
+
     h = Hist(
         axis.Regular(
             50, -4, 4, name="S", label="s [units]", underflow=False, overflow=False
@@ -207,8 +208,7 @@ def test_general_plot_pull():
     ).fill(np.random.normal(size=10))
 
     def pdf(x, a=1 / np.sqrt(2 * np.pi), x0=0, sigma=1, offset=0):
-        exp = unp.exp if a.dtype == np.dtype("O") else np.exp
-        return a * exp(-((x - x0) ** 2) / (2 * sigma ** 2)) + offset
+        return a * np.exp(-((x - x0) ** 2) / (2 * sigma ** 2)) + offset
 
     assert h.plot_pull(
         pdf,
@@ -231,6 +231,14 @@ def test_general_plot_pull():
         pp_ec=None,
     )
 
+    pdf_str = "a * np.exp(-((x - x0) ** 2) / (2 * sigma ** 2)) + offset"
+
+    assert h.plot_pull(pdf_str)
+
+    assert h.plot_pull("gaus")
+
+    assert h.plot_pull("gaus", likelihood=True)
+
     # dimension error
     hh = Hist(
         axis.Regular(
@@ -244,7 +252,7 @@ def test_general_plot_pull():
     with pytest.raises(Exception):
         hh.plot_pull(pdf)
 
-    # not callable
+    # no eval-able variable
     with pytest.raises(Exception):
         h.plot_pull("1")
 
@@ -490,6 +498,8 @@ def test_named_plot_pull():
     Test named plot_pull -- whether 1d-NamedHist can be plotted pull properly.
     """
 
+    np.random.seed(42)
+
     h = NamedHist(
         axis.Regular(
             50, -4, 4, name="S", label="s [units]", underflow=False, overflow=False
@@ -497,8 +507,7 @@ def test_named_plot_pull():
     ).fill(S=np.random.normal(size=10))
 
     def pdf(x, a=1 / np.sqrt(2 * np.pi), x0=0, sigma=1, offset=0):
-        exp = unp.exp if a.dtype == np.dtype("O") else np.exp
-        return a * exp(-((x - x0) ** 2) / (2 * sigma ** 2)) + offset
+        return a * np.exp(-((x - x0) ** 2) / (2 * sigma ** 2)) + offset
 
     assert h.plot_pull(
         pdf,
@@ -521,6 +530,14 @@ def test_named_plot_pull():
         pp_ec=None,
     )
 
+    pdf_str = "a * np.exp(-((x - x0) ** 2) / (2 * sigma ** 2)) + offset"
+
+    assert h.plot_pull(pdf_str)
+
+    assert h.plot_pull("gaus")
+
+    assert h.plot_pull("gaus", likelihood=True)
+
     # dimension error
     hh = NamedHist(
         axis.Regular(
@@ -534,7 +551,7 @@ def test_named_plot_pull():
     with pytest.raises(Exception):
         hh.plot_pull(pdf)
 
-    # not callable
+    # no eval-able variable
     with pytest.raises(Exception):
         h.plot_pull("1")
 
@@ -581,3 +598,28 @@ def test_named_plot_pull():
         h.plot_pull(pdf, eb_ecolor=1.0, eb_mfc=1.0)  # kwargs should be str
 
     plt.close("all")
+
+
+@pytest.mark.mpl_image_compare(baseline_dir="baseline", savefig_kwargs={"dpi": 50})
+def test_image_plot_pull():
+    """
+    Test plot_pull by comparing against a reference image generated via
+    `pytest --mpl-generate-path=baseline`
+    """
+
+    np.random.seed(42)
+
+    h = Hist(
+        axis.Regular(
+            50, -4, 4, name="S", label="s [units]", underflow=False, overflow=False
+        )
+    ).fill(np.random.normal(size=100))
+
+    def pdf(x, a=1 / np.sqrt(2 * np.pi), x0=0, sigma=1, offset=0):
+        return a * np.exp(-((x - x0) ** 2) / (2 * sigma ** 2)) + offset
+
+    fig, ax = plt.subplots()
+
+    assert h.plot_pull(pdf)
+
+    return fig
