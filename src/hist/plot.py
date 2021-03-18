@@ -266,7 +266,7 @@ def plot_pull(
     yerr = np.sqrt(variances)
 
     if isinstance(func, str):
-        if func == "gaus":
+        if func in {"gauss", "gaus"}:
             # gaussian with reasonable initial guesses for parameters
             constant = float(ydata.max())
             mean = (ydata * xdata).sum() / ydata.sum()
