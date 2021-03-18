@@ -36,15 +36,15 @@ If you do not need the plotting features, you can skip the `[plot]` extra.
 Hist currently provides everything boost-histogram provides, and the following enhancements:
 
 - Hist augments axes with names:
-  - `name=` is a unique label describing each axis.
+  - `name=` is a unique label describing each axis
   - `label=` is an optional string that is used in plotting (defaults to `name`
-    if not provided).
-  - Indexing, projection, and more support named axes.
-  - Experimental `NamedHist` is a `Hist` that disables most forms of positional access.
+    if not provided)
+  - Indexing, projection, and more support named axes
+  - Experimental `NamedHist` is a `Hist` that disables most forms of positional access
 
 - The `Hist` class augments `bh.Histogram` with reduced typing construction:
   - Optional import-free construction system
-  - `flow=False` is a fast way to turn off flow
+  - `flow=False` is a fast way to turn off flow for the axes on construction
   - Storages can be given by string
   - `storage=` can be omitted
   - `data=` can initialize a histogram with existing data
@@ -60,6 +60,10 @@ Hist currently provides everything boost-histogram provides, and the following e
   - `.plot2d_full()` shows 1D projects around a 2D plot
   - `.plot_pull(...)` performs a pull plot
   - `.plot_pie()` makes a pie plot
+  - `.show()` provides a nice str printout using Histoprint
+
+- Extended Histogram features:
+  - `.density()` computes the density as an array
 
 - Notebook ready: Hist has gorgeous in-notebook representation.
   - No dependencies required
