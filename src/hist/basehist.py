@@ -282,6 +282,40 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
         return super().__setitem__(self._index_transform(index), value)
 
+    def profile(self: T, axis: Union[int, str]) -> T:
+        """
+        Returns a profile (Mean/WeightedMean) histogram from a normal histogram
+        with N-1 axes. The axis given is profiled over and removed from the
+        final histogram.
+        """
+
+        if self.kind != bh.Kind.COUNT:
+            raise TypeError("Profile requires a COUNT histogram")
+
+        axes = list(self.axes)
+        iaxis = axis if isinstance(axis, int) else self._name_to_index(axis)
+        axes.pop(iaxis)
+
+        values = self.values()
+        tmp_variances = self.variances()
+        variances = tmp_variances if tmp_variances is not None else values
+        centers = self.axes[iaxis].centers
+
+        count = np.sum(values, axis=iaxis)
+
+        num = np.tensordot(values, centers, ([iaxis], [0]))
+        num_err = np.sqrt(np.tensordot(variances, centers ** 2, ([iaxis], [0])))
+
+        den = np.sum(values, axis=axis)
+        den_err = np.sqrt(np.sum(variances, axis=axis))
+
+        new_values = num / den
+        new_variances = (num_err / den) ** 2 + (den_err * num / den ** 2) ** 2
+
+        retval = self.__class__(*axes, storage=hist.storage.Mean())
+        retval[...] = np.stack([count, new_values, new_variances], axis=-1)
+        return retval
+
     def density(self) -> np.ndarray:
         """
         Density NumPy array.
