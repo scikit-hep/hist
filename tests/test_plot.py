@@ -237,6 +237,8 @@ def test_general_plot_pull():
 
     assert h.plot_pull("gaus")
 
+    assert h.plot_pull("gaus", likelihood=True)
+
     # dimension error
     hh = Hist(
         axis.Regular(
@@ -533,6 +535,8 @@ def test_named_plot_pull():
     assert h.plot_pull(pdf_str)
 
     assert h.plot_pull("gaus")
+
+    assert h.plot_pull("gaus", likelihood=True)
 
     # dimension error
     hh = NamedHist(
