@@ -1,6 +1,14 @@
 Changelog
 ====================
 
+IN PROGRESS
+--------------------
+
+* Allow `plot_pull` to take a more generic callable or a string as a fitting function.
+  Introduce an option to perform a likelihood fit. Write fit parameters' values
+  and uncertainties in the legend.
+  `#149 <https://github.com/scikit-hep/hist/pull/149>`_
+
 Version 2.2.1
 --------------------
 
