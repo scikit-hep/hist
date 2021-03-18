@@ -235,6 +235,8 @@ def test_general_plot_pull():
 
     assert h.plot_pull(pdf_str)
 
+    assert h.plot_pull("gaus")
+
     # dimension error
     hh = Hist(
         axis.Regular(
@@ -529,6 +531,8 @@ def test_named_plot_pull():
     pdf_str = "a * np.exp(-((x - x0) ** 2) / (2 * sigma ** 2)) + offset"
 
     assert h.plot_pull(pdf_str)
+
+    assert h.plot_pull("gaus")
 
     # dimension error
     hh = NamedHist(
