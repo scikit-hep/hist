@@ -40,7 +40,17 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "aminnj",
+      "name": "Nick Amin",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5760027?v=4",
+      "profile": "https://github.com/aminnj",
+      "contributions": [
+        "code"
+      ]
     }
   ],
-  "contributorsPerLine": 7
+  "contributorsPerLine": 7,
+  "skipCi": true
 }
