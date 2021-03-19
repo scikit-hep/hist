@@ -313,7 +313,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         new_variances = (num_err / den) ** 2 - (den_err * num / den ** 2) ** 2
 
         retval = self.__class__(*axes, storage=hist.storage.Mean())
-        retval[...] = np.stack([count, new_values, new_variances], axis=-1)
+        retval[...] = np.stack([count, new_values, count*new_variances], axis=-1)
         return retval
 
     def density(self) -> np.ndarray:
