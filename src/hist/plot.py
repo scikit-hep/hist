@@ -221,6 +221,52 @@ def plot2d_full(
 # Taken from coffea for now
 # https://github.com/CoffeaTeam/coffea/blob/12228d5564963234434d5c881efa761e088c298a/coffea/hist/plot.py#L57
 # TODO: Check licensing
+def poisson_interval(
+    values: np.ndarray, variances: np.ndarray, coverage: "Optional[float]" = None
+) -> np.ndarray:
+    """Frequentist coverage interval for Poisson-distributed observations
+    Parameters
+    ----------
+        values : np.ndarray
+            Sum of weights vector
+        variances : np.ndarray
+            Sum weights squared vector
+        coverage : float, optional
+            Central coverage interval, defaults to 68%
+    Calculates the so-called 'Garwood' interval,
+    c.f. https://www.ine.pt/revstat/pdf/rs120203.pdf or
+    http://ms.mcmaster.ca/peter/s743/poissonalpha.html
+    For weighted data, this approximates the observed count by ``values**2/variances``, which
+    effectively scales the unweighted poisson interval by the average weight.
+    This may not be the optimal solution: see https://arxiv.org/pdf/1309.1287.pdf for a proper treatment.
+    When a bin is zero, the scale of the nearest nonzero bin is substituted to scale the nominal upper bound.
+    If all bins zero, a warning is generated and interval is set to ``values``.
+    """
+    if coverage is None:
+        coverage = stats.norm.cdf(1) - stats.norm.cdf(-1)
+    scale = np.empty_like(values)
+    scale[values != 0] = variances[values != 0] / values[values != 0]
+    if np.sum(values == 0) > 0:
+        missing = np.where(values == 0)
+        available = np.nonzero(values)
+        if len(available[0]) == 0:
+            raise RuntimeWarning(
+                "All values are zero! Cannot compute meaningful error bars",
+            )
+            return np.vstack([values, values])
+        nearest = np.sum(
+            [np.square(np.subtract.outer(d, d0)) for d, d0 in zip(available, missing)]
+        ).argmin(axis=0)
+        argnearest = tuple(dim[nearest] for dim in available)
+        scale[missing] = scale[argnearest]
+    counts = values / scale
+    interval_min = scale * stats.chi2.ppf((1 - coverage) / 2, 2 * counts) / 2.0
+    interval_max = scale * stats.chi2.ppf((1 + coverage) / 2, 2 * (counts + 1)) / 2.0
+    interval = np.array([interval_min, interval_max])
+    interval[interval == np.nan] = 0.0  # chi2.ppf produces nan for counts=0
+    return interval
+
+
 def clopper_pearson_interval(
     num: np.ndarray, denom: np.ndarray, coverage: "Optional[float]" = None
 ) -> np.ndarray:
@@ -252,13 +298,14 @@ def clopper_pearson_interval(
 
 # TODO: Why is return type "Any"?
 def ratio_uncertainty(
-    num: np.ndarray, denom: np.ndarray, uncert_type: str = "poisson-ratio"
+    num: np.ndarray, denom: np.ndarray, uncert_type: str = "poisson"
 ) -> Any:
-    if uncert_type == "poisson-ratio":
+    ratio = num / denom
+    if uncert_type == "poisson":
+        ratio_uncert = np.abs(poisson_interval(ratio, num / np.square(denom)) - ratio)
+    elif uncert_type == "poisson-ratio":
         # poisson ratio n/m is equivalent to binomial n/(n+m)
-        ratio_uncert = np.abs(
-            clopper_pearson_interval(num, num + denom) - (num / denom)
-        )
+        ratio_uncert = np.abs(clopper_pearson_interval(num, num + denom) - ratio)
     return ratio_uncert
 
 
@@ -334,9 +381,7 @@ def plot_ratio(
     with np.errstate(divide="ignore"):
         ratios = ydata / fit
         # TODO: Make this configurable
-        ratio_uncert = ratio_uncertainty(
-            num=ydata, denom=fit, uncert_type="poisson-ratio"
-        )
+        ratio_uncert = ratio_uncertainty(num=ydata, denom=fit, uncert_type="poisson")
 
     # Keyword Argument Conversion: convert the kwargs to several independent args
 
