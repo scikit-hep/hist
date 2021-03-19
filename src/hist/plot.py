@@ -303,6 +303,10 @@ def ratio_uncertainty(
     ratio = num / denom
     if uncert_type == "poisson":
         ratio_uncert = np.abs(poisson_interval(ratio, num / np.square(denom)) - ratio)
+        # TODO: Why does SciPy not work here?
+        # coverage = stats.norm.cdf(1) - stats.norm.cdf(-1)
+        # alpha = 1 - coverage
+        # ratio_uncert = stats.poisson.interval(alpha, ratio)
     elif uncert_type == "poisson-ratio":
         # poisson ratio n/m is equivalent to binomial n/(n+m)
         ratio_uncert = np.abs(clopper_pearson_interval(num, num + denom) - ratio)
