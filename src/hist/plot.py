@@ -457,7 +457,7 @@ def plot_ratio(
         # plot centered around central value with a scaled view range
         # the value _with_ the uncertainty in view is important so base
         # view range on extrema of value +/- uncertainty
-        valid_ratios_idx = np.where(np.isnan(ratios) is False)
+        valid_ratios_idx = np.where(np.isnan(ratios) == False)  # noqa: E712
         valid_ratios = ratios[valid_ratios_idx]
         extrema = np.array(
             [
