@@ -454,17 +454,15 @@ def plot_ratio(
     # TODO: Make configurable
     ratio_ylim = None
     if ratio_ylim is None:
-        # set nans back to 0 to find extrema
-        ratios[np.isnan(ratios)] = 0
         # plot centered around central value with a scaled view range
         # the value _with_ the uncertainty in view is important so base
         # view range on extrema of value +/- uncertainty
-        non_zero_ratios_idx = np.where(ratios != 0)
-        non_zero_ratios = ratios[non_zero_ratios_idx]
+        valid_ratios_idx = np.where(np.isnan(ratios) is False)
+        valid_ratios = ratios[valid_ratios_idx]
         extrema = np.array(
             [
-                non_zero_ratios - ratio_uncert[0][non_zero_ratios_idx],
-                non_zero_ratios + ratio_uncert[1][non_zero_ratios_idx],
+                valid_ratios - ratio_uncert[0][valid_ratios_idx],
+                valid_ratios + ratio_uncert[1][valid_ratios_idx],
             ]
         )
         max_delta = np.max(np.abs(extrema - central_value))
