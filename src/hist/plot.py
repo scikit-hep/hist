@@ -12,6 +12,7 @@ try:
     import matplotlib.pyplot as plt
     import matplotlib.transforms as transforms
     from mplhep.plot import Hist1DArtists, Hist2DArtists, hist2dplot, histplot
+    from scipy import stats
 except ModuleNotFoundError:
     print(
         "Hist requires mplhep to plot, either install hist[plot] or mplhep",
@@ -215,6 +216,49 @@ def plot2d_full(
     side_ax.set_xlabel("Counts")
 
     return main_art, top_art, side_art
+
+
+# Taken from coffea for now
+# https://github.com/CoffeaTeam/coffea/blob/12228d5564963234434d5c881efa761e088c298a/coffea/hist/plot.py#L57
+# TODO: Check licensing
+def clopper_pearson_interval(
+    num: np.ndarray, denom: np.ndarray, coverage: "Optional[float]" = None
+) -> np.ndarray:
+    """Compute Clopper-Pearson coverage interval for a binomial distribution
+    Parameters
+    ----------
+        num : numpy.ndarray
+            Numerator, or number of successes, vectorized
+        denom : numpy.ndarray
+            Denominator or number of trials, vectorized
+        coverage : float, optional
+            Central coverage interval, defaults to 68%
+    c.f. http://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval
+    """
+    if coverage is None:
+        coverage = stats.norm.cdf(1) - stats.norm.cdf(-1)
+    if np.any(num > denom):
+        raise ValueError(
+            "Found numerator larger than denominator while calculating binomial uncertainty"
+        )
+    low = stats.beta.ppf((1 - coverage) / 2, num, denom - num + 1)
+    high = stats.beta.ppf((1 + coverage) / 2, num + 1, denom - num)
+    interval = np.array([low, high])
+    interval[:, num == 0.0] = 0.0
+    interval[1, num == denom] = 1.0
+    return interval
+
+
+# TODO: Why is return type "Any"?
+def ratio_uncertainty(
+    num: np.ndarray, denom: np.ndarray, uncert_type: str = "poisson-ratio"
+) -> Any:
+    if uncert_type == "poisson-ratio":
+        # poisson ratio n/m is equivalent to binomial n/(n+m)
+        ratio_uncert = np.abs(
+            clopper_pearson_interval(num, num + denom) - (num / denom)
+        )
+    return ratio_uncert
 
 
 def plot_ratio(
