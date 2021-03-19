@@ -220,6 +220,7 @@ def plot2d_full(
 def plot_ratio(
     self: hist.BaseHist,
     other: Callable[[np.ndarray], np.ndarray],
+    likelihood: bool = False,
     *,
     ax_dict: "Optional[Dict[str, matplotlib.axes.Axes]]" = None,
     **kwargs: Any,
@@ -229,11 +230,11 @@ def plot_ratio(
     """
 
     try:
-        from scipy.optimize import curve_fit
-        from uncertainties import correlated_values, unumpy
+        from iminuit import Minuit  # noqa: F401
+        from scipy.optimize import curve_fit  # noqa: F401
     except ImportError:
         print(
-            "Hist.plot_ratio requires scipy and uncertainties. Please install hist[plot] or manually install dependencies.",
+            "Hist.plot_pull requires scipy and iminuit. Please install hist[plot] or manually install dependencies.",
             file=sys.stderr,
         )
         raise
@@ -260,7 +261,8 @@ def plot_ratio(
         ratio_ax = fig.add_subplot(grid[1], sharex=main_ax)
 
     # Computation and Fit
-    values = self.values()
+    xdata = self.axes[0].centers
+    ydata = self.values()
     variances = self.variances()
     if variances is None:
         raise RuntimeError(
@@ -270,18 +272,22 @@ def plot_ratio(
 
     # TODO: Make this only for callable
     # Compute fit values: using other as fit model
-    popt, pcov = curve_fit(f=other, xdata=self.axes[0].centers, ydata=values)
+    popt, pcov = _curve_fit_wrapper(other, xdata, ydata, yerr, likelihood=likelihood)
+    # TODO: Remove this if necessary?
+    # perr = np.sqrt(np.diag(pcov))
     fit = other(self.axes[0].centers, *popt)
 
-    # Compute uncertainty on fit
-    copt = correlated_values(popt, pcov)
-    fit_uncert = other(self.axes[0].centers, *copt)
-    fit_nominal = unumpy.nominal_values(fit_uncert)
-    fit_std = unumpy.std_devs(fit_uncert)
+    if np.isfinite(pcov).all():
+        nsamples = 100
+        vopts = np.random.multivariate_normal(popt, pcov, nsamples)
+        sampled_ydata = np.vstack([other(xdata, *vopt).T for vopt in vopts])
+        fit_uncert = np.nanstd(sampled_ydata, axis=0)
+    else:
+        fit_uncert = np.zeros_like(yerr)
 
     # Compute ratios: containing no INF values
     with np.errstate(divide="ignore"):
-        ratios = values / fit_nominal
+        ratios = ydata / fit
 
     # Keyword Argument Conversion: convert the kwargs to several independent args
 
@@ -306,7 +312,7 @@ def plot_ratio(
         raise ValueError(f"{set(kwargs)}' not needed")
 
     # Main: plot the ratios using Matplotlib errorbar and plot methods
-    main_ax.errorbar(self.axes.centers[0], values, yerr, **eb_kwargs)
+    main_ax.errorbar(self.axes.centers[0], ydata, yerr, **eb_kwargs)
 
     (line,) = main_ax.plot(self.axes.centers[0], fit, **fp_kwargs)
 
@@ -314,8 +320,8 @@ def plot_ratio(
     ub_kwargs.setdefault("color", line.get_color())
     main_ax.fill_between(
         self.axes.centers[0],
-        fit_nominal - fit_std,
-        fit_nominal + fit_std,
+        fit - fit_uncert,
+        fit + fit_uncert,
         **ub_kwargs,
     )
 
@@ -356,6 +362,8 @@ def plot_ratio(
         # set nans back to 0 to find extrema
         ratios[np.isnan(ratios)] = 0
         # plot centered around central value with a scaled view range
+        # Note: calculate this in steps rather then just translating the final
+        # algebra to make it clearer and more flexible to change
         ratio_extrema = max(np.abs(ratios))
         ratio_delta = ratio_extrema - central_value
         _alpha = 1.5  # 1.5 provides better offset than 2.0
