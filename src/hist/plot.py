@@ -237,13 +237,14 @@ def clopper_pearson_interval(
     """
     if coverage is None:
         coverage = stats.norm.cdf(1) - stats.norm.cdf(-1)
+    # Numerator is subset of denominator
     if np.any(num > denom):
         raise ValueError(
             "Found numerator larger than denominator while calculating binomial uncertainty"
         )
-    low = stats.beta.ppf((1 - coverage) / 2, num, denom - num + 1)
-    high = stats.beta.ppf((1 + coverage) / 2, num + 1, denom - num)
-    interval = np.array([low, high])
+    interval_min = stats.beta.ppf((1 - coverage) / 2, num, denom - num + 1)
+    interval_max = stats.beta.ppf((1 + coverage) / 2, num + 1, denom - num)
+    interval = np.array([interval_min, interval_max])
     interval[:, num == 0.0] = 0.0
     interval[1, num == denom] = 1.0
     return interval
