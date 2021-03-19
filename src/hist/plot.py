@@ -332,6 +332,10 @@ def plot_ratio(
     # Compute ratios: containing no INF values
     with np.errstate(divide="ignore"):
         ratios = ydata / fit
+        # TODO: Make this configurable
+        ratio_uncert = ratio_uncertainty(
+            num=ydata, denom=fit, uncert_type="poisson-ratio"
+        )
 
     # Keyword Argument Conversion: convert the kwargs to several independent args
 
@@ -388,9 +392,6 @@ def plot_ratio(
     central_value = 1.0
 
     ratio_ax.axhline(central_value, color="black", linestyle="dashed", linewidth=1.0)
-    # TODO: Calculate this with different manners
-    # c.f. https://coffeateam.github.io/coffea/api/coffea.hist.plotratio.html#coffea.hist.plotratio
-    ratio_uncert = [0.25] * len(ratios)  # totally fake numbers for now
     ratio_ax.errorbar(
         self.axes.centers[0],
         ratios,
