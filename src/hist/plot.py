@@ -369,26 +369,23 @@ def plot_ratio(
             raise RuntimeError(
                 "Cannot compute from a variance-less histogram, try a Weight storage"
             )
-        y_uncert = np.sqrt(variances)
+        numerator_uncert = np.sqrt(variances)
 
-        # TODO: Make this only for callable
-        # Compute fit values: using other as fit model
+        # Infer model parameters using `other` as fit model
         popt, pcov = _curve_fit_wrapper(
-            other, x_values, numerator, y_uncert, likelihood=likelihood
+            other, x_values, numerator, numerator_uncert, likelihood=likelihood
         )
-        # TODO: Remove this if necessary?
-        # perr = np.sqrt(np.diag(pcov))
-        fit = other(x_values, *popt)
+        model_values = other(x_values, *popt)
 
         if np.isfinite(pcov).all():
             nsamples = 100
             vopts = np.random.multivariate_normal(popt, pcov, nsamples)
             sampled_ydata = np.vstack([other(x_values, *vopt).T for vopt in vopts])
-            fit_uncert = np.nanstd(sampled_ydata, axis=0)
+            model_uncert = np.nanstd(sampled_ydata, axis=0)
         else:
-            fit_uncert = np.zeros_like(y_uncert)
+            model_uncert = np.zeros_like(numerator_uncert)
 
-        denominator = fit
+        denominator = model_values
     else:
         denominator = other.values()
 
@@ -424,16 +421,16 @@ def plot_ratio(
 
     # Main: plot the ratios using Matplotlib errorbar and plot methods
     if callable(other) or type(other) in [str]:
-        main_ax.errorbar(self.axes.centers[0], numerator, y_uncert, **eb_kwargs)
+        main_ax.errorbar(self.axes.centers[0], numerator, numerator_uncert, **eb_kwargs)
 
-        (line,) = main_ax.plot(self.axes.centers[0], fit, **fp_kwargs)
+        (line,) = main_ax.plot(self.axes.centers[0], model_values, **fp_kwargs)
 
         # Uncertainty band for fitted function
         ub_kwargs.setdefault("color", line.get_color())
         main_ax.fill_between(
             self.axes.centers[0],
-            fit - fit_uncert,
-            fit + fit_uncert,
+            model_values - model_uncert,
+            model_values + model_uncert,
             **ub_kwargs,
         )
     else:
