@@ -393,9 +393,9 @@ def plot_ratio(
         denominator = other.values()
 
     # Compute ratios: containing no INF values
-    with np.errstate(divide="ignore"):
+    with np.errstate(divide="ignore", invalid="ignore"):
         ratios = numerator / denominator
-        # TODO: Make this configurable
+        # TODO: Make uncert_type configurable
         ratio_uncert = ratio_uncertainty(
             num=numerator, denom=denominator, uncert_type="poisson"
         )
