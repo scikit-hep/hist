@@ -428,11 +428,9 @@ def plot_ratio(
     # TODO: Make configurable
     main_ax.set_ylabel("Counts")
 
-    # ratio: plot the ratios using Matplotlib bar method
+    # ratio: plot the ratios using Matplotlib errorbar or bar
     left_edge = self.axes.edges[0][0]
     right_edge = self.axes.edges[-1][-1]
-    # # width = (right_edge - left_edge) / len(ratios)
-    # ratio_ax.bar(self.axes.centers[0], ratios, width=width, **bar_kwargs)
 
     # Set 0 and inf to nan to hide during plotting
     ratios[ratios == 0] = np.nan
@@ -440,16 +438,39 @@ def plot_ratio(
 
     # TODO: Make configurable
     central_value = 1.0
-
     ratio_ax.axhline(central_value, color="black", linestyle="dashed", linewidth=1.0)
-    ratio_ax.errorbar(
-        self.axes.centers[0],
-        ratios,
-        yerr=ratio_uncert,
-        color="black",
-        marker="o",
-        linestyle="none",
-    )
+
+    # TODO: Make configurable: {"line", "bar"}
+    uncert_draw_type = "line"
+    if uncert_draw_type == "line":
+        ratio_ax.errorbar(
+            self.axes.centers[0],
+            ratios,
+            yerr=ratio_uncert,
+            color="black",
+            marker="o",
+            linestyle="none",
+        )
+    elif uncert_draw_type == "bar":
+        bar_width = (right_edge - left_edge) / len(ratios)
+
+        bar_top = ratios + ratio_uncert[1]
+        bar_bottom = ratios - ratio_uncert[0]
+        # bottom can't be nan
+        bar_bottom[np.isnan(bar_bottom)] = 0
+        bar_height = bar_top - bar_bottom
+
+        ratio_ax.scatter(self.axes.centers[0], ratios, color="black")
+        ratio_ax.bar(
+            self.axes.centers[0],
+            height=bar_height,
+            width=bar_width,
+            bottom=bar_bottom,
+            fill=False,
+            linewidth=0,
+            edgecolor="gray",
+            hatch=3 * "/",
+        )
 
     # TODO: Make configurable
     ratio_ylim = None
