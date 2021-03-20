@@ -306,8 +306,8 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         num = np.tensordot(values, centers, ([iaxis], [0]))
         num_err = np.sqrt(np.tensordot(variances, centers ** 2, ([iaxis], [0])))
 
-        den = np.sum(values, axis=axis)
-        den_err = np.sqrt(np.sum(variances, axis=axis))
+        den = np.sum(values, axis=iaxis)
+        den_err = np.sqrt(np.sum(variances, axis=iaxis))
 
         new_values = num / den
         new_variances = (num_err / den) ** 2 - (den_err * num / den ** 2) ** 2
