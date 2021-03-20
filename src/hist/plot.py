@@ -378,7 +378,7 @@ def plot_ratio(
         )
         # TODO: Remove this if necessary?
         # perr = np.sqrt(np.diag(pcov))
-        fit = other(self.axes[0].centers, *popt)
+        fit = other(x_values, *popt)
 
         if np.isfinite(pcov).all():
             nsamples = 100
@@ -599,7 +599,7 @@ def plot_pull(
     # Compute fit values: using func as fit model
     popt, pcov = _curve_fit_wrapper(func, xdata, ydata, yerr, likelihood=likelihood)
     perr = np.diag(pcov) ** 0.5
-    yfit = func(self.axes[0].centers, *popt)
+    yfit = func(xdata, *popt)
 
     if np.isfinite(pcov).all():
         nsamples = 100
