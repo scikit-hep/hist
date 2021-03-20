@@ -315,6 +315,8 @@ def ratio_uncertainty(
     return ratio_uncert
 
 
+# TODO: Refactor and separate callable logic from hist logic
+# TODO: Revise plot_ratio to make it possible for plot_pull to use as infrastructure
 def plot_ratio(
     self: hist.BaseHist,
     other: Union[hist.BaseHist, Callable[[np.ndarray], np.ndarray], str],
