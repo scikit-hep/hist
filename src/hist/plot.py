@@ -360,7 +360,7 @@ def plot_ratio(
         ratio_ax = fig.add_subplot(grid[1], sharex=main_ax)
 
     # Computation and Fit
-    xdata = self.axes[0].centers
+    x_values = self.axes[0].centers
     numerator = self.values()
 
     if callable(other) or type(other) in [str]:
@@ -369,12 +369,12 @@ def plot_ratio(
             raise RuntimeError(
                 "Cannot compute from a variance-less histogram, try a Weight storage"
             )
-        yerr = np.sqrt(variances)
+        y_uncert = np.sqrt(variances)
 
         # TODO: Make this only for callable
         # Compute fit values: using other as fit model
         popt, pcov = _curve_fit_wrapper(
-            other, xdata, numerator, yerr, likelihood=likelihood
+            other, x_values, numerator, y_uncert, likelihood=likelihood
         )
         # TODO: Remove this if necessary?
         # perr = np.sqrt(np.diag(pcov))
@@ -383,10 +383,10 @@ def plot_ratio(
         if np.isfinite(pcov).all():
             nsamples = 100
             vopts = np.random.multivariate_normal(popt, pcov, nsamples)
-            sampled_ydata = np.vstack([other(xdata, *vopt).T for vopt in vopts])
+            sampled_ydata = np.vstack([other(x_values, *vopt).T for vopt in vopts])
             fit_uncert = np.nanstd(sampled_ydata, axis=0)
         else:
-            fit_uncert = np.zeros_like(yerr)
+            fit_uncert = np.zeros_like(y_uncert)
 
         denominator = fit
     else:
@@ -424,7 +424,7 @@ def plot_ratio(
 
     # Main: plot the ratios using Matplotlib errorbar and plot methods
     if callable(other) or type(other) in [str]:
-        main_ax.errorbar(self.axes.centers[0], numerator, yerr, **eb_kwargs)
+        main_ax.errorbar(self.axes.centers[0], numerator, y_uncert, **eb_kwargs)
 
         (line,) = main_ax.plot(self.axes.centers[0], fit, **fp_kwargs)
 
