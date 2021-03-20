@@ -218,6 +218,7 @@ def plot2d_full(
     return main_art, top_art, side_art
 
 
+# TODO: Move interval estimation functions into another module?
 # Taken from coffea for now
 # https://github.com/CoffeaTeam/coffea/blob/12228d5564963234434d5c881efa761e088c298a/coffea/hist/plot.py#L57
 # TODO: Check licensing
@@ -359,6 +360,28 @@ def plot_ratio(
         main_ax = fig.add_subplot(grid[0])
         ratio_ax = fig.add_subplot(grid[1], sharex=main_ax)
 
+    # Keyword Argument Conversion: convert the kwargs to several independent args
+
+    # error bar keyword arguments
+    eb_kwargs = _filter_dict(kwargs, "eb_")
+    eb_kwargs.setdefault("label", "Histogram Data")
+
+    # fit plot keyword arguments
+    fp_kwargs = _filter_dict(kwargs, "fp_")
+    fp_kwargs.setdefault("label", "Fitted Value")
+
+    # uncertainty band keyword arguments
+    ub_kwargs = _filter_dict(kwargs, "ub_")
+    ub_kwargs.setdefault("label", "Uncertainty")
+
+    # # patch plot keyword arguments
+    # pp_kwargs = _filter_dict(kwargs, "pp_", ignore={"pp_num"})
+    # pp_num = kwargs.pop("pp_num", 5)
+
+    # Judge whether some arguments are left
+    if kwargs:
+        raise ValueError(f"{set(kwargs)}' not needed")
+
     # Computation and Fit
     x_values = self.axes[0].centers
     numerator = self.values()
@@ -397,29 +420,7 @@ def plot_ratio(
             num=numerator, denom=denominator, uncert_type="poisson"
         )
 
-    # Keyword Argument Conversion: convert the kwargs to several independent args
-
-    # error bar keyword arguments
-    eb_kwargs = _filter_dict(kwargs, "eb_")
-    eb_kwargs.setdefault("label", "Histogram Data")
-
-    # fit plot keyword arguments
-    fp_kwargs = _filter_dict(kwargs, "fp_")
-    fp_kwargs.setdefault("label", "Fitted Value")
-
-    # uncertainty band keyword arguments
-    ub_kwargs = _filter_dict(kwargs, "ub_")
-    ub_kwargs.setdefault("label", "Uncertainty")
-
-    # # patch plot keyword arguments
-    # pp_kwargs = _filter_dict(kwargs, "pp_", ignore={"pp_num"})
-    # pp_num = kwargs.pop("pp_num", 5)
-
-    # Judge whether some arguments are left
-    if kwargs:
-        raise ValueError(f"{set(kwargs)}' not needed")
-
-    # Main: plot the ratios using Matplotlib errorbar and plot methods
+    # Main: plot the numerator and denominator
     if callable(other) or type(other) in [str]:
         main_ax.errorbar(self.axes.centers[0], numerator, numerator_uncert, **eb_kwargs)
 
