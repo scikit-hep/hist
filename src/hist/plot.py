@@ -300,7 +300,8 @@ def clopper_pearson_interval(
 def ratio_uncertainty(
     num: np.ndarray, denom: np.ndarray, uncert_type: str = "poisson"
 ) -> Any:
-    ratio = num / denom
+    with np.errstate(divide="ignore"):
+        ratio = num / denom
     if uncert_type == "poisson":
         ratio_uncert = np.abs(poisson_interval(ratio, num / np.square(denom)) - ratio)
         # TODO: Why does SciPy not work here?
@@ -315,7 +316,7 @@ def ratio_uncertainty(
 
 def plot_ratio(
     self: hist.BaseHist,
-    other: Callable[[np.ndarray], np.ndarray],
+    other: Union[hist.BaseHist, Callable[[np.ndarray], np.ndarray], str],
     likelihood: bool = False,
     *,
     ax_dict: "Optional[Dict[str, matplotlib.axes.Axes]]" = None,
@@ -335,13 +336,15 @@ def plot_ratio(
         )
         raise
 
-    # Type judgement
-    if not callable(other):
-        msg = f"Callable parameter other is supported for {self.__class__.__name__} in plot ratio"
-        raise TypeError(msg)
-
     if self.ndim != 1:
-        raise TypeError("Only 1D-histogram supports ratio plot, try projecting to 1D")
+        raise TypeError(
+            f"Only 1D-histogram supports ratio plot, try projecting {self.__class__.__name__} to 1D"
+        )
+    if isinstance(other, hist.hist.Hist):
+        if other.ndim != 1:
+            raise TypeError(
+                f"Only 1D-histogram supports ratio plot, try projecting {other.__class__.__name__} to 1D"
+            )
 
     if ax_dict:
         try:
@@ -358,34 +361,44 @@ def plot_ratio(
 
     # Computation and Fit
     xdata = self.axes[0].centers
-    ydata = self.values()
-    variances = self.variances()
-    if variances is None:
-        raise RuntimeError(
-            "Cannot compute from a variance-less histogram, try a Weight storage"
+    numerator = self.values()
+
+    if callable(other) or type(other) in [str]:
+        variances = self.variances()
+        if variances is None:
+            raise RuntimeError(
+                "Cannot compute from a variance-less histogram, try a Weight storage"
+            )
+        yerr = np.sqrt(variances)
+
+        # TODO: Make this only for callable
+        # Compute fit values: using other as fit model
+        popt, pcov = _curve_fit_wrapper(
+            other, xdata, numerator, yerr, likelihood=likelihood
         )
-    yerr = np.sqrt(variances)
+        # TODO: Remove this if necessary?
+        # perr = np.sqrt(np.diag(pcov))
+        fit = other(self.axes[0].centers, *popt)
 
-    # TODO: Make this only for callable
-    # Compute fit values: using other as fit model
-    popt, pcov = _curve_fit_wrapper(other, xdata, ydata, yerr, likelihood=likelihood)
-    # TODO: Remove this if necessary?
-    # perr = np.sqrt(np.diag(pcov))
-    fit = other(self.axes[0].centers, *popt)
+        if np.isfinite(pcov).all():
+            nsamples = 100
+            vopts = np.random.multivariate_normal(popt, pcov, nsamples)
+            sampled_ydata = np.vstack([other(xdata, *vopt).T for vopt in vopts])
+            fit_uncert = np.nanstd(sampled_ydata, axis=0)
+        else:
+            fit_uncert = np.zeros_like(yerr)
 
-    if np.isfinite(pcov).all():
-        nsamples = 100
-        vopts = np.random.multivariate_normal(popt, pcov, nsamples)
-        sampled_ydata = np.vstack([other(xdata, *vopt).T for vopt in vopts])
-        fit_uncert = np.nanstd(sampled_ydata, axis=0)
+        denominator = fit
     else:
-        fit_uncert = np.zeros_like(yerr)
+        denominator = other.values()
 
     # Compute ratios: containing no INF values
     with np.errstate(divide="ignore"):
-        ratios = ydata / fit
+        ratios = numerator / denominator
         # TODO: Make this configurable
-        ratio_uncert = ratio_uncertainty(num=ydata, denom=fit, uncert_type="poisson")
+        ratio_uncert = ratio_uncertainty(
+            num=numerator, denom=denominator, uncert_type="poisson"
+        )
 
     # Keyword Argument Conversion: convert the kwargs to several independent args
 
@@ -410,18 +423,22 @@ def plot_ratio(
         raise ValueError(f"{set(kwargs)}' not needed")
 
     # Main: plot the ratios using Matplotlib errorbar and plot methods
-    main_ax.errorbar(self.axes.centers[0], ydata, yerr, **eb_kwargs)
+    if callable(other) or type(other) in [str]:
+        main_ax.errorbar(self.axes.centers[0], numerator, yerr, **eb_kwargs)
 
-    (line,) = main_ax.plot(self.axes.centers[0], fit, **fp_kwargs)
+        (line,) = main_ax.plot(self.axes.centers[0], fit, **fp_kwargs)
 
-    # Uncertainty band for fitted function
-    ub_kwargs.setdefault("color", line.get_color())
-    main_ax.fill_between(
-        self.axes.centers[0],
-        fit - fit_uncert,
-        fit + fit_uncert,
-        **ub_kwargs,
-    )
+        # Uncertainty band for fitted function
+        ub_kwargs.setdefault("color", line.get_color())
+        main_ax.fill_between(
+            self.axes.centers[0],
+            fit - fit_uncert,
+            fit + fit_uncert,
+            **ub_kwargs,
+        )
+    else:
+        histplot(self, ax=main_ax)
+        histplot(other, ax=main_ax)
 
     # TODO: Make configurable
     main_ax.legend(loc="best")
