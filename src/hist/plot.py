@@ -315,6 +315,32 @@ def ratio_uncertainty(
     return ratio_uncert
 
 
+def _fit_callable(self, other, x_values, likelihood):
+    variances = self.variances()
+    if variances is None:
+        raise RuntimeError(
+            "Cannot compute from a variance-less histogram, try a Weight storage"
+        )
+    numerator_uncert = np.sqrt(variances)
+
+    # Infer model parameters using `other` as fit model
+    # numerator = self.values()
+    popt, pcov = _curve_fit_wrapper(
+        other, x_values, self.values(), numerator_uncert, likelihood=likelihood
+    )
+    model_values = other(x_values, *popt)
+
+    if np.isfinite(pcov).all():
+        nsamples = 100
+        vopts = np.random.multivariate_normal(popt, pcov, nsamples)
+        sampled_ydata = np.vstack([other(x_values, *vopt).T for vopt in vopts])
+        model_uncert = np.nanstd(sampled_ydata, axis=0)
+    else:
+        model_uncert = np.zeros_like(numerator_uncert)
+
+    return model_values, model_uncert, numerator_uncert
+
+
 # TODO: Refactor and separate callable logic from hist logic
 # TODO: Revise plot_ratio to make it possible for plot_pull to use as infrastructure
 def plot_ratio(
@@ -389,28 +415,9 @@ def plot_ratio(
     numerator = self.values()
 
     if callable(other) or type(other) in [str]:
-        variances = self.variances()
-        if variances is None:
-            raise RuntimeError(
-                "Cannot compute from a variance-less histogram, try a Weight storage"
-            )
-        numerator_uncert = np.sqrt(variances)
-
-        # Infer model parameters using `other` as fit model
-        popt, pcov = _curve_fit_wrapper(
-            other, x_values, numerator, numerator_uncert, likelihood=likelihood
+        denominator, model_uncert, numerator_uncert = _fit_callable(
+            self, other, x_values, likelihood
         )
-        model_values = other(x_values, *popt)
-
-        if np.isfinite(pcov).all():
-            nsamples = 100
-            vopts = np.random.multivariate_normal(popt, pcov, nsamples)
-            sampled_ydata = np.vstack([other(x_values, *vopt).T for vopt in vopts])
-            model_uncert = np.nanstd(sampled_ydata, axis=0)
-        else:
-            model_uncert = np.zeros_like(numerator_uncert)
-
-        denominator = model_values
     else:
         denominator = other.values()
 
@@ -426,14 +433,14 @@ def plot_ratio(
     if callable(other) or type(other) in [str]:
         main_ax.errorbar(self.axes.centers[0], numerator, numerator_uncert, **eb_kwargs)
 
-        (line,) = main_ax.plot(self.axes.centers[0], model_values, **fp_kwargs)
+        (line,) = main_ax.plot(self.axes.centers[0], denominator, **fp_kwargs)
 
         # Uncertainty band for fitted function
         ub_kwargs.setdefault("color", line.get_color())
         main_ax.fill_between(
             self.axes.centers[0],
-            model_values - model_uncert,
-            model_values + model_uncert,
+            denominator - model_uncert,
+            denominator + model_uncert,
             **ub_kwargs,
         )
     else:
