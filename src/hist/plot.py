@@ -490,6 +490,9 @@ def plot_ratiolike(
     else:
         fp_kwargs.setdefault("label", "Counts")
 
+    # bar plot keyword arguments
+    bar_kwargs = _filter_dict(kwargs, "bar_", ignore={"bar_width"})
+
     # uncertainty band keyword arguments
     ub_kwargs = _filter_dict(kwargs, "ub_")
     ub_kwargs.setdefault("label", "Uncertainty")
@@ -500,8 +503,7 @@ def plot_ratiolike(
     rp_kwargs.setdefault("legend_loc", "best")
 
     # patch plot keyword arguments
-    pp_kwargs = _filter_dict(kwargs, "pp_", ignore={"pp_num"})
-    pp_num = kwargs.pop("pp_num", 5)
+    pp_kwargs = _filter_dict(kwargs, "pp_")
 
     # Judge whether some arguments are left
     if kwargs:
@@ -541,10 +543,16 @@ def plot_ratiolike(
 
     # Compute ratios: containing no INF values
     with np.errstate(divide="ignore", invalid="ignore"):
-        ratios = numerator / denominator
-        ratio_uncert = ratio_uncertainty(
-            num=numerator, denom=denominator, uncert_type=rp_kwargs["uncert_type"]
-        )
+        if view == "ratio":
+            ratios = numerator / denominator
+            ratio_uncert = ratio_uncertainty(
+                num=numerator, denom=denominator, uncert_type=rp_kwargs["uncert_type"]
+            )
+        elif view == "pull":
+            pulls = (numerator - denominator) / numerator_uncert
+
+            pulls[np.isnan(pulls)] = 0
+            pulls[np.isinf(pulls)] = 0
 
     # Main: plot the numerator and denominator
     if callable(other) or isinstance(other, str):
@@ -569,12 +577,18 @@ def plot_ratiolike(
 
     # ratio: plot the ratios using Matplotlib errorbar or bar
     if view == "ratio":
-        ratiolike_ax = plot_ratio(self, ratios, ratio_uncert, ratiolike_ax, **rp_kwargs)
+        ratiolike_ax = plot_ratio(
+            self, ratios, ratio_uncert, ax=ratiolike_ax, **rp_kwargs
+        )
+    if view == "pull":
+        ratiolike_ax = plot_pull(
+            self, pulls, ax=ratiolike_ax, **pp_kwargs, **bar_kwargs
+        )
 
     return main_ax, ratiolike_ax
 
 
-def _plot_pull(
+def plot_pull(
     _hist: hist.BaseHist,
     pulls: np.ndarray,
     ax: matplotlib.axes.Axes,
@@ -589,10 +603,6 @@ def _plot_pull(
     # patch plot keyword arguments
     pp_kwargs = _filter_dict(kwargs, "pp_", ignore={"pp_num"})
     pp_num = kwargs.pop("pp_num", 5)
-
-    # Judge whether some arguments are left
-    if kwargs:
-        raise ValueError(f"{set(kwargs)}' not needed")
 
     x_values = _hist.axes[0].centers
     left_edge = _hist.axes.edges[0][0]
@@ -630,7 +640,7 @@ def _plot_pull(
     return ax
 
 
-def plot_pull(
+def _plot_pull(
     self: hist.BaseHist,
     func: Union[Callable[[np.ndarray], np.ndarray], str],
     likelihood: bool = False,
@@ -744,12 +754,12 @@ def plot_pull(
     ub_kwargs.setdefault("label", "Uncertainty")
     ub_kwargs.setdefault("alpha", 0.5)
 
-    # bar plot keyword arguments
-    bar_kwargs = _filter_dict(kwargs, "bar_", ignore={"bar_width"})
+    # # bar plot keyword arguments
+    # bar_kwargs = _filter_dict(kwargs, "bar_", ignore={"bar_width"})
 
-    # patch plot keyword arguments
-    pp_kwargs = _filter_dict(kwargs, "pp_", ignore={"pp_num"})
-    pp_num = kwargs.pop("pp_num", 5)
+    # # patch plot keyword arguments
+    # pp_kwargs = _filter_dict(kwargs, "pp_", ignore={"pp_num"})
+    # pp_num = kwargs.pop("pp_num", 5)
 
     # Judge whether some arguments are left
     if kwargs:
@@ -771,7 +781,7 @@ def plot_pull(
     main_ax.legend(loc=0)
     main_ax.set_ylabel("Counts")
 
-    pull_ax = _plot_pull(self, pulls, ax=pull_ax, **kwargs)
+    pull_ax = plot_pull(self, pulls, ax=pull_ax, **kwargs)
 
     return main_ax, pull_ax
 

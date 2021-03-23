@@ -383,7 +383,10 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
         import hist.plot
 
-        return hist.plot.plot_pull(self, func, ax_dict=ax_dict, **kwargs)
+        # return hist.plot.plot_pull(self, func, ax_dict=ax_dict, **kwargs)
+        return hist.plot.plot_ratiolike(
+            self, func, ax_dict=ax_dict, view="pull", **kwargs
+        )
 
     def plot_pie(
         self,
