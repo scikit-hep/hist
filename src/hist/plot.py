@@ -348,6 +348,83 @@ def _fit_callable_to_hist(
     return model_values, model_uncert, _hist_uncert
 
 
+def _draw_ratio(
+    _hist: hist.BaseHist,
+    x_values: np.ndarray,
+    ratios: np.ndarray,
+    ratio_uncert: np.ndarray,
+    ax: matplotlib.axes.Axes,
+) -> matplotlib.axes.Axes:
+    left_edge = _hist.axes.edges[0][0]
+    right_edge = _hist.axes.edges[-1][-1]
+
+    # TODO: Make configurable
+    central_value = 1.0
+    ax.axhline(central_value, color="black", linestyle="dashed", linewidth=1.0)
+
+    # TODO: Make configurable: {"line", "bar"}
+    uncert_draw_type = "line"
+    if uncert_draw_type == "line":
+        ax.errorbar(
+            x_values,
+            ratios,
+            yerr=ratio_uncert,
+            color="black",
+            marker="o",
+            linestyle="none",
+        )
+    elif uncert_draw_type == "bar":
+        bar_width = (right_edge - left_edge) / len(ratios)
+
+        bar_top = ratios + ratio_uncert[1]
+        bar_bottom = ratios - ratio_uncert[0]
+        # bottom can't be nan
+        bar_bottom[np.isnan(bar_bottom)] = 0
+        bar_height = bar_top - bar_bottom
+
+        ax.scatter(x_values, ratios, color="black")
+        ax.bar(
+            x_values,
+            height=bar_height,
+            width=bar_width,
+            bottom=bar_bottom,
+            fill=False,
+            linewidth=0,
+            edgecolor="gray",
+            hatch=3 * "/",
+        )
+
+    # TODO: Make configurable
+    ratio_ylim = None
+    if ratio_ylim is None:
+        # plot centered around central value with a scaled view range
+        # the value _with_ the uncertainty in view is important so base
+        # view range on extrema of value +/- uncertainty
+        valid_ratios_idx = np.where(np.isnan(ratios) == False)  # noqa: E712
+        valid_ratios = ratios[valid_ratios_idx]
+        extrema = np.array(
+            [
+                valid_ratios - ratio_uncert[0][valid_ratios_idx],
+                valid_ratios + ratio_uncert[1][valid_ratios_idx],
+            ]
+        )
+        max_delta = np.max(np.abs(extrema - central_value))
+        ratio_extrema = np.abs(max_delta + central_value)
+
+        _alpha = 2.0
+        scaled_offset = max_delta + (max_delta / (_alpha * ratio_extrema))
+        ratio_ylim = [central_value - scaled_offset, central_value + scaled_offset]
+
+    ax.set_xlim(left_edge, right_edge)
+    ax.set_ylim(bottom=ratio_ylim[0], top=ratio_ylim[1])
+
+    ax.set_xlabel(_hist.axes[0].label)
+    # TODO: Make configurable
+    ax.set_ylabel("Ratio")
+
+    return ax
+
+
 # TODO: Refactor and separate callable logic from hist logic
 # TODO: Revise plot_ratio to make it possible for plot_pull to use as infrastructure
 def plot_ratio(
@@ -458,78 +535,12 @@ def plot_ratio(
     # TODO: Make configurable
     main_ax.set_ylabel("Counts")
 
-    # ratio: plot the ratios using Matplotlib errorbar or bar
-    left_edge = self.axes.edges[0][0]
-    right_edge = self.axes.edges[-1][-1]
-
     # Set 0 and inf to nan to hide during plotting
     ratios[ratios == 0] = np.nan
     ratios[np.isinf(ratios)] = np.nan
 
-    # TODO: Make configurable
-    central_value = 1.0
-    ratio_ax.axhline(central_value, color="black", linestyle="dashed", linewidth=1.0)
-
-    # TODO: Make configurable: {"line", "bar"}
-    uncert_draw_type = "line"
-    if uncert_draw_type == "line":
-        ratio_ax.errorbar(
-            x_values,
-            ratios,
-            yerr=ratio_uncert,
-            color="black",
-            marker="o",
-            linestyle="none",
-        )
-    elif uncert_draw_type == "bar":
-        bar_width = (right_edge - left_edge) / len(ratios)
-
-        bar_top = ratios + ratio_uncert[1]
-        bar_bottom = ratios - ratio_uncert[0]
-        # bottom can't be nan
-        bar_bottom[np.isnan(bar_bottom)] = 0
-        bar_height = bar_top - bar_bottom
-
-        ratio_ax.scatter(x_values, ratios, color="black")
-        ratio_ax.bar(
-            x_values,
-            height=bar_height,
-            width=bar_width,
-            bottom=bar_bottom,
-            fill=False,
-            linewidth=0,
-            edgecolor="gray",
-            hatch=3 * "/",
-        )
-
-    # TODO: Make configurable
-    ratio_ylim = None
-    if ratio_ylim is None:
-        # plot centered around central value with a scaled view range
-        # the value _with_ the uncertainty in view is important so base
-        # view range on extrema of value +/- uncertainty
-        valid_ratios_idx = np.where(np.isnan(ratios) == False)  # noqa: E712
-        valid_ratios = ratios[valid_ratios_idx]
-        extrema = np.array(
-            [
-                valid_ratios - ratio_uncert[0][valid_ratios_idx],
-                valid_ratios + ratio_uncert[1][valid_ratios_idx],
-            ]
-        )
-        max_delta = np.max(np.abs(extrema - central_value))
-        ratio_extrema = np.abs(max_delta + central_value)
-
-        _alpha = 2.0
-        scaled_offset = max_delta + (max_delta / (_alpha * ratio_extrema))
-        ratio_ylim = [central_value - scaled_offset, central_value + scaled_offset]
-
-    ratio_ax.set_ylim(bottom=ratio_ylim[0], top=ratio_ylim[1])
-
-    plt.xlim(left_edge, right_edge)
-
-    ratio_ax.set_xlabel(self.axes[0].label)
-    # TODO: Make configurable
-    ratio_ax.set_ylabel("Ratio")
+    # ratio: plot the ratios using Matplotlib errorbar or bar
+    ratio_ax = _draw_ratio(self, x_values, ratios, ratio_uncert, ratio_ax)
 
     return main_ax, ratio_ax
 
