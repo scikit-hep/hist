@@ -82,7 +82,7 @@ def _curve_fit_wrapper(
     ydata: np.ndarray,
     yerr: np.ndarray,
     likelihood: bool = False,
-) -> Tuple[Tuple[float, ...], ArrayLike]:
+) -> Tuple[Tuple[float, ...], np.ndarray]:
     """
     Wrapper around `scipy.optimize.curve_fit`. Initial parameters (`p0`)
     can be set in the function definition with defaults for kwargs
