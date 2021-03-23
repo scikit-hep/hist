@@ -329,11 +329,11 @@ def _fit_callable_to_hist(
         raise RuntimeError(
             "Cannot compute from a variance-less histogram, try a Weight storage"
         )
-    _hist_uncert = np.sqrt(variances)
+    hist_uncert = np.sqrt(variances)
 
     # Infer best fit model parameters and covariance matrix
     popt, pcov = _curve_fit_wrapper(
-        model, xdata, _hist.values(), _hist_uncert, likelihood=likelihood
+        model, xdata, _hist.values(), hist_uncert, likelihood=likelihood
     )
     model_values = model(xdata, *popt)
 
@@ -343,9 +343,9 @@ def _fit_callable_to_hist(
         sampled_ydata = np.vstack([model(xdata, *vopt).T for vopt in vopts])
         model_uncert = np.nanstd(sampled_ydata, axis=0)
     else:
-        model_uncert = np.zeros_like(_hist_uncert)
+        model_uncert = np.zeros_like(hist_uncert)
 
-    return model_values, model_uncert, _hist_uncert
+    return model_values, model_uncert, hist_uncert
 
 
 def _draw_ratio(
