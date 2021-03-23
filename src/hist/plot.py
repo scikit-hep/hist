@@ -6,8 +6,6 @@ import numpy as np
 
 import hist
 
-from .typing import ArrayLike
-
 try:
     import matplotlib.axes
     import matplotlib.patches as patches
