@@ -145,7 +145,7 @@ def plot2d_full(
         raise TypeError("Only 2D-histogram has plot2d_full")
 
     if ax_dict is None:
-        ax_dict = dict()
+        ax_dict = {}
 
     # Default Figure: construct the figure and axes
     if ax_dict:
@@ -409,5 +409,4 @@ def plot_pie(
 
     labels = [str(get_center(x)) for x in self.axes[0]]
 
-    result = ax.pie(data, labels=labels, **kwargs)
-    return result
+    return ax.pie(data, labels=labels, **kwargs)
