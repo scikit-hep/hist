@@ -467,7 +467,7 @@ def plot_ratiolike(
     if ax_dict:
         try:
             main_ax = ax_dict["main_ax"]
-            ratiolike_ax = ax_dict["ratiolike_ax"]
+            ratiolike_ax = ax_dict[f"{view}_ax"]
         except KeyError:
             raise ValueError("All axes should be all given or none at all")
     else:
