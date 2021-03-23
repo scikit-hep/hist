@@ -318,7 +318,6 @@ def ratio_uncertainty(
 def _fit_callable_to_hist(
     model: Callable[[np.ndarray], np.ndarray],
     _hist: hist.BaseHist,
-    xdata: np.ndarray,
     likelihood: bool = False,
 ) -> "Tuple[np.ndarray, np.ndarray, np.ndarray]":
     """
@@ -332,6 +331,7 @@ def _fit_callable_to_hist(
     hist_uncert = np.sqrt(variances)
 
     # Infer best fit model parameters and covariance matrix
+    xdata = _hist.axes[0].centers
     popt, pcov = _curve_fit_wrapper(
         model, xdata, _hist.values(), hist_uncert, likelihood=likelihood
     )
@@ -348,16 +348,23 @@ def _fit_callable_to_hist(
     return model_values, model_uncert, hist_uncert
 
 
-def _draw_ratio(
+def _plot_ratio(
     _hist: hist.BaseHist,
-    x_values: np.ndarray,
     ratios: np.ndarray,
     ratio_uncert: np.ndarray,
     ax: matplotlib.axes.Axes,
     **kwargs: Any,
 ) -> matplotlib.axes.Axes:
+    """
+    Plot a ratio plot on the given axes
+    """
+    x_values = _hist.axes[0].centers
     left_edge = _hist.axes.edges[0][0]
     right_edge = _hist.axes.edges[-1][-1]
+
+    # Set 0 and inf to nan to hide during plotting
+    ratios[ratios == 0] = np.nan
+    ratios[np.isinf(ratios)] = np.nan
 
     central_value = kwargs.pop("central_value", 1.0)
     ax.axhline(central_value, color="black", linestyle="dashed", linewidth=1.0)
@@ -506,7 +513,7 @@ def plot_ratio(
     if callable(other) or isinstance(other, str):
         fp_kwargs.setdefault("label", "Counts")
         denominator, model_uncert, numerator_uncert = _fit_callable_to_hist(
-            other, self, x_values, likelihood
+            other, self, likelihood
         )
     else:
         denominator = other.values()
@@ -539,12 +546,8 @@ def plot_ratio(
     main_ax.legend(loc=rp_kwargs["legend_loc"])
     main_ax.set_ylabel(fp_kwargs["label"])
 
-    # Set 0 and inf to nan to hide during plotting
-    ratios[ratios == 0] = np.nan
-    ratios[np.isinf(ratios)] = np.nan
-
     # ratio: plot the ratios using Matplotlib errorbar or bar
-    ratio_ax = _draw_ratio(self, x_values, ratios, ratio_uncert, ratio_ax, **rp_kwargs)
+    ratio_ax = _plot_ratio(self, ratios, ratio_uncert, ratio_ax, **rp_kwargs)
 
     return main_ax, ratio_ax
 
