@@ -315,35 +315,37 @@ def ratio_uncertainty(
     return ratio_uncert
 
 
-def _fit_callable(
-    self: hist.BaseHist,
-    other: Callable[[np.ndarray], np.ndarray],
-    x_values: np.ndarray,
+def _fit_callable_to_hist(
+    model: Callable[[np.ndarray], np.ndarray],
+    _hist: hist.BaseHist,
+    xdata: np.ndarray,
     likelihood: bool = False,
 ) -> "Tuple[np.ndarray, np.ndarray, np.ndarray]":
-    variances = self.variances()
+    """
+    Fit a model, a callable function, to the histogram values.
+    """
+    variances = _hist.variances()
     if variances is None:
         raise RuntimeError(
             "Cannot compute from a variance-less histogram, try a Weight storage"
         )
-    numerator_uncert = np.sqrt(variances)
+    _hist_uncert = np.sqrt(variances)
 
-    # Infer model parameters using `other` as fit model
-    # numerator = self.values()
+    # Infer best fit model parameters and covariance matrix
     popt, pcov = _curve_fit_wrapper(
-        other, x_values, self.values(), numerator_uncert, likelihood=likelihood
+        model, xdata, _hist.values(), _hist_uncert, likelihood=likelihood
     )
-    model_values = other(x_values, *popt)
+    model_values = model(xdata, *popt)
 
     if np.isfinite(pcov).all():
-        nsamples = 100
-        vopts = np.random.multivariate_normal(popt, pcov, nsamples)
-        sampled_ydata = np.vstack([other(x_values, *vopt).T for vopt in vopts])
+        n_samples = 100
+        vopts = np.random.multivariate_normal(popt, pcov, n_samples)
+        sampled_ydata = np.vstack([model(xdata, *vopt).T for vopt in vopts])
         model_uncert = np.nanstd(sampled_ydata, axis=0)
     else:
-        model_uncert = np.zeros_like(numerator_uncert)
+        model_uncert = np.zeros_like(_hist_uncert)
 
-    return model_values, model_uncert, numerator_uncert
+    return model_values, model_uncert, _hist_uncert
 
 
 # TODO: Refactor and separate callable logic from hist logic
@@ -420,8 +422,8 @@ def plot_ratio(
     numerator = self.values()
 
     if callable(other) or isinstance(other, str):
-        denominator, model_uncert, numerator_uncert = _fit_callable(
-            self, other, x_values, likelihood
+        denominator, model_uncert, numerator_uncert = _fit_callable_to_hist(
+            other, self, x_values, likelihood
         )
     else:
         denominator = other.values()
