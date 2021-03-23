@@ -315,12 +315,11 @@ def ratio_uncertainty(
     return ratio_uncert
 
 
-# TODO: FIX TYPING
 def _fit_callable_to_hist(
     model: Callable[[np.ndarray], np.ndarray],
     _hist: hist.BaseHist,
     likelihood: bool = False,
-) -> "Tuple[np.ndarray, np.ndarray, np.ndarray, Tuple[Tuple[np.float64, ...], np.ndarray]]":
+) -> "Tuple[np.ndarray, np.ndarray, np.ndarray, Tuple[Tuple[float, ...], np.ndarray]]":
     """
     Fit a model, a callable function, to the histogram values.
     """
