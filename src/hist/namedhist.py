@@ -17,11 +17,10 @@ class NamedHist(BaseHist, family=hist):
         """
 
         super().__init__(*args, **kwargs)
-        if len(args):
-            if "" in self.axes.name:
-                raise RuntimeError(
-                    f"Each axes in the {self.__class__.__name__} instance should have a name"
-                )
+        if len(args) and "" in self.axes.name:
+            raise RuntimeError(
+                f"Each axes in the {self.__class__.__name__} instance should have a name"
+            )
 
     # TODO: This can return a single value
     def project(
@@ -67,11 +66,10 @@ class NamedHist(BaseHist, family=hist):
         Get histogram item.
         """
 
-        if isinstance(index, dict):
-            if any(isinstance(k, int) for k in index.keys()):
-                raise TypeError(
-                    f"Only access by names are supported for {self.__class__.__name__} in dictionay"
-                )
+        if isinstance(index, dict) and any(isinstance(k, int) for k in index.keys()):
+            raise TypeError(
+                f"Only access by names are supported for {self.__class__.__name__} in dictionay"
+            )
 
         return super().__getitem__(index)
 
@@ -84,10 +82,9 @@ class NamedHist(BaseHist, family=hist):
         Set histogram item.
         """
 
-        if isinstance(index, dict):
-            if any(isinstance(k, int) for k in index.keys()):
-                raise TypeError(
-                    f"Only access by names are supported for {self.__class__.__name__} in dictionay"
-                )
+        if isinstance(index, dict) and any(isinstance(k, int) for k in index.keys()):
+            raise TypeError(
+                f"Only access by names are supported for {self.__class__.__name__} in dictionay"
+            )
 
         return super().__setitem__(index, value)

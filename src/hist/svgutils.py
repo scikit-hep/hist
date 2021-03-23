@@ -31,11 +31,11 @@ class XML:
         return self.name + ending
 
     def __str__(self) -> str:
-        if self.contents:
-            contents = "\n".join(str(s) for s in self.contents)
-            return f"<{self.start}>\n{contents}\n</{self.name}>"
-        else:
+        if not self.contents:
             return f"<{self.start}/>"
+
+        contents = "\n".join(str(s) for s in self.contents)
+        return f"<{self.start}>\n{contents}\n</{self.name}>"
 
 
 class html(XML):
@@ -89,7 +89,7 @@ class rect(XML):
         width = right_edge - left_edge
         top_y = y
 
-        height = height * (1 - 2 * pad_y)
+        height *= 1 - 2 * pad_y
         top_y = top_y * (1 - 2 * pad_y) + pad_y
         width = width * (1 - 2 * pad_x)
         color = int(opacity * 255)
