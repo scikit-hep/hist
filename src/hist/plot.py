@@ -525,7 +525,9 @@ def plot_ratiolike(
                     mean: float = mean,
                     sigma: float = sigma,
                 ) -> np.ndarray:
-                    return constant * np.exp(-np.square(x - mean) / (2 * np.square(sigma)))  # type: ignore
+                    return constant * np.exp(
+                        -np.square(x - mean) / (2 * np.square(sigma))
+                    )
 
             else:
                 other = _expr_to_lambda(other)
@@ -566,9 +568,65 @@ def plot_ratiolike(
     main_ax.set_ylabel(fp_kwargs["label"])
 
     # ratio: plot the ratios using Matplotlib errorbar or bar
-    ratio_ax = _plot_ratio(self, ratios, ratio_uncert, ratio_ax, **rp_kwargs)
+    ratio_ax = plot_ratio(self, ratios, ratio_uncert, ratio_ax, **rp_kwargs)
 
     return main_ax, ratio_ax
+
+
+def _plot_pull(
+    _hist: hist.BaseHist,
+    pulls: np.ndarray,
+    ax: matplotlib.axes.Axes,
+    **kwargs: Any,
+) -> matplotlib.axes.Axes:
+    """
+    Plot a pull plot on the given axes
+    """
+    # bar plot keyword arguments
+    bar_kwargs = _filter_dict(kwargs, "bar_", ignore={"bar_width"})
+
+    # patch plot keyword arguments
+    pp_kwargs = _filter_dict(kwargs, "pp_", ignore={"pp_num"})
+    pp_num = kwargs.pop("pp_num", 5)
+
+    # Judge whether some arguments are left
+    if kwargs:
+        raise ValueError(f"{set(kwargs)}' not needed")
+
+    x_values = _hist.axes[0].centers
+    left_edge = _hist.axes.edges[0][0]
+    right_edge = _hist.axes.edges[-1][-1]
+
+    # Pull: plot the pulls using Matplotlib bar method
+    width = (right_edge - left_edge) / len(pulls)
+    ax.bar(x_values, pulls, width=width, **bar_kwargs)
+
+    patch_height = max(np.abs(pulls)) / pp_num
+    patch_width = width * len(pulls)
+    for i in range(pp_num):
+        # gradient color patches
+        if "alpha" in pp_kwargs:
+            pp_kwargs["alpha"] *= np.power(0.618, i)
+        else:
+            pp_kwargs["alpha"] = 0.5 * np.power(0.618, i)
+
+        upRect_startpoint = (left_edge, i * patch_height)
+        upRect = patches.Rectangle(
+            upRect_startpoint, patch_width, patch_height, **pp_kwargs
+        )
+        ax.add_patch(upRect)
+        downRect_startpoint = (left_edge, -(i + 1) * patch_height)
+        downRect = patches.Rectangle(
+            downRect_startpoint, patch_width, patch_height, **pp_kwargs
+        )
+        ax.add_patch(downRect)
+
+    ax.set_xlim(left_edge, right_edge)
+
+    ax.set_xlabel(_hist.axes[0].label)
+    ax.set_ylabel("Pull")
+
+    return ax
 
 
 def plot_pull(
@@ -712,36 +770,7 @@ def plot_pull(
     main_ax.legend(loc=0)
     main_ax.set_ylabel("Counts")
 
-    # Pull: plot the pulls using Matplotlib bar method
-    left_edge = self.axes.edges[0][0]
-    right_edge = self.axes.edges[-1][-1]
-    width = (right_edge - left_edge) / len(pulls)
-    pull_ax.bar(self.axes.centers[0], pulls, width=width, **bar_kwargs)
-
-    patch_height = max(np.abs(pulls)) / pp_num
-    patch_width = width * len(pulls)
-    for i in range(pp_num):
-        # gradient color patches
-        if "alpha" in pp_kwargs:
-            pp_kwargs["alpha"] *= np.power(0.618, i)
-        else:
-            pp_kwargs["alpha"] = 0.5 * np.power(0.618, i)
-
-        upRect_startpoint = (left_edge, i * patch_height)
-        upRect = patches.Rectangle(
-            upRect_startpoint, patch_width, patch_height, **pp_kwargs
-        )
-        pull_ax.add_patch(upRect)
-        downRect_startpoint = (left_edge, -(i + 1) * patch_height)
-        downRect = patches.Rectangle(
-            downRect_startpoint, patch_width, patch_height, **pp_kwargs
-        )
-        pull_ax.add_patch(downRect)
-
-    plt.xlim(left_edge, right_edge)
-
-    pull_ax.set_xlabel(self.axes[0].label)
-    pull_ax.set_ylabel("Pull")
+    pull_ax = _plot_pull(self, pulls, ax=pull_ax, **kwargs)
 
     return main_ax, pull_ax
 
