@@ -315,7 +315,12 @@ def ratio_uncertainty(
     return ratio_uncert
 
 
-def _fit_callable(self, other, x_values, likelihood):
+def _fit_callable(
+    self: hist.BaseHist,
+    other: Callable[[np.ndarray], np.ndarray],
+    x_values: np.ndarray,
+    likelihood: bool = False,
+) -> "Tuple[np.ndarray, np.ndarray, np.ndarray]":
     variances = self.variances()
     if variances is None:
         raise RuntimeError(
@@ -345,7 +350,7 @@ def _fit_callable(self, other, x_values, likelihood):
 # TODO: Revise plot_ratio to make it possible for plot_pull to use as infrastructure
 def plot_ratio(
     self: hist.BaseHist,
-    other: Union[hist.BaseHist, Callable[[np.ndarray], np.ndarray], str],
+    other: Union[hist.BaseHist, Callable[[np.ndarray], np.ndarray]],
     likelihood: bool = False,
     *,
     ax_dict: "Optional[Dict[str, matplotlib.axes.Axes]]" = None,
