@@ -376,11 +376,10 @@ def plot_ratio(
         raise TypeError(
             f"Only 1D-histogram supports ratio plot, try projecting {self.__class__.__name__} to 1D"
         )
-    if isinstance(other, hist.hist.Hist):
-        if other.ndim != 1:
-            raise TypeError(
-                f"Only 1D-histogram supports ratio plot, try projecting {other.__class__.__name__} to 1D"
-            )
+    if isinstance(other, hist.hist.Hist) and other.ndim != 1:
+        raise TypeError(
+            f"Only 1D-histogram supports ratio plot, try projecting {other.__class__.__name__} to 1D"
+        )
 
     if ax_dict:
         try:
