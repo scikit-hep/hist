@@ -467,7 +467,7 @@ def plot_ratiolike(
     if ax_dict:
         try:
             main_ax = ax_dict["main_ax"]
-            ratio_ax = ax_dict["ratio_ax"]
+            ratiolike_ax = ax_dict["ratiolike_ax"]
         except KeyError:
             raise ValueError("All axes should be all given or none at all")
     else:
@@ -475,7 +475,7 @@ def plot_ratiolike(
         grid = fig.add_gridspec(2, 1, hspace=0, height_ratios=[3, 1])
 
         main_ax = fig.add_subplot(grid[0])
-        ratio_ax = fig.add_subplot(grid[1], sharex=main_ax)
+        ratiolike_ax = fig.add_subplot(grid[1], sharex=main_ax)
 
     # Keyword Argument Conversion: convert the kwargs to several independent args
 
@@ -568,9 +568,10 @@ def plot_ratiolike(
     main_ax.set_ylabel(fp_kwargs["label"])
 
     # ratio: plot the ratios using Matplotlib errorbar or bar
-    ratio_ax = plot_ratio(self, ratios, ratio_uncert, ratio_ax, **rp_kwargs)
+    if view == "ratio":
+        ratiolike_ax = plot_ratio(self, ratios, ratio_uncert, ratiolike_ax, **rp_kwargs)
 
-    return main_ax, ratio_ax
+    return main_ax, ratiolike_ax
 
 
 def _plot_pull(
