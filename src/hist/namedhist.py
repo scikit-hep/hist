@@ -66,9 +66,7 @@ class NamedHist(BaseHist, family=hist):
         Get histogram item.
         """
 
-        if isinstance(index, dict) and any(
-            isinstance(k, int) for k in index.keys()
-        ):
+        if isinstance(index, dict) and any(isinstance(k, int) for k in index.keys()):
             raise TypeError(
                 f"Only access by names are supported for {self.__class__.__name__} in dictionay"
             )
@@ -84,9 +82,7 @@ class NamedHist(BaseHist, family=hist):
         Set histogram item.
         """
 
-        if isinstance(index, dict) and any(
-            isinstance(k, int) for k in index.keys()
-        ):
+        if isinstance(index, dict) and any(isinstance(k, int) for k in index.keys()):
             raise TypeError(
                 f"Only access by names are supported for {self.__class__.__name__} in dictionay"
             )
