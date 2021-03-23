@@ -414,7 +414,7 @@ def plot_ratio(
     x_values = self.axes[0].centers
     numerator = self.values()
 
-    if callable(other) or type(other) in [str]:
+    if callable(other) or isinstance(other, str):
         denominator, model_uncert, numerator_uncert = _fit_callable(
             self, other, x_values, likelihood
         )
@@ -430,7 +430,7 @@ def plot_ratio(
         )
 
     # Main: plot the numerator and denominator
-    if callable(other) or type(other) in [str]:
+    if callable(other) or isinstance(other, str):
         main_ax.errorbar(self.axes.centers[0], numerator, numerator_uncert, **eb_kwargs)
 
         (line,) = main_ax.plot(self.axes.centers[0], denominator, **fp_kwargs)
