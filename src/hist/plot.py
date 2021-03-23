@@ -315,11 +315,12 @@ def ratio_uncertainty(
     return ratio_uncert
 
 
+# TODO: FIX TYPING
 def _fit_callable_to_hist(
     model: Callable[[np.ndarray], np.ndarray],
     _hist: hist.BaseHist,
     likelihood: bool = False,
-) -> "Tuple[np.ndarray, np.ndarray, np.ndarray]":
+) -> "Tuple[np.ndarray, np.ndarray, np.ndarray, Tuple[Tuple[np.float64, ...], np.ndarray]]":
     """
     Fit a model, a callable function, to the histogram values.
     """
@@ -345,7 +346,7 @@ def _fit_callable_to_hist(
     else:
         model_uncert = np.zeros_like(hist_uncert)
 
-    return model_values, model_uncert, hist_uncert
+    return model_values, model_uncert, hist_uncert, (popt, pcov)
 
 
 def plot_ratio(
@@ -534,10 +535,23 @@ def plot_ratiolike(
             else:
                 other = _expr_to_lambda(other)
 
-        fp_kwargs.setdefault("label", "Counts")
-        denominator, model_uncert, numerator_uncert = _fit_callable_to_hist(
-            other, self, likelihood
-        )
+        (
+            denominator,
+            model_uncert,
+            numerator_uncert,
+            bestfit_result,
+        ) = _fit_callable_to_hist(other, self, likelihood)
+
+        # fit plot keyword arguments
+        parnames = list(inspect.signature(other).parameters)[1:]
+        popt, pcov = bestfit_result
+        perr = np.sqrt(np.diag(pcov))
+
+        fp_label = "Fit"
+        for name, value, error in zip(parnames, popt, perr):
+            fp_label += "\n  "
+            fp_label += rf"{name} = {value:.3g} $\pm$ {error:.3g}"
+        fp_kwargs["label"] = fp_label
     else:
         denominator = other.values()
 
@@ -573,7 +587,9 @@ def plot_ratiolike(
         histplot(other, ax=main_ax)
 
     main_ax.legend(loc=rp_kwargs["legend_loc"])
-    main_ax.set_ylabel(fp_kwargs["label"])
+    # FIXME: resolve conflict
+    # main_ax.set_ylabel(fp_kwargs["label"])
+    main_ax.set_ylabel("Counts")
 
     # ratio: plot the ratios using Matplotlib errorbar or bar
     if view == "ratio":
