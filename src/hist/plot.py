@@ -354,16 +354,16 @@ def _draw_ratio(
     ratios: np.ndarray,
     ratio_uncert: np.ndarray,
     ax: matplotlib.axes.Axes,
+    **kwargs: Any,
 ) -> matplotlib.axes.Axes:
     left_edge = _hist.axes.edges[0][0]
     right_edge = _hist.axes.edges[-1][-1]
 
-    # TODO: Make configurable
-    central_value = 1.0
+    central_value = kwargs.pop("central_value", 1.0)
     ax.axhline(central_value, color="black", linestyle="dashed", linewidth=1.0)
 
-    # TODO: Make configurable: {"line", "bar"}
-    uncert_draw_type = "line"
+    # {"line", "bar"}
+    uncert_draw_type = kwargs.pop("uncert_draw_type", "line")
     if uncert_draw_type == "line":
         ax.errorbar(
             x_values,
@@ -394,8 +394,7 @@ def _draw_ratio(
             hatch=3 * "/",
         )
 
-    # TODO: Make configurable
-    ratio_ylim = None
+    ratio_ylim = kwargs.pop("ylim", None)
     if ratio_ylim is None:
         # plot centered around central value with a scaled view range
         # the value _with_ the uncertainty in view is important so base
@@ -419,8 +418,7 @@ def _draw_ratio(
     ax.set_ylim(bottom=ratio_ylim[0], top=ratio_ylim[1])
 
     ax.set_xlabel(_hist.axes[0].label)
-    # TODO: Make configurable
-    ax.set_ylabel("Ratio")
+    ax.set_ylabel(kwargs.pop("ylabel", "Ratio"))
 
     return ax
 
@@ -479,11 +477,19 @@ def plot_ratio(
 
     # fit plot keyword arguments
     fp_kwargs = _filter_dict(kwargs, "fp_")
-    fp_kwargs.setdefault("label", "Fitted Value")
+    if callable(other) or isinstance(other, str):
+        fp_kwargs.setdefault("label", "Fitted value")
+    else:
+        fp_kwargs.setdefault("label", "Counts")
 
     # uncertainty band keyword arguments
     ub_kwargs = _filter_dict(kwargs, "ub_")
     ub_kwargs.setdefault("label", "Uncertainty")
+
+    # ratio plot keyword arguments
+    rp_kwargs = _filter_dict(kwargs, "rp_")
+    rp_kwargs.setdefault("uncert_type", "poisson")
+    rp_kwargs.setdefault("legend_loc", "best")
 
     # # patch plot keyword arguments
     # pp_kwargs = _filter_dict(kwargs, "pp_", ignore={"pp_num"})
@@ -498,6 +504,7 @@ def plot_ratio(
     numerator = self.values()
 
     if callable(other) or isinstance(other, str):
+        fp_kwargs.setdefault("label", "Counts")
         denominator, model_uncert, numerator_uncert = _fit_callable_to_hist(
             other, self, x_values, likelihood
         )
@@ -507,9 +514,8 @@ def plot_ratio(
     # Compute ratios: containing no INF values
     with np.errstate(divide="ignore", invalid="ignore"):
         ratios = numerator / denominator
-        # TODO: Make uncert_type configurable
         ratio_uncert = ratio_uncertainty(
-            num=numerator, denom=denominator, uncert_type="poisson"
+            num=numerator, denom=denominator, uncert_type=rp_kwargs["uncert_type"]
         )
 
     # Main: plot the numerator and denominator
@@ -530,17 +536,15 @@ def plot_ratio(
         histplot(self, ax=main_ax)
         histplot(other, ax=main_ax)
 
-    # TODO: Make configurable
-    main_ax.legend(loc="best")
-    # TODO: Make configurable
-    main_ax.set_ylabel("Counts")
+    main_ax.legend(loc=rp_kwargs["legend_loc"])
+    main_ax.set_ylabel(fp_kwargs["label"])
 
     # Set 0 and inf to nan to hide during plotting
     ratios[ratios == 0] = np.nan
     ratios[np.isinf(ratios)] = np.nan
 
     # ratio: plot the ratios using Matplotlib errorbar or bar
-    ratio_ax = _draw_ratio(self, x_values, ratios, ratio_uncert, ratio_ax)
+    ratio_ax = _draw_ratio(self, x_values, ratios, ratio_uncert, ratio_ax, **rp_kwargs)
 
     return main_ax, ratio_ax
 
