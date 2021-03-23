@@ -366,7 +366,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
         import hist.plot
 
-        return hist.plot.plot_ratiolike(
+        return hist.plot._plot_ratiolike(
             self, other, ax_dict=ax_dict, view="ratio", **kwargs
         )
 
@@ -383,7 +383,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
         import hist.plot
 
-        return hist.plot.plot_ratiolike(
+        return hist.plot._plot_ratiolike(
             self, func, ax_dict=ax_dict, view="pull", **kwargs
         )
 
