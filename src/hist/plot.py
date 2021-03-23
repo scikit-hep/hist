@@ -437,14 +437,14 @@ def plot_ratio(
 
     # Main: plot the numerator and denominator
     if callable(other) or isinstance(other, str):
-        main_ax.errorbar(self.axes.centers[0], numerator, numerator_uncert, **eb_kwargs)
+        main_ax.errorbar(x_values, numerator, numerator_uncert, **eb_kwargs)
 
-        (line,) = main_ax.plot(self.axes.centers[0], denominator, **fp_kwargs)
+        (line,) = main_ax.plot(x_values, denominator, **fp_kwargs)
 
         # Uncertainty band for fitted function
         ub_kwargs.setdefault("color", line.get_color())
         main_ax.fill_between(
-            self.axes.centers[0],
+            x_values,
             denominator - model_uncert,
             denominator + model_uncert,
             **ub_kwargs,
@@ -474,7 +474,7 @@ def plot_ratio(
     uncert_draw_type = "line"
     if uncert_draw_type == "line":
         ratio_ax.errorbar(
-            self.axes.centers[0],
+            x_values,
             ratios,
             yerr=ratio_uncert,
             color="black",
@@ -490,9 +490,9 @@ def plot_ratio(
         bar_bottom[np.isnan(bar_bottom)] = 0
         bar_height = bar_top - bar_bottom
 
-        ratio_ax.scatter(self.axes.centers[0], ratios, color="black")
+        ratio_ax.scatter(x_values, ratios, color="black")
         ratio_ax.bar(
-            self.axes.centers[0],
+            x_values,
             height=bar_height,
             width=bar_width,
             bottom=bar_bottom,
