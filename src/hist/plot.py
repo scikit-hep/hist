@@ -254,7 +254,6 @@ def poisson_interval(
             raise RuntimeWarning(
                 "All values are zero! Cannot compute meaningful error bars",
             )
-            return np.vstack([values, values])
         nearest = np.sum(
             [np.square(np.subtract.outer(d, d0)) for d, d0 in zip(available, missing)]
         ).argmin(axis=0)
