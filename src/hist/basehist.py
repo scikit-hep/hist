@@ -366,7 +366,9 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
         import hist.plot
 
-        return hist.plot.plot_ratio(self, other, ax_dict=ax_dict, **kwargs)
+        return hist.plot.plot_ratiolike(
+            self, other, ax_dict=ax_dict, view="ratio", **kwargs
+        )
 
     def plot_pull(
         self,

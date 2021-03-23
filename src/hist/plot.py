@@ -348,7 +348,7 @@ def _fit_callable_to_hist(
     return model_values, model_uncert, hist_uncert
 
 
-def _plot_ratio(
+def plot_ratio(
     _hist: hist.BaseHist,
     ratios: np.ndarray,
     ratio_uncert: np.ndarray,
@@ -432,16 +432,17 @@ def _plot_ratio(
 
 # TODO: Refactor and separate callable logic from hist logic
 # TODO: Revise plot_ratio to make it possible for plot_pull to use as infrastructure
-def plot_ratio(
+def plot_ratiolike(
     self: hist.BaseHist,
     other: Union[hist.BaseHist, Callable[[np.ndarray], np.ndarray]],
     likelihood: bool = False,
     *,
     ax_dict: "Optional[Dict[str, matplotlib.axes.Axes]]" = None,
+    view: str,
     **kwargs: Any,
 ) -> "Tuple[matplotlib.axes.Axes, matplotlib.axes.Axes]":
     """
-    Plot_ratio method for BaseHist object.
+    Plot ratio like plots for BaseHist
     """
 
     try:
@@ -498,9 +499,9 @@ def plot_ratio(
     rp_kwargs.setdefault("uncert_type", "poisson")
     rp_kwargs.setdefault("legend_loc", "best")
 
-    # # patch plot keyword arguments
-    # pp_kwargs = _filter_dict(kwargs, "pp_", ignore={"pp_num"})
-    # pp_num = kwargs.pop("pp_num", 5)
+    # patch plot keyword arguments
+    pp_kwargs = _filter_dict(kwargs, "pp_", ignore={"pp_num"})
+    pp_num = kwargs.pop("pp_num", 5)
 
     # Judge whether some arguments are left
     if kwargs:
@@ -511,6 +512,24 @@ def plot_ratio(
     numerator = self.values()
 
     if callable(other) or isinstance(other, str):
+        if isinstance(other, str):
+            if other in {"gauss", "gaus"}:
+                # gaussian with reasonable initial guesses for parameters
+                constant = float(numerator.max())
+                mean = (numerator * x_values).sum() / numerator.sum()
+                sigma = (numerator * (x_values - mean) ** 2.0).sum() / numerator.sum()
+
+                def other(
+                    x: np.ndarray,
+                    constant: float = constant,
+                    mean: float = mean,
+                    sigma: float = sigma,
+                ) -> np.ndarray:
+                    return constant * np.exp(-np.square(x - mean) / (2 * np.square(sigma)))  # type: ignore
+
+            else:
+                other = _expr_to_lambda(other)
+
         fp_kwargs.setdefault("label", "Counts")
         denominator, model_uncert, numerator_uncert = _fit_callable_to_hist(
             other, self, likelihood
