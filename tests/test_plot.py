@@ -620,6 +620,6 @@ def test_image_plot_pull():
 
     fig, ax = plt.subplots()
 
-    assert h.plot_pull(pdf)
+    assert h.plot_pull(pdf, fit_fmt=r"{name} = {value:.3g} $\pm$ {error:.3g}")
 
     return fig

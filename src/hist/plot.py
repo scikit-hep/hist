@@ -216,10 +216,13 @@ def plot_pull(
     likelihood: bool = False,
     *,
     ax_dict: "Optional[Dict[str, matplotlib.axes.Axes]]" = None,
+    fit_fmt: Optional[str] = None,
     **kwargs: Any,
 ) -> "Tuple[matplotlib.axes.Axes, matplotlib.axes.Axes]":
-    """
+    r"""
     Plot_pull method for BaseHist object.
+
+    fit_fmt can be a string such as r"{name} = {value:.3g} $\pm$ {error:.3g}"
     """
 
     try:
@@ -252,6 +255,7 @@ def plot_pull(
 
         main_ax = fig.add_subplot(grid[0])
         pull_ax = fig.add_subplot(grid[1], sharex=main_ax)
+        plt.setp(main_ax.get_xticklabels(), visible=False)
 
     # Computation and Fit
     xdata = self.axes[0].centers
@@ -310,12 +314,14 @@ def plot_pull(
     # error bar keyword arguments
     eb_kwargs = _filter_dict(kwargs, "eb_")
     eb_kwargs.setdefault("label", "Histogram Data")
+    eb_kwargs.setdefault("fmt", "o")
 
     # fit plot keyword arguments
     label = "Fit"
-    for name, value, error in zip(parnames, popt, perr):
-        label += "\n  "
-        label += rf"{name} = {value:.3g} $\pm$ {error:.3g}"
+    if fit_fmt is not None:
+        for name, value, error in zip(parnames, popt, perr):
+            label += "\n  "
+            label += fit_fmt.format(name=name, value=value, error=error)
     fp_kwargs = _filter_dict(kwargs, "fp_")
     fp_kwargs.setdefault("label", label)
 
