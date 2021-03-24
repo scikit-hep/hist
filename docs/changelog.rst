@@ -4,15 +4,18 @@ Changelog
 IN PROGRESS
 --------------------
 
-* Allow `plot_pull` to take a more generic callable or a string as a fitting function.
+* Allow ``plot_pull`` to take a more generic callable or a string as a fitting function.
   Introduce an option to perform a likelihood fit. Write fit parameters' values
   and uncertainties in the legend.
   `#149 <https://github.com/scikit-hep/hist/pull/149>`_
 
+* Add ``fit_fmt=`` to ``plot_pull`` to control display of fit params.
+  `#168 <https://github.com/scikit-hep/hist/pull/168>`_
+
 Version 2.2.1
 --------------------
 
-* Fix bug with `plot_pull` missing a sqrt.
+* Fix bug with ``plot_pull`` missing a sqrt.
   `#150 <https://github.com/scikit-hep/hist/pull/150>`_
 
 * Fix static typing with ellipses.
