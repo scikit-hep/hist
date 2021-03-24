@@ -604,7 +604,7 @@ def test_named_plot_pull():
 def test_image_plot_pull():
     """
     Test plot_pull by comparing against a reference image generated via
-    `pytest --mpl-generate-path=baseline`
+    `pytest --mpl-generate-path=tests/baseline`
     """
 
     np.random.seed(42)
@@ -618,7 +618,7 @@ def test_image_plot_pull():
     def pdf(x, a=1 / np.sqrt(2 * np.pi), x0=0, sigma=1, offset=0):
         return a * np.exp(-((x - x0) ** 2) / (2 * sigma ** 2)) + offset
 
-    fig, ax = plt.subplots()
+    fig = plt.figure()
 
     assert h.plot_pull(pdf, fit_fmt=r"{name} = {value:.3g} $\pm$ {error:.3g}")
 
