@@ -623,3 +623,31 @@ def test_image_plot_pull():
     assert h.plot_pull(pdf, fit_fmt=r"{name} = {value:.3g} $\pm$ {error:.3g}")
 
     return fig
+
+
+@pytest.mark.mpl_image_compare(baseline_dir="baseline", savefig_kwargs={"dpi": 50})
+def test_plot1d_auto_handling():
+    """
+    Test plot() by comparing against a reference image generated via
+    `pytest --mpl-generate-path=tests/baseline`
+    """
+
+    np.random.seed(42)
+
+    h = Hist(
+        axis.Regular(10, 0, 10, name="variable", label="variable"),
+        axis.StrCategory("", name="dataset", growth=True),
+    )
+
+    h.fill(dataset="A", variable=np.random.normal(3, 2, 100))
+    h.fill(dataset="B", variable=np.random.normal(5, 2, 100))
+    h.fill(dataset="C", variable=np.random.normal(7, 2, 100))
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
+
+    assert h.plot(ax=ax1)
+
+    # Discrete axis plotting not yet implemented 
+    # assert h.plot(ax=ax2, overlay='variable')
+
+    return fig

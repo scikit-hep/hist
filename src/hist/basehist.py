@@ -297,12 +297,14 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
         return histoprint.print_hist(self, **kwargs)
 
-    def plot(self, *args: Any, **kwargs: Any) -> "Union[Hist1DArtists, Hist2DArtists]":
+    def plot(self, *args: Any, overlay: "Optional[str]" = None, **kwargs: Any) -> "Union[Hist1DArtists, Hist2DArtists]":
         """
         Plot method for BaseHist object.
         """
-        if self.ndim == 1:
-            return self.plot1d(*args, **kwargs)
+        _has_categorical = np.sum([ax.traits.discrete for ax in self.axes]) == 1
+        _project = _has_categorical or overlay is not None
+        if self.ndim == 1 or (self.ndim == 2 and _project):
+            return self.plot1d(*args, overlay=overlay, **kwargs)
         elif self.ndim == 2:
             return self.plot2d(*args, **kwargs)
         else:
@@ -312,6 +314,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         self,
         *,
         ax: "Optional[matplotlib.axes.Axes]" = None,
+        overlay: "Optional[str]" = None,
         **kwargs: Any,
     ) -> "Hist1DArtists":
         """
@@ -319,8 +322,19 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         """
 
         import hist.plot
-
-        return hist.plot.histplot(self, ax=ax, **_proc_kw_for_lw(kwargs))
+        if self.ndim == 1:
+            return hist.plot.histplot(self, ax=ax, **_proc_kw_for_lw(kwargs))
+        else:
+            if overlay is not None:
+                (cat_ax,) = [ax for ax in self.axes if ax.name == overlay]
+            else:
+                (cat_ax,) = [ax for ax in self.axes if ax.traits.discrete]
+            if cat_ax.traits.discrete:
+                cats = [cat_ax.value(i) for i in range(len(cat_ax))]
+            else:
+                cats = [bh.loc(cat_ax.value(i)) for i in range(len(cat_ax))]
+            d1hists = [self[{cat_ax.name: cat}] for cat in cats]
+            return hist.plot.histplot(d1hists, ax=ax, label=cats, **_proc_kw_for_lw(kwargs))
 
     def plot2d(
         self,
