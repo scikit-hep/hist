@@ -7,13 +7,12 @@ import warnings
 from types import ModuleType
 from typing import Tuple
 
-from . import accumulators, axis, numpy, storage, tag
+from . import accumulators, axis, intervals, numpy, storage, tag
 from .basehist import BaseHist
 from .hist import Hist
 from .namedhist import NamedHist
 from .tag import loc, overflow, rebin, sum, underflow
 
-# Convenient access to the version number
 # Convenient access to the version number
 from .version import version as __version__
 
@@ -24,6 +23,7 @@ __all__ = (
     "NamedHist",
     "accumulators",
     "axis",
+    "intervals",
     "loc",
     "numpy",
     "overflow",
