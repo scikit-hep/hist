@@ -184,7 +184,7 @@ def test_ratio_uncert_poisson(hist_fixture):
 
     with np.errstate(divide="ignore", invalid="ignore"):
         uncert_min, uncert_max = intervals.ratio_uncertainty(
-            hist_1.values(), hist_2.values(), uncert_type="poisson"
+            hist_1.values(), hist_2.values(), uncertainty_type="poisson"
         )
     uncert_min[np.isnan(uncert_min)] = np.inf
 

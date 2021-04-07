@@ -98,14 +98,14 @@ def clopper_pearson_interval(
 def ratio_uncertainty(
     num: np.ndarray,
     denom: np.ndarray,
-    uncert_type: Literal["poisson", "poisson-ratio"] = "poisson",
+    uncertainty_type: Literal["poisson", "poisson-ratio"] = "poisson",
 ) -> Any:
     # Note: As return is a numpy ufuncs the type is "Any"
     with np.errstate(divide="ignore"):
         ratio = num / denom
-    if uncert_type == "poisson":
+    if uncertainty_type == "poisson":
         ratio_uncert = np.abs(poisson_interval(ratio, num / np.square(denom)) - ratio)
-    elif uncert_type == "poisson-ratio":
+    elif uncertainty_type == "poisson-ratio":
         # poisson ratio n/m is equivalent to binomial n/(n+m)
         ratio_uncert = np.abs(clopper_pearson_interval(num, num + denom) - ratio)
     return ratio_uncert
