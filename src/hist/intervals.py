@@ -100,6 +100,20 @@ def ratio_uncertainty(
     denom: np.ndarray,
     uncertainty_type: Literal["poisson", "poisson-ratio"] = "poisson",
 ) -> Any:
+    r"""
+    Calculate the uncertainties for the values of the ratio ``num/denom`` using
+    the specified coverage interval approach.
+
+    Args:
+        num: Numerator or number of successes.
+        denom: Denominator or number of trials.
+        uncertainty_type: Coverage interval type to use in the calculation of
+          the uncertainties.
+          Default is ``"poisson"``.
+
+    Returns:
+        The uncertainties for the ratio.
+    """
     # Note: As return is a numpy ufuncs the type is "Any"
     with np.errstate(divide="ignore"):
         ratio = num / denom
