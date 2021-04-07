@@ -2,9 +2,9 @@ import sys
 from typing import TYPE_CHECKING, Any, Tuple
 
 if sys.version_info < (3, 8):
-    from typing_extensions import Protocol, SupportsIndex
+    from typing_extensions import Literal, Protocol, SupportsIndex
 else:
-    from typing import Protocol, SupportsIndex
+    from typing import Literal, Protocol, SupportsIndex
 
 if TYPE_CHECKING:
     from numpy import ufunc as Ufunc
@@ -14,7 +14,7 @@ else:
     Ufunc = Any
 
 
-__all__ = ("Protocol", "SupportsIndex", "Ufunc", "ArrayLike")
+__all__ = ("Literal", "Protocol", "SupportsIndex", "Ufunc", "ArrayLike")
 
 
 def __dir__() -> Tuple[str, ...]:
