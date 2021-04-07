@@ -102,11 +102,11 @@ def test_ratio_uncert_poisson(hist_fixture):
     hist_1, hist_2 = hist_fixture
 
     with np.errstate(divide="ignore", invalid="ignore"):
-        uncert_min, uncert_max = intervals.ratio_uncertainty(
+        uncertainty_min, uncertainty_max = intervals.ratio_uncertainty(
             hist_1.values(), hist_2.values(), uncertainty_type="poisson"
         )
 
-    assert approx(uncert_min) == np.array(
+    assert approx(uncertainty_min) == np.array(
         [
             0.1439794096271186,
             0.12988019998066708,
@@ -121,7 +121,7 @@ def test_ratio_uncert_poisson(hist_fixture):
         ]
     )
 
-    assert approx(uncert_max) == np.array(
+    assert approx(uncertainty_max) == np.array(
         [
             0.22549817680979262,
             0.1615766277480729,
