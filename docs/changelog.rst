@@ -4,6 +4,9 @@ Changelog
 IN PROGRESS
 --------------------
 
+* Add frequentist coverage interval support in the ``intervals`` module.
+  `#176 <https://github.com/scikit-hep/hist/pull/176>`_
+
 * Allow ``plot_pull`` to take a more generic callable or a string as a fitting function.
   Introduce an option to perform a likelihood fit. Write fit parameters' values
   and uncertainties in the legend.
