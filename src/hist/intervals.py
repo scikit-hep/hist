@@ -8,8 +8,6 @@ from .typing import Literal
 __all__ = ("poisson_interval", "clopper_pearson_interval", "ratio_uncertainty")
 
 
-# Code originally contributed to coffea by Nicholas Smith
-# Copyright (c) 2018, Fermilab
 def poisson_interval(
     values: np.ndarray, variances: np.ndarray, coverage: "Optional[float]" = None
 ) -> np.ndarray:
@@ -38,6 +36,8 @@ def poisson_interval(
     Returns:
         The Poisson central coverage interval.
     """
+    # Parts originally contributed to coffea
+    # https://github.com/CoffeaTeam/coffea/blob/8c58807e199a7694bf15e3803dbaf706d34bbfa0/LICENSE
     if coverage is None:
         coverage = stats.norm.cdf(1) - stats.norm.cdf(-1)
     scale = np.empty_like(values)
@@ -62,8 +62,6 @@ def poisson_interval(
     return interval
 
 
-# Code originally contributed to coffea by Nicholas Smith
-# Copyright (c) 2018, Fermilab
 def clopper_pearson_interval(
     num: np.ndarray, denom: np.ndarray, coverage: "Optional[float]" = None
 ) -> np.ndarray:
@@ -80,6 +78,8 @@ def clopper_pearson_interval(
     Returns:
         The Clopper-Pearson central coverage interval.
     """
+    # Parts originally contributed to coffea
+    # https://github.com/CoffeaTeam/coffea/blob/8c58807e199a7694bf15e3803dbaf706d34bbfa0/LICENSE
     if coverage is None:
         coverage = stats.norm.cdf(1) - stats.norm.cdf(-1)
     # Numerator is subset of denominator
