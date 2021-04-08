@@ -98,7 +98,7 @@ def test_clopper_pearson_interval(hist_fixture):
     )
 
 
-def test_ratio_uncert_poisson(hist_fixture):
+def test_ratio_uncert(hist_fixture):
     hist_1, hist_2 = hist_fixture
 
     uncertainty_min, uncertainty_max = intervals.ratio_uncertainty(
@@ -134,3 +134,8 @@ def test_ratio_uncert_poisson(hist_fixture):
             0.2817958228477908,
         ]
     )
+
+    with pytest.raises(TypeError):
+        intervals.ratio_uncertainty(
+            hist_1.values(), hist_2.values(), uncertainty_type="fail"
+        )
