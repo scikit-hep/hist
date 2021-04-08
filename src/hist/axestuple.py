@@ -5,6 +5,10 @@ from boost_histogram.axis import ArrayTuple, AxesTuple
 __all__ = ("NamedAxesTuple", "AxesTuple", "ArrayTuple")
 
 
+def __dir__() -> Tuple[str, ...]:
+    return __all__
+
+
 class NamedAxesTuple(AxesTuple):
     __slots__ = ()
 

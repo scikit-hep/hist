@@ -1,5 +1,5 @@
 import sys
-from typing import Any, Dict, Iterable, List, Optional
+from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 import boost_histogram.axis as bha
 
@@ -26,6 +26,10 @@ __all__ = (
     "NamedAxesTuple",
     "ArrayTuple",
 )
+
+
+def __dir__() -> Tuple[str, ...]:
+    return __all__
 
 
 class CoreAxisProtocol(Protocol):
