@@ -117,8 +117,11 @@ def ratio_uncertainty(
         num: Numerator or number of successes.
         denom: Denominator or number of trials.
         uncertainty_type: Coverage interval type to use in the calculation of
-          the uncertainties.
-          Default is ``"poisson"``.
+         the uncertainties.
+         ``"poisson"`` (default) implements the Poisson interval for the
+         numerator scaled by the denominator.
+         ``"poisson-ratio"`` implements the Clopper-Pearson interval for Poisson
+         distributed ``num`` and ``denom``.
 
     Returns:
         The uncertainties for the ratio.
