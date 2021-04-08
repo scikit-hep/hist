@@ -98,7 +98,7 @@ def test_clopper_pearson_interval(hist_fixture):
     )
 
 
-def test_ratio_uncert(hist_fixture):
+def test_ratio_uncertainty(hist_fixture):
     hist_1, hist_2 = hist_fixture
 
     uncertainty_min, uncertainty_max = intervals.ratio_uncertainty(
