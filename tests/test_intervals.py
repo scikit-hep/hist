@@ -101,10 +101,9 @@ def test_clopper_pearson_interval(hist_fixture):
 def test_ratio_uncert_poisson(hist_fixture):
     hist_1, hist_2 = hist_fixture
 
-    with np.errstate(divide="ignore", invalid="ignore"):
-        uncertainty_min, uncertainty_max = intervals.ratio_uncertainty(
-            hist_1.values(), hist_2.values(), uncertainty_type="poisson"
-        )
+    uncertainty_min, uncertainty_max = intervals.ratio_uncertainty(
+        hist_1.values(), hist_2.values(), uncertainty_type="poisson"
+    )
 
     assert approx(uncertainty_min) == np.array(
         [
