@@ -333,9 +333,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         cat_ax = self.axes[overlay]
         cats = cat_ax if cat_ax.traits.discrete else np.arange(len(cat_ax.centers))
         d1hists = [self[{overlay: cat}] for cat in cats]
-        return hist.plot.histplot(
-            d1hists, ax=ax, label=cats, **_proc_kw_for_lw(kwargs)
-        )
+        return hist.plot.histplot(d1hists, ax=ax, label=cats, **_proc_kw_for_lw(kwargs))
 
     def plot2d(
         self,

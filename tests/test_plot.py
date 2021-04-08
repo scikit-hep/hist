@@ -640,7 +640,7 @@ def test_plot1d_auto_handling():
     )
 
     h_nameless = Hist(
-        axis.Regular(10, 0 ,10),
+        axis.Regular(10, 0, 10),
         axis.StrCategory("", growth=True),
     )
 
