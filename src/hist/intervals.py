@@ -122,4 +122,8 @@ def ratio_uncertainty(
     elif uncertainty_type == "poisson-ratio":
         # poisson ratio n/m is equivalent to binomial n/(n+m)
         ratio_uncert = np.abs(clopper_pearson_interval(num, num + denom) - ratio)
+    else:
+        raise TypeError(
+            f"'{uncertainty_type}' is an invalid option for uncertainty_type."
+        )
     return ratio_uncert
