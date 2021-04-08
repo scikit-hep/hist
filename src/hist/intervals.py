@@ -6,7 +6,7 @@ from .typing import Literal
 
 try:
     from scipy import stats
-except ImportError:
+except ModuleNotFoundError:
     from sys import stderr
 
     print(
