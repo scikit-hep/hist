@@ -3,7 +3,9 @@
 # Distributed under the 3-clause BSD license, see accompanying file LICENSE
 # or https://github.com/scikit-hep/hist for details.
 
+import warnings
 from types import ModuleType
+from typing import Tuple
 
 from . import accumulators, axis, numpy, storage, tag
 from .basehist import BaseHist
@@ -34,8 +36,12 @@ __all__ = (
 
 
 # Python 3.7 only
+def __dir__() -> Tuple[str, ...]:
+    return __all__
+
+
+# Python 3.7 only
 def __getattr__(name: str) -> ModuleType:
-    import warnings
 
     if name == "axes":
         msg = f"Misspelling error, '{name}' should be 'axis'"

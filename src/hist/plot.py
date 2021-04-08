@@ -23,6 +23,10 @@ except ModuleNotFoundError:
 __all__ = ("histplot", "hist2dplot", "plot2d_full", "plot_pull", "plot_pie")
 
 
+def __dir__() -> Tuple[str, ...]:
+    return __all__
+
+
 def _expand_shortcuts(key: str) -> str:
     if key == "ls":
         return "linestyle"

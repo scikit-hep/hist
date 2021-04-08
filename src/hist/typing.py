@@ -1,5 +1,5 @@
 import sys
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Tuple
 
 if sys.version_info < (3, 8):
     from typing_extensions import Protocol, SupportsIndex
@@ -15,3 +15,7 @@ else:
 
 
 __all__ = ("Protocol", "SupportsIndex", "Ufunc", "ArrayLike")
+
+
+def __dir__() -> Tuple[str, ...]:
+    return __all__

@@ -12,6 +12,10 @@ IN PROGRESS
 * Add ``fit_fmt=`` to ``plot_pull`` to control display of fit params.
   `#168 <https://github.com/scikit-hep/hist/pull/168>`_
 
+* Cleaner IPython completion for Python 3.7+.
+  `#179 <https://github.com/scikit-hep/hist/pull/179>`_
+
+
 Version 2.2.1
 --------------------
 
