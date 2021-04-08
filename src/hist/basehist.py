@@ -329,9 +329,9 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
             return hist.plot.histplot(self, ax=ax, **_proc_kw_for_lw(kwargs))
         else:
             if overlay is not None:
-                (cat_ax,) = [ax for ax in self.axes if ax.name == overlay]
+                cat_ax = self.axes[overlay]
             else:
-                (cat_ax,) = [ax for ax in self.axes if ax.traits.discrete]
+                (cat_ax,) = (ax for ax in self.axes if ax.traits.discrete)
             if cat_ax.traits.discrete:
                 cats = [cat_ax.value(i) for i in range(len(cat_ax))]
             else:
