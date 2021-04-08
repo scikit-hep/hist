@@ -647,7 +647,7 @@ def test_plot1d_auto_handling():
 
     assert h.plot(ax=ax1)
 
-    # Discrete axis plotting not yet implemented 
+    # Discrete axis plotting not yet implemented
     # assert h.plot(ax=ax2, overlay='variable')
 
     return fig

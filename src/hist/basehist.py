@@ -297,7 +297,9 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
         return histoprint.print_hist(self, **kwargs)
 
-    def plot(self, *args: Any, overlay: "Optional[str]" = None, **kwargs: Any) -> "Union[Hist1DArtists, Hist2DArtists]":
+    def plot(
+        self, *args: Any, overlay: "Optional[str]" = None, **kwargs: Any
+    ) -> "Union[Hist1DArtists, Hist2DArtists]":
         """
         Plot method for BaseHist object.
         """
@@ -322,6 +324,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         """
 
         import hist.plot
+
         if self.ndim == 1:
             return hist.plot.histplot(self, ax=ax, **_proc_kw_for_lw(kwargs))
         else:
@@ -334,7 +337,9 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
             else:
                 cats = [bh.loc(cat_ax.value(i)) for i in range(len(cat_ax))]
             d1hists = [self[{cat_ax.name: cat}] for cat in cats]
-            return hist.plot.histplot(d1hists, ax=ax, label=cats, **_proc_kw_for_lw(kwargs))
+            return hist.plot.histplot(
+                d1hists, ax=ax, label=cats, **_proc_kw_for_lw(kwargs)
+            )
 
     def plot2d(
         self,
