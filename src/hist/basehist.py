@@ -316,7 +316,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         self,
         *,
         ax: "Optional[matplotlib.axes.Axes]" = None,
-        overlay: "Optional[str]" = None,
+        overlay: "Optional[Union[str, int]]" = None,
         **kwargs: Any,
     ) -> "Hist1DArtists":
         """
@@ -327,19 +327,15 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
         if self.ndim == 1:
             return hist.plot.histplot(self, ax=ax, **_proc_kw_for_lw(kwargs))
-        else:
-            if overlay is not None:
-                cat_ax = self.axes[overlay]
-            else:
-                (cat_ax,) = (ax for ax in self.axes if ax.traits.discrete)
-            if cat_ax.traits.discrete:
-                cats = [cat_ax.value(i) for i in range(len(cat_ax))]
-            else:
-                cats = [bh.loc(cat_ax.value(i)) for i in range(len(cat_ax))]
-            d1hists = [self[{cat_ax.name: cat}] for cat in cats]
-            return hist.plot.histplot(
-                d1hists, ax=ax, label=cats, **_proc_kw_for_lw(kwargs)
-            )
+        if overlay is None:
+            (overlay,) = (i for i, ax in enumerate(self.axes) if ax.traits.discrete)
+        assert overlay is not None
+        cat_ax = self.axes[overlay]
+        cats = cat_ax if cat_ax.traits.discrete else np.arange(len(cat_ax.centers))
+        d1hists = [self[{overlay: cat}] for cat in cats]
+        return hist.plot.histplot(
+            d1hists, ax=ax, label=cats, **_proc_kw_for_lw(kwargs)
+        )
 
     def plot2d(
         self,
