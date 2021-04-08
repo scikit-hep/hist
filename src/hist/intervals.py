@@ -1,9 +1,19 @@
 from typing import Any, Optional
 
 import numpy as np
-from scipy import stats
 
 from .typing import Literal
+
+try:
+    from scipy import stats
+except ImportError:
+    from sys import stderr
+
+    print(
+        "hist.intervals requires scipy. Please install hist[plot] or manually install scipy.",
+        file=stderr,
+    )
+    raise
 
 __all__ = ("poisson_interval", "clopper_pearson_interval", "ratio_uncertainty")
 
