@@ -7,7 +7,7 @@ import warnings
 from types import ModuleType
 from typing import Tuple
 
-from . import accumulators, axis, intervals, numpy, storage, tag
+from . import accumulators, axis, numpy, storage, tag
 from .basehist import BaseHist
 from .hist import Hist
 from .namedhist import NamedHist
@@ -23,7 +23,6 @@ __all__ = (
     "NamedHist",
     "accumulators",
     "axis",
-    "intervals",
     "loc",
     "numpy",
     "overflow",
