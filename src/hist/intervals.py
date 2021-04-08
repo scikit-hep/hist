@@ -35,7 +35,6 @@ def poisson_interval(
 
     When a bin is zero, the scale of the nearest nonzero bin is substituted to
     scale the nominal upper bound.
-    If all bins zero, a warning is generated and interval is set to ``values``.
 
     Args:
         values: Sum of weights.
@@ -57,7 +56,7 @@ def poisson_interval(
         available = np.nonzero(values)
         if len(available[0]) == 0:
             raise RuntimeError(
-                "All values are zero! Cannot compute meaningful error bars",
+                "All values are zero! Cannot compute meaningful uncertainties.",
             )
         nearest = np.sum(
             [np.square(np.subtract.outer(d, d0)) for d, d0 in zip(available, missing)]
