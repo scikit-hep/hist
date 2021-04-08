@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any, Optional, Tuple
 
 import numpy as np
 
@@ -16,6 +16,10 @@ except ModuleNotFoundError:
     raise
 
 __all__ = ("poisson_interval", "clopper_pearson_interval", "ratio_uncertainty")
+
+
+def __dir__() -> Tuple[str, ...]:
+    return __all__
 
 
 def poisson_interval(
