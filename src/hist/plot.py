@@ -1,6 +1,17 @@
 import inspect
 import sys
-from typing import Any, Callable, Dict, Iterable, List, Optional, Set, Tuple, Union
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    List,
+    NamedTuple,
+    Optional,
+    Set,
+    Tuple,
+    Union,
+)
 
 import numpy as np
 
@@ -21,6 +32,34 @@ except ModuleNotFoundError:
         file=sys.stderr,
     )
     raise
+
+
+class FitResultArtists(NamedTuple):
+    line: matplotlib.lines.Line2D
+    errorbar: matplotlib.container.ErrorbarContainer
+    band: matplotlib.collections.PolyCollection
+
+
+class RatioErrorbarArtists(NamedTuple):
+    line: matplotlib.lines.Line2D
+    errorbar: matplotlib.container.ErrorbarContainer
+
+
+class RatioBarArtists(NamedTuple):
+    line: matplotlib.lines.Line2D
+    dots: matplotlib.collections.PathCollection
+    bar: matplotlib.container.BarContainer
+
+
+class PullArtists(NamedTuple):
+    bar: matplotlib.container.BarContainer
+    patch_artist: List[matplotlib.patches.Rectangle]
+
+
+MainAxisArtists = Union[FitResultArtists, Hist1DArtists]
+
+RatioArtists = Union[RatioErrorbarArtists, RatioBarArtists]
+RatiolikeArtists = Union[RatioArtists, PullArtists]
 
 
 __all__ = (
@@ -235,14 +274,18 @@ def _construct_gaussian_callable(
     mean = (hist_values * x_values).sum() / hist_values.sum()
     sigma = (hist_values * np.square(x_values - mean)).sum() / hist_values.sum()
 
+    # gauss is a closure that will get evaluated in _fit_callable_to_hist
     def gauss(
         x: np.ndarray,
         constant: float = constant,
         mean: float = mean,
         sigma: float = sigma,
-    ) -> Any:
-        # Note: As return is a numpy ufuncs the type is "Any"
-        return constant * np.exp(-np.square(x - mean) / (2 * np.square(sigma)))
+    ) -> np.ndarray:
+        # Note: Force np.ndarray type as numpy ufuncs have type "Any"
+        ret: np.ndarray = constant * np.exp(
+            -np.square(x - mean) / (2 * np.square(sigma))
+        )
+        return ret
 
     return gauss
 
@@ -288,7 +331,7 @@ def _plot_fit_result(
     eb_kwargs: Dict[str, Any],
     fp_kwargs: Dict[str, Any],
     ub_kwargs: Dict[str, Any],
-) -> List[matplotlib.artist.Artist]:
+) -> FitResultArtists:
     """
     Plot fit of model to histogram data
     """
@@ -300,23 +343,23 @@ def _plot_fit_result(
         )
     hist_uncert = np.sqrt(variances)
 
-    _errorbars = ax.errorbar(x_values, _hist.values(), hist_uncert, **eb_kwargs)
+    errorbars = ax.errorbar(x_values, _hist.values(), hist_uncert, **eb_kwargs)
 
     # Ensure zorder draws data points above model
-    line_zorder = _errorbars[0].get_zorder() - 1
+    line_zorder = errorbars[0].get_zorder() - 1
     (line,) = ax.plot(x_values, model_values, **fp_kwargs, zorder=line_zorder)
 
     # Uncertainty band for fitted function
     # TODO: Probably set a better default color than the fit line color
     ub_kwargs.setdefault("color", line.get_color())
-    ax.fill_between(
+    uncertainty_band = ax.fill_between(
         x_values,
         model_values - model_uncert,
         model_values + model_uncert,
         **ub_kwargs,
     )
 
-    return ax.get_children()
+    return FitResultArtists(line, errorbars, uncertainty_band)
 
 
 def plot_ratio(
@@ -325,7 +368,7 @@ def plot_ratio(
     ratio_uncert: np.ndarray,
     ax: matplotlib.axes.Axes,
     **kwargs: Any,
-) -> matplotlib.axes.Axes:
+) -> RatioArtists:
     """
     Plot a ratio plot on the given axes
     """
@@ -338,11 +381,16 @@ def plot_ratio(
     ratio[np.isinf(ratio)] = np.nan
 
     central_value = kwargs.pop("central_value", 1.0)
-    ax.axhline(central_value, color="black", linestyle="dashed", linewidth=1.0)
+    central_value_artist = ax.axhline(
+        central_value, color="black", linestyle="dashed", linewidth=1.0
+    )
+
+    # Type now due to control flow
+    axis_artists: Union[RatioErrorbarArtists, RatioBarArtists]
 
     uncert_draw_type = kwargs.pop("uncert_draw_type", "line")
     if uncert_draw_type == "line":
-        ax.errorbar(
+        errorbar_artists = ax.errorbar(
             x_values,
             ratio,
             yerr=ratio_uncert,
@@ -350,6 +398,7 @@ def plot_ratio(
             marker="o",
             linestyle="none",
         )
+        axis_artists = RatioErrorbarArtists(central_value_artist, errorbar_artists)
     elif uncert_draw_type == "bar":
         bar_width = (right_edge - left_edge) / len(ratio)
 
@@ -363,7 +412,7 @@ def plot_ratio(
 
         # Ensure zorder draws data points above uncertainty bars
         bar_zorder = _ratio_points.get_zorder() - 1
-        ax.bar(
+        bar_artists = ax.bar(
             x_values,
             height=bar_height,
             width=bar_width,
@@ -374,6 +423,7 @@ def plot_ratio(
             hatch=3 * "/",
             zorder=bar_zorder,
         )
+        axis_artists = RatioBarArtists(central_value_artist, _ratio_points, bar_artists)
 
     ratio_ylim = kwargs.pop("ylim", None)
     if ratio_ylim is None:
@@ -401,7 +451,7 @@ def plot_ratio(
     ax.set_xlabel(_hist.axes[0].label)
     ax.set_ylabel(kwargs.pop("ylabel", "Ratio"))
 
-    return ax
+    return axis_artists
 
 
 def plot_pull(
@@ -410,7 +460,7 @@ def plot_pull(
     ax: matplotlib.axes.Axes,
     bar_kwargs: Dict[str, Any],
     pp_kwargs: Dict[str, Any],
-) -> matplotlib.axes.Axes:
+) -> PullArtists:
     """
     Plot a pull plot on the given axes
     """
@@ -420,11 +470,12 @@ def plot_pull(
 
     # Pull: plot the pulls using Matplotlib bar method
     width = (right_edge - left_edge) / len(pulls)
-    ax.bar(x_values, pulls, width=width, **bar_kwargs)
+    bar_artists = ax.bar(x_values, pulls, width=width, **bar_kwargs)
 
     pp_num = pp_kwargs.pop("num", 5)
     patch_height = max(np.abs(pulls)) / pp_num
     patch_width = width * len(pulls)
+    patch_artists = []
     for i in range(pp_num):
         # gradient color patches
         if "alpha" in pp_kwargs:
@@ -442,13 +493,14 @@ def plot_pull(
             downRect_startpoint, patch_width, patch_height, **pp_kwargs
         )
         ax.add_patch(downRect)
+        patch_artists.append((downRect, upRect))
 
     ax.set_xlim(left_edge, right_edge)
 
     ax.set_xlabel(_hist.axes[0].label)
     ax.set_ylabel("Pull")
 
-    return ax
+    return PullArtists(bar_artists, patch_artists)
 
 
 def _plot_ratiolike(
@@ -460,7 +512,7 @@ def _plot_ratiolike(
     view: Literal["ratio", "pull"],
     fit_fmt: Optional[str] = None,
     **kwargs: Any,
-) -> "Tuple[matplotlib.axes.Axes, matplotlib.axes.Axes]":
+) -> Tuple[MainAxisArtists, RatiolikeArtists]:
     r"""
     Plot ratio-like plots (ratio plots and pull plots) for BaseHist
 
@@ -538,6 +590,7 @@ def _plot_ratiolike(
     # Computation and Fit
     hist_values = self.values()
 
+    main_ax_artists: MainAxisArtists  # Type now due to control flow
     if callable(other) or isinstance(other, str):
         if isinstance(other, str):
             if other in {"gauss", "gaus", "normal"}:
@@ -565,9 +618,7 @@ def _plot_ratiolike(
         else:
             fp_kwargs["label"] = "Fitted value"
 
-        # TODO FIXME
-        # main_ax = _plot_fit_result(
-        _plot_fit_result(
+        main_ax_artists = _plot_fit_result(
             self,
             model_values=compare_values,
             model_uncert=model_uncert,
@@ -579,9 +630,12 @@ def _plot_ratiolike(
     else:
         compare_values = other.values()
 
-        histplot(self, ax=main_ax, label=rp_kwargs["num_label"])
-        histplot(other, ax=main_ax, label=rp_kwargs["denom_label"])
+        self_artists = histplot(self, ax=main_ax, label=rp_kwargs["num_label"])
+        other_artists = histplot(other, ax=main_ax, label=rp_kwargs["denom_label"])
 
+        main_ax_artists = self_artists, other_artists
+
+    subplot_ax_artists: RatiolikeArtists  # Type now due to control flow
     # Compute ratios: containing no INF values
     with np.errstate(divide="ignore", invalid="ignore"):
         if view == "ratio":
@@ -592,7 +646,7 @@ def _plot_ratiolike(
                 uncertainty_type=rp_kwargs["uncertainty_type"],
             )
             # ratio: plot the ratios using Matplotlib errorbar or bar
-            subplot_ax = plot_ratio(
+            subplot_ax_artists = plot_ratio(
                 self, ratios, ratio_uncert, ax=subplot_ax, **rp_kwargs
             )
 
@@ -602,14 +656,14 @@ def _plot_ratiolike(
             pulls[np.isnan(pulls) | np.isinf(pulls)] = 0
 
             # Pass dicts instead of unpacking to avoid conflicts
-            subplot_ax = plot_pull(
+            subplot_ax_artists = plot_pull(
                 self, pulls, ax=subplot_ax, bar_kwargs=bar_kwargs, pp_kwargs=pp_kwargs
             )
 
     if main_ax.get_legend_handles_labels()[0]:  # Don't plot an empty legend
         main_ax.legend(loc=rp_kwargs["legend_loc"])
 
-    return main_ax, subplot_ax
+    return main_ax_artists, subplot_ax_artists
 
 
 def get_center(x: Union[str, int, Tuple[float, float]]) -> Union[str, float]:

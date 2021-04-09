@@ -35,6 +35,8 @@ if TYPE_CHECKING:
     import matplotlib.axes
     from mplhep.plot import Hist1DArtists, Hist2DArtists
 
+    from .plot import FitResultArtists, MainAxisArtists, RatiolikeArtists
+
 InnerIndexing = Union[
     SupportsIndex, str, Callable[[bh.axis.Axis], int], slice, "ellipsis"
 ]
@@ -407,9 +409,12 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         *,
         ax_dict: "Optional[Dict[str, matplotlib.axes.Axes]]" = None,
         **kwargs: Any,
-    ) -> "Tuple[matplotlib.axes.Axes, matplotlib.axes.Axes]":
+    ) -> "Tuple[MainAxisArtists, RatiolikeArtists]":
         """
-        plot_ratio method for BaseHist object.
+        ``plot_ratio`` method for ``BaseHist`` object.
+
+        Return a tuple of artists following a structure of
+        ``(main_ax_artists, subplot_ax_artists)``
         """
 
         import hist.plot
@@ -424,9 +429,12 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         *,
         ax_dict: "Optional[Dict[str, matplotlib.axes.Axes]]" = None,
         **kwargs: Any,
-    ) -> "Tuple[matplotlib.axes.Axes, matplotlib.axes.Axes]":
+    ) -> "Tuple[FitResultArtists, RatiolikeArtists]":
         """
-        Plot_pull method for BaseHist object.
+        ``plot_pull`` method for ``BaseHist`` object.
+
+        Return a tuple of artists following a structure of
+        ``(main_ax_artists, subplot_ax_artists)``
         """
 
         import hist.plot
