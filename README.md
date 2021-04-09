@@ -121,6 +121,7 @@ We would like to acknowledge the contributors that made this project possible ([
     <td align="center"><a href="https://github.com/aminnj"><img src="https://avatars.githubusercontent.com/u/5760027?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Nick Amin</b></sub></a><br /><a href="https://github.com/scikit-hep/hist/commits?author=aminnj" title="Code">💻</a></td>
     <td align="center"><a href="http://cern.ch/eduardo.rodrigues"><img src="https://avatars.githubusercontent.com/u/5013581?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Eduardo Rodrigues</b></sub></a><br /><a href="https://github.com/scikit-hep/hist/commits?author=eduardo-rodrigues" title="Code">💻</a></td>
     <td align="center"><a href="http://andrzejnovak.github.io/"><img src="https://avatars.githubusercontent.com/u/13226500?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Andrzej Novak</b></sub></a><br /><a href="https://github.com/scikit-hep/hist/commits?author=andrzejnovak" title="Code">💻</a></td>
+    <td align="center"><a href="http://www.matthewfeickert.com/"><img src="https://avatars.githubusercontent.com/u/5142394?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Matthew Feickert</b></sub></a><br /><a href="https://github.com/scikit-hep/hist/commits?author=matthewfeickert" title="Code">💻</a></td>
   </tr>
 </table>
 
