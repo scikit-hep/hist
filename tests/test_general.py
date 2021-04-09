@@ -597,6 +597,7 @@ def test_general_transform_proxy():
         Hist.new.Sqrt(3, -4, 25)
 
     h1 = Hist.new.Log(4, 1, 10_000).Log(3, 1 / 1_000, 1).Double()
+
     h1.fill([2, 11, 101, 1_001], [1 / 999, 1 / 99, 1 / 9, 1 / 9])
     assert h1[0, 0] == 1
     assert h1[1, 1] == 1
@@ -604,11 +605,11 @@ def test_general_transform_proxy():
     assert h1[3, 2] == 1
 
     # Missing arguments
-    with pytest.raises(Exception):
-        Hist.new.Regular(4, 1, 10_000).Log()
+    with pytest.raises(TypeError):
+        Hist.new.Reg(4, 1, 10_000).Log()
 
-    # wrong value
-    with pytest.raises(Exception):
+    # Wrong value
+    with pytest.raises(ValueError):
         Hist.new.Log(3, -1, 10_000)
 
     h2 = Hist.new.Pow(24, 1, 5, power=2).Pow(124, 1, 5, power=3).Int64()
@@ -636,25 +637,28 @@ def test_general_transform_proxy():
             4, 1, 5, forward=ftype(np.log), inverse=ftype(np.exp)
         )
     ).Int64()
+
     h3.fill([1, 2, 3, 4], [1, 2, 3, 4])
     assert h3[0, 0] == 1
     assert h3[1, 1] == 1
     assert h3[2, 2] == 1
     assert h3[3, 3] == 1
 
-    # wrong value
-    with pytest.raises(Exception):
-        Hist().Regular(24, 1, 5).Func(ftype(math.log), ftype(math.exp))
+    # wrong args
+    with pytest.raises(TypeError):
+        Hist.new.Reg(24, 1, 5).Func(ftype(math.log), ftype(math.exp))
 
-    # wrong value
-    assert Hist.new.Func(
-        4, -1, 5, forward=ftype(math.log), inverse=ftype(math.log)
-    ).Double()
-    with pytest.raises(Exception):
-        Hist.new.Func(4, -1, 5, forward=ftype(np.log), inverse=ftype(np.log))
+    # wrong value raises uncatchable warning
+    # Hist.new.Func(
+    #     4, -1, 5, forward=ftype(math.log), inverse=ftype(math.log)
+    # ).Double()
+
+    with pytest.raises(ValueError):
+        with pytest.warns(RuntimeWarning):
+            Hist.new.Func(4, -1, 5, forward=ftype(np.log), inverse=ftype(np.log))
 
     # lack args
-    with pytest.raises(Exception):
+    with pytest.raises(TypeError):
         Hist.new.Func(4, 1, 5)
 
 

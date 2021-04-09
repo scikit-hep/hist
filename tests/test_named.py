@@ -649,12 +649,12 @@ def test_named_transform_proxy():
     assert h1[2, 2] == 1
     assert h1[3, 2] == 1
 
-    # wrong value
-    with pytest.raises(Exception):
-        NamedHist.new.Regular(4, 1, 10_000, name="x").Log()
+    # wrong arguments
+    with pytest.raises(TypeError):
+        NamedHist.new.Reg(4, 1, 10_000, name="x").Log()
 
     # wrong value
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError):
         NamedHist.new.Log(3, -1, 10_000, name="x")
 
     h2 = (
@@ -669,15 +669,15 @@ def test_named_transform_proxy():
     assert h2[15, 63] == 1
 
     # based on existing axis
-    with pytest.raises(Exception):
-        NamedHist.new.Regular(24, 1, 5, name="x").Pow(2)
+    with pytest.raises(TypeError):
+        NamedHist.new.Reg(24, 1, 5, name="x").Pow(2)
 
     # wrong value
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError):
         NamedHist.new.Pow(24, -1, 5, power=1 / 2, name="x")
 
     # lack args
-    with pytest.raises(Exception):
+    with pytest.raises(TypeError):
         NamedHist.new.Pow(24, 1, 5, name="x")
 
     ftype = ctypes.CFUNCTYPE(ctypes.c_double, ctypes.c_double)
@@ -695,20 +695,22 @@ def test_named_transform_proxy():
     assert h3[3, 3] == 1
 
     # based on existing axis
-    with pytest.raises(Exception):
-        NamedHist.new.Regular(24, 1, 5, name="x").Func(ftype(math.log), ftype(math.exp))
+    with pytest.raises(TypeError):
+        NamedHist.new.Reg(24, 1, 5, name="x").Func(ftype(math.log), ftype(math.exp))
 
-    # wrong value
-    assert NamedHist.new.Func(
-        4, -1, 5, name="x", forward=ftype(math.log), inverse=ftype(math.log)
-    )
-    with pytest.raises(Exception):
-        NamedHist.new.Func(
-            4, -1, 5, name="x", forward=ftype(np.log), inverse=ftype(np.log)
-        )
+    # Uncatchable warning
+    # assert NamedHist.new.Func(
+    #     4, -1, 5, name="x", forward=ftype(math.log), inverse=ftype(math.log)
+    # )
+
+    with pytest.raises(ValueError):
+        with pytest.warns(RuntimeWarning):
+            NamedHist.new.Func(
+                4, -1, 5, name="x", forward=ftype(np.log), inverse=ftype(np.log)
+            )
 
     # lack args
-    with pytest.raises(Exception):
+    with pytest.raises(TypeError):
         NamedHist.new.Func(4, 1, 5, name="x")
 
 
@@ -720,7 +722,7 @@ def test_named_hist_proxy():
     h = NamedHist.new.Reg(10, 0, 1, name="x").Double().fill(x=[0.5, 0.5])
     assert h[0.5j] == 2
 
-    assert type(h) == NamedHist
+    assert type(h) is NamedHist
 
     with pytest.raises(AttributeError):
         NamedHist().new
