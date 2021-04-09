@@ -65,7 +65,7 @@ html_static_path: List[str] = []
 
 # -- Options for Notebook input ----------------------------------------------
 
-# html_logo = "_images/BoostHistogramPythonLogo.png"
+html_logo = "_images/histlogo.png"
 html_title = "Hist docs"
 
 nbsphinx_execute = "auto"  # auto, never
