@@ -1,10 +1,13 @@
 import inspect
 import sys
-from typing import Any, Callable, Dict, Iterable, Optional, Set, Tuple, Union
+from typing import Any, Callable, Dict, Iterable, List, Optional, Set, Tuple, Union
 
 import numpy as np
 
 import hist
+
+from .intervals import ratio_uncertainty
+from .typing import Literal
 
 try:
     import matplotlib.axes
@@ -20,7 +23,14 @@ except ModuleNotFoundError:
     raise
 
 
-__all__ = ("histplot", "hist2dplot", "plot2d_full", "plot_pull", "plot_pie")
+__all__ = (
+    "histplot",
+    "hist2dplot",
+    "plot2d_full",
+    "plot_ratio",
+    "plot_pull",
+    "plot_pie",
+)
 
 
 def __dir__() -> Tuple[str, ...]:
@@ -214,159 +224,205 @@ def plot2d_full(
     return main_art, top_art, side_art
 
 
-def plot_pull(
-    self: hist.BaseHist,
-    func: Union[Callable[[np.ndarray], np.ndarray], str],
+def _construct_gaussian_callable(
+    _hist: hist.BaseHist,
+) -> Callable[[np.ndarray, float, float, float], np.ndarray]:
+    x_values = _hist.axes[0].centers
+    hist_values = _hist.values()
+
+    # gaussian with reasonable initial guesses for parameters
+    constant = float(hist_values.max())
+    mean = (hist_values * x_values).sum() / hist_values.sum()
+    sigma = (hist_values * np.square(x_values - mean)).sum() / hist_values.sum()
+
+    def gauss(
+        x: np.ndarray,
+        constant: float = constant,
+        mean: float = mean,
+        sigma: float = sigma,
+    ) -> Any:
+        # Note: As return is a numpy ufuncs the type is "Any"
+        return constant * np.exp(-np.square(x - mean) / (2 * np.square(sigma)))
+
+    return gauss
+
+
+def _fit_callable_to_hist(
+    model: Callable[[np.ndarray], np.ndarray],
+    _hist: hist.BaseHist,
     likelihood: bool = False,
-    *,
-    ax_dict: "Optional[Dict[str, matplotlib.axes.Axes]]" = None,
-    fit_fmt: Optional[str] = None,
-    **kwargs: Any,
-) -> "Tuple[matplotlib.axes.Axes, matplotlib.axes.Axes]":
-    r"""
-    Plot_pull method for BaseHist object.
-
-    fit_fmt can be a string such as r"{name} = {value:.3g} $\pm$ {error:.3g}"
+) -> "Tuple[np.ndarray, np.ndarray, np.ndarray, Tuple[Tuple[float, ...], np.ndarray]]":
     """
-
-    try:
-        from iminuit import Minuit  # noqa: F401
-        from scipy.optimize import curve_fit  # noqa: F401
-    except ModuleNotFoundError:
-        print(
-            "Hist.plot_pull requires scipy and iminuit. Please install hist[plot] or manually install dependencies.",
-            file=sys.stderr,
-        )
-        raise
-
-    # Type judgement
-    if not callable(func) and not type(func) in [str]:
-        msg = f"Parameter func must be callable or a string for {self.__class__.__name__} in plot pull"
-        raise TypeError(msg)
-
-    if self.ndim != 1:
-        raise TypeError("Only 1D-histogram supports pull plot, try projecting to 1D")
-
-    if ax_dict:
-        try:
-            main_ax = ax_dict["main_ax"]
-            pull_ax = ax_dict["pull_ax"]
-        except KeyError:
-            raise ValueError("All axes should be all given or none at all")
-    else:
-        fig = plt.gcf()
-        grid = fig.add_gridspec(2, 1, hspace=0, height_ratios=[3, 1])
-
-        main_ax = fig.add_subplot(grid[0])
-        pull_ax = fig.add_subplot(grid[1], sharex=main_ax)
-        plt.setp(main_ax.get_xticklabels(), visible=False)
-
-    # Computation and Fit
-    xdata = self.axes[0].centers
-    ydata = self.values()
-    variances = self.variances()
+    Fit a model, a callable function, to the histogram values.
+    """
+    variances = _hist.variances()
     if variances is None:
         raise RuntimeError(
             "Cannot compute from a variance-less histogram, try a Weight storage"
         )
-    yerr = np.sqrt(variances)
+    hist_uncert = np.sqrt(variances)
 
-    if isinstance(func, str):
-        if func in {"gauss", "gaus"}:
-            # gaussian with reasonable initial guesses for parameters
-            constant = float(ydata.max())
-            mean = (ydata * xdata).sum() / ydata.sum()
-            sigma = (ydata * (xdata - mean) ** 2.0).sum() / ydata.sum()
-
-            def func(
-                x: np.ndarray,
-                constant: float = constant,
-                mean: float = mean,
-                sigma: float = sigma,
-            ) -> np.ndarray:
-                return constant * np.exp(-((x - mean) ** 2.0) / (2 * sigma ** 2))  # type: ignore
-
-        else:
-            func = _expr_to_lambda(func)
-
-    assert not isinstance(func, str)
-
-    parnames = list(inspect.signature(func).parameters)[1:]
-
-    # Compute fit values: using func as fit model
-    popt, pcov = _curve_fit_wrapper(func, xdata, ydata, yerr, likelihood=likelihood)
-    perr = np.diag(pcov) ** 0.5
-    yfit = func(self.axes[0].centers, *popt)
+    # Infer best fit model parameters and covariance matrix
+    xdata = _hist.axes[0].centers
+    popt, pcov = _curve_fit_wrapper(
+        model, xdata, _hist.values(), hist_uncert, likelihood=likelihood
+    )
+    model_values = model(xdata, *popt)
 
     if np.isfinite(pcov).all():
-        nsamples = 100
-        vopts = np.random.multivariate_normal(popt, pcov, nsamples)
-        sampled_ydata = np.vstack([func(xdata, *vopt).T for vopt in vopts])
-        yfiterr = np.nanstd(sampled_ydata, axis=0)
+        n_samples = 100
+        vopts = np.random.multivariate_normal(popt, pcov, n_samples)
+        sampled_ydata = np.vstack([model(xdata, *vopt).T for vopt in vopts])
+        model_uncert = np.nanstd(sampled_ydata, axis=0)
     else:
-        yfiterr = np.zeros_like(yerr)
+        model_uncert = np.zeros_like(hist_uncert)
 
-    # Compute pulls: containing no INF values
-    with np.errstate(divide="ignore"):
-        pulls = (ydata - yfit) / yerr
+    return model_values, model_uncert, hist_uncert, (popt, pcov)
 
-    pulls[np.isnan(pulls)] = 0
-    pulls[np.isinf(pulls)] = 0
 
-    # Keyword Argument Conversion: convert the kwargs to several independent args
+def _plot_fit_result(
+    _hist: hist.BaseHist,
+    model_values: np.ndarray,
+    model_uncert: np.ndarray,
+    ax: matplotlib.axes.Axes,
+    eb_kwargs: Dict[str, Any],
+    fp_kwargs: Dict[str, Any],
+    ub_kwargs: Dict[str, Any],
+) -> List[matplotlib.artist.Artist]:
+    """
+    Plot fit of model to histogram data
+    """
+    x_values = _hist.axes[0].centers
+    variances = _hist.variances()
+    if variances is None:
+        raise RuntimeError(
+            "Cannot compute from a variance-less histogram, try a Weight storage"
+        )
+    hist_uncert = np.sqrt(variances)
 
-    # error bar keyword arguments
-    eb_kwargs = _filter_dict(kwargs, "eb_")
-    eb_kwargs.setdefault("label", "Histogram Data")
-    eb_kwargs.setdefault("fmt", "o")
+    _errorbars = ax.errorbar(x_values, _hist.values(), hist_uncert, **eb_kwargs)
 
-    # fit plot keyword arguments
-    label = "Fit"
-    if fit_fmt is not None:
-        for name, value, error in zip(parnames, popt, perr):
-            label += "\n  "
-            label += fit_fmt.format(name=name, value=value, error=error)
-    fp_kwargs = _filter_dict(kwargs, "fp_")
-    fp_kwargs.setdefault("label", label)
+    # Ensure zorder draws data points above model
+    line_zorder = _errorbars[0].get_zorder() - 1
+    (line,) = ax.plot(x_values, model_values, **fp_kwargs, zorder=line_zorder)
 
-    # uncertainty band keyword arguments
-    ub_kwargs = _filter_dict(kwargs, "ub_")
-    ub_kwargs.setdefault("label", "Uncertainty")
-    ub_kwargs.setdefault("alpha", 0.5)
-
-    # bar plot keyword arguments
-    bar_kwargs = _filter_dict(kwargs, "bar_", ignore={"bar_width"})
-
-    # patch plot keyword arguments
-    pp_kwargs = _filter_dict(kwargs, "pp_", ignore={"pp_num"})
-    pp_num = kwargs.pop("pp_num", 5)
-
-    # Judge whether some arguments are left
-    if kwargs:
-        raise ValueError(f"{set(kwargs)}' not needed")
-
-    # Main: plot the pulls using Matplotlib errorbar and plot methods
-    main_ax.errorbar(self.axes.centers[0], ydata, yerr, **eb_kwargs)
-
-    (line,) = main_ax.plot(self.axes.centers[0], yfit, **fp_kwargs)
-
-    # Uncertainty band
+    # Uncertainty band for fitted function
+    # TODO: Probably set a better default color than the fit line color
     ub_kwargs.setdefault("color", line.get_color())
-    main_ax.fill_between(
-        self.axes.centers[0],
-        yfit - yfiterr,
-        yfit + yfiterr,
+    ax.fill_between(
+        x_values,
+        model_values - model_uncert,
+        model_values + model_uncert,
         **ub_kwargs,
     )
-    main_ax.legend(loc=0)
-    main_ax.set_ylabel("Counts")
+
+    return ax.get_children()
+
+
+def plot_ratio(
+    _hist: hist.BaseHist,
+    ratio: np.ndarray,
+    ratio_uncert: np.ndarray,
+    ax: matplotlib.axes.Axes,
+    **kwargs: Any,
+) -> matplotlib.axes.Axes:
+    """
+    Plot a ratio plot on the given axes
+    """
+    x_values = _hist.axes[0].centers
+    left_edge = _hist.axes.edges[0][0]
+    right_edge = _hist.axes.edges[-1][-1]
+
+    # Set 0 and inf to nan to hide during plotting
+    ratio[ratio == 0] = np.nan
+    ratio[np.isinf(ratio)] = np.nan
+
+    central_value = kwargs.pop("central_value", 1.0)
+    ax.axhline(central_value, color="black", linestyle="dashed", linewidth=1.0)
+
+    uncert_draw_type = kwargs.pop("uncert_draw_type", "line")
+    if uncert_draw_type == "line":
+        ax.errorbar(
+            x_values,
+            ratio,
+            yerr=ratio_uncert,
+            color="black",
+            marker="o",
+            linestyle="none",
+        )
+    elif uncert_draw_type == "bar":
+        bar_width = (right_edge - left_edge) / len(ratio)
+
+        bar_top = ratio + ratio_uncert[1]
+        bar_bottom = ratio - ratio_uncert[0]
+        # bottom can't be nan
+        bar_bottom[np.isnan(bar_bottom)] = 0
+        bar_height = bar_top - bar_bottom
+
+        _ratio_points = ax.scatter(x_values, ratio, color="black")
+
+        # Ensure zorder draws data points above uncertainty bars
+        bar_zorder = _ratio_points.get_zorder() - 1
+        ax.bar(
+            x_values,
+            height=bar_height,
+            width=bar_width,
+            bottom=bar_bottom,
+            fill=False,
+            linewidth=0,
+            edgecolor="gray",
+            hatch=3 * "/",
+            zorder=bar_zorder,
+        )
+
+    ratio_ylim = kwargs.pop("ylim", None)
+    if ratio_ylim is None:
+        # plot centered around central value with a scaled view range
+        # the value _with_ the uncertainty in view is important so base
+        # view range on extrema of value +/- uncertainty
+        valid_ratios_idx = np.where(np.isnan(ratio) == False)  # noqa: E712
+        valid_ratios = ratio[valid_ratios_idx]
+        extrema = np.array(
+            [
+                valid_ratios - ratio_uncert[0][valid_ratios_idx],
+                valid_ratios + ratio_uncert[1][valid_ratios_idx],
+            ]
+        )
+        max_delta = np.max(np.abs(extrema - central_value))
+        ratio_extrema = np.abs(max_delta + central_value)
+
+        _alpha = 2.0
+        scaled_offset = max_delta + (max_delta / (_alpha * ratio_extrema))
+        ratio_ylim = [central_value - scaled_offset, central_value + scaled_offset]
+
+    ax.set_xlim(left_edge, right_edge)
+    ax.set_ylim(bottom=ratio_ylim[0], top=ratio_ylim[1])
+
+    ax.set_xlabel(_hist.axes[0].label)
+    ax.set_ylabel(kwargs.pop("ylabel", "Ratio"))
+
+    return ax
+
+
+def plot_pull(
+    _hist: hist.BaseHist,
+    pulls: np.ndarray,
+    ax: matplotlib.axes.Axes,
+    bar_kwargs: Dict[str, Any],
+    pp_kwargs: Dict[str, Any],
+) -> matplotlib.axes.Axes:
+    """
+    Plot a pull plot on the given axes
+    """
+    x_values = _hist.axes[0].centers
+    left_edge = _hist.axes.edges[0][0]
+    right_edge = _hist.axes.edges[-1][-1]
 
     # Pull: plot the pulls using Matplotlib bar method
-    left_edge = self.axes.edges[0][0]
-    right_edge = self.axes.edges[-1][-1]
     width = (right_edge - left_edge) / len(pulls)
-    pull_ax.bar(self.axes.centers[0], pulls, width=width, **bar_kwargs)
+    ax.bar(x_values, pulls, width=width, **bar_kwargs)
 
+    pp_num = pp_kwargs.pop("num", 5)
     patch_height = max(np.abs(pulls)) / pp_num
     patch_width = width * len(pulls)
     for i in range(pp_num):
@@ -380,19 +436,180 @@ def plot_pull(
         upRect = patches.Rectangle(
             upRect_startpoint, patch_width, patch_height, **pp_kwargs
         )
-        pull_ax.add_patch(upRect)
+        ax.add_patch(upRect)
         downRect_startpoint = (left_edge, -(i + 1) * patch_height)
         downRect = patches.Rectangle(
             downRect_startpoint, patch_width, patch_height, **pp_kwargs
         )
-        pull_ax.add_patch(downRect)
+        ax.add_patch(downRect)
 
-    plt.xlim(left_edge, right_edge)
+    ax.set_xlim(left_edge, right_edge)
 
-    pull_ax.set_xlabel(self.axes[0].label)
-    pull_ax.set_ylabel("Pull")
+    ax.set_xlabel(_hist.axes[0].label)
+    ax.set_ylabel("Pull")
 
-    return main_ax, pull_ax
+    return ax
+
+
+def _plot_ratiolike(
+    self: hist.BaseHist,
+    other: Union[hist.BaseHist, Callable[[np.ndarray], np.ndarray]],
+    likelihood: bool = False,
+    *,
+    ax_dict: "Optional[Dict[str, matplotlib.axes.Axes]]" = None,
+    view: Literal["ratio", "pull"],
+    fit_fmt: Optional[str] = None,
+    **kwargs: Any,
+) -> "Tuple[matplotlib.axes.Axes, matplotlib.axes.Axes]":
+    r"""
+    Plot ratio-like plots (ratio plots and pull plots) for BaseHist
+
+    ``fit_fmt`` can be a string such as ``r"{name} = {value:.3g} $\pm$ {error:.3g}"``
+    """
+
+    try:
+        from iminuit import Minuit  # noqa: F401
+        from scipy.optimize import curve_fit  # noqa: F401
+    except ModuleNotFoundError:
+        print(
+            f"Hist.plot_{view} requires scipy and iminuit. Please install hist[plot] or manually install dependencies.",
+            file=sys.stderr,
+        )
+        raise
+
+    if self.ndim != 1:
+        raise TypeError(
+            f"Only 1D-histogram supports ratio plot, try projecting {self.__class__.__name__} to 1D"
+        )
+    if isinstance(other, hist.hist.Hist) and other.ndim != 1:
+        raise TypeError(
+            f"Only 1D-histogram supports ratio plot, try projecting other={other.__class__.__name__} to 1D"
+        )
+
+    if ax_dict:
+        try:
+            main_ax = ax_dict["main_ax"]
+            subplot_ax = ax_dict[f"{view}_ax"]
+        except KeyError:
+            raise ValueError("All axes should be all given or none at all")
+    else:
+        fig = plt.gcf()
+        grid = fig.add_gridspec(2, 1, hspace=0, height_ratios=[3, 1])
+
+        main_ax = fig.add_subplot(grid[0])
+        subplot_ax = fig.add_subplot(grid[1], sharex=main_ax)
+        plt.setp(main_ax.get_xticklabels(), visible=False)
+
+    # Keyword Argument Conversion: convert the kwargs to several independent args
+    # error bar keyword arguments
+    eb_kwargs = _filter_dict(kwargs, "eb_")
+    eb_kwargs.setdefault("label", "Histogram Data")
+    # Use "fmt" over "marker" to avoid UserWarning on keyword precedence
+    eb_kwargs.setdefault("fmt", "o")
+    eb_kwargs.setdefault("linestyle", "none")
+
+    # fit plot keyword arguments
+    fp_kwargs = _filter_dict(kwargs, "fp_")
+    fp_kwargs.setdefault("label", "Counts")
+
+    # bar plot keyword arguments
+    bar_kwargs = _filter_dict(kwargs, "bar_", ignore={"bar_width"})
+
+    # uncertainty band keyword arguments
+    ub_kwargs = _filter_dict(kwargs, "ub_")
+    ub_kwargs.setdefault("label", "Uncertainty")
+
+    # ratio plot keyword arguments
+    rp_kwargs = _filter_dict(kwargs, "rp_")
+    rp_kwargs.setdefault("uncertainty_type", "poisson")
+    rp_kwargs.setdefault("legend_loc", "best")
+    rp_kwargs.setdefault("num_label", None)
+    rp_kwargs.setdefault("denom_label", None)
+
+    # patch plot keyword arguments
+    pp_kwargs = _filter_dict(kwargs, "pp_")
+
+    # Judge whether some arguments are left
+    if kwargs:
+        raise ValueError(f"{set(kwargs)}' not needed")
+
+    main_ax.set_ylabel(fp_kwargs["label"])
+
+    # Computation and Fit
+    hist_values = self.values()
+
+    if callable(other) or isinstance(other, str):
+        if isinstance(other, str):
+            if other in {"gauss", "gaus", "normal"}:
+                other = _construct_gaussian_callable(self)
+            else:
+                other = _expr_to_lambda(other)
+
+        (
+            compare_values,
+            model_uncert,
+            hist_values_uncert,
+            bestfit_result,
+        ) = _fit_callable_to_hist(other, self, likelihood)
+
+        if fit_fmt is not None:
+            parnames = list(inspect.signature(other).parameters)[1:]
+            popt, pcov = bestfit_result
+            perr = np.sqrt(np.diag(pcov))
+
+            fp_label = "Fit"
+            for name, value, error in zip(parnames, popt, perr):
+                fp_label += "\n  "
+                fp_label += fit_fmt.format(name=name, value=value, error=error)
+            fp_kwargs["label"] = fp_label
+        else:
+            fp_kwargs["label"] = "Fitted value"
+
+        # TODO FIXME
+        # main_ax = _plot_fit_result(
+        _plot_fit_result(
+            self,
+            model_values=compare_values,
+            model_uncert=model_uncert,
+            ax=main_ax,
+            eb_kwargs=eb_kwargs,
+            fp_kwargs=fp_kwargs,
+            ub_kwargs=ub_kwargs,
+        )
+    else:
+        compare_values = other.values()
+
+        histplot(self, ax=main_ax, label=rp_kwargs["num_label"])
+        histplot(other, ax=main_ax, label=rp_kwargs["denom_label"])
+
+    # Compute ratios: containing no INF values
+    with np.errstate(divide="ignore", invalid="ignore"):
+        if view == "ratio":
+            ratios = hist_values / compare_values
+            ratio_uncert = ratio_uncertainty(
+                num=hist_values,
+                denom=compare_values,
+                uncertainty_type=rp_kwargs["uncertainty_type"],
+            )
+            # ratio: plot the ratios using Matplotlib errorbar or bar
+            subplot_ax = plot_ratio(
+                self, ratios, ratio_uncert, ax=subplot_ax, **rp_kwargs
+            )
+
+        elif view == "pull":
+            pulls = (hist_values - compare_values) / hist_values_uncert
+
+            pulls[np.isnan(pulls) | np.isinf(pulls)] = 0
+
+            # Pass dicts instead of unpacking to avoid conflicts
+            subplot_ax = plot_pull(
+                self, pulls, ax=subplot_ax, bar_kwargs=bar_kwargs, pp_kwargs=pp_kwargs
+            )
+
+    if main_ax.get_legend_handles_labels()[0]:  # Don't plot an empty legend
+        main_ax.legend(loc=rp_kwargs["legend_loc"])
+
+    return main_ax, subplot_ax
 
 
 def get_center(x: Union[str, int, Tuple[float, float]]) -> Union[str, float]:
