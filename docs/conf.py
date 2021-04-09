@@ -9,11 +9,14 @@
 
 from typing import List
 
+from pkg_resources import get_distribution
+
 # -- Project information -----------------------------------------------------
 
 project = "Hist"
-copyright = "2020, Scikit-HEP"
+copyright = "2020-2021, Henry Schreiner"
 author = "Henry Schreiner and Nino Lau"
+version = get_distribution("hist").version
 
 
 # -- General configuration ---------------------------------------------------
@@ -47,7 +50,7 @@ html_theme = "sphinx_book_theme"
 
 # Config for the Sphinx book
 
-html_baseurl = "https://boost-histogram.readthedocs.io/en/latest/"
+html_baseurl = "https://hist.readthedocs.io/en/latest/"
 
 html_theme_options = {
     "home_page_in_toc": True,
@@ -66,7 +69,7 @@ html_static_path: List[str] = []
 # -- Options for Notebook input ----------------------------------------------
 
 html_logo = "_images/histlogo.png"
-html_title = "Hist docs"
+html_title = f"Hist {version}"
 
 nbsphinx_execute = "auto"  # auto, never
 
