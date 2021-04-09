@@ -232,7 +232,7 @@ def plot_pull(
     try:
         from iminuit import Minuit  # noqa: F401
         from scipy.optimize import curve_fit  # noqa: F401
-    except ImportError:
+    except ModuleNotFoundError:
         print(
             "Hist.plot_pull requires scipy and iminuit. Please install hist[plot] or manually install dependencies.",
             file=sys.stderr,
