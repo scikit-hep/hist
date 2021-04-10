@@ -37,8 +37,8 @@ __all__ = (
     "histplot",
     "hist2dplot",
     "plot2d_full",
-    "plot_ratio",
-    "plot_pull",
+    "plot_ratio_array",
+    "plot_pull_array",
     "plot_pie",
 )
 
@@ -362,7 +362,7 @@ def _plot_fit_result(
     return FitResultArtists(line, errorbars, uncertainty_band)
 
 
-def plot_ratio(
+def plot_ratio_array(
     __hist: hist.BaseHist,
     ratio: np.ndarray,
     ratio_uncert: np.ndarray,
@@ -454,7 +454,7 @@ def plot_ratio(
     return axis_artists
 
 
-def plot_pull(
+def plot_pull_array(
     __hist: hist.BaseHist,
     pulls: np.ndarray,
     ax: matplotlib.axes.Axes,
@@ -646,7 +646,7 @@ def _plot_ratiolike(
                 uncertainty_type=rp_kwargs["uncertainty_type"],
             )
             # ratio: plot the ratios using Matplotlib errorbar or bar
-            subplot_ax_artists = plot_ratio(
+            subplot_ax_artists = plot_ratio_array(
                 self, ratios, ratio_uncert, ax=subplot_ax, **rp_kwargs
             )
 
@@ -656,7 +656,7 @@ def _plot_ratiolike(
             pulls[np.isnan(pulls) | np.isinf(pulls)] = 0
 
             # Pass dicts instead of unpacking to avoid conflicts
-            subplot_ax_artists = plot_pull(
+            subplot_ax_artists = plot_pull_array(
                 self, pulls, ax=subplot_ax, bar_kwargs=bar_kwargs, pp_kwargs=pp_kwargs
             )
 
