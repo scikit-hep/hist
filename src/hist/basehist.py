@@ -405,7 +405,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
     def plot_ratio(
         self,
-        other: Union[T, Callable[[np.ndarray], np.ndarray], str],
+        other: Union["hist.BaseHist", Callable[[np.ndarray], np.ndarray], str],
         *,
         ax_dict: "Optional[Dict[str, matplotlib.axes.Axes]]" = None,
         **kwargs: Any,
