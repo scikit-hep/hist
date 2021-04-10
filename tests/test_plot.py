@@ -534,10 +534,6 @@ def test_named_plot_pull():
 
     assert h.plot_pull(pdf_str)
 
-    assert h.plot_pull("gauss")
-
-    assert h.plot_pull("gauss", likelihood=True)
-
     # dimension error
     hh = NamedHist(
         axis.Regular(
@@ -598,6 +594,25 @@ def test_named_plot_pull():
         h.plot_pull(pdf, eb_ecolor=1.0, eb_mfc=1.0)  # kwargs should be str
 
     plt.close("all")
+
+
+@pytest.mark.parametrize("str_alias", ["normal", "gauss", "gaus"])
+@pytest.mark.parametrize("use_likelihood", [True, False])
+def test_ratiolike_str_alias(str_alias, use_likelihood):
+    """
+    Test str alias for callable in plot_ratio and plot_pull
+    """
+
+    np.random.seed(42)
+
+    h = NamedHist(
+        axis.Regular(
+            50, -4, 4, name="S", label="s [units]", underflow=False, overflow=False
+        )
+    ).fill(S=np.random.normal(size=10))
+
+    assert h.plot_ratio(str_alias, likelihood=use_likelihood)
+    assert h.plot_pull(str_alias, likelihood=use_likelihood)
 
 
 @pytest.mark.mpl_image_compare(baseline_dir="baseline", savefig_kwargs={"dpi": 50})

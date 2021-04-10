@@ -33,6 +33,15 @@ except ModuleNotFoundError:
     )
     raise
 
+__all__ = (
+    "histplot",
+    "hist2dplot",
+    "plot2d_full",
+    "plot_ratio",
+    "plot_pull",
+    "plot_pie",
+)
+
 
 class FitResultArtists(NamedTuple):
     line: matplotlib.lines.Line2D
@@ -60,16 +69,6 @@ MainAxisArtists = Union[FitResultArtists, Hist1DArtists]
 
 RatioArtists = Union[RatioErrorbarArtists, RatioBarArtists]
 RatiolikeArtists = Union[RatioArtists, PullArtists]
-
-
-__all__ = (
-    "histplot",
-    "hist2dplot",
-    "plot2d_full",
-    "plot_ratio",
-    "plot_pull",
-    "plot_pie",
-)
 
 
 def __dir__() -> Tuple[str, ...]:
@@ -183,9 +182,9 @@ def _curve_fit_wrapper(
 def plot2d_full(
     self: hist.BaseHist,
     *,
-    ax_dict: "Optional[Dict[str, matplotlib.axes.Axes]]" = None,
+    ax_dict: Optional[Dict[str, matplotlib.axes.Axes]] = None,
     **kwargs: Any,
-) -> "Tuple[Hist2DArtists, Hist1DArtists, Hist1DArtists]":
+) -> Tuple[Hist2DArtists, Hist1DArtists, Hist1DArtists]:
     """
     Plot2d_full method for BaseHist object.
 
@@ -264,10 +263,10 @@ def plot2d_full(
 
 
 def _construct_gaussian_callable(
-    _hist: hist.BaseHist,
-) -> Callable[[np.ndarray, float, float, float], np.ndarray]:
-    x_values = _hist.axes[0].centers
-    hist_values = _hist.values()
+    __hist: hist.BaseHist,
+) -> Callable[[np.ndarray], np.ndarray]:
+    x_values = __hist.axes[0].centers
+    hist_values = __hist.values()
 
     # gaussian with reasonable initial guesses for parameters
     constant = float(hist_values.max())
@@ -292,13 +291,13 @@ def _construct_gaussian_callable(
 
 def _fit_callable_to_hist(
     model: Callable[[np.ndarray], np.ndarray],
-    _hist: hist.BaseHist,
+    histogram: hist.BaseHist,
     likelihood: bool = False,
 ) -> "Tuple[np.ndarray, np.ndarray, np.ndarray, Tuple[Tuple[float, ...], np.ndarray]]":
     """
     Fit a model, a callable function, to the histogram values.
     """
-    variances = _hist.variances()
+    variances = histogram.variances()
     if variances is None:
         raise RuntimeError(
             "Cannot compute from a variance-less histogram, try a Weight storage"
@@ -306,9 +305,9 @@ def _fit_callable_to_hist(
     hist_uncert = np.sqrt(variances)
 
     # Infer best fit model parameters and covariance matrix
-    xdata = _hist.axes[0].centers
+    xdata = histogram.axes[0].centers
     popt, pcov = _curve_fit_wrapper(
-        model, xdata, _hist.values(), hist_uncert, likelihood=likelihood
+        model, xdata, histogram.values(), hist_uncert, likelihood=likelihood
     )
     model_values = model(xdata, *popt)
 
@@ -324,7 +323,7 @@ def _fit_callable_to_hist(
 
 
 def _plot_fit_result(
-    _hist: hist.BaseHist,
+    __hist: hist.BaseHist,
     model_values: np.ndarray,
     model_uncert: np.ndarray,
     ax: matplotlib.axes.Axes,
@@ -335,23 +334,24 @@ def _plot_fit_result(
     """
     Plot fit of model to histogram data
     """
-    x_values = _hist.axes[0].centers
-    variances = _hist.variances()
+    x_values = __hist.axes[0].centers
+    variances = __hist.variances()
     if variances is None:
         raise RuntimeError(
             "Cannot compute from a variance-less histogram, try a Weight storage"
         )
     hist_uncert = np.sqrt(variances)
 
-    errorbars = ax.errorbar(x_values, _hist.values(), hist_uncert, **eb_kwargs)
+    errorbars = ax.errorbar(x_values, __hist.values(), hist_uncert, **eb_kwargs)
 
     # Ensure zorder draws data points above model
     line_zorder = errorbars[0].get_zorder() - 1
     (line,) = ax.plot(x_values, model_values, **fp_kwargs, zorder=line_zorder)
 
     # Uncertainty band for fitted function
-    # TODO: Probably set a better default color than the fit line color
     ub_kwargs.setdefault("color", line.get_color())
+    if ub_kwargs["color"] == line.get_color():
+        ub_kwargs.setdefault("alpha", 0.3)
     uncertainty_band = ax.fill_between(
         x_values,
         model_values - model_uncert,
@@ -363,7 +363,7 @@ def _plot_fit_result(
 
 
 def plot_ratio(
-    _hist: hist.BaseHist,
+    __hist: hist.BaseHist,
     ratio: np.ndarray,
     ratio_uncert: np.ndarray,
     ax: matplotlib.axes.Axes,
@@ -372,9 +372,9 @@ def plot_ratio(
     """
     Plot a ratio plot on the given axes
     """
-    x_values = _hist.axes[0].centers
-    left_edge = _hist.axes.edges[0][0]
-    right_edge = _hist.axes.edges[-1][-1]
+    x_values = __hist.axes[0].centers
+    left_edge = __hist.axes.edges[0][0]
+    right_edge = __hist.axes.edges[-1][-1]
 
     # Set 0 and inf to nan to hide during plotting
     ratio[ratio == 0] = np.nan
@@ -448,14 +448,14 @@ def plot_ratio(
     ax.set_xlim(left_edge, right_edge)
     ax.set_ylim(bottom=ratio_ylim[0], top=ratio_ylim[1])
 
-    ax.set_xlabel(_hist.axes[0].label)
+    ax.set_xlabel(__hist.axes[0].label)
     ax.set_ylabel(kwargs.pop("ylabel", "Ratio"))
 
     return axis_artists
 
 
 def plot_pull(
-    _hist: hist.BaseHist,
+    __hist: hist.BaseHist,
     pulls: np.ndarray,
     ax: matplotlib.axes.Axes,
     bar_kwargs: Dict[str, Any],
@@ -464,9 +464,9 @@ def plot_pull(
     """
     Plot a pull plot on the given axes
     """
-    x_values = _hist.axes[0].centers
-    left_edge = _hist.axes.edges[0][0]
-    right_edge = _hist.axes.edges[-1][-1]
+    x_values = __hist.axes[0].centers
+    left_edge = __hist.axes.edges[0][0]
+    right_edge = __hist.axes.edges[-1][-1]
 
     # Pull: plot the pulls using Matplotlib bar method
     width = (right_edge - left_edge) / len(pulls)
@@ -497,7 +497,7 @@ def plot_pull(
 
     ax.set_xlim(left_edge, right_edge)
 
-    ax.set_xlabel(_hist.axes[0].label)
+    ax.set_xlabel(__hist.axes[0].label)
     ax.set_ylabel("Pull")
 
     return PullArtists(bar_artists, patch_artists)
@@ -505,10 +505,10 @@ def plot_pull(
 
 def _plot_ratiolike(
     self: hist.BaseHist,
-    other: Union[hist.BaseHist, Callable[[np.ndarray], np.ndarray]],
+    other: Union[hist.BaseHist, Callable[[np.ndarray], np.ndarray], str],
     likelihood: bool = False,
     *,
-    ax_dict: "Optional[Dict[str, matplotlib.axes.Axes]]" = None,
+    ax_dict: Optional[Dict[str, matplotlib.axes.Axes]] = None,
     view: Literal["ratio", "pull"],
     fit_fmt: Optional[str] = None,
     **kwargs: Any,
@@ -676,7 +676,7 @@ def get_center(x: Union[str, int, Tuple[float, float]]) -> Union[str, float]:
 def plot_pie(
     self: hist.BaseHist,
     *,
-    ax: "Optional[matplotlib.axes.Axes]" = None,
+    ax: Optional[matplotlib.axes.Axes] = None,
     **kwargs: Any,
 ) -> Any:
 
