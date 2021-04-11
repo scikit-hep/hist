@@ -1,4 +1,4 @@
-<img alt="histogram" width="200" src="https://raw.githubusercontent.com/scikit-hep/hist/master/docs/_images/histlogo.png"/>
+<img alt="histogram" width="200" src="https://raw.githubusercontent.com/scikit-hep/hist/main/docs/_images/histlogo.png"/>
 
 # Hist
 
@@ -159,7 +159,7 @@ Support for this work was provided by the National Science Foundation cooperativ
 [github-discussions-link]:  https://github.com/scikit-hep/hist/discussions
 [gitter-badge]:             https://badges.gitter.im/HSF/PyHEP-histogramming.svg
 [gitter-link]:              https://gitter.im/HSF/PyHEP-histogramming?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
-[pre-commit-badge]:         https://results.pre-commit.ci/badge/github/scikit-hep/hist/master.svg
+[pre-commit-badge]:         https://results.pre-commit.ci/badge/github/scikit-hep/hist/main.svg
 [pre-commit-link]:          https://results.pre-commit.ci/repo/github/scikit-hep/hist
 [pypi-link]:                https://pypi.org/project/hist/
 [pypi-platforms]:           https://img.shields.io/pypi/pyversions/hist
