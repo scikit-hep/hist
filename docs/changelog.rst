@@ -4,6 +4,10 @@ Changelog
 IN PROGRESS
 --------------------
 
+* Add ``plot_ratio`` to the public API, which allows for making ratio plots between the
+  histogram and either another histogram or a callable.
+  `#161 <https://github.com/scikit-hep/hist/pull/161>`_
+
 * Add frequentist coverage interval support in the ``intervals`` module.
   `#176 <https://github.com/scikit-hep/hist/pull/176>`_
 

@@ -58,6 +58,7 @@ Hist currently provides everything boost-histogram provides, and the following e
 - Quick plotting routines encourage exploration:
   - `.plot()` provides 1D and 2D plots
   - `.plot2d_full()` shows 1D projects around a 2D plot
+  - `.plot_ratio(...)` make a ratio plot between the histogram and another histogram or callable
   - `.plot_pull(...)` performs a pull plot
   - `.plot_pie()` makes a pie plot
   - `.show()` provides a nice str printout using Histoprint

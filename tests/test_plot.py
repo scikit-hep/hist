@@ -534,10 +534,6 @@ def test_named_plot_pull():
 
     assert h.plot_pull(pdf_str)
 
-    assert h.plot_pull("gauss")
-
-    assert h.plot_pull("gauss", likelihood=True)
-
     # dimension error
     hh = NamedHist(
         axis.Regular(
@@ -600,6 +596,25 @@ def test_named_plot_pull():
     plt.close("all")
 
 
+@pytest.mark.parametrize("str_alias", ["normal", "gauss", "gaus"])
+@pytest.mark.parametrize("use_likelihood", [True, False])
+def test_ratiolike_str_alias(str_alias, use_likelihood):
+    """
+    Test str alias for callable in plot_ratio and plot_pull
+    """
+
+    np.random.seed(42)
+
+    h = NamedHist(
+        axis.Regular(
+            50, -4, 4, name="S", label="s [units]", underflow=False, overflow=False
+        )
+    ).fill(S=np.random.normal(size=10))
+
+    assert h.plot_ratio(str_alias, likelihood=use_likelihood)
+    assert h.plot_pull(str_alias, likelihood=use_likelihood)
+
+
 @pytest.mark.mpl_image_compare(baseline_dir="baseline", savefig_kwargs={"dpi": 50})
 def test_image_plot_pull():
     """
@@ -620,7 +635,69 @@ def test_image_plot_pull():
 
     fig = plt.figure()
 
-    assert h.plot_pull(pdf, fit_fmt=r"{name} = {value:.3g} $\pm$ {error:.3g}")
+    assert h.plot_pull(
+        pdf,
+        eb_color="black",
+        fp_color="blue",
+        ub_color="lightblue",
+        fit_fmt=r"{name} = {value:.3g} $\pm$ {error:.3g}",
+    )
+
+    return fig
+
+
+@pytest.mark.mpl_image_compare(baseline_dir="baseline", savefig_kwargs={"dpi": 50})
+def test_image_plot_ratio_hist():
+    """
+    Test plot_pull by comparing against a reference image generated via
+    `pytest --mpl-generate-path=tests/baseline`
+    """
+
+    np.random.seed(42)
+
+    hist_1 = Hist(
+        axis.Regular(
+            50, -5, 5, name="X", label="x [units]", underflow=False, overflow=False
+        )
+    ).fill(np.random.normal(size=1000))
+    hist_2 = Hist(
+        axis.Regular(
+            50, -5, 5, name="X", label="x [units]", underflow=False, overflow=False
+        )
+    ).fill(np.random.normal(size=1700))
+
+    fig = plt.figure()
+
+    assert hist_1.plot_ratio(
+        hist_2, rp_num_label="numerator", rp_denom_label="denominator"
+    )
+
+    return fig
+
+
+@pytest.mark.mpl_image_compare(baseline_dir="baseline", savefig_kwargs={"dpi": 50})
+def test_image_plot_ratio_callable():
+    """
+    Test plot_pull by comparing against a reference image generated via
+    `pytest --mpl-generate-path=tests/baseline`
+    """
+
+    np.random.seed(42)
+
+    hist_1 = Hist(
+        axis.Regular(
+            50, -5, 5, name="X", label="x [units]", underflow=False, overflow=False
+        )
+    ).fill(np.random.normal(size=1000))
+
+    def model(x, a=1 / np.sqrt(2 * np.pi), x0=0, sigma=1, offset=0):
+        return a * np.exp(-((x - x0) ** 2) / (2 * sigma ** 2)) + offset
+
+    fig = plt.figure()
+
+    assert hist_1.plot_ratio(
+        model, eb_color="black", fp_color="blue", ub_color="lightblue"
+    )
 
     return fig
 

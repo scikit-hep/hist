@@ -35,6 +35,8 @@ if TYPE_CHECKING:
     import matplotlib.axes
     from mplhep.plot import Hist1DArtists, Hist2DArtists
 
+    from .plot import FitResultArtists, MainAxisArtists, RatiolikeArtists
+
 InnerIndexing = Union[
     SupportsIndex, str, Callable[[bh.axis.Axis], int], slice, "ellipsis"
 ]
@@ -401,20 +403,45 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
         return hist.plot.plot2d_full(self, ax_dict=ax_dict, **kwargs)
 
-    def plot_pull(
+    def plot_ratio(
         self,
-        func: Callable[[np.ndarray], np.ndarray],
+        other: Union["hist.BaseHist", Callable[[np.ndarray], np.ndarray], str],
         *,
         ax_dict: "Optional[Dict[str, matplotlib.axes.Axes]]" = None,
         **kwargs: Any,
-    ) -> "Tuple[matplotlib.axes.Axes, matplotlib.axes.Axes]":
+    ) -> "Tuple[MainAxisArtists, RatiolikeArtists]":
         """
-        Plot_pull method for BaseHist object.
+        ``plot_ratio`` method for ``BaseHist`` object.
+
+        Return a tuple of artists following a structure of
+        ``(main_ax_artists, subplot_ax_artists)``
         """
 
         import hist.plot
 
-        return hist.plot.plot_pull(self, func, ax_dict=ax_dict, **kwargs)
+        return hist.plot._plot_ratiolike(
+            self, other, ax_dict=ax_dict, view="ratio", **kwargs
+        )
+
+    def plot_pull(
+        self,
+        func: Union[Callable[[np.ndarray], np.ndarray], str],
+        *,
+        ax_dict: "Optional[Dict[str, matplotlib.axes.Axes]]" = None,
+        **kwargs: Any,
+    ) -> "Tuple[FitResultArtists, RatiolikeArtists]":
+        """
+        ``plot_pull`` method for ``BaseHist`` object.
+
+        Return a tuple of artists following a structure of
+        ``(main_ax_artists, subplot_ax_artists)``
+        """
+
+        import hist.plot
+
+        return hist.plot._plot_ratiolike(
+            self, func, ax_dict=ax_dict, view="pull", **kwargs
+        )
 
     def plot_pie(
         self,
