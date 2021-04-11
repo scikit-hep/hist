@@ -19,7 +19,7 @@
 
 Hist is a analyst friendly front-end for
 [boost-histogram](https://github.com/scikit-hep/boost-histogram), designed for
-Python 3.6+. See [what's new](https://hist.readthedocs.io/en/latest/changelog.html).
+Python 3.7+ (3.6 users get version 2.3). See [what's new](https://hist.readthedocs.io/en/latest/changelog.html).
 
 ## Installation
 
@@ -56,7 +56,7 @@ Hist currently provides everything boost-histogram provides, and the following e
   - Strings can be used directly to index into string category axes
 
 - Quick plotting routines encourage exploration:
-  - `.plot()` provides 1D and 2D plots
+  - `.plot()` provides 1D and 2D plots (or use `plot1d()`, `plot2d()`)
   - `.plot2d_full()` shows 1D projects around a 2D plot
   - `.plot_ratio(...)` make a ratio plot between the histogram and another histogram or callable
   - `.plot_pull(...)` performs a pull plot
@@ -65,6 +65,10 @@ Hist currently provides everything boost-histogram provides, and the following e
 
 - Extended Histogram features:
   - `.density()` computes the density as an array
+  - `.profile(remove_ax)` can convert a ND COUNT histogram into a (N-1)D MEAN histogram
+
+- New modules
+  - `intervals` supports frequentist coverage intervals
 
 - Notebook ready: Hist has gorgeous in-notebook representation.
   - No dependencies required

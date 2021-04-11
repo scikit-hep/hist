@@ -8,6 +8,12 @@ IN PROGRESS
   histogram and either another histogram or a callable.
   `#161 <https://github.com/scikit-hep/hist/pull/161>`_
 
+* Add ``.profile`` to compute a (N-1)D profile histogram.
+  `#160 <https://github.com/scikit-hep/hist/pull/160>`_
+
+* Support plot1d / plot on Histograms with a categorical axis.
+  `#174 <https://github.com/scikit-hep/hist/pull/174>`_
+
 * Add frequentist coverage interval support in the ``intervals`` module.
   `#176 <https://github.com/scikit-hep/hist/pull/176>`_
 
