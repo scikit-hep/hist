@@ -1,7 +1,7 @@
 Changelog
 ====================
 
-IN PROGRESS
+Version 2.3.0
 --------------------
 
 * Add ``plot_ratio`` to the public API, which allows for making ratio plots between the
