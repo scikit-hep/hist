@@ -25,6 +25,9 @@ IN PROGRESS
 * Add ``fit_fmt=`` to ``plot_pull`` to control display of fit params.
   `#168 <https://github.com/scikit-hep/hist/pull/168>`_
 
+* Support ``<prefix>_kw`` arguments for setting each axis in plotting.
+  `#193 <https://github.com/scikit-hep/hist/pull/193>`_
+
 * Cleaner IPython completion for Python 3.7+.
   `#179 <https://github.com/scikit-hep/hist/pull/179>`_
 

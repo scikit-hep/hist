@@ -82,16 +82,22 @@ def _expand_shortcuts(key: str) -> str:
 
 
 def _filter_dict(
-    dict: Dict[str, Any], prefix: str, *, ignore: Optional[Set[str]] = None
+    __dict: Dict[str, Any], prefix: str, *, ignore: Optional[Set[str]] = None
 ) -> Dict[str, Any]:
     """
     Keyword argument conversion: convert the kwargs to several independent args, pulling
-    them out of the dict given.
+    them out of the dict given. Prioritize prefix_kw dict.
     """
+
+    # If passed explicitly, use that
+    if f"{prefix}kw" in __dict:
+        res: Dict[str, Any] = __dict.pop(f"{prefix}kw")
+        return {_expand_shortcuts(k): v for k, v in res.items()}
+
     ignore_set: Set[str] = ignore or set()
     return {
-        _expand_shortcuts(key[len(prefix) :]): dict.pop(key)
-        for key in list(dict)
+        _expand_shortcuts(key[len(prefix) :]): __dict.pop(key)
+        for key in list(__dict)
         if key.startswith(prefix) and key not in ignore_set
     }
 

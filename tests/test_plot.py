@@ -108,6 +108,20 @@ def test_general_plot2d_full():
         side_color="steelblue",
     )
 
+    assert h.plot2d_full(
+        main_cmap="cividis",
+        top_kw={
+            "ls": "--",
+            "color": "orange",
+            "lw": 2,
+        },
+        side_kw={
+            "ls": "-.",
+            "lw": 1,
+            "color": "steelblue",
+        },
+    )
+
     # dimension error
     h = Hist(
         axis.Regular(
