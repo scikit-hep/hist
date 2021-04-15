@@ -27,7 +27,6 @@ extras_require["dev"] = [*extras_require["test"], *extras_require["plot"], "ipyk
 extras_require["docs"] = [
     *extras_require["plot"],
     "nbsphinx",
-    "recommonmark >=0.5.0",
     "Sphinx >=3.0.0",
     "sphinx_copybutton",
     "sphinx_rtd_theme >=0.5.0",
