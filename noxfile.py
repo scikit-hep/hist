@@ -11,6 +11,15 @@ nox.options.sessions = ["lint", "tests"]
 DIR = Path(__file__).parent.resolve()
 
 
+@nox.session
+def lint(session):
+    """
+    Run the linter.
+    """
+    session.install("pre-commit")
+    session.run("pre-commit", "run", "--all-files")
+
+
 @nox.session(python=ALL_PYTHONS)
 def tests(session):
     """
@@ -26,8 +35,8 @@ def docs(session):
     Build the docs. Pass "serve" to serve.
     """
 
-    session.chdir("docs")
     session.install(".[docs]")
+    session.chdir("docs")
     session.run("sphinx-build", "-M", "html", ".", "_build")
 
     if session.posargs:
@@ -36,15 +45,6 @@ def docs(session):
             session.run("python", "-m", "http.server", "8000", "-d", "_build/html")
         else:
             print("Unsupported argument to docs")
-
-
-@nox.session
-def lint(session):
-    """
-    Run the linter.
-    """
-    session.install("pre-commit")
-    session.run("pre-commit", "run", "--all-files")
 
 
 @nox.session
