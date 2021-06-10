@@ -57,7 +57,7 @@ class AxesMixin:
     @property
     def name(self: AxisProtocol) -> str:
         """
-        Get or set the name for the Regular axis
+        Get the name for the Regular axis
         """
         return self._ax.metadata.get("name", "")
 
