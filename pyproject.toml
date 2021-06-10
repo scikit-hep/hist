@@ -51,33 +51,14 @@ no_implicit_reexport = true
 strict_equality = true
 
 [[tool.mypy.overrides]]
-module = "histoprint.*"
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
-module = "scipy.optimize.*"
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
-module = "uncertainties.*"
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
-module = "matplotlib.*"
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
-module = "scipy.*"
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
-module = "iminuit.*"
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
-module = "mplhep.*"
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
-module = "hist.version"
+module = [
+    "histoprint.*",
+    "scipy.optimize.*",
+    "uncertainties.*",
+    "matplotlib.*",
+    "scipy.*",
+    "iminuit.*",
+    "mplhep.*",
+    "hist.version",
+]
 ignore_missing_imports = true
