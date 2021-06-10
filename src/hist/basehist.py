@@ -136,7 +136,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
             if name == axis.name:
                 return index
 
-        raise ValueError("The axis names could not be found")
+        raise ValueError(f"The axis name {name} could not be found")
 
     @classmethod
     def from_columns(
