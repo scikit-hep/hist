@@ -7,9 +7,18 @@
 # Warning: do not change the path here. To use autodoc, you need to install the
 # package first.
 
+import os
+import shutil
+import sys
+from pathlib import Path
 from typing import List
 
 from pkg_resources import get_distribution
+
+DIR = Path(__file__).parent.resolve()
+BASEDIR = DIR.parent
+
+sys.path.append(str(BASEDIR / "src/hist"))
 
 # -- Project information -----------------------------------------------------
 
@@ -82,3 +91,29 @@ nbsphinx_execute_arguments = [
 ]
 
 nbsphinx_kernel_name = "python3"
+
+
+def prepare(app):
+    outer = BASEDIR / ".github"
+    inner = DIR
+    # print(outer)
+    # print(inner)
+    contributing = "CONTRIBUTING.md"
+    # print(contributing)
+    # print(outer/contributing)
+    shutil.copy(outer / contributing, inner / "contributing.md")
+    # print(shutil.copy(outer/contributing, inner))
+
+
+def clean_up(app, exception):
+    inner = DIR
+    os.unlink(inner / "contributing.md")
+
+
+def setup(app):
+
+    # Copy the file in
+    app.connect("builder-inited", prepare)
+
+    # Clean up the generated file
+    app.connect("build-finished", clean_up)
