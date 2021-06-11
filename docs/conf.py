@@ -96,13 +96,8 @@ nbsphinx_kernel_name = "python3"
 def prepare(app):
     outer = BASEDIR / ".github"
     inner = DIR
-    # print(outer)
-    # print(inner)
     contributing = "CONTRIBUTING.md"
-    # print(contributing)
-    # print(outer/contributing)
     shutil.copy(outer / contributing, inner / "contributing.md")
-    # print(shutil.copy(outer/contributing, inner))
 
 
 def clean_up(app, exception):
