@@ -116,7 +116,9 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         return NamedAxesTuple(self._axis(i) for i in range(self.ndim))
 
     def _repr_html_(self) -> str:
-        if self.ndim == 1:
+        if self.size == 0:
+            return str(self)
+        elif self.ndim == 1:
             if self.axes[0].traits.circular:
                 return str(html_hist(self, svg_hist_1d_c))
             else:
@@ -125,6 +127,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
             return str(html_hist(self, svg_hist_2d))
         elif self.ndim > 2:
             return str(html_hist(self, svg_hist_nd))
+
         return str(self)
 
     def _name_to_index(self, name: str) -> int:
