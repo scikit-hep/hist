@@ -846,3 +846,24 @@ def test_from_array(named_hist):
             axis.Regular(7, 1, 3, name="B"),
             data=np.ones((11, 9)),
         )
+
+
+def test_sum_empty_axis():
+    hist = bh.Histogram(
+        bh.axis.StrCategory("", growth=True),
+        bh.axis.Regular(10, 0, 1),
+        storage=bh.storage.Weight(),
+    )
+    assert hist.sum().value == 0
+    assert "Str" in repr(hist)
+
+
+def test_sum_empty_axis_hist():
+    h = Hist(
+        axis.StrCategory("", growth=True),
+        axis.Regular(10, 0, 1),
+        storage=storage.Weight(),
+    )
+    assert h.sum().value == 0
+    assert "Str" in repr(h)
+    h._repr_html_()
