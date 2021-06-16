@@ -163,9 +163,9 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
                     raise TypeError(
                         f"{ax} must be all int or strings if axis not given"
                     )
+            elif not ax.name or ax.name not in data:
+                raise TypeError("All axes must have names present in the data")
             else:
-                if not ax.name or ax.name not in data:
-                    raise TypeError("All axes must have names present in the data")
                 axes_list.append(ax)
 
         weight_arr = data[weight] if weight else None
@@ -236,15 +236,15 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         Convert some specific indices to step.
         """
 
-        if isinstance(x, complex):
-            if x.real != 0:
-                raise ValueError("The step should not have real part")
-            elif x.imag % 1 != 0:
-                raise ValueError("The imaginary part should be an integer")
-            else:
-                return bh.rebin(int(x.imag))
-        else:
+        if not isinstance(x, complex):
             return x
+
+        if x.real != 0:
+            raise ValueError("The step should not have real part")
+        elif x.imag % 1 != 0:
+            raise ValueError("The imaginary part should be an integer")
+        else:
+            return bh.rebin(int(x.imag))
 
     def _index_transform(self, index: IndexingExpr) -> bh.IndexingExpr:
         """
