@@ -17,7 +17,7 @@ def lint(session):
     Run the linter.
     """
     session.install("pre-commit")
-    session.run("pre-commit", "run", "--all-files")
+    session.run("pre-commit", "run", "--all-files", *session.posargs)
 
 
 @nox.session(python=ALL_PYTHONS)
@@ -26,7 +26,7 @@ def tests(session):
     Run the unit and regular tests.
     """
     session.install(".[test]")
-    session.run("pytest")
+    session.run("pytest", *session.posargs)
 
 
 @nox.session
@@ -56,10 +56,6 @@ def build(session):
     build_p = DIR.joinpath("build")
     if build_p.exists():
         shutil.rmtree(build_p)
-
-    dist_p = DIR.joinpath("dist")
-    if dist_p.exists():
-        shutil.rmtree(dist_p)
 
     session.install("build")
     session.run("python", "-m", "build")
