@@ -35,6 +35,7 @@ extras_require["docs"] = [
     "ipykernel",
     "pillow",
     "uncertainties>=3",
+    "myst_parser>=0.14",
 ]
 
 extras_require["all"] = sorted(set(sum(extras_require.values(), [])))
