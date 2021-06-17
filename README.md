@@ -7,7 +7,6 @@
 [![pre-commit.ci status][pre-commit-badge]][pre-commit-link]
 [![Code style: black][black-badge]][black-link]
 
-
 [![PyPI version][pypi-version]][pypi-link]
 [![Conda-Forge][conda-badge]][conda-link]
 [![PyPI platforms][pypi-platforms]][pypi-link]
@@ -110,7 +109,7 @@ From a git checkout, run:
 python -m pip install -e .[dev]
 ```
 
-See [CONTRIBUTING.md](./.github/CONTRIBUTING.md) for information on setting up a development environment.
+See [CONTRIBUTING.md](https://hist.readthedocs.io/en/latest/contributing.html) for information on setting up a development environment.
 
 ## Contributors
 
@@ -138,14 +137,12 @@ We would like to acknowledge the contributors that made this project possible ([
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
-
-
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification.
 
 ## Talks
 
-* [2020-07-07 SciPy Proceedings](https://www.youtube.com/watch?v=ERraTfHkPd0&list=PLYx7XA2nY5GfY4WWJjG5cQZDc7DIUmn6Z&index=4)
-* [2020-07-17 PyHEP2020](https://indico.cern.ch/event/882824/contributions/3931299/)
+- [2020-07-07 SciPy Proceedings](https://www.youtube.com/watch?v=ERraTfHkPd0&list=PLYx7XA2nY5GfY4WWJjG5cQZDc7DIUmn6Z&index=4)
+- [2020-07-17 PyHEP2020](https://indico.cern.ch/event/882824/contributions/3931299/)
 
 ---
 
@@ -154,7 +151,6 @@ This project follows the [all-contributors](https://github.com/all-contributors/
 This library was primarily developed by Henry Schreiner and Nino Lau.
 
 Support for this work was provided by the National Science Foundation cooperative agreement OAC-1836650 (IRIS-HEP) and OAC-1450377 (DIANA/HEP). Any opinions, findings, conclusions or recommendations expressed in this material are those of the authors and do not necessarily reflect the views of the National Science Foundation.
-
 
 [actions-badge]:            https://github.com/scikit-hep/hist/workflows/CI/badge.svg
 [actions-link]:             https://github.com/scikit-hep/hist/actions
