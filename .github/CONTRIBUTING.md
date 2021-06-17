@@ -4,7 +4,9 @@ detailed description of best practices for developing Scikit-HEP packages.
 
 [skhep-dev-intro]: https://scikit-hep.org/developer/intro
 
-# Setting up a development environment
+# Contributing
+
+## Setting up a development environment
 
 ### Nox
 
@@ -52,7 +54,7 @@ $ conda activate hist
 (hist)$ python -m ipykernel install --name hist
 ```
 
-# Post setup
+## Post setup
 
 You should prepare pre-commit, which will help you by checking that commits
 pass required checks:
@@ -65,7 +67,7 @@ pre-commit install # Will install a pre-commit hook into the git repo
 You can also/alternatively run `pre-commit run` (changes only) or `pre-commit
 run --all-files` to check even without installing the hook.
 
-# Testing
+## Testing
 
 Use PyTest to run the unit checks:
 
