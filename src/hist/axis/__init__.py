@@ -141,7 +141,7 @@ class Boolean(AxesMixin, bha.Boolean, family=hist):
         self.label: str = label
 
 
-class Variable(bha.Variable, AxesMixin, family=hist):
+class Variable(AxesMixin, bha.Variable, family=hist):
     __slots__ = ()
 
     def __init__(
@@ -150,12 +150,12 @@ class Variable(bha.Variable, AxesMixin, family=hist):
         *,
         name: str = "",
         label: str = "",
+        metadata: Any = None,
         flow: bool = True,
         underflow: Optional[bool] = None,
         overflow: Optional[bool] = None,
         growth: bool = False,
         circular: bool = False,
-        metadata: Any = None,
         __dict__: Optional[Dict[str, Any]] = None,
     ) -> None:
         super().__init__(
@@ -171,7 +171,7 @@ class Variable(bha.Variable, AxesMixin, family=hist):
         self.label: str = label
 
 
-class Integer(bha.Integer, AxesMixin, family=hist):
+class Integer(AxesMixin, bha.Integer, family=hist):
     __slots__ = ()
 
     def __init__(
@@ -181,12 +181,12 @@ class Integer(bha.Integer, AxesMixin, family=hist):
         *,
         name: str = "",
         label: str = "",
+        metadata: Any = None,
         flow: bool = True,
         underflow: Optional[bool] = None,
         overflow: Optional[bool] = None,
         growth: bool = False,
         circular: bool = False,
-        metadata: Any = None,
         __dict__: Optional[Dict[str, Any]] = None,
     ) -> None:
         super().__init__(
@@ -203,7 +203,7 @@ class Integer(bha.Integer, AxesMixin, family=hist):
         self.label: str = label
 
 
-class IntCategory(bha.IntCategory, AxesMixin, family=hist):
+class IntCategory(AxesMixin, bha.IntCategory, family=hist):
     __slots__ = ()
 
     def __init__(
@@ -212,8 +212,8 @@ class IntCategory(bha.IntCategory, AxesMixin, family=hist):
         *,
         name: str = "",
         label: str = "",
-        growth: bool = False,
         metadata: Any = None,
+        growth: bool = False,
         __dict__: Optional[Dict[str, Any]] = None,
     ) -> None:
         super().__init__(
@@ -226,7 +226,7 @@ class IntCategory(bha.IntCategory, AxesMixin, family=hist):
         self.label: str = label
 
 
-class StrCategory(bha.StrCategory, AxesMixin, family=hist):
+class StrCategory(AxesMixin, bha.StrCategory, family=hist):
     __slots__ = ()
 
     def __init__(
@@ -235,8 +235,8 @@ class StrCategory(bha.StrCategory, AxesMixin, family=hist):
         *,
         name: str = "",
         label: str = "",
-        growth: bool = False,
         metadata: Any = None,
+        growth: bool = False,
         __dict__: Optional[Dict[str, Any]] = None,
     ) -> None:
         super().__init__(
