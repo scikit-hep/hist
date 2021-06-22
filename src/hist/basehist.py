@@ -1,5 +1,5 @@
 import functools
-import inspect 
+import inspect
 import operator
 import typing
 import warnings
@@ -229,7 +229,6 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         total_data = tuple(args) + tuple(data)  # Python 2 can't unpack twice
         return super().fill(*total_data, weight=weight, sample=sample, threads=threads)
 
-    
     def sort(
         self: T,
         axis: Union[int, str],
@@ -240,29 +239,34 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         name = axis
         pos = [i for i in range(len(self.axes)) if self.axes[name] == self.axes[i]][0]
         ixes = sorted(range(len(self.axes[name])), key=lambda k: self.axes[name][k])
-        
+
         def copy_traits(axis, instance=hist.axis.StrCategory):
             trait_dict = vars(axis.traits)
             for key in list(trait_dict.keys()):
                 if key not in inspect.signature(instance).parameters.keys():
                     del trait_dict[key]
-            trait_dict['name'] = axis.name
-            trait_dict['label'] = axis.label
+            trait_dict["name"] = axis.name
+            trait_dict["label"] = axis.label
             return trait_dict
 
         labels = [list(self.axes[pos])[i] for i in ixes]
         if isinstance(self.axes[pos], hist.axis.IntCategory):
-            new_ax = hist.axis.IntCategory(labels, **copy_traits(self.axes[pos], hist.axis.IntCategory))
+            new_ax = hist.axis.IntCategory(
+                labels, **copy_traits(self.axes[pos], hist.axis.IntCategory)
+            )
         elif isinstance(self.axes[pos], hist.axis.StrCategory):
-            new_ax = hist.axis.StrCategory(labels, **copy_traits(self.axes[pos], hist.axis.StrCategory))
+            new_ax = hist.axis.StrCategory(
+                labels, **copy_traits(self.axes[pos], hist.axis.StrCategory)
+            )
         else:
             raise RuntimeError("Expected a categorical axis")
-            
-        new_h = hist.Hist(*self.axes[:pos], new_ax, *self.axes[pos+1:])
 
-        new_h[...] = self.view(flow=True)[(slice(None),) * pos + (ixes,) + (slice(None),) * (len(self.axes) - pos - 1)]
+        new_h = hist.Hist(*self.axes[:pos], new_ax, *self.axes[pos + 1 :])
+
+        new_h[...] = self.view(flow=True)[
+            (slice(None),) * pos + (ixes,) + (slice(None),) * (len(self.axes) - pos - 1)
+        ]
         return new_h
-
 
     def _loc_shortcut(self, x: Any) -> Any:
         """
