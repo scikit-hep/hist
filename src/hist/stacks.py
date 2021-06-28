@@ -1,0 +1,42 @@
+from typing import TYPE_CHECKING, Any, Optional, Union
+
+import numpy as np
+
+if TYPE_CHECKING:
+    from mplhep.plot import Hist1DArtists, Hist2DArtists
+
+
+class Stack:
+    def __init__(
+        self,
+        *args: Any,
+    ) -> None:
+        """
+        Initialize Stack for histograms and axes.
+        """
+        # todo: make the args support axes.
+
+        if len(args) == 0:
+            raise ValueError("There should be histograms or axes in Stack")
+        ndim = args[0].ndim
+        for a in args:
+            if a.ndim != ndim:
+                raise ValueError("Histograms' dimensions don't match")
+        self._stack = [*args]
+
+    def plot(
+        self, *args: Any, overlay: "Optional[str]" = None, **kwargs: Any
+    ) -> "Union[Hist1DArtists, Hist2DArtists]":
+        """
+        Plot method for Stack object.
+        """
+        _has_categorical = (
+            np.sum([ax.traits.discrete for ax in self._stack[0].axes]) == 1
+        )
+        _project = _has_categorical or overlay is not None
+        if self._stack[0].ndim == 1 or (self._stack[0].ndim == 2 and _project):
+            return self._stack[0].plot1d(*args, overlay=overlay, **kwargs)
+        elif self._stack[0].ndim == 2:
+            return self._stack[0].plot2d(*args, **kwargs)
+        else:
+            raise NotImplementedError("Please project to 1D or 2D before calling plot")
