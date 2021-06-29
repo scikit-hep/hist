@@ -31,9 +31,12 @@ class Stack:
         """
         Plot method for Stack object.
         """
-        _has_categorical = (
-            np.sum([ax.traits.discrete for ax in self._stack[0].axes]) == 1
-        )
+        _has_categorical = 0
+        if (
+            np.sum(self._stack[0].axes.traits.ordered) == 1
+            and np.sum(self._stack[0].axes.traits.discrete) == 1
+        ):
+            _has_categorical = 1
         _project = _has_categorical or overlay is not None
         if self._stack[0].ndim == 1 or (self._stack[0].ndim == 2 and _project):
             return [
