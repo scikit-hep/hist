@@ -57,7 +57,7 @@ repos:
   - id: mypy
     files: ^src
     args: []
-    additional_dependencies: ["numpy>=1.20", "matplotlib>=3.3", "boost-histogram~=1.0.1", "uhi>=0.2.1"]
+    additional_dependencies: ["numpy==1.20.*", "matplotlib>=3.3", "boost-histogram~=1.0.1", "uhi~=0.3.0"]
 
 - repo: https://github.com/mgedmin/check-manifest
   rev: "0.46"
