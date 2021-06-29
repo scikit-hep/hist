@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Any, Optional, Union
+from typing import TYPE_CHECKING, Any, List, Optional, Union
 
 import numpy as np
 
@@ -23,10 +23,11 @@ class Stack:
             if a.ndim != ndim:
                 raise ValueError("Histograms' dimensions don't match")
         self._stack = [*args]
+        self._stack_len = len(args)
 
     def plot(
         self, *args: Any, overlay: "Optional[str]" = None, **kwargs: Any
-    ) -> "Union[Hist1DArtists, Hist2DArtists]":
+    ) -> "List[Union[Hist1DArtists, Hist2DArtists]]":
         """
         Plot method for Stack object.
         """
@@ -35,8 +36,9 @@ class Stack:
         )
         _project = _has_categorical or overlay is not None
         if self._stack[0].ndim == 1 or (self._stack[0].ndim == 2 and _project):
-            return self._stack[0].plot1d(*args, overlay=overlay, **kwargs)
-        elif self._stack[0].ndim == 2:
-            return self._stack[0].plot2d(*args, **kwargs)
+            return [
+                self._stack[-i - 1].plot1d(*args, overlay=overlay, **kwargs)
+                for i in range(self._stack_len)
+            ]
         else:
-            raise NotImplementedError("Please project to 1D or 2D before calling plot")
+            raise NotImplementedError("Please project to 1D before calling plot")
