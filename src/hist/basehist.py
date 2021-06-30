@@ -343,7 +343,9 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         """
         Plot method for BaseHist object.
         """
-        _has_categorical = np.sum([ax.traits.discrete for ax in self.axes]) == 1
+        _has_categorical = (
+            np.sum([ax.traits.discrete and ax.traits.ordered for ax in self.axes]) == 1
+        )
         _project = _has_categorical or overlay is not None
         if self.ndim == 1 or (self.ndim == 2 and _project):
             return self.plot1d(*args, overlay=overlay, **kwargs)

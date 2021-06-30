@@ -1,7 +1,5 @@
 from typing import TYPE_CHECKING, Any, List, Optional, Union
 
-import numpy as np
-
 if TYPE_CHECKING:
     from mplhep.plot import Hist1DArtists, Hist2DArtists
 
@@ -36,8 +34,8 @@ class Stack:
         """
         _has_categorical = 0
         if (
-            np.sum(self._stack[0].axes.traits.ordered) == 1
-            and np.sum(self._stack[0].axes.traits.discrete) == 1
+            self._stack[0].axes.traits.ordered == 1
+            and self._stack[0].axes.traits.discrete == 1
         ):
             _has_categorical = 1
         _project = _has_categorical or overlay is not None
