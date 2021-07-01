@@ -1,3 +1,5 @@
+import sys
+
 import numpy as np
 import pytest
 
@@ -44,6 +46,7 @@ str_cat_hist_2d = Hist(axis.StrCategory(["F", "T"]), axis.StrCategory(["F", "T"]
 )
 
 
+@pytest.mark.skipif(sys.version_info < (3, 7), reason="requires Python 3.7 or higher")
 def test_stack_init():
     """
     Test stack init -- whether Stack can be properly initialized.
@@ -93,6 +96,7 @@ def test_stack_init():
         Stack(str_cat_hist, str_cat_hist_2d)
 
 
+@pytest.mark.skipif(sys.version_info < (3, 7), reason="requires Python 3.7 or higher")
 def test_stack_plot():
     """
     Test stack plot -- whether Stack can be properly plot.
