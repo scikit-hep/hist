@@ -1,7 +1,6 @@
-from typing import TYPE_CHECKING, Any, List, Optional, Union
+from typing import Any, Optional
 
-if TYPE_CHECKING:
-    from mplhep.plot import Hist1DArtists, Hist2DArtists
+from mplhep.plot import histplot
 
 
 class Stack:
@@ -23,23 +22,12 @@ class Stack:
         self._stack = [*args]
         self._stack_len = len(args)
 
-    def plot(
-        self, *args: Any, overlay: "Optional[str]" = None, **kwargs: Any
-    ) -> "List[Union[Hist1DArtists, Hist2DArtists]]":
+    def plot(self, *args: Any, overlay: "Optional[str]" = None, **kwargs: Any) -> "Any":
         """
         Plot method for Stack object.
         """
-        _has_categorical = 0
-        if (
-            self._stack[0].axes.traits.ordered == 1
-            and self._stack[0].axes.traits.discrete == 1
-        ):
-            _has_categorical = 1
-        _project = _has_categorical or overlay is not None
-        if self._stack[0].ndim == 1 or (self._stack[0].ndim == 2 and _project):
-            return [
-                self._stack[-i - 1].plot1d(*args, overlay=overlay, **kwargs)
-                for i in range(self._stack_len)
-            ]
+
+        if self._stack[0].ndim == 1:
+            return histplot(self._stack, stack=True)
         else:
             raise NotImplementedError("Please project to 1D before calling plot")
