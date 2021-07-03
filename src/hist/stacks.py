@@ -1,6 +1,14 @@
+import sys
 from typing import Any, Optional
 
-from mplhep.plot import histplot
+try:
+    from mplhep.plot import histplot
+except ModuleNotFoundError:
+    print(
+        "Hist stack requires mplhep to plot, either install hist[plot] or mplhep",
+        file=sys.stderr,
+    )
+    raise
 
 
 class Stack:
@@ -15,10 +23,12 @@ class Stack:
 
         if len(args) == 0:
             raise ValueError("There should be histograms or axes in Stack")
-        axes_check = args[0].axes
-        for a in args:
-            if axes_check != a.axes:
+
+        axes_type = [type(ax) for ax in args[0].axes]
+        for h in args:
+            if axes_type != [type(ax) for ax in h.axes]:
                 raise ValueError("Histograms' axes don't match")
+
         self._stack = [*args]
         self._stack_len = len(args)
 
