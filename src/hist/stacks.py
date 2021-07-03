@@ -26,16 +26,16 @@ class Stack:
             raise ValueError("There should be histograms or axes in stack")
 
         if all([isinstance(a, BaseHist) for a in args]):
-            axes_type = [type(ax) for ax in args[0].axes]
+            axes_type = args[0].axes
             for a in args:
-                if axes_type != [type(ax) for ax in a.axes]:
+                if axes_type != a.axes:
                     raise ValueError("Histograms' axes don't match")
 
             self._stack = [*args]
             self._stack_len = len(args)
 
         elif all([isinstance(a, AxesMixin) for a in args]):
-            if len({type(ax) for ax in args}) != 1:
+            if len({*args}) != 1:
                 raise ValueError("Axes don't match")
 
             self._stack = [*args]
