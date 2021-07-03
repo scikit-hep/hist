@@ -16,13 +16,10 @@ class Stack:
 
         if len(args) == 0:
             raise ValueError("There should be histograms or axes in Stack")
-        ndim = args[0].ndim
-        axestypes = set(map(type, args[0].axes))
+        axes_check = args[0].axes
         for a in args:
-            if a.ndim != ndim:
-                raise ValueError("Histograms' dimensions don't match")
-            if axestypes != set(map(type, a.axes)):
-                raise ValueError("Histograms' axes types don't match")
+            if axes_check != a.axes:
+                raise ValueError("Histograms' axes don't match")
         self._stack = [*args]
         self._stack_len = len(args)
 
