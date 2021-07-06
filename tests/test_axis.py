@@ -58,9 +58,8 @@ def test_axis_flow():
 def test_axis_disallowed_names():
 
     with pytest.warns(UserWarning):
-        h = hist.Hist(
-            axis.Regular(10, 0, 10, name="weight"),
-            axis.Regular(10, 0, 10, name="test"),
-            axis.Regular(10, 0, 10, name="threads"),
-        )
-        h
+        hist.Hist(axis.Regular(10, 0, 10, name="weight"))
+    with pytest.warns(UserWarning):
+        hist.Hist(axis.Regular(10, 0, 10, name="sample"))
+    with pytest.warns(UserWarning):
+        hist.Hist(axis.Regular(10, 0, 10, name="threads"))
