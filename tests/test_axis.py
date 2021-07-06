@@ -1,4 +1,6 @@
-from hist import axis
+import pytest
+
+from hist import axis, hist
 
 
 def test_axis_names():
@@ -51,3 +53,13 @@ def test_axis_flow():
     assert axis.Integer(0, 8, flow=False, overflow=True) == axis.Integer(
         0, 8, underflow=False
     )
+
+
+def test_axis_disallowed_names():
+
+    with pytest.warns(UserWarning):
+        hist.Hist(axis.Regular(10, 0, 10, name="weight"))
+    with pytest.warns(UserWarning):
+        hist.Hist(axis.Regular(10, 0, 10, name="sample"))
+    with pytest.warns(UserWarning):
+        hist.Hist(axis.Regular(10, 0, 10, name="threads"))

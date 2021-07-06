@@ -94,6 +94,13 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
                 warnings.warn(msg)
                 storage = storage()
             super().__init__(*args, storage=storage, metadata=metadata)  # type: ignore
+
+            disallowed_names = {"weight", "sample", "threads"}
+            for ax in self.axes:
+                if ax.name in disallowed_names:
+                    disallowed_warning = f"{ax.name} is a protected keyword and cannot be used as axis name"
+                    warnings.warn(disallowed_warning)
+
             valid_names = [ax.name for ax in self.axes if ax.name]
             if len(valid_names) != len(set(valid_names)):
                 raise KeyError(
@@ -203,7 +210,9 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         }
 
         if set(data_dict) != set(range(len(args), self.ndim)):
-            raise TypeError("All axes must be accounted for in fill")
+            raise TypeError(
+                "All axes must be accounted for in fill, you may have used a disallowed name in the axes"
+            )
 
         data = (data_dict[i] for i in range(len(args), self.ndim))
 
