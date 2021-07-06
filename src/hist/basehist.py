@@ -97,7 +97,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
             disallowed_names = ["weight", "sample", "threads"]
             if any(item in disallowed_names for item in [ax.name for ax in self.axes]):
-                disallowed_warning = "You have used a disallowed name for axes"
+                disallowed_warning = f"{item} is a protected keyword and cannot be used as axis name"
                 warnings.warn(disallowed_warning)
 
             valid_names = [ax.name for ax in self.axes if ax.name]
