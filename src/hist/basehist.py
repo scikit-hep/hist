@@ -95,7 +95,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
                 storage = storage()
             super().__init__(*args, storage=storage, metadata=metadata)  # type: ignore
 
-            disallowed_names = ["weight", "sample", "threads"]
+            disallowed_names = {"weight", "sample", "threads"}
             for ax in self.axes:
                 if ax.name in disallowed_names:
                     disallowed_warning = f"{ax.name} is a protected keyword and cannot be used as axis name"
