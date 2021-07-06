@@ -462,18 +462,17 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
         return hist.plot.plot_pie(self, ax=ax, **kwargs)
 
-    def stack(self: T, *args: Union[int, str]) -> Any:  # todo: should return Stack here
+    def stack(self: T, *args: Union[int, str]) -> "hist.stacks.Stack":
         """
         Returns a stack from a normal histogram axes.
         """
-        from .stacks import Stack
 
         if len(args) == 0:
             raise ValueError("There should be histograms or axes in stack")
 
         if isinstance(args[0], int):
             stack_args = [self.axes[i] for i in args]
-            return Stack(*stack_args)
+            return hist.stacks.Stack(*stack_args)
         elif isinstance(args[0], str):
             axes_names = [ax.name for ax in self.axes]
             stack_args = []
@@ -481,6 +480,6 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
                 idx = axes_names.index(a)
                 stack_args.append(self.axes[idx])
 
-            return Stack(*stack_args)
+            return hist.stacks.Stack(*stack_args)
         else:
             raise NotImplementedError("Only int or str args are supported")
