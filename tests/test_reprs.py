@@ -1,4 +1,4 @@
-from hist import Stack, axis
+from hist import Hist, Stack, axis
 
 
 def test_1D_empty_repr(named_hist):
@@ -96,5 +96,5 @@ def test_stack_repr(named_hist):
     a2 = axis.Regular(
         50, -5, 5, name="A", label="a [unit]", underflow=False, overflow=False
     )
-    assert "name='A'" in repr(Stack(a1, a2))
-    assert "label='a [unit]'" in repr(Stack(a1, a2))
+    assert "name='A'" in repr(Stack(Hist(a1), Hist(a2)))
+    assert "label='a [unit]'" in repr(Stack(Hist(a1), Hist(a2)))

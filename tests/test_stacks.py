@@ -35,6 +35,7 @@ named_int_cat_hist = NamedHist(named_int_cat_ax).fill(E=np.random.randn(10))
 named_str_cat_hist = NamedHist(named_str_cat_ax).fill(F=["T", "F", "T"])
 
 reg_hist_2d = Hist(reg_ax, reg_ax).fill(np.random.randn(10), np.random.randn(10))
+
 boo_hist_2d = Hist(boo_ax, boo_ax).fill([True, False, True], [True, False, True])
 var_hist_2d = Hist(var_ax, var_ax).fill(np.random.randn(10), np.random.randn(10))
 int_hist_2d = Hist(int_ax, int_ax).fill(np.random.randn(10), np.random.randn(10))
@@ -43,41 +44,51 @@ int_cat_hist_2d = Hist(int_cat_ax, int_cat_ax).fill(
 )
 str_cat_hist_2d = Hist(str_cat_ax, str_cat_ax).fill(["T", "F", "T"], ["T", "F", "T"])
 
+axs = (reg_ax, boo_ax, var_ax, int_ax, int_cat_ax, str_cat_ax)
+fills = (int, bool, int, int, int, str)
+ids = ("reg", "boo", "var", "int", "icat", "scat")
 
-@pytest.mark.skipif(sys.version_info < (3, 7), reason="requires Python 3.7 or higher")
-def test_stack_init():
+
+@pytest.fixture(params=zip(axs, fills), ids=ids)
+def hist_1d(request):
+    def make_hist():
+        ax, fill = request.param
+        h = Hist(ax)
+        if fill is int:
+            h.fill(np.random.randn(10))
+        elif fill is bool:
+            h.fill(np.random.randint(0, 1, size=10) == 1)
+        elif fill is str:
+            h.fill(np.random.choice(("T", "F"), size=10))
+        return h
+
+    return make_hist
+
+
+def test_stack_init(hist_1d):
     """
     Test stack init -- whether Stack can be properly initialized.
     """
-    # allow to construct stack with same axes
-    assert Stack(reg_ax, reg_ax, reg_ax)
-    assert Stack(boo_ax, boo_ax, boo_ax)
-    assert Stack(var_ax, var_ax, var_ax)
-    assert Stack(int_ax, int_ax, int_ax)
-    assert Stack(int_cat_ax, int_cat_ax, int_cat_ax)
-    assert Stack(str_cat_ax, str_cat_ax, str_cat_ax)
+    h1 = hist_1d()
+    h2 = hist_1d()
+    h3 = hist_1d()
 
-    # not allow to construct stack with different axes
-    with pytest.raises(Exception):
-        Stack(reg_ax, named_reg_ax)
-    with pytest.raises(Exception):
-        assert Stack(boo_ax, named_boo_ax)
-    with pytest.raises(Exception):
-        Stack(var_ax, named_var_ax)
-    with pytest.raises(Exception):
-        Stack(int_ax, named_int_ax)
-    with pytest.raises(Exception):
-        Stack(int_cat_ax, named_int_cat_ax)
-    with pytest.raises(Exception):
-        Stack(str_cat_ax, named_str_cat_ax)
+    # Allow to construct stack with same-type and same-type-axis histograms
+    stack = Stack(h1, h2, h3)
+    assert stack[0] == h1
+    assert stack[1] == h2
+    assert stack[2] == h3
 
-    # allow to construct stack with same-type and same-type-axis histograms
-    assert Stack(reg_hist, reg_hist, reg_hist)
-    assert Stack(boo_hist, boo_hist, boo_hist)
-    assert Stack(var_hist, var_hist, var_hist)
-    assert Stack(int_hist, int_hist, int_hist)
-    assert Stack(int_cat_hist, int_cat_hist, int_cat_hist)
-    assert Stack(str_cat_hist, str_cat_hist, str_cat_hist)
+    assert tuple(stack) == (h1, h2, h3)
+
+
+def test_stack_constructor_fails():
+    # Don't allow construction directly from axes with no Histograms
+    with pytest.raises(Exception):
+        assert Stack(reg_ax)
+
+    with pytest.raises(Exception):
+        assert Stack(reg_ax, reg_ax, reg_ax)
 
     # not allow to construct stack with different-type but same-type-axis histograms
     with pytest.raises(Exception):
@@ -100,12 +111,12 @@ def test_stack_init():
         Stack(int_hist, int_cat_hist, str_cat_hist)
 
     # allow to construct stack with 2d histograms
-    assert Stack(reg_hist_2d, reg_hist_2d, reg_hist_2d)
-    assert Stack(boo_hist_2d, boo_hist_2d, boo_hist_2d)
-    assert Stack(var_hist_2d, var_hist_2d, var_hist_2d)
-    assert Stack(int_hist_2d, int_hist_2d, int_hist_2d)
-    assert Stack(int_cat_hist_2d, int_cat_hist_2d, int_cat_hist_2d)
-    assert Stack(str_cat_hist_2d, str_cat_hist_2d, str_cat_hist_2d)
+    Stack(reg_hist_2d, reg_hist_2d, reg_hist_2d)
+    Stack(boo_hist_2d, boo_hist_2d, boo_hist_2d)
+    Stack(var_hist_2d, var_hist_2d, var_hist_2d)
+    Stack(int_hist_2d, int_hist_2d, int_hist_2d)
+    Stack(int_cat_hist_2d, int_cat_hist_2d, int_cat_hist_2d)
+    Stack(str_cat_hist_2d, str_cat_hist_2d, str_cat_hist_2d)
 
     # not allow to constuct stack with different ndim
     with pytest.raises(Exception):
@@ -120,14 +131,6 @@ def test_stack_init():
         Stack(int_cat_hist, int_cat_hist_2d)
     with pytest.raises(Exception):
         Stack(str_cat_hist, str_cat_hist_2d)
-
-    # allow to struct stack from histograms with same axes
-    assert reg_hist_2d.stack(0, 1)
-    assert boo_hist_2d.stack(0, 1)
-    assert var_hist_2d.stack(0, 1)
-    assert int_hist_2d.stack(0, 1)
-    assert int_cat_hist_2d.stack(0, 1)
-    assert str_cat_hist_2d.stack(0, 1)
 
     # not allow to struct stack from histograms with different axes
     with pytest.raises(Exception):

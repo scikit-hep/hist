@@ -1,11 +1,12 @@
 import functools
 import operator
+import typing
 import warnings
 from typing import (
-    TYPE_CHECKING,
     Any,
     Callable,
     Dict,
+    Iterator,
     List,
     Mapping,
     Optional,
@@ -29,7 +30,7 @@ from .storage import Storage
 from .svgplots import html_hist, svg_hist_1d, svg_hist_1d_c, svg_hist_2d, svg_hist_nd
 from .typing import ArrayLike, SupportsIndex
 
-if TYPE_CHECKING:
+if typing.TYPE_CHECKING:
     from builtins import ellipsis
 
     import matplotlib.axes
@@ -462,24 +463,16 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
         return hist.plot.plot_pie(self, ax=ax, **kwargs)
 
-    def stack(self: T, *args: Union[int, str]) -> "hist.stacks.Stack":
+    def stack(self, axis: Union[int, str]) -> "hist.stack.Stack":
         """
         Returns a stack from a normal histogram axes.
         """
+        if self.ndim < 2:
+            raise RuntimeError("Cannot stack with less than two axis")
+        stack_histograms: Iterator[BaseHist] = (
+            self[{axis: i}] for i in range(len(self.axes[axis]))  # type: ignore
+        )
+        for name, h in zip(self.axes[axis], stack_histograms):
+            h.name = name  # type: ignore
 
-        if len(args) == 0:
-            raise ValueError("There should be histograms or axes in stack")
-
-        if isinstance(args[0], int):
-            stack_args = [self.axes[i] for i in args]
-            return hist.stacks.Stack(*stack_args)
-        elif isinstance(args[0], str):
-            axes_names = [ax.name for ax in self.axes]
-            stack_args = []
-            for a in args:
-                idx = axes_names.index(a)
-                stack_args.append(self.axes[idx])
-
-            return hist.stacks.Stack(*stack_args)
-        else:
-            raise NotImplementedError("Only int or str args are supported")
+        return hist.stack.Stack(*stack_histograms)
