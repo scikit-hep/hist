@@ -94,6 +94,12 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
                 warnings.warn(msg)
                 storage = storage()
             super().__init__(*args, storage=storage, metadata=metadata)  # type: ignore
+
+            disallowed_names = ["weight", "sample", "threads"]
+            if any(item in disallowed_names for item in [ax.name for ax in self.axes]):
+                disallowed_warning = "You have used a disallowed name for axes"
+                warnings.warn(disallowed_warning)
+
             valid_names = [ax.name for ax in self.axes if ax.name]
             if len(valid_names) != len(set(valid_names)):
                 raise KeyError(
