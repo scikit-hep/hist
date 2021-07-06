@@ -209,7 +209,9 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         }
 
         if set(data_dict) != set(range(len(args), self.ndim)):
-            raise TypeError("All axes must be accounted for in fill")
+            raise TypeError(
+                "All axes must be accounted for in fill, you may have used a disallowed name in the axes"
+            )
 
         data = (data_dict[i] for i in range(len(args), self.ndim))
 
