@@ -1,5 +1,4 @@
 import functools
-import inspect
 import operator
 import typing
 import warnings
@@ -29,7 +28,7 @@ from .axis import AxisProtocol
 from .quick_construct import MetaConstructor
 from .storage import Storage
 from .svgplots import html_hist, svg_hist_1d, svg_hist_1d_c, svg_hist_2d, svg_hist_nd
-from .typing import ArrayLike, SupportsIndex
+from .typing import ArrayLike, Protocol, SupportsIndex
 
 if typing.TYPE_CHECKING:
     from builtins import ellipsis
@@ -38,6 +37,12 @@ if typing.TYPE_CHECKING:
     from mplhep.plot import Hist1DArtists, Hist2DArtists
 
     from .plot import FitResultArtists, MainAxisArtists, RatiolikeArtists
+
+
+class SupportsLessThan(Protocol):
+    def __lt__(self, __other: Any) -> bool:
+        ...
+
 
 InnerIndexing = Union[
     SupportsIndex, str, Callable[[bh.axis.Axis], int], slice, "ellipsis"
@@ -232,41 +237,20 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
     def sort(
         self: T,
         axis: Union[int, str],
-    ) -> Union[T, float, bh.accumulators.Accumulator]:
+        key: Union[
+            Callable[[int], SupportsLessThan], Callable[[str], SupportsLessThan], None
+        ] = None,
+        reverse: bool = False,
+    ) -> T:
         """
         Sort a categorical axis.
         """
-        name = axis
-        pos = [i for i in range(len(self.axes)) if self.axes[name] == self.axes[i]][0]
-        ixes = sorted(range(len(self.axes[name])), key=lambda k: self.axes[name][k])
 
-        def copy_traits(axis, instance=hist.axis.StrCategory):
-            trait_dict = vars(axis.traits)
-            for key in list(trait_dict.keys()):
-                if key not in inspect.signature(instance).parameters.keys():
-                    del trait_dict[key]
-            trait_dict["name"] = axis.name
-            trait_dict["label"] = axis.label
-            return trait_dict
-
-        labels = [list(self.axes[pos])[i] for i in ixes]
-        if isinstance(self.axes[pos], hist.axis.IntCategory):
-            new_ax = hist.axis.IntCategory(
-                labels, **copy_traits(self.axes[pos], hist.axis.IntCategory)
-            )
-        elif isinstance(self.axes[pos], hist.axis.StrCategory):
-            new_ax = hist.axis.StrCategory(
-                labels, **copy_traits(self.axes[pos], hist.axis.StrCategory)
-            )
-        else:
-            raise RuntimeError("Expected a categorical axis")
-
-        new_h = hist.Hist(*self.axes[:pos], new_ax, *self.axes[pos + 1 :])
-
-        new_h[...] = self.view(flow=True)[
-            (slice(None),) * pos + (ixes,) + (slice(None),) * (len(self.axes) - pos - 1)
-        ]
-        return new_h
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            sorted_cats = sorted(self.axes[axis], key=key, reverse=reverse)
+            # This can only return T, not float, etc., so we ignore the extra types here
+            return self[{axis: [bh.loc(x) for x in sorted_cats]}]  # type: ignore
 
     def _loc_shortcut(self, x: Any) -> Any:
         """
