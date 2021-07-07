@@ -1,6 +1,51 @@
 Changelog
 ====================
 
+Version 2.4.0
+--------------------
+
+* Support ``.stack(axis)`` and stacked histograms.
+  `#244 <https://github.com/scikit-hep/hist/pull/244>`_
+  `#257 <https://github.com/scikit-hep/hist/pull/257>`_
+  `#258 <https://github.com/scikit-hep/hist/pull/258>`_
+
+* Support selection lists (experimental with boost-histogram 1.1.0).
+  `#255 <https://github.com/scikit-hep/hist/pull/255>`_
+
+* Support full names for QuickConstruct, and support mistaken usage in constructor.
+  `#256 <https://github.com/scikit-hep/hist/pull/256>`_
+
+* Add ``.sort(axis)`` for quickly sorting a categorical axis.
+  `#243 <https://github.com/scikit-hep/hist/pull/243>`_
+
+
+Smaller features or fixes:
+
+* Support nox for easier contributor setup.
+  `#228 <https://github.com/scikit-hep/hist/pull/228>`_
+
+* Better name axis error.
+  `#232 <https://github.com/scikit-hep/hist/pull/232>`_
+
+* Fix for issue plotting size 0 axes.
+  `#238 <https://github.com/scikit-hep/hist/pull/238>`_
+
+* Fix issues with repr information missing.
+  `#241 <https://github.com/scikit-hep/hist/pull/241>`_
+
+* Fix issues with wrong plot shortcut being triggered by Integer axes.
+  `#247 <https://github.com/scikit-hep/hist/pull/247>`_
+
+* Warn and better error if overlapping keyword used as axis name.
+  `#250 <https://github.com/scikit-hep/hist/pull/250>`_
+
+Along with lots of smaller docs updates.
+
+
+
+
+
+
 Version 2.3.0
 --------------------
 
