@@ -1,11 +1,14 @@
-import sys
 import typing
-from typing import Any, Iterator, List, Tuple, Union
+from typing import Any, Iterator, List, Tuple, TypeVar, Union
 
 from .basehist import BaseHist
 
 if typing.TYPE_CHECKING:
     from mplhep.plot import Hist1DArtists
+
+__all__ = ("Stack",)
+
+T = TypeVar("T", bound="Stack")
 
 
 class Stack:
@@ -30,35 +33,48 @@ class Stack:
             if first_axes != a.axes:
                 raise ValueError("The Histogram axes don't match")
 
-    def __repr__(self) -> str:
-        str_stack = ", ".join(repr(h) for h in self._stack)
-        return f"{self.__class__.__name__}({str_stack})"
+    @typing.overload
+    def __getitem__(self, val: int) -> BaseHist:
+        ...
 
-    def __getitem__(
-        self, val: Union[int, slice]
-    ) -> Union[BaseHist, Tuple[BaseHist, ...]]:
+    @typing.overload
+    def __getitem__(self: T, val: slice) -> T:
+        ...
+
+    def __getitem__(self: T, val: Union[int, slice]) -> Union[BaseHist, T]:
+        if isinstance(val, slice):
+            return self.__class__(*self._stack.__getitem__(val))
+
         return self._stack.__getitem__(val)
 
     def __iter__(self) -> Iterator[BaseHist]:
         return iter(self._stack)
 
-    def plot(self, *, overlay: None = None, **kwargs: Any) -> "List[Hist1DArtists]":
+    def __len__(self) -> int:
+        return len(self._stack)
+
+    def __repr__(self) -> str:
+        str_stack = ", ".join(repr(h) for h in self)
+        return f"{self.__class__.__name__}({str_stack})"
+
+    def plot(self, **kwargs: Any) -> "List[Hist1DArtists]":
         """
         Plot method for Stack object.
         """
-        if overlay is not None:
-            raise NotImplementedError("Currently overlay is not supported")
 
-        if self._stack[0].ndim != 1:
+        import hist.plot
+
+        if self[0].ndim != 1:
             raise NotImplementedError("Please project to 1D before calling plot")
 
-        try:
-            import mplhep.plot
-        except ModuleNotFoundError:
-            print(
-                f"{self.__class__.__name__}.plot() requires mplhep to plot, either install hist[plot] or mplhep",
-                file=sys.stderr,
-            )
-            raise
+        if "label" not in kwargs:
+            # TODO: add .name to static typing. And runtime, for that matter.
+            if all(getattr(h, "name", None) is not None for h in self):
+                kwargs["label"] = [h.name for h in self]  # type: ignore
 
-        return mplhep.plot.histplot(list(self._stack), **kwargs)  # type: ignore
+        return hist.plot.histplot(list(self), **kwargs)  # type: ignore
+
+
+# Python 3.7 only
+def __dir__() -> Tuple[str, ...]:
+    return __all__
