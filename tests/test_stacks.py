@@ -152,7 +152,7 @@ def test_stack_constructor_fails():
 
 
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="requires Python 3.7 or higher")
-def test_stack_plot():
+def test_stack_plot_construct():
     """
     Test stack plot -- whether Stack can be properly plot.
     """
@@ -217,3 +217,24 @@ def test_stack_method():
     assert s2[0].axes[0] == h.axes[0]
     assert s2[0].name == "one"
     assert s2[1].name == "two"
+
+
+def collect(*args, **kwargs):
+    return args, kwargs
+
+
+def test_stack_plot(monkeypatch):
+    import hist.plot
+
+    monkeypatch.setattr(hist.plot, "histplot", collect)
+
+    h = Hist.new.Regular(10, 0, 1).StrCategory(["one", "two"], name="str").Double()
+    s = h.stack(1)
+
+    args, kwargs = s.plot(silly=...)
+
+    assert len(s) == 2
+    assert len(list(s)) == 2
+
+    assert args == (list(s),)
+    assert kwargs == {"label": ["one", "two"], "silly": ...}
