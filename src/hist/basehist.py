@@ -225,7 +225,9 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         Convert some specific indices to location.
         """
 
-        if isinstance(x, slice):
+        if isinstance(x, list):
+            return [self._loc_shortcut(each) for each in x]
+        elif isinstance(x, slice):
             return slice(
                 self._loc_shortcut(x.start),
                 self._loc_shortcut(x.stop),
@@ -256,7 +258,9 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         else:
             return bh.rebin(int(x.imag))
 
-    def _index_transform(self, index: IndexingExpr) -> bh.IndexingExpr:
+    def _index_transform(
+        self, index: Union[List[IndexingExpr], IndexingExpr]
+    ) -> bh.IndexingExpr:
         """
         Auxiliary function for __getitem__ and __setitem__.
         """
@@ -274,7 +278,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
                 )
             return new_indices
 
-        elif not hasattr(index, "__iter__"):
+        elif not isinstance(index, tuple):
             index = (index,)  # type: ignore
 
         return tuple(self._loc_shortcut(v) for v in index)  # type: ignore

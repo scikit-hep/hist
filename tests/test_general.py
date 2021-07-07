@@ -867,3 +867,25 @@ def test_sum_empty_axis_hist():
     assert h.sum().value == 0
     assert "Str" in repr(h)
     h._repr_html_()
+
+
+@pytest.mark.filterwarnings("ignore:List indexing selection is experimental")
+def test_select_by_index():
+    h = Hist(
+        axis.StrCategory(["a", "two", "3"]),
+        storage=storage.Weight(),
+    )
+
+    assert tuple(h[["a", "3"]].axes[0]) == ("a", "3")
+    assert tuple(h[["a"]].axes[0]) == ("a",)
+
+
+@pytest.mark.filterwarnings("ignore:List indexing selection is experimental")
+def test_select_by_index_imag():
+    h = Hist(
+        axis.IntCategory([7, 8, 9]),
+        storage=storage.Int64(),
+    )
+
+    assert tuple(h[[2, 1]].axes[0]) == (9, 8)
+    assert tuple(h[[8j, 7j]].axes[0]) == (8, 7)
