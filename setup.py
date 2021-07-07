@@ -18,7 +18,7 @@ extras_require = {
 
 extras_require["test"] = [
     *extras_require["plot"],
-    "pytest >=4.6",
+    "pytest >=6",
     "pytest-mpl >=0.12",
 ]
 

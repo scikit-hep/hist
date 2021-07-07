@@ -5,6 +5,15 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools_scm]
 write_to = "src/hist/version.py"
 
+[tool.pytest.ini_options]
+minverison = "6.0"
+addopts = "-ra -Wd --strict-markers"
+xfail_strict = true
+testpaths = ["tests"]
+required_plugins = ["pytest-mpl"]
+log_cli_level = "DEBUG"
+
+
 [tool.nbqa.mutate]
 black = 1
 pyupgrade = 1
