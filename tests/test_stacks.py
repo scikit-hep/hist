@@ -204,3 +204,16 @@ def test_stack_plot():
 
     with pytest.raises(Exception):
         Stack(str_cat_hist_2d).plot()
+
+
+def test_stack_method():
+    h = Hist.new.Regular(10, 0, 1).StrCategory(["one", "two"], name="str").Double()
+    s = h.stack(1)
+    assert s[0].axes[0] == h.axes[0]
+    assert s[0].name == "one"
+    assert s[1].name == "two"
+
+    s2 = h.stack("str")
+    assert s2[0].axes[0] == h.axes[0]
+    assert s2[0].name == "one"
+    assert s2[1].name == "two"
