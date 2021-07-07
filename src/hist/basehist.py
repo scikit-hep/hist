@@ -1,11 +1,12 @@
 import functools
 import operator
+import typing
 import warnings
 from typing import (
-    TYPE_CHECKING,
     Any,
     Callable,
     Dict,
+    Iterator,
     List,
     Mapping,
     Optional,
@@ -29,7 +30,7 @@ from .storage import Storage
 from .svgplots import html_hist, svg_hist_1d, svg_hist_1d_c, svg_hist_2d, svg_hist_nd
 from .typing import ArrayLike, SupportsIndex
 
-if TYPE_CHECKING:
+if typing.TYPE_CHECKING:
     from builtins import ellipsis
 
     import matplotlib.axes
@@ -470,3 +471,17 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         import hist.plot
 
         return hist.plot.plot_pie(self, ax=ax, **kwargs)
+
+    def stack(self, axis: Union[int, str]) -> "hist.stack.Stack":
+        """
+        Returns a stack from a normal histogram axes.
+        """
+        if self.ndim < 2:
+            raise RuntimeError("Cannot stack with less than two axis")
+        stack_histograms: Iterator[BaseHist] = (
+            self[{axis: i}] for i in range(len(self.axes[axis]))  # type: ignore
+        )
+        for name, h in zip(self.axes[axis], stack_histograms):
+            h.name = name  # type: ignore
+
+        return hist.stack.Stack(*stack_histograms)

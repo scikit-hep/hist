@@ -11,6 +11,7 @@ from . import accumulators, axis, numpy, storage, tag
 from .basehist import BaseHist
 from .hist import Hist
 from .namedhist import NamedHist
+from .stack import Stack
 from .tag import loc, overflow, rebin, sum, underflow
 
 # Convenient access to the version number
@@ -21,6 +22,7 @@ __all__ = (
     "Hist",
     "BaseHist",
     "NamedHist",
+    "Stack",
     "accumulators",
     "axis",
     "loc",

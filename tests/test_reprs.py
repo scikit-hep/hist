@@ -1,3 +1,6 @@
+from hist import Hist, Stack, axis
+
+
 def test_1D_empty_repr(named_hist):
 
     h = named_hist.new.Reg(10, -1, 1, name="x", label="y").Double()
@@ -83,3 +86,15 @@ def test_ND_empty_repr(named_hist):
     assert "label='y'" in repr(h)
     assert "label='q'" in repr(h)
     assert "label='b'" in repr(h)
+
+
+def test_stack_repr(named_hist):
+
+    a1 = axis.Regular(
+        50, -5, 5, name="A", label="a [unit]", underflow=False, overflow=False
+    )
+    a2 = axis.Regular(
+        50, -5, 5, name="A", label="a [unit]", underflow=False, overflow=False
+    )
+    assert "name='A'" in repr(Stack(Hist(a1), Hist(a2)))
+    assert "label='a [unit]'" in repr(Stack(Hist(a1), Hist(a2)))
