@@ -514,9 +514,9 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         """
         if self.ndim < 2:
             raise RuntimeError("Cannot stack with less than two axis")
-        stack_histograms: Iterator[BaseHist] = (
+        stack_histograms: Iterator[BaseHist] = [
             self[{axis: i}] for i in range(len(self.axes[axis]))  # type: ignore
-        )
+        ]
         for name, h in zip(self.axes[axis], stack_histograms):
             h.name = name  # type: ignore
 
