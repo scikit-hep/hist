@@ -27,7 +27,7 @@ class QuickConstruct:
         self.hist_class = hist_class
         self.axes = axes
 
-    def Reg(
+    def Regular(
         self,
         bins: int,
         start: float,
@@ -62,6 +62,8 @@ class QuickConstruct:
                 __dict__=__dict__,
             ),
         )
+
+    Reg = Regular
 
     def Sqrt(
         self,
@@ -170,7 +172,7 @@ class QuickConstruct:
             ),
         )
 
-    def Bool(
+    def Boolean(
         self,
         name: str = "",
         label: str = "",
@@ -188,7 +190,9 @@ class QuickConstruct:
             ),
         )
 
-    def Var(
+    Bool = Boolean
+
+    def Variable(
         self,
         edges: Iterable[float],
         *,
@@ -219,7 +223,9 @@ class QuickConstruct:
             ),
         )
 
-    def Int(
+    Var = Variable
+
+    def Integer(
         self,
         start: int,
         stop: int,
@@ -252,7 +258,9 @@ class QuickConstruct:
             ),
         )
 
-    def IntCat(
+    Int = Integer
+
+    def IntCategory(
         self,
         categories: Iterable[int],
         *,
@@ -274,6 +282,8 @@ class QuickConstruct:
                 growth=growth,
             ),
         )
+
+    IntCat = IntCategory
 
     def StrCat(
         self,
@@ -297,6 +307,8 @@ class QuickConstruct:
                 growth=growth,
             ),
         )
+
+    StrCategory = StrCat
 
 
 class ConstructProxy(QuickConstruct):

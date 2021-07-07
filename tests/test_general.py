@@ -746,6 +746,13 @@ def test_hist_proxy():
     assert h["T", "F"] == 1
 
 
+def test_hist_proxy_mistake():
+    h = Hist(Hist.new.IntCat(range(10)))
+    h2 = Hist.new.IntCategory(range(10)).Double()
+
+    assert h == h2
+
+
 def test_general_density():
     """
     Test general density -- whether Hist density work properly.
