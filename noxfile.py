@@ -20,7 +20,7 @@ def lint(session):
     session.run("pre-commit", "run", "--all-files", *session.posargs)
 
 
-@nox.session(python=ALL_PYTHONS)
+@nox.session(python=ALL_PYTHONS, reuse_venv=True)
 def tests(session):
     """
     Run the unit and regular tests.
