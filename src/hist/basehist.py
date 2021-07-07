@@ -80,6 +80,14 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
             storage = args[-1]
             args = args[:-1]
 
+        # Support raw Quick Construct being accidentally passed in
+        args = [
+            a.axes[0]  # type: ignore
+            if isinstance(a, hist.quick_construct.ConstructProxy) and len(a.axes) == 1
+            else a
+            for a in args
+        ]
+
         if args:
             if isinstance(storage, str):
                 storage_str = storage.title()
