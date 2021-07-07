@@ -896,3 +896,11 @@ def test_select_by_index_imag():
 
     assert tuple(h[[2, 1]].axes[0]) == (9, 8)
     assert tuple(h[[8j, 7j]].axes[0]) == (8, 7)
+
+
+def test_sorted_simple():
+    h = Hist.new.IntCat([4, 1, 2]).Double()
+    assert tuple(h.sort(0).axes[0]) == (1, 2, 4)
+    assert tuple(h.sort(0, reverse=True).axes[0]) == (4, 2, 1)
+    assert tuple(h.sort(0, key=lambda x: -x).axes[0]) == (4, 2, 1)
+    assert tuple(h.sort(0, key=lambda x: -x, reverse=True).axes[0]) == (1, 2, 4)

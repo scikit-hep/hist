@@ -28,7 +28,7 @@ from .axis import AxisProtocol
 from .quick_construct import MetaConstructor
 from .storage import Storage
 from .svgplots import html_hist, svg_hist_1d, svg_hist_1d_c, svg_hist_2d, svg_hist_nd
-from .typing import ArrayLike, SupportsIndex
+from .typing import ArrayLike, Protocol, SupportsIndex
 
 if typing.TYPE_CHECKING:
     from builtins import ellipsis
@@ -37,6 +37,12 @@ if typing.TYPE_CHECKING:
     from mplhep.plot import Hist1DArtists, Hist2DArtists
 
     from .plot import FitResultArtists, MainAxisArtists, RatiolikeArtists
+
+
+class SupportsLessThan(Protocol):
+    def __lt__(self, __other: Any) -> bool:
+        ...
+
 
 InnerIndexing = Union[
     SupportsIndex, str, Callable[[bh.axis.Axis], int], slice, "ellipsis"
@@ -227,6 +233,24 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
         total_data = tuple(args) + tuple(data)  # Python 2 can't unpack twice
         return super().fill(*total_data, weight=weight, sample=sample, threads=threads)
+
+    def sort(
+        self: T,
+        axis: Union[int, str],
+        key: Union[
+            Callable[[int], SupportsLessThan], Callable[[str], SupportsLessThan], None
+        ] = None,
+        reverse: bool = False,
+    ) -> T:
+        """
+        Sort a categorical axis.
+        """
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            sorted_cats = sorted(self.axes[axis], key=key, reverse=reverse)
+            # This can only return T, not float, etc., so we ignore the extra types here
+            return self[{axis: [bh.loc(x) for x in sorted_cats]}]  # type: ignore
 
     def _loc_shortcut(self, x: Any) -> Any:
         """
