@@ -109,7 +109,7 @@ From a git checkout, run:
 python -m pip install -e .[dev]
 ```
 
-See [CONTRIBUTING.md](https://hist.readthedocs.io/en/latest/contributing.html) for information on setting up a development environment.
+See [Contributing](https://hist.readthedocs.io/en/latest/contributing.html) guidelines for information on setting up a development environment.
 
 ## Contributors
 
