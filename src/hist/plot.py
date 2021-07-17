@@ -1,17 +1,8 @@
+from __future__ import annotations
+
 import inspect
 import sys
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    Iterable,
-    List,
-    NamedTuple,
-    Optional,
-    Set,
-    Tuple,
-    Union,
-)
+from typing import Any, Callable, Iterable, NamedTuple, Union
 
 import numpy as np
 
@@ -62,7 +53,7 @@ class RatioBarArtists(NamedTuple):
 
 class PullArtists(NamedTuple):
     bar: matplotlib.container.BarContainer
-    patch_artist: List[matplotlib.patches.Rectangle]
+    patch_artist: list[matplotlib.patches.Rectangle]
 
 
 MainAxisArtists = Union[FitResultArtists, Hist1DArtists]
@@ -71,7 +62,7 @@ RatioArtists = Union[RatioErrorbarArtists, RatioBarArtists]
 RatiolikeArtists = Union[RatioArtists, PullArtists]
 
 
-def __dir__() -> Tuple[str, ...]:
+def __dir__() -> tuple[str, ...]:
     return __all__
 
 
@@ -82,8 +73,8 @@ def _expand_shortcuts(key: str) -> str:
 
 
 def _filter_dict(
-    __dict: Dict[str, Any], prefix: str, *, ignore: Optional[Set[str]] = None
-) -> Dict[str, Any]:
+    __dict: dict[str, Any], prefix: str, *, ignore: set[str] | None = None
+) -> dict[str, Any]:
     """
     Keyword argument conversion: convert the kwargs to several independent args, pulling
     them out of the dict given. Prioritize prefix_kw dict.
@@ -91,10 +82,10 @@ def _filter_dict(
 
     # If passed explicitly, use that
     if f"{prefix}kw" in __dict:
-        res: Dict[str, Any] = __dict.pop(f"{prefix}kw")
+        res: dict[str, Any] = __dict.pop(f"{prefix}kw")
         return {_expand_shortcuts(k): v for k, v in res.items()}
 
-    ignore_set: Set[str] = ignore or set()
+    ignore_set: set[str] = ignore or set()
     return {
         _expand_shortcuts(key[len(prefix) :]): __dict.pop(key)
         for key in list(__dict)
@@ -138,7 +129,7 @@ def _curve_fit_wrapper(
     ydata: np.ndarray,
     yerr: np.ndarray,
     likelihood: bool = False,
-) -> Tuple[Tuple[float, ...], np.ndarray]:
+) -> tuple[tuple[float, ...], np.ndarray]:
     """
     Wrapper around `scipy.optimize.curve_fit`. Initial parameters (`p0`)
     can be set in the function definition with defaults for kwargs
@@ -188,9 +179,9 @@ def _curve_fit_wrapper(
 def plot2d_full(
     self: hist.BaseHist,
     *,
-    ax_dict: Optional[Dict[str, matplotlib.axes.Axes]] = None,
+    ax_dict: dict[str, matplotlib.axes.Axes] | None = None,
     **kwargs: Any,
-) -> Tuple[Hist2DArtists, Hist1DArtists, Hist1DArtists]:
+) -> tuple[Hist2DArtists, Hist1DArtists, Hist1DArtists]:
     """
     Plot2d_full method for BaseHist object.
 
@@ -299,7 +290,7 @@ def _fit_callable_to_hist(
     model: Callable[[np.ndarray], np.ndarray],
     histogram: hist.BaseHist,
     likelihood: bool = False,
-) -> "Tuple[np.ndarray, np.ndarray, np.ndarray, Tuple[Tuple[float, ...], np.ndarray]]":
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, tuple[tuple[float, ...], np.ndarray]]:
     """
     Fit a model, a callable function, to the histogram values.
     """
@@ -333,9 +324,9 @@ def _plot_fit_result(
     model_values: np.ndarray,
     model_uncert: np.ndarray,
     ax: matplotlib.axes.Axes,
-    eb_kwargs: Dict[str, Any],
-    fp_kwargs: Dict[str, Any],
-    ub_kwargs: Dict[str, Any],
+    eb_kwargs: dict[str, Any],
+    fp_kwargs: dict[str, Any],
+    ub_kwargs: dict[str, Any],
 ) -> FitResultArtists:
     """
     Plot fit of model to histogram data
@@ -392,7 +383,7 @@ def plot_ratio_array(
     )
 
     # Type now due to control flow
-    axis_artists: Union[RatioErrorbarArtists, RatioBarArtists]
+    axis_artists: RatioErrorbarArtists | RatioBarArtists
 
     uncert_draw_type = kwargs.pop("uncert_draw_type", "line")
     if uncert_draw_type == "line":
@@ -464,8 +455,8 @@ def plot_pull_array(
     __hist: hist.BaseHist,
     pulls: np.ndarray,
     ax: matplotlib.axes.Axes,
-    bar_kwargs: Dict[str, Any],
-    pp_kwargs: Dict[str, Any],
+    bar_kwargs: dict[str, Any],
+    pp_kwargs: dict[str, Any],
 ) -> PullArtists:
     """
     Plot a pull plot on the given axes
@@ -511,14 +502,14 @@ def plot_pull_array(
 
 def _plot_ratiolike(
     self: hist.BaseHist,
-    other: Union[hist.BaseHist, Callable[[np.ndarray], np.ndarray], str],
+    other: hist.BaseHist | Callable[[np.ndarray], np.ndarray] | str,
     likelihood: bool = False,
     *,
-    ax_dict: Optional[Dict[str, matplotlib.axes.Axes]] = None,
+    ax_dict: dict[str, matplotlib.axes.Axes] | None = None,
     view: Literal["ratio", "pull"],
-    fit_fmt: Optional[str] = None,
+    fit_fmt: str | None = None,
     **kwargs: Any,
-) -> Tuple[MainAxisArtists, RatiolikeArtists]:
+) -> tuple[MainAxisArtists, RatiolikeArtists]:
     r"""
     Plot ratio-like plots (ratio plots and pull plots) for BaseHist
 
@@ -672,7 +663,7 @@ def _plot_ratiolike(
     return main_ax_artists, subplot_ax_artists
 
 
-def get_center(x: Union[str, int, Tuple[float, float]]) -> Union[str, float]:
+def get_center(x: str | int | tuple[float, float]) -> str | float:
     if isinstance(x, tuple):
         return (x[0] + x[1]) / 2
     else:
@@ -682,7 +673,7 @@ def get_center(x: Union[str, int, Tuple[float, float]]) -> Union[str, float]:
 def plot_pie(
     self: hist.BaseHist,
     *,
-    ax: Optional[matplotlib.axes.Axes] = None,
+    ax: matplotlib.axes.Axes | None = None,
     **kwargs: Any,
 ) -> Any:
 

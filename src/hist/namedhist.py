@@ -1,4 +1,6 @@
-from typing import Any, Optional, TypeVar, Union
+from __future__ import annotations
+
+from typing import Any, TypeVar
 
 import boost_histogram as bh
 
@@ -23,9 +25,7 @@ class NamedHist(BaseHist, family=hist):
             )
 
     # TODO: This can return a single value
-    def project(
-        self: T, *args: Union[int, str]
-    ) -> Union[T, float, bh.accumulators.Accumulator]:
+    def project(self: T, *args: int | str) -> T | float | bh.accumulators.Accumulator:
         """
         Projection of axis idx.
         """
@@ -40,9 +40,9 @@ class NamedHist(BaseHist, family=hist):
 
     def fill(  # type: ignore
         self: T,
-        weight: Optional[ArrayLike] = None,
-        sample: Optional[ArrayLike] = None,
-        threads: Optional[int] = None,
+        weight: ArrayLike | None = None,
+        sample: ArrayLike | None = None,
+        threads: int | None = None,
         **kwargs: ArrayLike,
     ) -> T:
         """
@@ -61,7 +61,7 @@ class NamedHist(BaseHist, family=hist):
     def __getitem__(  # type: ignore
         self: T,
         index: IndexingExpr,
-    ) -> Union[T, float, bh.accumulators.Accumulator]:
+    ) -> T | float | bh.accumulators.Accumulator:
         """
         Get histogram item.
         """
@@ -76,7 +76,7 @@ class NamedHist(BaseHist, family=hist):
     def __setitem__(  # type: ignore
         self,
         index: IndexingExpr,
-        value: Union[ArrayLike, bh.accumulators.Accumulator],
+        value: ArrayLike | bh.accumulators.Accumulator,
     ) -> None:
         """
         Set histogram item.

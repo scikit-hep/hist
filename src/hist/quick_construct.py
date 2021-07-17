@@ -1,4 +1,6 @@
-from typing import TYPE_CHECKING, Any, Callable, Dict, Iterable, Optional, Type
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any, Callable, Iterable
 
 from . import axis, storage
 from .axis import AxisProtocol
@@ -23,7 +25,7 @@ class QuickConstruct:
         inside = ", ".join(repr(ax) for ax in self.axes)
         return f"{self.__class__.__name__}({self.hist_class.__name__}, {inside})"
 
-    def __init__(self, hist_class: "Type[BaseHist]", *axes: AxisProtocol) -> None:
+    def __init__(self, hist_class: type[BaseHist], *axes: AxisProtocol) -> None:
         self.hist_class = hist_class
         self.axes = axes
 
@@ -37,13 +39,13 @@ class QuickConstruct:
         label: str = "",
         metadata: Any = None,
         flow: bool = True,
-        underflow: Optional[bool] = None,
-        overflow: Optional[bool] = None,
+        underflow: bool | None = None,
+        overflow: bool | None = None,
         growth: bool = False,
         circular: bool = False,
-        transform: Optional[AxisTransform] = None,
-        __dict__: Optional[Dict[str, Any]] = None,
-    ) -> "ConstructProxy":
+        transform: AxisTransform | None = None,
+        __dict__: dict[str, Any] | None = None,
+    ) -> ConstructProxy:
         return ConstructProxy(
             self.hist_class,
             *self.axes,
@@ -74,8 +76,8 @@ class QuickConstruct:
         name: str = "",
         label: str = "",
         metadata: Any = None,
-        __dict__: Optional[Dict[str, Any]] = None,
-    ) -> "ConstructProxy":
+        __dict__: dict[str, Any] | None = None,
+    ) -> ConstructProxy:
         return ConstructProxy(
             self.hist_class,
             *self.axes,
@@ -100,8 +102,8 @@ class QuickConstruct:
         name: str = "",
         label: str = "",
         metadata: Any = None,
-        __dict__: Optional[Dict[str, Any]] = None,
-    ) -> "ConstructProxy":
+        __dict__: dict[str, Any] | None = None,
+    ) -> ConstructProxy:
         return ConstructProxy(
             self.hist_class,
             *self.axes,
@@ -127,8 +129,8 @@ class QuickConstruct:
         label: str = "",
         power: float,
         metadata: Any = None,
-        __dict__: Optional[Dict[str, Any]] = None,
-    ) -> "ConstructProxy":
+        __dict__: dict[str, Any] | None = None,
+    ) -> ConstructProxy:
         return ConstructProxy(
             self.hist_class,
             *self.axes,
@@ -155,8 +157,8 @@ class QuickConstruct:
         forward: Callable[[float], float],
         inverse: Callable[[float], float],
         metadata: Any = None,
-        __dict__: Optional[Dict[str, Any]] = None,
-    ) -> "ConstructProxy":
+        __dict__: dict[str, Any] | None = None,
+    ) -> ConstructProxy:
         return ConstructProxy(
             self.hist_class,
             *self.axes,
@@ -177,8 +179,8 @@ class QuickConstruct:
         name: str = "",
         label: str = "",
         metadata: Any = None,
-        __dict__: Optional[Dict[str, Any]] = None,
-    ) -> "ConstructProxy":
+        __dict__: dict[str, Any] | None = None,
+    ) -> ConstructProxy:
         return ConstructProxy(
             self.hist_class,
             *self.axes,
@@ -200,12 +202,12 @@ class QuickConstruct:
         label: str = "",
         metadata: Any = None,
         flow: bool = True,
-        underflow: Optional[bool] = None,
-        overflow: Optional[bool] = None,
+        underflow: bool | None = None,
+        overflow: bool | None = None,
         growth: bool = False,
         circular: bool = False,
-        __dict__: Optional[Dict[str, Any]] = None,
-    ) -> "ConstructProxy":
+        __dict__: dict[str, Any] | None = None,
+    ) -> ConstructProxy:
         return ConstructProxy(
             self.hist_class,
             *self.axes,
@@ -234,12 +236,12 @@ class QuickConstruct:
         label: str = "",
         metadata: Any = None,
         flow: bool = True,
-        underflow: Optional[bool] = None,
-        overflow: Optional[bool] = None,
+        underflow: bool | None = None,
+        overflow: bool | None = None,
         growth: bool = False,
         circular: bool = False,
-        __dict__: Optional[Dict[str, Any]] = None,
-    ) -> "ConstructProxy":
+        __dict__: dict[str, Any] | None = None,
+    ) -> ConstructProxy:
         return ConstructProxy(
             self.hist_class,
             *self.axes,
@@ -268,8 +270,8 @@ class QuickConstruct:
         label: str = "",
         metadata: Any = None,
         growth: bool = False,
-        __dict__: Optional[Dict[str, Any]] = None,
-    ) -> "ConstructProxy":
+        __dict__: dict[str, Any] | None = None,
+    ) -> ConstructProxy:
         return ConstructProxy(
             self.hist_class,
             *self.axes,
@@ -293,8 +295,8 @@ class QuickConstruct:
         label: str = "",
         metadata: Any = None,
         growth: bool = False,
-        __dict__: Optional[Dict[str, Any]] = None,
-    ) -> "ConstructProxy":
+        __dict__: dict[str, Any] | None = None,
+    ) -> ConstructProxy:
         return ConstructProxy(
             self.hist_class,
             *self.axes,
@@ -314,29 +316,29 @@ class QuickConstruct:
 class ConstructProxy(QuickConstruct):
     __slots__ = ()
 
-    def Double(self) -> "BaseHist":
+    def Double(self) -> BaseHist:
         return self.hist_class(*self.axes, storage=storage.Double())
 
-    def Int64(self) -> "BaseHist":
+    def Int64(self) -> BaseHist:
         return self.hist_class(*self.axes, storage=storage.Int64())
 
-    def AtomicInt64(self) -> "BaseHist":
+    def AtomicInt64(self) -> BaseHist:
         return self.hist_class(*self.axes, storage=storage.AtomicInt64())
 
-    def Weight(self) -> "BaseHist":
+    def Weight(self) -> BaseHist:
         return self.hist_class(*self.axes, storage=storage.Weight())
 
-    def Mean(self) -> "BaseHist":
+    def Mean(self) -> BaseHist:
         return self.hist_class(*self.axes, storage=storage.Mean())
 
-    def WeightedMean(self) -> "BaseHist":
+    def WeightedMean(self) -> BaseHist:
         return self.hist_class(*self.axes, storage=storage.WeightedMean())
 
-    def Unlimited(self) -> "BaseHist":
+    def Unlimited(self) -> BaseHist:
         return self.hist_class(*self.axes, storage=storage.Unlimited())
 
 
 class MetaConstructor(type):
     @property
-    def new(cls: "Type[BaseHist]") -> QuickConstruct:  # type: ignore
+    def new(cls: type[BaseHist]) -> QuickConstruct:  # type: ignore
         return QuickConstruct(cls)

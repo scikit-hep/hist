@@ -1,4 +1,6 @@
-from typing import Any, Optional, Tuple
+from __future__ import annotations
+
+from typing import Any
 
 import numpy as np
 
@@ -18,12 +20,12 @@ except ModuleNotFoundError:
 __all__ = ("poisson_interval", "clopper_pearson_interval", "ratio_uncertainty")
 
 
-def __dir__() -> Tuple[str, ...]:
+def __dir__() -> tuple[str, ...]:
     return __all__
 
 
 def poisson_interval(
-    values: np.ndarray, variances: np.ndarray, coverage: "Optional[float]" = None
+    values: np.ndarray, variances: np.ndarray, coverage: float | None = None
 ) -> np.ndarray:
     r"""
     The Frequentist coverage interval for Poisson-distributed observations.
@@ -76,7 +78,7 @@ def poisson_interval(
 
 
 def clopper_pearson_interval(
-    num: np.ndarray, denom: np.ndarray, coverage: "Optional[float]" = None
+    num: np.ndarray, denom: np.ndarray, coverage: float | None = None
 ) -> np.ndarray:
     r"""
     Compute the Clopper-Pearson coverage interval for a binomial distribution.

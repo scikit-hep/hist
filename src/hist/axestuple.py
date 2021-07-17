@@ -1,18 +1,20 @@
-from typing import Any, Tuple, Union
+from __future__ import annotations
+
+from typing import Any
 
 from boost_histogram.axis import ArrayTuple, AxesTuple
 
 __all__ = ("NamedAxesTuple", "AxesTuple", "ArrayTuple")
 
 
-def __dir__() -> Tuple[str, ...]:
+def __dir__() -> tuple[str, ...]:
     return __all__
 
 
 class NamedAxesTuple(AxesTuple):
     __slots__ = ()
 
-    def _get_index_by_name(self, name: Union[int, str, None]) -> Union[int, None]:
+    def _get_index_by_name(self, name: int | str | None) -> int | None:
         if not isinstance(name, str):
             return name
 
@@ -34,14 +36,14 @@ class NamedAxesTuple(AxesTuple):
         return super().__getitem__(item)
 
     @property
-    def name(self) -> Tuple[str]:
+    def name(self) -> tuple[str]:
         """
         The names of the axes. May be empty strings.
         """
         return tuple(ax.name for ax in self)  # type: ignore
 
     @property
-    def label(self) -> Tuple[str]:
+    def label(self) -> tuple[str]:
         """
         The labels of the axes. Defaults to name if label not given, or Axis N
         if neither was given.
