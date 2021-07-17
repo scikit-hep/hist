@@ -7,6 +7,8 @@ Version 2.5.0
 * Dropped Python 3.6 support.
   `#194 <https://github.com/scikit-hep/hist/pull/194>`_
 
+* Add ``"efficiency"`` ``uncertainty_type`` option alias for ``ratio_plot`` API.
+  `#266 <https://github.com/scikit-hep/hist/pull/266>`_
 
 
 Version 2.4.0

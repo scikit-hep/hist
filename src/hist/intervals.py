@@ -113,7 +113,7 @@ def clopper_pearson_interval(
 def ratio_uncertainty(
     num: np.ndarray,
     denom: np.ndarray,
-    uncertainty_type: Literal["poisson", "poisson-ratio"] = "poisson",
+    uncertainty_type: Literal["poisson", "poisson-ratio", "efficiency"] = "poisson",
 ) -> Any:
     r"""
     Calculate the uncertainties for the values of the ratio ``num/denom`` using
@@ -128,6 +128,7 @@ def ratio_uncertainty(
          numerator scaled by the denominator.
          ``"poisson-ratio"`` implements the Clopper-Pearson interval for Poisson
          distributed ``num`` and ``denom``.
+         ``"efficiency"`` is an alias for ``"poisson-ratio"``.
 
     Returns:
         The uncertainties for the ratio.
@@ -137,7 +138,7 @@ def ratio_uncertainty(
         ratio = num / denom
     if uncertainty_type == "poisson":
         ratio_uncert = np.abs(poisson_interval(ratio, num / np.square(denom)) - ratio)
-    elif uncertainty_type == "poisson-ratio":
+    elif uncertainty_type in {"poisson-ratio", "efficiency"}:
         # poisson ratio n/m is equivalent to binomial n/(n+m)
         ratio_uncert = np.abs(clopper_pearson_interval(num, num + denom) - ratio)
     else:
