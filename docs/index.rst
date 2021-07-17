@@ -1,3 +1,7 @@
+.. image:: _images/histlogo.png
+   :width: 60%
+   :alt: Hist logo
+   :align: center
 
 Welcome to Hist's documentation!
 ================================
