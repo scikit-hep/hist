@@ -14,7 +14,7 @@ To get an idea of creating histograms in Hist looks like, you can take a look at
 .. toctree::
    :maxdepth: 2
    :titlesonly:
-   :caption: Contents
+   :caption: User Guide
    :glob:
 
    installation
@@ -25,6 +25,13 @@ To get an idea of creating histograms in Hist looks like, you can take a look at
    user-guide/notebooks/Reprs
    user-guide/notebooks/Plots
    user-guide/notebooks/Histogram
+
+.. toctree::
+   :maxdepth: 2
+   :titlesonly:
+   :caption: Developers
+   :glob:
+
    contributing
    support
    changelog

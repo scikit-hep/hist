@@ -174,8 +174,34 @@ Computing with Histograms
 
 As an complete example, let's say you wanted to compute and plot the density, without using ``.density()``:
 
-.. literalinclude:: ../../examples/simple_density.py
-   :language: python
+.. code:: python3
+
+    import functools
+    import operator
+
+    import matplotlib.pyplot as plt
+    import numpy as np
+
+    import hist
+
+    # Make a 2D histogram
+    hist = hist.Hist(hist.axis.Regular(50, -3, 3), hist.axis.Regular(50, -3, 3))
+
+    # Fill with Gaussian random values
+    hist.fill(np.random.normal(size=1_000_000), np.random.normal(size=1_000_000))
+
+    # Compute the areas of each bin
+    areas = functools.reduce(operator.mul, hist.axes.widths)
+
+    # Compute the density
+    density = hist.values() / hist.sum() / areas
+
+    # Make the plot
+    fig, ax = plt.subplots()
+    mesh = ax.pcolormesh(*hist.axes.edges.T, density.T)
+    fig.colorbar(mesh)
+    plt.savefig("simple_density.png")
+
 
 .. image:: ../_images/ex_hist_density.png
    :alt: Density histogram output
