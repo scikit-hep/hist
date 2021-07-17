@@ -14,15 +14,35 @@ To get an idea of creating histograms in Hist looks like, you can take a look at
 .. toctree::
    :maxdepth: 2
    :titlesonly:
-   :caption: Contents
+   :caption: User Guide
    :glob:
 
    installation
-   user-guide/index
-   examples/index
+   user-guide/quickstart
+   user-guide/notebooks/Axis
+   user-guide/notebooks/Storage
+   user-guide/notebooks/Transform
+   user-guide/notebooks/Reprs
+   user-guide/notebooks/Plots
+   user-guide/notebooks/Histogram
+
+.. toctree::
+   :maxdepth: 2
+   :titlesonly:
+   :caption: Developers
+   :glob:
+
    contributing
    support
    changelog
+
+.. toctree::
+   :maxdepth: 2
+   :titlesonly:
+   :caption: Examples
+   :glob:
+
+   examples/HistDemo
 
 .. toctree::
    :maxdepth: 2
