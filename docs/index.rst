@@ -6,6 +6,8 @@
 Welcome to Hist's documentation!
 ================================
 
+|Actions Status| |Documentation Status| |pre-commit.ci Status| |Code style: black| |PyPI version|
+|Conda-Forge| |PyPI platforms| |DOI| |GitHub Discussion| |Gitter| |Scikit-HEP|
 
 Introduction
 ------------
@@ -64,3 +66,26 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+.. |Actions Status| image:: https://github.com/scikit-hep/hist/workflows/CI/badge.svg
+   :target: https://github.com/scikit-hep/hist/actions
+.. |Documentation Status| image:: https://readthedocs.org/projects/hist/badge/?version=latest
+   :target: https://hist.readthedocs.io/en/latest/?badge=latest
+.. |pre-commit.ci Status| image:: https://results.pre-commit.ci/badge/github/scikit-hep/hist/main.svg
+   :target: https://results.pre-commit.ci/repo/github/scikit-hep/hist
+.. |Code style: black| image:: https://img.shields.io/badge/code%20style-black-000000.svg
+   :target: https://github.com/psf/black
+.. |PyPI version| image:: https://badge.fury.io/py/hist.svg
+   :target: https://pypi.org/project/hist/
+.. |Conda-Forge| image:: https://img.shields.io/conda/vn/conda-forge/hist
+   :target: https://github.com/conda-forge/hist-feedstock
+.. |PyPI platforms| image:: https://img.shields.io/pypi/pyversions/hist
+   :target: https://pypi.org/project/hist/
+.. |DOI| image:: https://zenodo.org/badge/239605861.svg
+   :target: https://zenodo.org/badge/latestdoi/239605861
+.. |GitHub Discussion| image:: https://img.shields.io/static/v1?label=Discussions&message=Ask&color=blue&logo=github
+   :target: https://github.com/scikit-hep/hist/discussions
+.. |Gitter| image:: https://badges.gitter.im/HSF/PyHEP-histogramming.svg
+   :target: https://gitter.im/HSF/PyHEP-histogramming?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
+.. |Scikit-HEP| image:: https://scikit-hep.org/assets/images/Scikit--HEP-Project-blue.svg
+   :target: https://scikit-hep.org/
