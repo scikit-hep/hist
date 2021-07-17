@@ -18,7 +18,7 @@
 
 Hist is an analyst-friendly front-end for
 [boost-histogram](https://github.com/scikit-hep/boost-histogram), designed for
-Python 3.7+ (3.6 users get version 2.3). See [what's new](https://hist.readthedocs.io/en/latest/changelog.html).
+Python 3.7+ (3.6 users get version 2.4). See [what's new](https://hist.readthedocs.io/en/latest/changelog.html).
 
 ## Installation
 

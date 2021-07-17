@@ -1,6 +1,14 @@
 Changelog
 ====================
 
+Version 2.5.0
+--------------------
+
+* Dropped Python 3.6 support.
+  `#194 <https://github.com/scikit-hep/hist/pull/194>`_
+
+
+
 Version 2.4.0
 --------------------
 
