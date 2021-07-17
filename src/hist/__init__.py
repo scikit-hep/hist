@@ -37,12 +37,10 @@ __all__ = (
 )
 
 
-# Python 3.7 only
 def __dir__() -> tuple[str, ...]:
     return __all__
 
 
-# Python 3.7 only
 def __getattr__(name: str) -> ModuleType:
 
     if name == "axes":

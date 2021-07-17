@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import sys
-
 import numpy as np
 import pytest
 
@@ -153,7 +151,6 @@ def test_stack_constructor_fails():
         )
 
 
-@pytest.mark.skipif(sys.version_info < (3, 7), reason="requires Python 3.7 or higher")
 def test_stack_plot_construct():
     """
     Test stack plot -- whether Stack can be properly plot.
