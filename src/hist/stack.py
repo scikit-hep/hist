@@ -77,6 +77,5 @@ class Stack:
         return hist.plot.histplot(list(self), **kwargs)  # type: ignore
 
 
-# Python 3.7 only
 def __dir__() -> tuple[str, ...]:
     return __all__
