@@ -1,4 +1,6 @@
-from typing import Type, TypeVar, Union
+from __future__ import annotations
+
+from typing import TypeVar
 
 from .typing import Protocol
 
@@ -9,9 +11,7 @@ class SupportsStr(Protocol):
 
 
 class XML:
-    def __init__(
-        self, *contents: Union["XML", SupportsStr], **kargs: SupportsStr
-    ) -> None:
+    def __init__(self, *contents: XML | SupportsStr, **kargs: SupportsStr) -> None:
         self.properties = kargs
         self.contents = contents
 
@@ -44,7 +44,7 @@ class html(XML):
 
 
 class svg(XML):
-    def __init__(self, *args: Union[XML, str], **kwargs: str) -> None:
+    def __init__(self, *args: XML | str, **kwargs: str) -> None:
         super().__init__(*args, xmlns="http://www.w3.org/2000/svg", **kwargs)
 
     def _repr_svg_(self) -> str:
@@ -73,7 +73,7 @@ T = TypeVar("T", bound="rect")
 class rect(XML):
     @classmethod
     def pad(
-        cls: Type[T],
+        cls: type[T],
         x: float,
         y: float,
         scale_x: float,

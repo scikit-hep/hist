@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 import typing
-from typing import Any, Iterator, List, Tuple, TypeVar, Union
+from typing import Any, Iterator, TypeVar
 
 from .basehist import BaseHist
 
@@ -41,7 +43,7 @@ class Stack:
     def __getitem__(self: T, val: slice) -> T:
         ...
 
-    def __getitem__(self: T, val: Union[int, slice]) -> Union[BaseHist, T]:
+    def __getitem__(self: T, val: int | slice) -> BaseHist | T:
         if isinstance(val, slice):
             return self.__class__(*self._stack.__getitem__(val))
 
@@ -57,7 +59,7 @@ class Stack:
         str_stack = ", ".join(repr(h) for h in self)
         return f"{self.__class__.__name__}({str_stack})"
 
-    def plot(self, **kwargs: Any) -> "List[Hist1DArtists]":
+    def plot(self, **kwargs: Any) -> list[Hist1DArtists]:
         """
         Plot method for Stack object.
         """
@@ -76,5 +78,5 @@ class Stack:
 
 
 # Python 3.7 only
-def __dir__() -> Tuple[str, ...]:
+def __dir__() -> tuple[str, ...]:
     return __all__

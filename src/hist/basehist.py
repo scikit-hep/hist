@@ -1,21 +1,10 @@
+from __future__ import annotations
+
 import functools
 import operator
 import typing
 import warnings
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    Iterator,
-    List,
-    Mapping,
-    Optional,
-    Sequence,
-    Tuple,
-    Type,
-    TypeVar,
-    Union,
-)
+from typing import Any, Callable, Iterator, Mapping, Sequence, Tuple, TypeVar, Union
 
 import boost_histogram as bh
 import histoprint
@@ -52,7 +41,7 @@ IndexingExpr = Union[IndexingWithMapping, Tuple[IndexingWithMapping, ...]]
 
 
 # Workaround for bug in mplhep
-def _proc_kw_for_lw(kwargs: Mapping[str, Any]) -> Dict[str, Any]:
+def _proc_kw_for_lw(kwargs: Mapping[str, Any]) -> dict[str, Any]:
     return {
         f"{k[:-3]}_linestyle"
         if k.endswith("_ls")
@@ -71,10 +60,10 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
     def __init__(
         self,
-        *args: Union[AxisProtocol, Storage, str, Tuple[int, float, float]],
-        storage: Optional[Union[Storage, str]] = None,
+        *args: AxisProtocol | Storage | str | tuple[int, float, float],
+        storage: Storage | str | None = None,
         metadata: Any = None,
-        data: Optional[np.ndarray] = None,
+        data: np.ndarray | None = None,
     ) -> None:
         """
         Initialize BaseHist object. Axis params can contain the names.
@@ -165,14 +154,14 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
     @classmethod
     def from_columns(
-        cls: Type[T],
+        cls: type[T],
         data: Mapping[str, ArrayLike],
-        axes: Sequence[Union[str, AxisProtocol]],
+        axes: Sequence[str | AxisProtocol],
         *,
-        weight: Optional[str] = None,
+        weight: str | None = None,
         storage: hist.storage.Storage = hist.storage.Double(),  # noqa: B008
     ) -> T:
-        axes_list: List[Any] = list()
+        axes_list: list[Any] = list()
         for ax in axes:
             if isinstance(ax, str):
                 assert ax in data, f"{ax} must be present in data={list(data)}"
@@ -197,9 +186,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         self.fill(**data_list, weight=weight_arr)  # type: ignore
         return self
 
-    def project(
-        self: T, *args: Union[int, str]
-    ) -> Union[T, float, bh.accumulators.Accumulator]:
+    def project(self: T, *args: int | str) -> T | float | bh.accumulators.Accumulator:
         """
         Projection of axis idx.
         """
@@ -209,9 +196,9 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
     def fill(
         self: T,
         *args: ArrayLike,
-        weight: Optional[ArrayLike] = None,
-        sample: Optional[ArrayLike] = None,
-        threads: Optional[int] = None,
+        weight: ArrayLike | None = None,
+        sample: ArrayLike | None = None,
+        threads: int | None = None,
         **kwargs: ArrayLike,
     ) -> T:
         """
@@ -236,10 +223,10 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
     def sort(
         self: T,
-        axis: Union[int, str],
-        key: Union[
-            Callable[[int], SupportsLessThan], Callable[[str], SupportsLessThan], None
-        ] = None,
+        axis: int | str,
+        key: (
+            Callable[[int], SupportsLessThan] | Callable[[str], SupportsLessThan] | None
+        ) = None,
         reverse: bool = False,
     ) -> T:
         """
@@ -291,7 +278,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
             return bh.rebin(int(x.imag))
 
     def _index_transform(
-        self, index: Union[List[IndexingExpr], IndexingExpr]
+        self, index: list[IndexingExpr] | IndexingExpr
     ) -> bh.IndexingExpr:
         """
         Auxiliary function for __getitem__ and __setitem__.
@@ -317,7 +304,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
     def __getitem__(  # type: ignore
         self: T, index: IndexingExpr
-    ) -> Union[T, float, bh.accumulators.Accumulator]:
+    ) -> T | float | bh.accumulators.Accumulator:
         """
         Get histogram item.
         """
@@ -325,7 +312,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         return super().__getitem__(self._index_transform(index))
 
     def __setitem__(  # type: ignore
-        self, index: IndexingExpr, value: Union[ArrayLike, bh.accumulators.Accumulator]
+        self, index: IndexingExpr, value: ArrayLike | bh.accumulators.Accumulator
     ) -> None:
         """
         Set histogram item.
@@ -333,7 +320,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
         return super().__setitem__(self._index_transform(index), value)
 
-    def profile(self: T, axis: Union[int, str]) -> T:
+    def profile(self: T, axis: int | str) -> T:
         """
         Returns a profile (Mean/WeightedMean) histogram from a normal histogram
         with N-1 axes. The axis given is profiled over and removed from the
@@ -384,8 +371,8 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         return histoprint.print_hist(self, **kwargs)
 
     def plot(
-        self, *args: Any, overlay: "Optional[str]" = None, **kwargs: Any
-    ) -> "Union[Hist1DArtists, Hist2DArtists]":
+        self, *args: Any, overlay: str | None = None, **kwargs: Any
+    ) -> Hist1DArtists | Hist2DArtists:
         """
         Plot method for BaseHist object.
         """
@@ -406,10 +393,10 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
     def plot1d(
         self,
         *,
-        ax: "Optional[matplotlib.axes.Axes]" = None,
-        overlay: "Optional[Union[str, int]]" = None,
+        ax: matplotlib.axes.Axes | None = None,
+        overlay: str | int | None = None,
         **kwargs: Any,
-    ) -> "Hist1DArtists":
+    ) -> Hist1DArtists:
         """
         Plot1d method for BaseHist object.
         """
@@ -429,9 +416,9 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
     def plot2d(
         self,
         *,
-        ax: "Optional[matplotlib.axes.Axes]" = None,
+        ax: matplotlib.axes.Axes | None = None,
         **kwargs: Any,
-    ) -> "Hist2DArtists":
+    ) -> Hist2DArtists:
         """
         Plot2d method for BaseHist object.
         """
@@ -443,9 +430,9 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
     def plot2d_full(
         self,
         *,
-        ax_dict: "Optional[Dict[str, matplotlib.axes.Axes]]" = None,
+        ax_dict: dict[str, matplotlib.axes.Axes] | None = None,
         **kwargs: Any,
-    ) -> "Tuple[Hist2DArtists, Hist1DArtists, Hist1DArtists]":
+    ) -> tuple[Hist2DArtists, Hist1DArtists, Hist1DArtists]:
         """
         Plot2d_full method for BaseHist object.
 
@@ -459,11 +446,11 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
     def plot_ratio(
         self,
-        other: Union["hist.BaseHist", Callable[[np.ndarray], np.ndarray], str],
+        other: hist.BaseHist | Callable[[np.ndarray], np.ndarray] | str,
         *,
-        ax_dict: "Optional[Dict[str, matplotlib.axes.Axes]]" = None,
+        ax_dict: dict[str, matplotlib.axes.Axes] | None = None,
         **kwargs: Any,
-    ) -> "Tuple[MainAxisArtists, RatiolikeArtists]":
+    ) -> tuple[MainAxisArtists, RatiolikeArtists]:
         """
         ``plot_ratio`` method for ``BaseHist`` object.
 
@@ -479,11 +466,11 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
     def plot_pull(
         self,
-        func: Union[Callable[[np.ndarray], np.ndarray], str],
+        func: Callable[[np.ndarray], np.ndarray] | str,
         *,
-        ax_dict: "Optional[Dict[str, matplotlib.axes.Axes]]" = None,
+        ax_dict: dict[str, matplotlib.axes.Axes] | None = None,
         **kwargs: Any,
-    ) -> "Tuple[FitResultArtists, RatiolikeArtists]":
+    ) -> tuple[FitResultArtists, RatiolikeArtists]:
         """
         ``plot_pull`` method for ``BaseHist`` object.
 
@@ -500,7 +487,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
     def plot_pie(
         self,
         *,
-        ax: "Optional[matplotlib.axes.Axes]" = None,
+        ax: matplotlib.axes.Axes | None = None,
         **kwargs: Any,
     ) -> Any:
 
@@ -508,7 +495,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
         return hist.plot.plot_pie(self, ax=ax, **kwargs)
 
-    def stack(self, axis: Union[int, str]) -> "hist.stack.Stack":
+    def stack(self, axis: int | str) -> hist.stack.Stack:
         """
         Returns a stack from a normal histogram axes.
         """

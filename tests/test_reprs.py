@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from hist import Hist, Stack, axis
 
 
