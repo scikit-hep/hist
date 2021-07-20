@@ -30,7 +30,7 @@ for an axis in a histogram and must be unique.
     axis5 = hist.axis.StrCategory(["T", "F"], name="F")
 
 Histogram’s Axis
-----------
+----------------
 
 Histogram is consisted with various axes, there are two ways to create a histogram,
 currently. You can either fill a histogram object with axes or add axes to a
