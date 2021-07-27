@@ -77,6 +77,10 @@ There are several axis types to choose from.
 Regular axis
 ^^^^^^^^^^^^
 
+.. image:: ../_images/axis_regular.png
+   :alt: Regular axis illustration
+   :align: center
+
 .. py:function:: hist.axis.Regular(bins, start, stop, name, label, *, metadata="", underflow=True, overflow=True, circular=False, growth=False, transform=None)
    :noindex:
 
@@ -87,6 +91,10 @@ flow bin settings. The exception is ``underflow=False, overflow=False``, which
 is quite useful together to make an axis with no flow bins at all.
 
 There are some other useful axis types based on regular axis:
+
+.. image:: ../_images/axis_circular.png
+   :alt: Regular axis illustration
+   :align: center
 
 .. py:function:: hist.axis.Regular(..., circular=True)
    :noindex:
@@ -127,6 +135,10 @@ precompiled transforms:
 Variable axis
 ^^^^^^^^^^^^^
 
+.. image:: ../_images/axis_variable.png
+   :alt: Regular axis illustration
+   :align: center
+
 .. py:function:: hist.axis.Variable([edge1, ...], name, label, *, metadata="", underflow=True, overflow=True, circular=False, growth=False)
    :noindex:
 
@@ -134,6 +146,10 @@ Variable axis
 
 Integer axis
 ^^^^^^^^^^^^
+
+.. image:: ../_images/axis_integer.png
+   :alt: Regular axis illustration
+   :align: center
 
 .. py:function:: hist.axis.Integer(start, stop, name, label, *, metadata="", underflow=True, overflow=True, circular=False, growth=False)
    :noindex:
@@ -152,6 +168,10 @@ Another could be for an IntEnum (Python 3 or backport) if the values are contigu
 
 Category axis
 -------------
+
+.. image:: ../_images/axis_category.png
+   :alt: Regular axis illustration
+   :align: center
 
 .. py:function:: hist.axis.IntCategory([value1, ...], name, label, metadata="", grow=False)
    :noindex:
