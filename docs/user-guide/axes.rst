@@ -102,7 +102,7 @@ There are some other useful axis types based on regular axis:
    This wraps around, so that out-of-range values map back into the valid range circularly.
 
 Regular axis: Transforms
-^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""
 
 Regular axes support transforms, as well; these are functions that convert from an external,
 non-regular bin spacing to an internal, regularly spaced one. A transform is made of two functions,
@@ -167,7 +167,7 @@ One common use for an integer axis could be a true/false axis:
 Another could be for an IntEnum (Python 3 or backport) if the values are contiguous.
 
 Category axis
--------------
+^^^^^^^^^^^^^
 
 .. image:: ../_images/axis_category.png
    :alt: Regular axis illustration
