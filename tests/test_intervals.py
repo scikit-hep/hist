@@ -150,7 +150,7 @@ def test_valid_efficiency_ratio_uncertainty(hist_fixture):
     """
 
     hist_1, _ = hist_fixture
-    num = hist_1.copy().values()
+    num = hist_1.values()
     den = num
 
     efficiency_ratio = num / den
