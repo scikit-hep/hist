@@ -129,8 +129,8 @@ def ratio_uncertainty(
          ``"poisson-ratio"`` implements the Clopper-Pearson interval for Poisson
          distributed ``num`` and ``denom``.
          ``"efficiency"`` implements the Clopper-Pearson interval for Poisson
-         distributed ``num`` and ``denom``, with ``denom`` assumed to be a
-         strict subset of ``num``.
+         distributed ``num`` and ``denom``, with ``num`` assumed to be a
+         strict subset of ``denom``.
 
     Returns:
         The uncertainties for the ratio.
