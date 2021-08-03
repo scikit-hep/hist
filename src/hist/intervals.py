@@ -128,7 +128,9 @@ def ratio_uncertainty(
          numerator scaled by the denominator.
          ``"poisson-ratio"`` implements the Clopper-Pearson interval for Poisson
          distributed ``num`` and ``denom``.
-         ``"efficiency"`` is an alias for ``"poisson-ratio"``.
+         ``"efficiency"`` implements the Clopper-Pearson interval for Poisson
+         distributed ``num`` and ``denom``, with ``denom`` assumed to be a
+         strict subset of ``num``.
 
     Returns:
         The uncertainties for the ratio.
@@ -138,9 +140,11 @@ def ratio_uncertainty(
         ratio = num / denom
     if uncertainty_type == "poisson":
         ratio_uncert = np.abs(poisson_interval(ratio, num / np.square(denom)) - ratio)
-    elif uncertainty_type in {"poisson-ratio", "efficiency"}:
-        # poisson ratio n/m is equivalent to binomial n/(n+m)
+    elif uncertainty_type == "poisson-ratio":
         ratio_uncert = np.abs(clopper_pearson_interval(num, num + denom) - ratio)
+    elif uncertainty_type == "efficiency":
+        # poisson ratio n/m is equivalent to binomial n/(n+m)
+        ratio_uncert = np.abs(clopper_pearson_interval(num, denom) - ratio)
     else:
         raise TypeError(
             f"'{uncertainty_type}' is an invalid option for uncertainty_type."
