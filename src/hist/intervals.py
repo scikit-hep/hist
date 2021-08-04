@@ -55,11 +55,12 @@ def poisson_interval(
     # https://github.com/CoffeaTeam/coffea/blob/8c58807e199a7694bf15e3803dbaf706d34bbfa0/LICENSE
     if coverage is None:
         coverage = stats.norm.cdf(1) - stats.norm.cdf(-1)
-    scale = np.empty_like(values)
-    scale[values != 0] = variances[values != 0] / values[values != 0]
+    scale = np.ones_like(values)
+    mask = np.isfinite(values) & (values != 0)
+    scale[mask] = variances[mask] / values[mask]
     if np.sum(values == 0) > 0:
         missing = np.where(values == 0)
-        available = np.nonzero(values)
+        available = np.where(mask)
         if len(available[0]) == 0:
             raise RuntimeError(
                 "All values are zero! Cannot compute meaningful uncertainties.",
@@ -73,7 +74,7 @@ def poisson_interval(
     interval_min = scale * stats.chi2.ppf((1 - coverage) / 2, 2 * counts) / 2.0
     interval_max = scale * stats.chi2.ppf((1 + coverage) / 2, 2 * (counts + 1)) / 2.0
     interval = np.stack((interval_min, interval_max))
-    interval[interval == np.nan] = 0.0  # chi2.ppf produces nan for counts=0
+    interval[np.isnan(interval)] = 0.0  # chi2.ppf produces nan for counts=0
     return interval
 
 
@@ -138,16 +139,19 @@ def ratio_uncertainty(
         The uncertainties for the ratio.
     """
     # Note: As return is a numpy ufuncs the type is "Any"
-    with np.errstate(divide="ignore"):
+    with np.errstate(divide="ignore", invalid="ignore"):
+        # Nota bene: x/0 = inf, 0/0 = nan
         ratio = num / denom
     if uncertainty_type == "poisson":
-        ratio_uncert = np.abs(poisson_interval(ratio, num / np.square(denom)) - ratio)
+        with np.errstate(divide="ignore", invalid="ignore"):
+            ratio_variance = num * np.power(denom, -2.0)
+        ratio_uncert = np.abs(poisson_interval(ratio, ratio_variance) - ratio)
     elif uncertainty_type == "poisson-ratio":
         # Details: see https://github.com/scikit-hep/hist/issues/279
         p_lim = clopper_pearson_interval(num, num + denom)
-        with np.errstate(divide="ignore"):
+        with np.errstate(divide="ignore", invalid="ignore"):
             r_lim = p_lim / (1 - p_lim)
-        ratio_uncert = np.abs(r_lim - ratio)
+            ratio_uncert = np.abs(r_lim - ratio)
     elif uncertainty_type == "efficiency":
         ratio_uncert = np.abs(clopper_pearson_interval(num, denom) - ratio)
     else:
