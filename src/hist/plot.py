@@ -574,6 +574,9 @@ def _plot_ratiolike(
     rp_kwargs.setdefault("legend_loc", "best")
     rp_kwargs.setdefault("num_label", None)
     rp_kwargs.setdefault("denom_label", None)
+    if rp_kwargs["uncertainty_type"] == "efficiency":
+        rp_kwargs.setdefault("ylabel", "Efficiency")
+        rp_kwargs.setdefault("ylim", [0, 1.1])
 
     # patch plot keyword arguments
     pp_kwargs = _filter_dict(kwargs, "pp_")
