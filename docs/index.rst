@@ -25,7 +25,7 @@ To get an idea of creating histograms in Hist looks like, you can take a look at
 
    installation
    user-guide/quickstart
-   user-guide/notebooks/Axis
+   user-guide/axes
    user-guide/storages
    user-guide/accumulators
    user-guide/notebooks/Transform
