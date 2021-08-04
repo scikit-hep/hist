@@ -124,14 +124,15 @@ def ratio_uncertainty(
         denom: Denominator or number of trials.
         uncertainty_type: Coverage interval type to use in the calculation of
          the uncertainties.
-         ``"poisson"`` (default) implements the Poisson interval for the
-         numerator scaled by the denominator.
-         ``"poisson-ratio"`` implements the Clopper-Pearson interval for Poisson
-         distributed ``num`` and ``denom`` where it is assumed that ``num`` and
-         ``denom`` are independent.
-         ``"efficiency"`` implements the Clopper-Pearson interval for Poisson
-         distributed ``num`` and ``denom``, with ``num`` assumed to be a
-         strict subset of ``denom``.
+         ``"poisson"`` (default) implements the Garwood confidence interval for
+         a Poisson-distribbuted numerator scaled by the denominator.
+         ``"poisson-ratio"`` implements a confidence interval for the ratio assuming
+         it is an estimator of the ratio of the expected rates from independent Poisson
+         distributions. It does over-cover to a similar degree as the Clopper-Pearson interval
+         does for the Binomial efficiency parameter estimate.
+         ``"efficiency"`` implements the Clopper-Pearson confidence interval for the ratio assuming
+         it is an estimator of a Binomial efficiency parameter. This is only valid
+         if the entries contributing to ``num`` are a strict subset of those contributing to ``denom``.
 
     Returns:
         The uncertainties for the ratio.
@@ -142,8 +143,11 @@ def ratio_uncertainty(
     if uncertainty_type == "poisson":
         ratio_uncert = np.abs(poisson_interval(ratio, num / np.square(denom)) - ratio)
     elif uncertainty_type == "poisson-ratio":
-        # poisson ratio n/m is equivalent to binomial n/(n+m)
-        ratio_uncert = np.abs(clopper_pearson_interval(num, num + denom) - ratio)
+        # Details: see https://github.com/scikit-hep/hist/issues/279
+        p_lim = clopper_pearson_interval(num, num + denom)
+        with np.errstate(divide="ignore"):
+            r_lim = p_lim / (1 - p_lim)
+        ratio_uncert = np.abs(r_lim - ratio)
     elif uncertainty_type == "efficiency":
         ratio_uncert = np.abs(clopper_pearson_interval(num, denom) - ratio)
     else:
