@@ -125,7 +125,7 @@ def ratio_uncertainty(
         uncertainty_type: Coverage interval type to use in the calculation of
          the uncertainties.
          ``"poisson"`` (default) implements the Garwood confidence interval for
-         a Poisson-distribbuted numerator scaled by the denominator.
+         a Poisson-distributed numerator scaled by the denominator.
          ``"poisson-ratio"`` implements a confidence interval for the ratio assuming
          it is an estimator of the ratio of the expected rates from independent Poisson
          distributions. It does over-cover to a similar degree as the Clopper-Pearson interval
