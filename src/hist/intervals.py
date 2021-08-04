@@ -105,7 +105,7 @@ def clopper_pearson_interval(
     interval_min = stats.beta.ppf((1 - coverage) / 2, num, denom - num + 1)
     interval_max = stats.beta.ppf((1 + coverage) / 2, num + 1, denom - num)
     interval = np.stack((interval_min, interval_max))
-    interval[:, num == 0.0] = 0.0
+    interval[0, num == 0.0] = 0.0
     interval[1, num == denom] = 1.0
     return interval
 
