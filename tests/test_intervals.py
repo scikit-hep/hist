@@ -141,3 +141,22 @@ def test_ratio_uncertainty(hist_fixture):
         intervals.ratio_uncertainty(
             hist_1.values(), hist_2.values(), uncertainty_type="fail"
         )
+
+
+def test_valid_efficiency_ratio_uncertainty(hist_fixture):
+    """
+    Test that the upper bound for the error interval does not exceed unity
+    for efficiency ratio plots.
+    """
+
+    hist_1, _ = hist_fixture
+    num = hist_1.values()
+    den = num
+
+    efficiency_ratio = num / den
+    _, uncertainty_max = intervals.ratio_uncertainty(
+        num, den, uncertainty_type="efficiency"
+    )
+    efficiency_err_up = efficiency_ratio + uncertainty_max
+
+    assert len(efficiency_err_up[efficiency_err_up > 1.0]) == 0
