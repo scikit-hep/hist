@@ -76,6 +76,14 @@ hist.numpy module
    :undoc-members:
    :show-inheritance:
 
+hist.stack module
+-------------------
+
+.. automodule:: hist.stack
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 hist.storage module
 -------------------
 

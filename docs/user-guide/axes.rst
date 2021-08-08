@@ -162,7 +162,7 @@ One common use for an integer axis could be a true/false axis:
 .. code:: python3
 
    bool_axis = hist.axis.Integer(0, 2, underflow=False, overflow=False)
-   :noindex:
+
 
 Another could be for an IntEnum (Python 3 or backport) if the values are contiguous.
 
@@ -189,7 +189,15 @@ One use for an IntCategory axis is for an IntEnum:
         b = 5
 
     my_enum_axis = hist.axis.IntEnum(list(MyEnum), underflow=False, overflow=False)
-   :noindex:
+
+
+You can also sort the Categorty axes via ``.sort()`` method:
+
+.. code:: python3
+
+    h = Hist(axis.IntCategory([3, 1, 2], label="Number"), axis.StrCategory(["Teacher", "Police", "Artist"], label="Profession"))
+    h.sort(0).axes[0] # IntCategory([1, 2, 3], label='Number')
+    h.sort(1, reverse=True).axes[1] # StrCategory(['Teacher', 'Police', 'Artist'], label='Profession')
 
 
 .. py:function:: hist.axis.StrCategory([str1, ...], name, label, metadata="", grow=False)
