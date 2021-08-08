@@ -191,7 +191,7 @@ One use for an IntCategory axis is for an IntEnum:
     my_enum_axis = hist.axis.IntEnum(list(MyEnum), underflow=False, overflow=False)
 
 
-You can also sort the Categorty axes via ``.sort()`` method:
+You can sort the Categorty axes via ``.sort()`` method:
 
 .. code:: python3
 

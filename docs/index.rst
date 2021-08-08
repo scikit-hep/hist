@@ -33,6 +33,7 @@ To get an idea of creating histograms in Hist looks like, you can take a look at
    user-guide/notebooks/Plots
    user-guide/analyses
    user-guide/notebooks/Histogram
+   user-guide/notebooks/Stack
 
 .. toctree::
    :maxdepth: 2
