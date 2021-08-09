@@ -25,7 +25,9 @@ def __dir__() -> tuple[str, ...]:
 
 
 def poisson_interval(
-    values: np.ndarray, variances: np.ndarray | None = None, coverage: float | None = None
+    values: np.ndarray,
+    variances: np.ndarray | None = None,
+    coverage: float | None = None,
 ) -> np.ndarray:
     r"""
     The Frequentist coverage interval for Poisson-distributed observations.
@@ -67,7 +69,9 @@ def poisson_interval(
         counts = values / scale
         interval_min = scale * stats.chi2.ppf((1 - coverage) / 2, 2 * counts) / 2.0
         interval_min[values == 0.0] = 0.0  # chi2.ppf produces NaN for values=0
-        interval_max = scale * stats.chi2.ppf((1 + coverage) / 2, 2 * (counts + 1)) / 2.0
+        interval_max = (
+            scale * stats.chi2.ppf((1 + coverage) / 2, 2 * (counts + 1)) / 2.0
+        )
         interval_max[values == 0.0] = np.nan
     interval = np.stack((interval_min, interval_max))
     return interval

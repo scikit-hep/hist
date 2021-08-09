@@ -62,8 +62,10 @@ def test_poisson_interval(hist_fixture):
     )
 
     interval_min, interval_max = intervals.poisson_interval(np.arange(4))
-    assert approx(interval_min) == np.array([       0.0, 0.17275378, 0.70818544, 1.36729531])
-    assert approx(interval_max) == np.array([1.84102165, 3.29952656, 4.63785962, 5.91818583])
+    assert approx(interval_min) == np.array([0.0, 0.17275378, 0.70818544, 1.36729531])
+    assert approx(interval_max) == np.array(
+        [1.84102165, 3.29952656, 4.63785962, 5.91818583]
+    )
 
 
 def test_clopper_pearson_interval(hist_fixture):
