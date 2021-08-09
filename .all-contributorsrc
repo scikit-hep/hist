@@ -85,6 +85,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "dantrim",
+      "name": "Daniel Antrim",
+      "avatar_url": "https://avatars.githubusercontent.com/u/7841565?v=4",
+      "profile": "http://dantrim.github.io",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
