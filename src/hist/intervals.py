@@ -25,7 +25,7 @@ def __dir__() -> tuple[str, ...]:
 
 
 def poisson_interval(
-    values: np.ndarray, variances: np.ndarray, coverage: float | None = None
+    values: np.ndarray, variances: np.ndarray | None = None, coverage: float | None = None
 ) -> np.ndarray:
     r"""
     The Frequentist coverage interval for Poisson-distributed observations.
@@ -33,14 +33,15 @@ def poisson_interval(
     What is calculated is the "Garwood" interval,
     c.f. https://www.ine.pt/revstat/pdf/rs120203.pdf or
     http://ms.mcmaster.ca/peter/s743/poissonalpha.html.
-    For weighted data, this approximates the observed count by
-    ``values**2/variances``, which effectively scales the unweighted
-    Poisson interval by the average weight.
+    If ``variances`` is supplied, the data is assumed to be weighted, and the
+    unweighted count is approximated by ``values**2/variances``, which effectively
+    scales the unweighted Poisson interval by the average weight.
     This may not be the optimal solution: see https://arxiv.org/abs/1309.1287
     for a proper treatment.
 
-    When a bin is zero, the scale of the nearest nonzero bin is substituted to
-    scale the nominal upper bound.
+    In cases where the value is zero, an upper limit is well-defined only in the case of
+    unweighted data, so if ``variances`` is supplied, the upper limit for a zero value
+    will be set to NaN.
 
     Args:
         values: Sum of weights.
@@ -55,26 +56,20 @@ def poisson_interval(
     # https://github.com/CoffeaTeam/coffea/blob/8c58807e199a7694bf15e3803dbaf706d34bbfa0/LICENSE
     if coverage is None:
         coverage = stats.norm.cdf(1) - stats.norm.cdf(-1)
-    scale = np.ones_like(values)
-    mask = np.isfinite(values) & (values != 0)
-    scale[mask] = variances[mask] / values[mask]
-    if np.sum(values == 0) > 0:
-        missing = np.where(values == 0)
-        available = np.where(mask)
-        if len(available[0]) == 0:
-            raise RuntimeError(
-                "All values are zero! Cannot compute meaningful uncertainties.",
-            )
-        nearest = np.sum(
-            [np.square(np.subtract.outer(d, d0)) for d, d0 in zip(available, missing)]
-        ).argmin(axis=0)
-        argnearest = tuple(dim[nearest] for dim in available)
-        scale[missing] = scale[argnearest]
-    counts = values / scale
-    interval_min = scale * stats.chi2.ppf((1 - coverage) / 2, 2 * counts) / 2.0
-    interval_max = scale * stats.chi2.ppf((1 + coverage) / 2, 2 * (counts + 1)) / 2.0
+    if variances is None:
+        interval_min = stats.chi2.ppf((1 - coverage) / 2, 2 * values) / 2.0
+        interval_min[values == 0.0] = 0.0  # chi2.ppf produces NaN for values=0
+        interval_max = stats.chi2.ppf((1 + coverage) / 2, 2 * (values + 1)) / 2.0
+    else:
+        scale = np.ones_like(values)
+        mask = np.isfinite(values) & (values != 0)
+        np.divide(variances, values, out=scale, where=mask)
+        counts = values / scale
+        interval_min = scale * stats.chi2.ppf((1 - coverage) / 2, 2 * counts) / 2.0
+        interval_min[values == 0.0] = 0.0  # chi2.ppf produces NaN for values=0
+        interval_max = scale * stats.chi2.ppf((1 + coverage) / 2, 2 * (counts + 1)) / 2.0
+        interval_max[values == 0.0] = np.nan
     interval = np.stack((interval_min, interval_max))
-    interval[np.isnan(interval)] = 0.0  # chi2.ppf produces nan for counts=0
     return interval
 
 
@@ -126,13 +121,14 @@ def ratio_uncertainty(
         uncertainty_type: Coverage interval type to use in the calculation of
          the uncertainties.
          ``"poisson"`` (default) implements the Garwood confidence interval for
-         a Poisson-distributed numerator scaled by the denominator.
-         ``"poisson-ratio"`` implements a confidence interval for the ratio assuming
-         it is an estimator of the ratio of the expected rates from independent Poisson
-         distributions. It does over-cover to a similar degree as the Clopper-Pearson interval
+         a Poisson-distributed numerator scaled by the denominator. See `poisson_interval`
+         for further details.
+         ``"poisson-ratio"`` implements a confidence interval for the ratio ``num / denom``
+         assuming it is an estimator of the ratio of the expected rates from two independent Poisson
+         distributions. It over-covers to a similar degree as the Clopper-Pearson interval
          does for the Binomial efficiency parameter estimate.
-         ``"efficiency"`` implements the Clopper-Pearson confidence interval for the ratio assuming
-         it is an estimator of a Binomial efficiency parameter. This is only valid
+         ``"efficiency"`` implements the Clopper-Pearson confidence interval for the ratio ``num / denom``
+         assuming it is an estimator of a Binomial efficiency parameter. This is only valid
          if the entries contributing to ``num`` are a strict subset of those contributing to ``denom``.
 
     Returns:

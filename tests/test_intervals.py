@@ -61,6 +61,10 @@ def test_poisson_interval(hist_fixture):
         ]
     )
 
+    interval_min, interval_max = intervals.poisson_interval(np.arange(4))
+    assert approx(interval_min) == np.array([       0.0, 0.17275378, 0.70818544, 1.36729531])
+    assert approx(interval_max) == np.array([1.84102165, 3.29952656, 4.63785962, 5.91818583])
+
 
 def test_clopper_pearson_interval(hist_fixture):
     hist_1, _ = hist_fixture
@@ -100,7 +104,7 @@ def test_clopper_pearson_interval(hist_fixture):
     )
 
 
-def test_ratio_uncertainty(hist_fixture):
+def test_ratio_uncertainty():
     num, denom = np.meshgrid(np.array([0, 1, 4, 512]), np.array([0, 1, 4, 512]))
 
     uncertainty_min, uncertainty_max = intervals.ratio_uncertainty(
@@ -109,7 +113,7 @@ def test_ratio_uncertainty(hist_fixture):
 
     assert approx(uncertainty_min, nan_ok=True) == np.array(
         [
-            [np.nan, np.inf, np.inf, np.inf],
+            [np.nan, np.nan, np.nan, np.nan],
             [0.0, 8.27246221e-01, 1.91433919e00, 2.26200365e01],
             [0.0, 2.06811555e-01, 4.78584797e-01, 5.65500911e00],
             [0.0, 1.61571528e-03, 3.73894372e-03, 4.41797587e-02],
@@ -118,10 +122,10 @@ def test_ratio_uncertainty(hist_fixture):
 
     assert approx(uncertainty_max, nan_ok=True) == np.array(
         [
-            [np.nan, np.inf, np.inf, np.inf],
-            [1.84102165e00, 2.29952656e00, 3.16275317e00, 2.36421589e01],
-            [1.84102165e00, 5.74881640e-01, 7.90688293e-01, 5.91053972e00],
-            [1.84102165e00, 4.49126281e-03, 6.17725229e-03, 4.61760915e-02],
+            [np.nan, np.nan, np.nan, np.nan],
+            [np.nan, 2.29952656e00, 3.16275317e00, 2.36421589e01],
+            [np.nan, 5.74881640e-01, 7.90688293e-01, 5.91053972e00],
+            [np.nan, 4.49126281e-03, 6.17725229e-03, 4.61760915e-02],
         ]
     )
 
