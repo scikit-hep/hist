@@ -32,18 +32,19 @@ def poisson_interval(
     r"""
     The Frequentist coverage interval for Poisson-distributed observations.
 
-    What is calculated is the "Garwood" interval,
-    c.f. https://www.ine.pt/revstat/pdf/rs120203.pdf or
-    http://ms.mcmaster.ca/peter/s743/poissonalpha.html.
+    What is calculated is the "Garwood" interval, c.f.
+    `V. Patil, H. Kulkarni (Revstat, 2012) <https://www.ine.pt/revstat/pdf/rs120203.pdf>`_
+    or http://ms.mcmaster.ca/peter/s743/poissonalpha.html.
     If ``variances`` is supplied, the data is assumed to be weighted, and the
     unweighted count is approximated by ``values**2/variances``, which effectively
     scales the unweighted Poisson interval by the average weight.
-    This may not be the optimal solution: see https://arxiv.org/abs/1309.1287
-    for a proper treatment.
+    This may not be the optimal solution: see
+    `10.1016/j.nima.2014.02.021 <https://doi.org/10.1016/j.nima.2014.02.021>`_
+    (`arXiv:1309.1287 <https://arxiv.org/abs/1309.1287>`_) for a proper treatment.
 
     In cases where the value is zero, an upper limit is well-defined only in the case of
     unweighted data, so if ``variances`` is supplied, the upper limit for a zero value
-    will be set to NaN.
+    will be set to ``NaN``.
 
     Args:
         values: Sum of weights.
@@ -124,16 +125,20 @@ def ratio_uncertainty(
         denom: Denominator or number of trials.
         uncertainty_type: Coverage interval type to use in the calculation of
          the uncertainties.
-         ``"poisson"`` (default) implements the Garwood confidence interval for
-         a Poisson-distributed numerator scaled by the denominator. See `poisson_interval`
-         for further details.
-         ``"poisson-ratio"`` implements a confidence interval for the ratio ``num / denom``
-         assuming it is an estimator of the ratio of the expected rates from two independent Poisson
-         distributions. It over-covers to a similar degree as the Clopper-Pearson interval
-         does for the Binomial efficiency parameter estimate.
-         ``"efficiency"`` implements the Clopper-Pearson confidence interval for the ratio ``num / denom``
-         assuming it is an estimator of a Binomial efficiency parameter. This is only valid
-         if the entries contributing to ``num`` are a strict subset of those contributing to ``denom``.
+
+         * ``"poisson"`` (default) implements the Garwood confidence interval for
+           a Poisson-distributed numerator scaled by the denominator.
+           See :func:`hist.intervals.poisson_interval` for further details.
+         * ``"poisson-ratio"`` implements a confidence interval for the ratio ``num / denom``
+           assuming it is an estimator of the ratio of the expected rates from
+           two independent Poisson distributions.
+           It over-covers to a similar degree as the Clopper-Pearson interval
+           does for the Binomial efficiency parameter estimate.
+         * ``"efficiency"`` implements the Clopper-Pearson confidence interval
+           for the ratio ``num / denom`` assuming it is an estimator of a Binomial
+           efficiency parameter.
+           This is only valid if the entries contributing to ``num`` are a strict
+           subset of those contributing to ``denom``.
 
     Returns:
         The uncertainties for the ratio.
