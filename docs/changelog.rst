@@ -11,6 +11,9 @@ Version 2.5.0
   `#266 <https://github.com/scikit-hep/hist/pull/266>`_
   `#278 <https://github.com/scikit-hep/hist/pull/278>`_
 
+* Improve and clarify treatment of confidence intervals in ``intervals`` submodule.
+  `#281 <https://github.com/scikit-hep/hist/pull/281>`_
+
 
 Version 2.4.0
 --------------------
