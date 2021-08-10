@@ -125,11 +125,11 @@ def _expr_to_lambda(expr: str) -> Callable[..., Any]:
 
 def _curve_fit_wrapper(
     func: Callable[..., Any],
-    xdata: np.ndarray,
-    ydata: np.ndarray,
-    yerr: np.ndarray,
+    xdata: np.typing.NDArray[Any],
+    ydata: np.typing.NDArray[Any],
+    yerr: np.typing.NDArray[Any],
     likelihood: bool = False,
-) -> tuple[tuple[float, ...], np.ndarray]:
+) -> tuple[tuple[float, ...], np.typing.NDArray[Any]]:
     """
     Wrapper around `scipy.optimize.curve_fit`. Initial parameters (`p0`)
     can be set in the function definition with defaults for kwargs
@@ -156,7 +156,7 @@ def _curve_fit_wrapper(
         from iminuit import Minuit
         from scipy.special import gammaln
 
-        def fnll(v: Iterable[np.ndarray]) -> float:
+        def fnll(v: Iterable[np.typing.NDArray[Any]]) -> float:
             ypred = func(xdata, *v)
             if (ypred <= 0.0).any():
                 return 1e6
@@ -261,7 +261,7 @@ def plot2d_full(
 
 def _construct_gaussian_callable(
     __hist: hist.BaseHist,
-) -> Callable[[np.ndarray], np.ndarray]:
+) -> Callable[[np.typing.NDArray[Any]], np.typing.NDArray[Any]]:
     x_values = __hist.axes[0].centers
     hist_values = __hist.values()
 
@@ -272,13 +272,13 @@ def _construct_gaussian_callable(
 
     # gauss is a closure that will get evaluated in _fit_callable_to_hist
     def gauss(
-        x: np.ndarray,
+        x: np.typing.NDArray[Any],
         constant: float = constant,
         mean: float = mean,
         sigma: float = sigma,
-    ) -> np.ndarray:
-        # Note: Force np.ndarray type as numpy ufuncs have type "Any"
-        ret: np.ndarray = constant * np.exp(
+    ) -> np.typing.NDArray[Any]:
+        # Note: Force np.typing.NDArray[Any] type as numpy ufuncs have type "Any"
+        ret: np.typing.NDArray[Any] = constant * np.exp(
             -np.square(x - mean) / (2 * np.square(sigma))
         )
         return ret
@@ -287,10 +287,15 @@ def _construct_gaussian_callable(
 
 
 def _fit_callable_to_hist(
-    model: Callable[[np.ndarray], np.ndarray],
+    model: Callable[[np.typing.NDArray[Any]], np.typing.NDArray[Any]],
     histogram: hist.BaseHist,
     likelihood: bool = False,
-) -> tuple[np.ndarray, np.ndarray, np.ndarray, tuple[tuple[float, ...], np.ndarray]]:
+) -> tuple[
+    np.typing.NDArray[Any],
+    np.typing.NDArray[Any],
+    np.typing.NDArray[Any],
+    tuple[tuple[float, ...], np.typing.NDArray[Any]],
+]:
     """
     Fit a model, a callable function, to the histogram values.
     """
@@ -312,7 +317,7 @@ def _fit_callable_to_hist(
         n_samples = 100
         vopts = np.random.multivariate_normal(popt, pcov, n_samples)
         sampled_ydata = np.vstack([model(xdata, *vopt).T for vopt in vopts])
-        model_uncert = np.nanstd(sampled_ydata, axis=0)
+        model_uncert = np.nanstd(sampled_ydata, axis=0)  # type: ignore
     else:
         model_uncert = np.zeros_like(hist_uncert)
 
@@ -321,8 +326,8 @@ def _fit_callable_to_hist(
 
 def _plot_fit_result(
     __hist: hist.BaseHist,
-    model_values: np.ndarray,
-    model_uncert: np.ndarray,
+    model_values: np.typing.NDArray[Any],
+    model_uncert: np.typing.NDArray[Any],
     ax: matplotlib.axes.Axes,
     eb_kwargs: dict[str, Any],
     fp_kwargs: dict[str, Any],
@@ -361,8 +366,8 @@ def _plot_fit_result(
 
 def plot_ratio_array(
     __hist: hist.BaseHist,
-    ratio: np.ndarray,
-    ratio_uncert: np.ndarray,
+    ratio: np.typing.NDArray[Any],
+    ratio_uncert: np.typing.NDArray[Any],
     ax: matplotlib.axes.Axes,
     **kwargs: Any,
 ) -> RatioArtists:
@@ -435,7 +440,7 @@ def plot_ratio_array(
                 valid_ratios + ratio_uncert[1][valid_ratios_idx],
             ]
         )
-        max_delta = np.max(np.abs(extrema - central_value))
+        max_delta = np.amax(np.abs(extrema - central_value))
         ratio_extrema = np.abs(max_delta + central_value)
 
         _alpha = 2.0
@@ -453,7 +458,7 @@ def plot_ratio_array(
 
 def plot_pull_array(
     __hist: hist.BaseHist,
-    pulls: np.ndarray,
+    pulls: np.typing.NDArray[Any],
     ax: matplotlib.axes.Axes,
     bar_kwargs: dict[str, Any],
     pp_kwargs: dict[str, Any],
@@ -502,7 +507,9 @@ def plot_pull_array(
 
 def _plot_ratiolike(
     self: hist.BaseHist,
-    other: hist.BaseHist | Callable[[np.ndarray], np.ndarray] | str,
+    other: hist.BaseHist
+    | Callable[[np.typing.NDArray[Any]], np.typing.NDArray[Any]]
+    | str,
     likelihood: bool = False,
     *,
     ax_dict: dict[str, matplotlib.axes.Axes] | None = None,
@@ -608,7 +615,7 @@ def _plot_ratiolike(
         if fit_fmt is not None:
             parnames = list(inspect.signature(other).parameters)[1:]
             popt, pcov = bestfit_result
-            perr = np.sqrt(np.diag(pcov))
+            perr = np.sqrt(np.diagonal(pcov))
 
             fp_label = "Fit"
             for name, value, error in zip(parnames, popt, perr):
@@ -651,7 +658,9 @@ def _plot_ratiolike(
             )
 
         elif view == "pull":
-            pulls = (hist_values - compare_values) / hist_values_uncert
+            pulls: np.typing.NDArray[Any] = (
+                hist_values - compare_values
+            ) / hist_values_uncert
 
             pulls[np.isnan(pulls) | np.isinf(pulls)] = 0
 
