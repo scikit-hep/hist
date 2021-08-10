@@ -25,10 +25,10 @@ def __dir__() -> tuple[str, ...]:
 
 
 def poisson_interval(
-    values: np.ndarray,
-    variances: np.ndarray | None = None,
+    values: np.typing.NDArray[Any],
+    variances: np.typing.NDArray[Any] | None = None,
     coverage: float | None = None,
-) -> np.ndarray:
+) -> np.typing.NDArray[Any]:
     r"""
     The Frequentist coverage interval for Poisson-distributed observations.
 
@@ -67,7 +67,7 @@ def poisson_interval(
         scale = np.ones_like(values)
         mask = np.isfinite(values) & (values != 0)
         np.divide(variances, values, out=scale, where=mask)
-        counts = values / scale
+        counts: np.typing.NDArray[Any] = values / scale
         interval_min = scale * stats.chi2.ppf((1 - coverage) / 2, 2 * counts) / 2.0
         interval_min[values == 0.0] = 0.0  # chi2.ppf produces NaN for values=0
         interval_max = (
@@ -79,8 +79,10 @@ def poisson_interval(
 
 
 def clopper_pearson_interval(
-    num: np.ndarray, denom: np.ndarray, coverage: float | None = None
-) -> np.ndarray:
+    num: np.typing.NDArray[Any],
+    denom: np.typing.NDArray[Any],
+    coverage: float | None = None,
+) -> np.typing.NDArray[Any]:
     r"""
     Compute the Clopper-Pearson coverage interval for a binomial distribution.
     c.f. http://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval
@@ -112,8 +114,8 @@ def clopper_pearson_interval(
 
 
 def ratio_uncertainty(
-    num: np.ndarray,
-    denom: np.ndarray,
+    num: np.typing.NDArray[Any],
+    denom: np.typing.NDArray[Any],
     uncertainty_type: Literal["poisson", "poisson-ratio", "efficiency"] = "poisson",
 ) -> Any:
     r"""
@@ -155,7 +157,7 @@ def ratio_uncertainty(
         # Details: see https://github.com/scikit-hep/hist/issues/279
         p_lim = clopper_pearson_interval(num, num + denom)
         with np.errstate(divide="ignore", invalid="ignore"):
-            r_lim = p_lim / (1 - p_lim)
+            r_lim: np.typing.NDArray[Any] = p_lim / (1 - p_lim)
             ratio_uncert = np.abs(r_lim - ratio)
     elif uncertainty_type == "efficiency":
         ratio_uncert = np.abs(clopper_pearson_interval(num, denom) - ratio)

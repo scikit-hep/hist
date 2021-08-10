@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Callable
+from typing import Any, Callable
 
 import numpy as np
 from boost_histogram.axis import Axis
@@ -70,8 +70,8 @@ def svg_hist_1d(h: hist.BaseHist) -> svg:
     (edges,) = h.axes.edges
     norm_edges = (edges - edges[0]) / (edges[-1] - edges[0])
     density = h.density()
-    max_dens = np.max(density) or 1
-    norm_vals = density / max_dens
+    max_dens = np.amax(density) or 1
+    norm_vals: np.typing.NDArray[Any] = density / max_dens
 
     arr = np.empty((2, len(norm_vals) * 2 + 2), dtype=float)
     arr[0, 0:-1:2] = arr[0, 1::2] = width * norm_edges
@@ -119,8 +119,8 @@ def svg_hist_1d_c(h: hist.BaseHist) -> svg:
     (edges,) = h.axes.edges
     norm_edges = (edges - edges[0]) / (edges[-1] - edges[0]) * np.pi * 2
     density = h.density()
-    max_dens = np.max(density) or 1
-    norm_vals = density / max_dens
+    max_dens = np.amax(density) or 1
+    norm_vals: np.typing.NDArray[Any] = density / max_dens
 
     arr = np.empty((2, len(norm_vals) * 2), dtype=float)
     arr[0, :-1:2] = arr[0, 1::2] = norm_edges[:-1]
@@ -153,8 +153,8 @@ def svg_hist_2d(h: hist.BaseHist) -> svg:
     ey = -(e1 - e1[0]) / (e1[-1] - e1[0]) * height
 
     density = h.density()
-    max_dens = np.max(density) or 1
-    norm_vals = density / max_dens
+    max_dens = np.amax(density) or 1
+    norm_vals: np.typing.NDArray[Any] = density / max_dens
 
     boxes = []
     for r, (up_edge, bottom_edge) in enumerate(zip(ey[:-1], ey[1:])):
