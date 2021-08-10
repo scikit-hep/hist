@@ -615,7 +615,7 @@ def _plot_ratiolike(
         if fit_fmt is not None:
             parnames = list(inspect.signature(other).parameters)[1:]
             popt, pcov = bestfit_result
-            perr = np.sqrt(np.diag(pcov))  # type: ignore
+            perr = np.sqrt(np.diagonal(pcov))
 
             fp_label = "Fit"
             for name, value, error in zip(parnames, popt, perr):
