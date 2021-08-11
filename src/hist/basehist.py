@@ -63,7 +63,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         *args: AxisProtocol | Storage | str | tuple[int, float, float],
         storage: Storage | str | None = None,
         metadata: Any = None,
-        data: np.ndarray | None = None,
+        data: np.typing.NDArray[Any] | None = None,
     ) -> None:
         """
         Initialize BaseHist object. Axis params can contain the names.
@@ -355,12 +355,12 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         retval[...] = np.stack([count, new_values, count * new_variances], axis=-1)
         return retval
 
-    def density(self) -> np.ndarray:
+    def density(self) -> np.typing.NDArray[Any]:
         """
         Density NumPy array.
         """
         total = np.sum(self.values()) * functools.reduce(operator.mul, self.axes.widths)
-        dens: np.ndarray = self.values() / np.where(total > 0, total, 1)
+        dens: np.typing.NDArray[Any] = self.values() / np.where(total > 0, total, 1)
         return dens
 
     def show(self, **kwargs: Any) -> Any:
@@ -446,7 +446,9 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
     def plot_ratio(
         self,
-        other: hist.BaseHist | Callable[[np.ndarray], np.ndarray] | str,
+        other: hist.BaseHist
+        | Callable[[np.typing.NDArray[Any]], np.typing.NDArray[Any]]
+        | str,
         *,
         ax_dict: dict[str, matplotlib.axes.Axes] | None = None,
         **kwargs: Any,
@@ -466,7 +468,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
     def plot_pull(
         self,
-        func: Callable[[np.ndarray], np.ndarray] | str,
+        func: Callable[[np.typing.NDArray[Any]], np.typing.NDArray[Any]] | str,
         *,
         ax_dict: dict[str, matplotlib.axes.Axes] | None = None,
         **kwargs: Any,
