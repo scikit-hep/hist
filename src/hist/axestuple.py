@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from typing import Any
 
 from boost_histogram.axis import ArrayTuple, AxesTuple
@@ -34,6 +35,30 @@ class NamedAxesTuple(AxesTuple):
             item = self._get_index_by_name(item)
 
         return super().__getitem__(item)
+
+    def __setattr__(self, attr: str, values: Any) -> Any:
+        if attr == "name":
+            if len(values) != len(self):
+                raise ValueError(
+                    "The length of values should match the histogram's dimension"
+                )
+
+            for i, ax in enumerate(self):
+                ax._ax.metadata["name"] = values[i]
+
+            disallowed_names = {"weight", "sample", "threads"}
+            for ax in self:
+                if ax.name in disallowed_names:
+                    disallowed_warning = f"{ax.name} is a protected keyword and cannot be used as axis name"
+                    warnings.warn(disallowed_warning)
+
+            valid_names = [ax.name for ax in self if ax.name]
+            if len(valid_names) != len(set(valid_names)):
+                raise KeyError(
+                    f"{self.__class__.__name__} instance cannot contain axes with duplicated names"
+                )
+        else:
+            self.__class__(s.__setattr__(attr, v) for s, v in zip(self, values))
 
     @property
     def name(self) -> tuple[str]:
