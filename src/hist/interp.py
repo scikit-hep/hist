@@ -22,9 +22,7 @@ def __dir__() -> tuple[str, ...]:
     return __all__
 
 
-def Linear(
-    h: BaseHist, **kwargs: Any
-) -> Any:  # Callable[[Any], np.ndarray] doesn't work
+def Linear(h: BaseHist, **kwargs: Any) -> interpolate.interpolate.interp1d:
     r"""
     Linear interpolator using scipy.
 
@@ -41,9 +39,7 @@ def Linear(
     return interpolate.interp1d(h.axes[0].centers, h.values(), kind="linear", **kwargs)
 
 
-def Cubic(
-    h: BaseHist, **kwargs: Any
-) -> Any:  # Callable[[Any], np.ndarray] doesn't work
+def Cubic(h: BaseHist, **kwargs: Any) -> interpolate.interpolate.interp1d:
     r"""
     Cubic interpolator using scipy.
 
