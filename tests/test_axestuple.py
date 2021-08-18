@@ -19,11 +19,11 @@ def test_axestuple():
     assert h.axes[0].label == "A-unit"
     assert h.axes[1].label == "B-unit"
 
-    with pytest.raises(Exception):
-        h.axes.name = ("A", "B", "C")
-
     with pytest.warns(UserWarning):
         h.axes.name = ("weight", "sample")
 
     with pytest.raises(Exception):
         h.axes.name = ("A", "A")
+
+    with pytest.raises(Exception):
+        h.axes.name = ("A", "B", "C")
