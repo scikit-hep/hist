@@ -229,11 +229,11 @@ def test_stack_plot(monkeypatch):
 
     h = Hist.new.Regular(10, 0, 1).StrCategory(["one", "two"], name="str").Double()
     s = h.stack(1)
-
     args, kwargs = s.plot(silly=...)
 
     assert len(s) == 2
     assert len(list(s)) == 2
 
     assert args == (list(s),)
-    assert kwargs == {"label": ["one", "two"], "silly": ...}
+    assert kwargs["label"] == ["one", "two"]
+    assert kwargs["silly"] == ...
