@@ -78,6 +78,9 @@ def test_stack_init(hist_1d):
     assert stack[0] == h1
     assert stack[1] == h2
     assert stack[2] == h3
+    assert stack.axes == h1.axes
+    assert stack.axes == h2.axes
+    assert stack.axes == h3.axes
 
     assert tuple(stack) == (h1, h2, h3)
 
@@ -111,12 +114,19 @@ def test_stack_constructor_fails():
         Stack(int_hist, int_cat_hist, str_cat_hist)
 
     # allow to construct stack with 2d histograms
-    Stack(reg_hist_2d, reg_hist_2d, reg_hist_2d)
-    Stack(boo_hist_2d, boo_hist_2d, boo_hist_2d)
-    Stack(var_hist_2d, var_hist_2d, var_hist_2d)
-    Stack(int_hist_2d, int_hist_2d, int_hist_2d)
-    Stack(int_cat_hist_2d, int_cat_hist_2d, int_cat_hist_2d)
-    Stack(str_cat_hist_2d, str_cat_hist_2d, str_cat_hist_2d)
+    s1 = Stack(reg_hist_2d, reg_hist_2d, reg_hist_2d)
+    s2 = Stack(boo_hist_2d, boo_hist_2d, boo_hist_2d)
+    s3 = Stack(var_hist_2d, var_hist_2d, var_hist_2d)
+    s4 = Stack(int_hist_2d, int_hist_2d, int_hist_2d)
+    s5 = Stack(int_cat_hist_2d, int_cat_hist_2d, int_cat_hist_2d)
+    s6 = Stack(str_cat_hist_2d, str_cat_hist_2d, str_cat_hist_2d)
+
+    assert s1.axes == reg_hist_2d.axes
+    assert s2.axes == boo_hist_2d.axes
+    assert s3.axes == var_hist_2d.axes
+    assert s4.axes == int_hist_2d.axes
+    assert s5.axes == int_cat_hist_2d.axes
+    assert s6.axes == str_cat_hist_2d.axes
 
     # not allow to constuct stack with different ndim
     with pytest.raises(Exception):
