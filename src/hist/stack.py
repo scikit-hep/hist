@@ -7,6 +7,7 @@ from typing import Any, Iterator, TypeVar
 from .basehist import BaseHist
 
 try:
+    import matplotlib
     import matplotlib.pyplot as plt
 except ModuleNotFoundError:
     print(
@@ -66,7 +67,7 @@ class Stack:
         str_stack = ", ".join(repr(h) for h in self)
         return f"{self.__class__.__name__}({str_stack})"
 
-    def plot(self, **kwargs: Any) -> Any:
+    def plot(self, *, ax: matplotlib.axes.Axes | None = None, **kwargs: Any) -> Any:
         """
         Plot method for Stack object.
         """
@@ -81,14 +82,16 @@ class Stack:
             if all(getattr(h, "name", None) is not None for h in self):
                 kwargs["label"] = [h.name for h in self]  # type: ignore
 
-        fig = plt.gcf()
-        ax = fig.add_subplot()
-        ret = hist.plot.histplot(list(self), ax=ax, **kwargs)
-        if ax.get_legend_handles_labels()[0]:  # Don't plot an empty legend
+        if ax is None:
+            fig = plt.gcf()
+            ax = fig.add_subplot()
+
+        art = hist.plot.histplot(list(self), ax=ax, **kwargs)
+        if ax.get_legend_handles_labels()[0]:
             legend = ax.legend()
             legend.set_title("histogram")
 
-        return ret
+        return art
 
 
 def __dir__() -> tuple[str, ...]:
