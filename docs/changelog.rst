@@ -15,6 +15,12 @@ Version 2.5.0
   `#281 <https://github.com/scikit-hep/hist/pull/281>`_
 
 
+Smaller features or fixes:
+
+* Support showing histogram titles in the legend, ``Stack.axes``, and histoprint for HistStack.
+  `#291 <https://github.com/scikit-hep/hist/pull/291>`_
+
+
 Version 2.4.0
 --------------------
 

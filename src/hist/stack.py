@@ -4,6 +4,7 @@ import sys
 import typing
 from typing import Any, Iterator, TypeVar
 
+from .axestuple import NamedAxesTuple
 from .basehist import BaseHist
 
 try:
@@ -66,6 +67,10 @@ class Stack:
     def __repr__(self) -> str:
         str_stack = ", ".join(repr(h) for h in self)
         return f"{self.__class__.__name__}({str_stack})"
+
+    @property
+    def axes(self) -> NamedAxesTuple:
+        return self._stack[0].axes
 
     def plot(self, *, ax: matplotlib.axes.Axes | None = None, **kwargs: Any) -> Any:
         """
