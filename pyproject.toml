@@ -69,5 +69,7 @@ module = [
     "iminuit.*",
     "mplhep.*",
     "hist.version",
+    "ROOT.*",
+    "coffea.*",
 ]
 ignore_missing_imports = true

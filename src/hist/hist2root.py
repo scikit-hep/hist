@@ -1,11 +1,15 @@
+from __future__ import annotations
+
 import math
 
 import ROOT
 from coffea import processor
 
+import hist.basehist
 
-def convert(hist, hname=""):
-    """Convert a 1-dimensional or 2-dimensional`Hist` object or a counter to ROOT.TH1D or ROOT.TH2D
+
+def convert(hist: hist.basehist.BaseHist, hname: str = "") -> ROOT.TH1D | ROOT.TH2D:
+    """Convert a 1-dimensional or 2-dimensional `Hist` object or a counter to ROOT.TH1D or ROOT.TH2D
     Parameters
     ----------
         hist : Hist
@@ -38,14 +42,16 @@ def convert(hist, hname=""):
     if isinstance(hist, processor.defaultdict_accumulator):
         return convertCounter(hist, hname)
 
-    if len(hist.axes()) == 1:
+    if len(hist.axes) == 1:
         return convert2TH1D(hist, hname)
 
-    if len(hist.axes()) == 2:
+    if len(hist.axes) == 2:
         return convert2TH2D(hist, hname)
 
+    raise TypeError("Not a known ROOT type")
 
-def convertCounter(counter, hname):
+
+def convertCounter(counter: hist.basehist.BaseHist, hname: str):
     n = len(counter.keys())
     out = ROOT.TH1D(hname, "", n, 0, n)
     for i, key in enumerate(counter.keys()):
@@ -54,12 +60,12 @@ def convertCounter(counter, hname):
     return out
 
 
-def convert2TH1D(hist, hname):
+def convert2TH1D(hist: hist.basehist.BaseHist, hname: str) -> ROOT.TH1D:
     name = hist.label
     if len(name) > 0:
         name = hname
     title = hist.label
-    axis = hist.axes()[0]
+    axis = hist.axes[0]
     edges = axis.edges(overflow="none")
     edgesOFlow = axis.edges(overflow="all")
 
@@ -73,15 +79,15 @@ def convert2TH1D(hist, hname):
     return out
 
 
-def convert2TH2D(hist, hname):
+def convert2TH2D(hist: hist.basehist.BaseHist, hname: str) -> ROOT.TH2D:
     name = hist.label
     if len(name) > 0:
         name = hname
     title = hist.label
-    axis1 = hist.axes()[0]
+    axis1 = hist.axes[0]
     xedges = axis1.edges(overflow="none")
     xedgesOFlow = axis1.edges(overflow="all")
-    axis2 = hist.axes()[1]
+    axis2 = hist.axes[1]
     yedges = axis2.edges(overflow="none")
     yedgesOFlow = axis2.edges(overflow="all")
 
