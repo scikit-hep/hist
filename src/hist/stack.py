@@ -4,6 +4,8 @@ import sys
 import typing
 from typing import Any, Iterator, TypeVar
 
+import histoprint
+
 from .axestuple import NamedAxesTuple
 from .basehist import BaseHist
 
@@ -97,6 +99,13 @@ class Stack:
             legend.set_title("histogram")
 
         return art
+
+    def show(self, **kwargs: Any) -> Any:
+        """
+        Pretty print the stacked histograms to the console.
+        """
+
+        return histoprint.print_hist(list(self), stack=True, **kwargs)
 
 
 def __dir__() -> tuple[str, ...]:
