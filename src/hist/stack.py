@@ -11,7 +11,6 @@ from .basehist import BaseHist
 
 try:
     import matplotlib
-    import matplotlib.pyplot as plt
 except ModuleNotFoundError:
     print(
         "Hist requires mplhep to plot, either install hist[plot] or mplhep",
@@ -81,24 +80,7 @@ class Stack:
 
         import hist.plot
 
-        if self[0].ndim != 1:
-            raise NotImplementedError("Please project to 1D before calling plot")
-
-        if "label" not in kwargs:
-            # TODO: add .name to static typing. And runtime, for that matter.
-            if all(getattr(h, "name", None) is not None for h in self):
-                kwargs["label"] = [h.name for h in self]  # type: ignore
-
-        if ax is None:
-            fig = plt.gcf()
-            ax = fig.add_subplot()
-
-        art = hist.plot.histplot(list(self), ax=ax, **kwargs)
-        if ax.get_legend_handles_labels()[0]:
-            legend = ax.legend()
-            legend.set_title("histogram")
-
-        return art
+        return hist.plot.plot_stack(self, ax=ax, **kwargs)
 
     def show(self, **kwargs: Any) -> Any:
         """
