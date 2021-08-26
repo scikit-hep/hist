@@ -7,8 +7,18 @@ from boost_histogram.axis import Axis
 
 import hist
 
-from .svgutils import (SupportsStr, circle, div, html, line, polygon, polyline,
-                       rect, svg, text)
+from .svgutils import (
+    SupportsStr,
+    circle,
+    div,
+    html,
+    line,
+    polygon,
+    polyline,
+    rect,
+    svg,
+    text,
+)
 
 
 def _desc_hist(h: hist.BaseHist) -> str:

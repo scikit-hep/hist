@@ -14,6 +14,7 @@ from .hist import Hist
 from .namedhist import NamedHist
 from .stack import Stack
 from .tag import loc, overflow, rebin, sum, underflow
+
 # Convenient access to the version number
 from .version import version as __version__
 
