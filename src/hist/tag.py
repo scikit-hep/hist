@@ -1,14 +1,6 @@
 from __future__ import annotations
 
-from boost_histogram.tag import (
-    Locator,
-    Slicer,
-    at,
-    loc,
-    overflow,
-    rebin,
-    sum,
-    underflow,
-)
+from boost_histogram.tag import (Locator, Slicer, at, loc, overflow, rebin,
+                                 sum, underflow)
 
 __all__ = ("Slicer", "Locator", "at", "loc", "overflow", "underflow", "rebin", "sum")

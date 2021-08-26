@@ -4,7 +4,8 @@ import functools
 import operator
 import typing
 import warnings
-from typing import Any, Callable, Iterator, Mapping, Sequence, Tuple, TypeVar, Union
+from typing import (Any, Callable, Iterator, Mapping, Sequence, Tuple, TypeVar,
+                    Union)
 
 import boost_histogram as bh
 import histoprint
@@ -16,7 +17,8 @@ from .axestuple import NamedAxesTuple
 from .axis import AxisProtocol
 from .quick_construct import MetaConstructor
 from .storage import Storage
-from .svgplots import html_hist, svg_hist_1d, svg_hist_1d_c, svg_hist_2d, svg_hist_nd
+from .svgplots import (html_hist, svg_hist_1d, svg_hist_1d_c, svg_hist_2d,
+                       svg_hist_nd)
 from .typing import ArrayLike, Protocol, SupportsIndex
 
 if typing.TYPE_CHECKING:
