@@ -582,6 +582,14 @@ class TestGeneralStorageProxy:
         )
 
 
+def test_quick_construct_kwargs():
+    data = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+    h = Hist.new.Regular(10, 0, 1, name="x").Double(name="h", label="y", data=data)
+    assert h.name == "h"
+    assert h.label == "y"
+    assert h.values() == approx(data)
+
+
 def test_general_transform_proxy():
     """
     Test general transform proxy -- whether Hist transform proxy works properly.
