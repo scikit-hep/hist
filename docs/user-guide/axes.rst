@@ -99,7 +99,7 @@ There are some other useful axis types based on regular axis:
 .. py:function:: hist.axis.Regular(..., circular=True)
    :noindex:
 
-   This wraps around, so that out-of-range values map back into the valid range circularly.
+   This wraps around, so that out-of-range values map back into the valid range in a circular fashion.
 
 Regular axis: Transforms
 """"""""""""""""""""""""

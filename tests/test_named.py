@@ -394,7 +394,7 @@ def test_named_access():
 
     assert h[0j, -0j + 2, "hi", True, 1]
 
-    # mis-match dimension
+    # mismatch dimension
     with pytest.raises(Exception):
         h[0j, -0j + 2, "hi", True]
 

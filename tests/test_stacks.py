@@ -118,7 +118,7 @@ def test_stack_constructor_fails():
     Stack(int_cat_hist_2d, int_cat_hist_2d, int_cat_hist_2d)
     Stack(str_cat_hist_2d, str_cat_hist_2d, str_cat_hist_2d)
 
-    # not allow to constuct stack with different ndim
+    # not allow to construct stack with different ndim
     with pytest.raises(Exception):
         Stack(reg_hist, reg_hist_2d)
     with pytest.raises(Exception):
