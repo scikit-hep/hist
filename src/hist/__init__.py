@@ -34,7 +34,11 @@ __all__ = (
     "sum",
     "tag",
     "underflow",
+    "new",
 )
+
+
+new = Hist.new
 
 
 def __dir__() -> tuple[str, ...]:
