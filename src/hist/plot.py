@@ -713,7 +713,11 @@ def plot_pie(
 
 
 def plot_stack(
-    self: hist.stack.Stack, *, ax: matplotlib.axes.Axes | None = None, **kwargs: Any
+    self: hist.stack.Stack,
+    *,
+    ax: matplotlib.axes.Axes | None = None,
+    legend: bool | None = False,
+    **kwargs: Any,
 ) -> Any:
 
     if self[0].ndim != 1:
@@ -725,8 +729,7 @@ def plot_stack(
             kwargs["label"] = [h.name for h in self]  # type: ignore
 
     ret = hist.plot.histplot(list(self), **kwargs)
-    #     print(len(ret))
-    #     ax = ret[0]
-    #     _plot_keywords_wrapper(ax, legend=legend)
+    ax = ret[0].stairs.axes
+    _plot_keywords_wrapper(ax, legend=legend)
 
     return ret
