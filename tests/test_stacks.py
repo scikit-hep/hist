@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from unittest.mock import MagicMock
+
 import numpy as np
 import pytest
 
@@ -229,17 +231,18 @@ def test_stack_method():
 
 
 def collect(*args, **kwargs):
-    return args, kwargs
+    return MagicMock(), args, kwargs
 
 
 def test_stack_plot(monkeypatch):
     import hist.plot
 
     monkeypatch.setattr(hist.plot, "histplot", collect)
+    monkeypatch.setattr(hist.plot, "_plot_keywords_wrapper", collect)
 
     h = Hist.new.Regular(10, 0, 1).StrCategory(["one", "two"], name="str").Double()
     s = h.stack(1)
-    args, kwargs = s.plot(silly=...)
+    _, args, kwargs = s.plot(silly=...)
 
     assert len(s) == 2
     assert len(list(s)) == 2
