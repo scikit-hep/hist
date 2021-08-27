@@ -68,7 +68,7 @@ class NamedHist(BaseHist, family=hist):
 
         if isinstance(index, dict) and any(isinstance(k, int) for k in index.keys()):
             raise TypeError(
-                f"Only access by names are supported for {self.__class__.__name__} in dictionay"
+                f"Only access by names are supported for {self.__class__.__name__} in dictionary"
             )
 
         return super().__getitem__(index)
@@ -84,7 +84,7 @@ class NamedHist(BaseHist, family=hist):
 
         if isinstance(index, dict) and any(isinstance(k, int) for k in index.keys()):
             raise TypeError(
-                f"Only access by names are supported for {self.__class__.__name__} in dictionay"
+                f"Only access by names are supported for {self.__class__.__name__} in dictionary"
             )
 
         return super().__setitem__(index, value)
