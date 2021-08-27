@@ -72,7 +72,7 @@ class Stack:
         if "label" not in kwargs:
             # TODO: add .name to static typing. And runtime, for that matter.
             if all(getattr(h, "name", None) is not None for h in self):
-                kwargs["label"] = [h.name for h in self]  # type: ignore
+                kwargs["label"] = [h.name for h in self]
 
         return hist.plot.histplot(list(self), **kwargs)  # type: ignore
 
