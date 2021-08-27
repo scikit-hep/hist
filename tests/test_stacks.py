@@ -128,7 +128,7 @@ def test_stack_constructor_fails():
     assert s5.axes == int_cat_hist_2d.axes
     assert s6.axes == str_cat_hist_2d.axes
 
-    # not allow to constuct stack with different ndim
+    # not allow to construct stack with different ndim
     with pytest.raises(Exception):
         Stack(reg_hist, reg_hist_2d)
     with pytest.raises(Exception):

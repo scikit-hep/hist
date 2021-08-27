@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Callable, Iterable
 
+import numpy as np
+
 from . import axis, storage
 from .axis import AxisProtocol
 from .axis.transform import AxisTransform
@@ -56,6 +58,7 @@ class QuickConstruct:
                 name=name,
                 label=label,
                 metadata=metadata,
+                flow=flow,
                 underflow=underflow,
                 overflow=overflow,
                 growth=growth,
@@ -316,26 +319,124 @@ class QuickConstruct:
 class ConstructProxy(QuickConstruct):
     __slots__ = ()
 
-    def Double(self) -> BaseHist:
-        return self.hist_class(*self.axes, storage=storage.Double())
+    def Double(
+        self,
+        *,
+        metadata: Any = None,
+        data: np.typing.NDArray[Any] | None = None,
+        label: str | None = None,
+        name: str | None = None,
+    ) -> BaseHist:
+        return self.hist_class(
+            *self.axes,
+            storage=storage.Double(),
+            metadata=metadata,
+            data=data,
+            label=label,
+            name=name,
+        )
 
-    def Int64(self) -> BaseHist:
-        return self.hist_class(*self.axes, storage=storage.Int64())
+    def Int64(
+        self,
+        *,
+        metadata: Any = None,
+        data: np.typing.NDArray[Any] | None = None,
+        label: str | None = None,
+        name: str | None = None,
+    ) -> BaseHist:
+        return self.hist_class(
+            *self.axes,
+            storage=storage.Int64(),
+            metadata=metadata,
+            data=data,
+            label=label,
+            name=name,
+        )
 
-    def AtomicInt64(self) -> BaseHist:
-        return self.hist_class(*self.axes, storage=storage.AtomicInt64())
+    def AtomicInt64(
+        self,
+        *,
+        metadata: Any = None,
+        data: np.typing.NDArray[Any] | None = None,
+        label: str | None = None,
+        name: str | None = None,
+    ) -> BaseHist:
+        return self.hist_class(
+            *self.axes,
+            storage=storage.AtomicInt64(),
+            metadata=metadata,
+            data=data,
+            label=label,
+            name=name,
+        )
 
-    def Weight(self) -> BaseHist:
-        return self.hist_class(*self.axes, storage=storage.Weight())
+    def Weight(
+        self,
+        *,
+        metadata: Any = None,
+        data: np.typing.NDArray[Any] | None = None,
+        label: str | None = None,
+        name: str | None = None,
+    ) -> BaseHist:
+        return self.hist_class(
+            *self.axes,
+            storage=storage.Weight(),
+            metadata=metadata,
+            data=data,
+            label=label,
+            name=name,
+        )
 
-    def Mean(self) -> BaseHist:
-        return self.hist_class(*self.axes, storage=storage.Mean())
+    def Mean(
+        self,
+        *,
+        metadata: Any = None,
+        data: np.typing.NDArray[Any] | None = None,
+        label: str | None = None,
+        name: str | None = None,
+    ) -> BaseHist:
+        return self.hist_class(
+            *self.axes,
+            storage=storage.Mean(),
+            metadata=metadata,
+            data=data,
+            label=label,
+            name=name,
+        )
 
-    def WeightedMean(self) -> BaseHist:
-        return self.hist_class(*self.axes, storage=storage.WeightedMean())
+    def WeightedMean(
+        self,
+        *,
+        metadata: Any = None,
+        data: np.typing.NDArray[Any] | None = None,
+        label: str | None = None,
+        name: str | None = None,
+    ) -> BaseHist:
+        return self.hist_class(
+            *self.axes,
+            storage=storage.WeightedMean(),
+            metadata=metadata,
+            data=data,
+            label=label,
+            name=name,
+        )
 
-    def Unlimited(self) -> BaseHist:
-        return self.hist_class(*self.axes, storage=storage.Unlimited())
+    def Unlimited(
+        self,
+        *,
+        metadata: Any = None,
+        data: np.typing.NDArray[Any] | None = None,
+        label: str | None = None,
+        name: str | None = None,
+    ) -> BaseHist:
+        return self.hist_class(
+            *self.axes,
+            storage=storage.Unlimited(),
+            metadata=metadata,
+            data=data,
+            label=label,
+            name=name,
+        )
 
 
 class MetaConstructor(type):

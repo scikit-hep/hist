@@ -86,6 +86,9 @@ class Stack:
         """
         Pretty print the stacked histograms to the console.
         """
+        if "label" not in kwargs:
+            if all(h.name is not None for h in self):
+                kwargs["label"] = [h.name for h in self]
 
         return histoprint.print_hist(list(self), stack=True, **kwargs)
 

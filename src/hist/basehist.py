@@ -64,12 +64,16 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         storage: Storage | str | None = None,
         metadata: Any = None,
         data: np.typing.NDArray[Any] | None = None,
+        label: str | None = None,
+        name: str | None = None,
     ) -> None:
         """
         Initialize BaseHist object. Axis params can contain the names.
         """
         self._hist: Any = None
         self.axes: NamedAxesTuple
+        self.name = name
+        self.label = label
 
         if args and storage is None and isinstance(args[-1], (Storage, str)):
             storage = args[-1]
@@ -503,10 +507,10 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         """
         if self.ndim < 2:
             raise RuntimeError("Cannot stack with less than two axis")
-        stack_histograms: Iterator[BaseHist] = [
-            self[{axis: i}] for i in range(len(self.axes[axis]))  # type: ignore
+        stack_histograms: Iterator[BaseHist] = [  # type: ignore
+            self[{axis: i}] for i in range(len(self.axes[axis]))
         ]
         for name, h in zip(self.axes[axis], stack_histograms):
-            h.name = name  # type: ignore
+            h.name = name
 
         return hist.stack.Stack(*stack_histograms)

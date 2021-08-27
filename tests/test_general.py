@@ -8,6 +8,7 @@ import numpy as np
 import pytest
 from pytest import approx
 
+import hist
 from hist import Hist, axis, storage
 
 # TODO: specify what error is raised
@@ -294,7 +295,7 @@ def test_general_access():
 
     assert h[0j, -0j + 2, "hi", True, 1]
 
-    # mis-match dimension
+    # mismatch dimension
     with pytest.raises(Exception):
         h[0j, -0j + 2, "hi", True]
 
@@ -580,6 +581,14 @@ class TestGeneralStorageProxy:
             Hist(axis.Regular(10, 0, 1, name="x"), storage.Unlimited())._storage_type
             == storage.Unlimited
         )
+
+
+def test_quick_construct_kwargs():
+    data = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+    h = Hist.new.Regular(10, 0, 1, name="x").Double(name="h", label="y", data=data)
+    assert h.name == "h"
+    assert h.label == "y"
+    assert h.values() == approx(data)
 
 
 def test_general_transform_proxy():
@@ -902,6 +911,15 @@ def test_select_by_index_imag():
 
 def test_sorted_simple():
     h = Hist.new.IntCat([4, 1, 2]).StrCat(["AB", "BCC", "BC"]).Double()
+    assert tuple(h.sort(0).axes[0]) == (1, 2, 4)
+    assert tuple(h.sort(0, reverse=True).axes[0]) == (4, 2, 1)
+    assert tuple(h.sort(0, key=lambda x: -x).axes[0]) == (4, 2, 1)
+    assert tuple(h.sort(1).axes[1]) == ("AB", "BC", "BCC")
+    assert tuple(h.sort(1, reverse=True).axes[1]) == ("BCC", "BC", "AB")
+
+
+def test_quick_construct_direct():
+    h = hist.new.IntCat([4, 1, 2]).StrCat(["AB", "BCC", "BC"]).Double()
     assert tuple(h.sort(0).axes[0]) == (1, 2, 4)
     assert tuple(h.sort(0, reverse=True).axes[0]) == (4, 2, 1)
     assert tuple(h.sort(0, key=lambda x: -x).axes[0]) == (4, 2, 1)

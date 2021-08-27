@@ -724,9 +724,8 @@ def plot_stack(
         raise NotImplementedError("Please project to 1D before calling plot")
 
     if "label" not in kwargs:
-        # TODO: add .name to static typing. And runtime, for that matter.
-        if all(getattr(h, "name", None) is not None for h in self):
-            kwargs["label"] = [h.name for h in self]  # type: ignore
+        if all(h.name is not None for h in self):
+            kwargs["label"] = [h.name for h in self]
 
     ret = hist.plot.histplot(list(self), **kwargs)
     ax = ret[0].stairs.axes
