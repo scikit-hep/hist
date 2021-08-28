@@ -176,6 +176,18 @@ def _curve_fit_wrapper(
     return tuple(popt), pcov
 
 
+def _plot_keywords_wrapper(ax: matplotlib.axes.Axes, legend: bool | None) -> None:
+    """
+    Pandas-like wrapper that wrap several useful mpl keyword arguments.
+    """
+    # Todo: more keywords here
+    if legend:
+        if ax.get_legend_handles_labels()[0]:
+            legend = ax.legend()
+        else:
+            raise ValueError("No labels to legend")
+
+
 def plot2d_full(
     self: hist.BaseHist,
     *,
@@ -698,3 +710,25 @@ def plot_pie(
     labels = [str(get_center(x)) for x in self.axes[0]]
 
     return ax.pie(data, labels=labels, **kwargs)
+
+
+def plot_stack(
+    self: hist.stack.Stack,
+    *,
+    ax: matplotlib.axes.Axes | None = None,
+    legend: bool | None = False,
+    **kwargs: Any,
+) -> Any:
+
+    if self[0].ndim != 1:
+        raise NotImplementedError("Please project to 1D before calling plot")
+
+    if "label" not in kwargs:
+        if all(h.name is not None for h in self):
+            kwargs["label"] = [h.name for h in self]
+
+    ret = histplot(list(self), **kwargs)
+    ax = ret[0].stairs.axes
+    _plot_keywords_wrapper(ax, legend=legend)
+
+    return ret

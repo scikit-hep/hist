@@ -1,12 +1,22 @@
 from __future__ import annotations
 
+import sys
 import typing
 from typing import Any, Iterator, TypeVar
 
+import histoprint
+
+from .axestuple import NamedAxesTuple
 from .basehist import BaseHist
 
-if typing.TYPE_CHECKING:
-    from mplhep.plot import Hist1DArtists
+try:
+    import matplotlib
+except ModuleNotFoundError:
+    print(
+        "Hist requires mplhep to plot, either install hist[plot] or mplhep",
+        file=sys.stderr,
+    )
+    raise
 
 __all__ = ("Stack",)
 
@@ -59,22 +69,28 @@ class Stack:
         str_stack = ", ".join(repr(h) for h in self)
         return f"{self.__class__.__name__}({str_stack})"
 
-    def plot(self, **kwargs: Any) -> list[Hist1DArtists]:
+    @property
+    def axes(self) -> NamedAxesTuple:
+        return self._stack[0].axes
+
+    def plot(self, *, ax: matplotlib.axes.Axes | None = None, **kwargs: Any) -> Any:
         """
         Plot method for Stack object.
         """
 
         import hist.plot
 
-        if self[0].ndim != 1:
-            raise NotImplementedError("Please project to 1D before calling plot")
+        return hist.plot.plot_stack(self, ax=ax, **kwargs)
 
+    def show(self, **kwargs: Any) -> Any:
+        """
+        Pretty print the stacked histograms to the console.
+        """
         if "label" not in kwargs:
-            # TODO: add .name to static typing. And runtime, for that matter.
-            if all(getattr(h, "name", None) is not None for h in self):
+            if all(h.name is not None for h in self):
                 kwargs["label"] = [h.name for h in self]
 
-        return hist.plot.histplot(list(self), **kwargs)  # type: ignore
+        return histoprint.print_hist(list(self), stack=True, **kwargs)
 
 
 def __dir__() -> tuple[str, ...]:
