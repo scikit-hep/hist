@@ -39,7 +39,7 @@ repos:
   rev: 1.1.0
   hooks:
   - id: nbqa-pyupgrade
-    additional_dependencies: [pyupgrade==2.12.0]
+    additional_dependencies: [pyupgrade==2.25.0]
     args: ["--py37-plus"]
 
 - repo: https://github.com/pycqa/flake8
