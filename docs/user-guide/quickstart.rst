@@ -119,7 +119,7 @@ you can set either values or arrays at a time:
 .. code:: python3
 
     hist[2] = 3.5
-    hist[bh.underflow] = 0  # set the underflow bin
+    hist[hist.underflow] = 0  # set the underflow bin
     hist2d[3:5, 2:4] = np.eye(2)  # set with array
 
 For non-simple storages, you can add an extra dimension that matches the
