@@ -84,9 +84,3 @@ class NamedAxesTuple(AxesTuple):
         if neither was given.
         """
         return tuple(ax.label for ax in self)  # type: ignore
-
-    def __setattr__(self, attr: str, values: Any) -> None:
-        try:
-            getattr(self.__class__, attr).__set__(self, values)
-        except AttributeError:
-            super().__setattr__(attr, values)
