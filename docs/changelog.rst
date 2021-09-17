@@ -4,21 +4,34 @@ Changelog
 Version 2.5.0
 --------------------
 
+* Added ``name=`` and ``label=`` to histograms, include Hist arguments in QuickConstruct.
+  `#297 <https://github.com/scikit-hep/hist/pull/297>`_
+
+* Added ``hist.new`` alias for ``hist.Hist.new``.
+  `#296 <https://github.com/scikit-hep/hist/pull/296>`_
+
+* AxesTuple now supports bulk name setting, ``h.axes.name = ("a", "b", ...)``.
+  `#288 <https://github.com/scikit-hep/hist/pull/288>`_
+
+* Added ``"efficiency"`` ``uncertainty_type`` option for ``ratio_plot`` API.
+  `#266 <https://github.com/scikit-hep/hist/pull/266>`_
+  `#278 <https://github.com/scikit-hep/hist/pull/278>`_
+
+Smaller features or fixes:
+
 * Dropped Python 3.6 support.
   `#194 <https://github.com/scikit-hep/hist/pull/194>`_
 
-* Add ``"efficiency"`` ``uncertainty_type`` option for ``ratio_plot`` API.
-  `#266 <https://github.com/scikit-hep/hist/pull/266>`_
-  `#278 <https://github.com/scikit-hep/hist/pull/278>`_
+* Uses boost-histogram 1.2.x series, includes all features and fixes.
+
+* Support showing histogram titles in the legend, ``Stack.axes``, and histoprint for HistStack.
+  `#291 <https://github.com/scikit-hep/hist/pull/291>`_
 
 * Improve and clarify treatment of confidence intervals in ``intervals`` submodule.
   `#281 <https://github.com/scikit-hep/hist/pull/281>`_
 
-
-Smaller features or fixes:
-
-* Support showing histogram titles in the legend, ``Stack.axes``, and histoprint for HistStack.
-  `#291 <https://github.com/scikit-hep/hist/pull/291>`_
+* Use NumPy 1.21 for static typing.
+  `#285 <https://github.com/scikit-hep/hist/pull/285>`_
 
 
 Version 2.4.0
