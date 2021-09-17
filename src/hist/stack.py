@@ -5,6 +5,7 @@ import typing
 from typing import Any, Iterator, TypeVar
 
 import histoprint
+import numpy as np
 
 from .axestuple import NamedAxesTuple
 from .basehist import BaseHist
@@ -91,6 +92,66 @@ class Stack:
                 kwargs["label"] = [h.name for h in self]
 
         return histoprint.print_hist(list(self), stack=True, **kwargs)
+
+    def __mul__(self: T, other: float) -> T:
+        """
+        Multiply the Stack by a scalar.
+        """
+        return self.__class__(*(h * other for h in self))
+
+    def __imul__(self: T, other: float) -> T:
+        """
+        Multiply each histogram in the Stack by a scalar.
+        """
+        for h in self:
+            h *= other
+        return self
+
+    def __rmul__(self: T, other: float) -> T:
+        """
+        Multiply the Stack by a scalar.
+        """
+        return self.__mul__(other)
+
+    def __add__(self: T, other: float | np.typing.NDArray[Any]) -> T:
+        """
+        Add a scalar or array to the Stack.
+        """
+        return self.__class__(*(h + other for h in self))
+
+    def __iadd__(self: T, other: float | np.typing.NDArray[Any]) -> T:
+        """
+        Add a scalar or array to the Stack.
+        """
+        for h in self:
+            h += other
+        return self
+
+    def __radd__(self: T, other: float | np.typing.NDArray[Any]) -> T:
+        """
+        Add a scalar or array to the Stack.
+        """
+        return self.__add__(other)
+
+    def __sub__(self: T, other: float | np.typing.NDArray[Any]) -> T:
+        """
+        Subtract a scalar or array to the Stack.
+        """
+        return self.__class__(*(h - other for h in self))  # type: ignore
+
+    def __isub__(self: T, other: float | np.typing.NDArray[Any]) -> T:
+        """
+        Subtract a scalar or array to the Stack.
+        """
+        for h in self:
+            h -= other  # type: ignore
+        return self
+
+    def project(self: T, *args: int | str) -> T:
+        """
+        Project the Stack onto a new axes.
+        """
+        return self.__class__(*(h.project(*args) for h in self))  # type: ignore
 
 
 def __dir__() -> tuple[str, ...]:

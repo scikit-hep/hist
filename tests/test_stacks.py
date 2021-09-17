@@ -4,6 +4,7 @@ from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
+from pytest import approx
 
 from hist import Hist, NamedHist, Stack, axis
 
@@ -250,3 +251,74 @@ def test_stack_plot(monkeypatch):
     assert args == (list(s),)
     assert kwargs["label"] == ["one", "two"]
     assert kwargs["silly"] == ...
+
+
+def test_stack_add():
+    h = Hist.new.Regular(10, 0, 1).StrCategory(["one", "two"], name="str").Double()
+    s = h.stack(1)
+    s += 1
+
+    assert s[0].values() == approx(np.ones(10))
+    assert s[1].values() == approx(np.ones(10))
+
+    assert (s + 1)[0].values() == approx(np.ones(10) * 2)
+
+
+def test_stack_sub():
+    h = Hist.new.Regular(10, 0, 1).StrCategory(["one", "two"], name="str").Double()
+    s = h.stack(1)
+    s -= 1
+
+    assert s[0].values() == approx(-np.ones(10))
+    assert s[1].values() == approx(-np.ones(10))
+
+    assert (s - 1)[0].values() == approx(-np.ones(10) * 2)
+
+
+def test_stack_mul():
+    h = Hist.new.Regular(10, 0, 1).StrCategory(["one", "two"], name="str").Double()
+    s = h.stack(1)
+    s += 1
+    s *= 2
+
+    assert s[0].values() == approx(np.ones(10) * 2)
+    assert s[1].values() == approx(np.ones(10) * 2)
+
+    assert (s * 2)[0].values() == approx(np.ones(10) * 4)
+
+
+def test_stack_array_add():
+    h = Hist.new.Regular(10, 0, 1).StrCategory(["one", "two"], name="str").Double()
+    s = h.stack(1)
+    s += np.arange(10)
+
+    assert s[0].values() == approx(np.arange(10))
+    assert s[1].values() == approx(np.arange(10))
+
+    assert (s + np.arange(10))[0].values() == approx(np.arange(10) * 2)
+
+
+def test_stack_array_mul():
+    h = Hist.new.Regular(10, 0, 1).StrCategory(["one", "two"], name="str").Double()
+    s = h.stack(1)
+    s += 1
+    s *= np.arange(10)
+
+    assert s[0].values() == approx(np.arange(10))
+    assert s[1].values() == approx(np.arange(10))
+
+    assert (s * np.arange(10))[0].values() == approx(np.arange(10) ** 2)
+
+
+def test_project():
+    h = (
+        Hist.new.Regular(10, 0, 1, name="first")
+        .StrCategory(["one", "two"], name="str")
+        .StrCategory(["other", "thing"], name="again")
+        .Double()
+    )
+    s = h.stack("str")
+    s += np.ones((10, 2))
+    s = s.project("first")
+
+    assert s[0].values() == approx(2 * np.ones(10))
