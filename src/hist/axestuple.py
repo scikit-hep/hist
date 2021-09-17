@@ -1,8 +1,23 @@
 from __future__ import annotations
 
+import sys
+import warnings
+from collections.abc import Iterable, Iterator
 from typing import Any
 
 from boost_histogram.axis import ArrayTuple, AxesTuple
+
+if sys.version_info < (3, 10):
+    import builtins
+
+    import more_itertools
+
+    def zip(*iterables: Any, strict: bool = False) -> Iterator[tuple[Any, ...]]:
+        if strict:
+            return more_itertools.zip_equal(*iterables)
+        else:
+            return builtins.zip(*iterables)
+
 
 __all__ = ("NamedAxesTuple", "AxesTuple", "ArrayTuple")
 
@@ -41,6 +56,26 @@ class NamedAxesTuple(AxesTuple):
         The names of the axes. May be empty strings.
         """
         return tuple(ax.name for ax in self)  # type: ignore
+
+    @name.setter
+    def name(self, values: Iterable[str]) -> None:
+        # strict = True from Python 3.10
+        for ax, val in zip(self, values, strict=True):
+            ax._ax.metadata["name"] = val
+
+        disallowed_names = {"weight", "sample", "threads"}
+        for ax in self:
+            if ax.name in disallowed_names:
+                disallowed_warning = (
+                    f"{ax.name} is a protected keyword and cannot be used as axis name"
+                )
+                warnings.warn(disallowed_warning)
+
+        valid_names = [ax.name for ax in self if ax.name]
+        if len(valid_names) != len(set(valid_names)):
+            raise KeyError(
+                f"{self.__class__.__name__} instance cannot contain axes with duplicated names"
+            )
 
     @property
     def label(self) -> tuple[str]:

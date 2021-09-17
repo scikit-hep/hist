@@ -212,8 +212,8 @@ def plot2d_full(
             main_ax = ax_dict["main_ax"]
             top_ax = ax_dict["top_ax"]
             side_ax = ax_dict["side_ax"]
-        except KeyError:
-            raise ValueError("All axes should be all given or none at all")
+        except KeyError as err:
+            raise ValueError("All axes should be all given or none at all") from err
 
     else:
         fig = plt.gcf()
@@ -558,8 +558,8 @@ def _plot_ratiolike(
         try:
             main_ax = ax_dict["main_ax"]
             subplot_ax = ax_dict[f"{view}_ax"]
-        except KeyError:
-            raise ValueError("All axes should be all given or none at all")
+        except KeyError as err:
+            raise ValueError("All axes should be all given or none at all") from err
     else:
         fig = plt.gcf()
         grid = fig.add_gridspec(2, 1, hspace=0, height_ratios=[3, 1])
