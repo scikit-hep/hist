@@ -88,6 +88,31 @@ def test_stack_init(hist_1d):
     assert tuple(stack) == (h1, h2, h3)
 
 
+def test_stack_from_iter(hist_1d):
+    h1 = hist_1d()
+    h2 = hist_1d()
+    h3 = hist_1d()
+
+    stack = Stack.from_iter([h1, h2, h3])
+
+    assert stack[0] == h1
+    assert stack[1] == h2
+    assert stack[2] == h3
+
+
+def test_stack_from_dict(hist_1d):
+    h1 = hist_1d()
+    h2 = hist_1d()
+    h3 = hist_1d()
+
+    d = {"one": h1, "two": h2, "three": h3}
+    stack = Stack.from_dict(d)
+
+    assert stack[0].name == "one"
+    assert stack[1].name == "two"
+    assert stack[2].name == "three"
+
+
 def test_stack_constructor_fails():
     # Don't allow construction directly from axes with no Histograms
     with pytest.raises(Exception):

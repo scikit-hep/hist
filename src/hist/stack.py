@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import sys
 import typing
 from typing import Any, Iterator, TypeVar
@@ -45,6 +46,26 @@ class Stack:
         for a in args[1:]:
             if first_axes != a.axes:
                 raise ValueError("The Histogram axes don't match")
+
+    @classmethod
+    def from_iter(cls: type[T], iterable: typing.Iterable[BaseHist]) -> T:
+        """
+        Create a Stack from an iterable of histograms.
+        """
+        return cls(*iterable)
+
+    @classmethod
+    def from_dict(cls: type[T], d: typing.Mapping[str, BaseHist]) -> T:
+        """
+        Create a Stack from a dictionary of histograms. The keys of the
+        dictionary are used as names.
+        """
+
+        new_dict = {k: copy.copy(h) for k, h in d.items()}
+        for k, h in new_dict.items():
+            h.name = k
+
+        return cls(*new_dict.values())
 
     @typing.overload
     def __getitem__(self, val: int) -> BaseHist:
