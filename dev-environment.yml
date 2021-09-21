@@ -3,23 +3,21 @@ channels:
   - conda-forge
 dependencies:
   - pip >=18
-  - root >=6.20.0
-  - boost-histogram >=0.10
+  - root >=6.24.0
+  - boost-histogram >=1.1
   - jupyterlab >=1.2
-  - matplotlib >=3.1
-  - pytest >=5
+  - matplotlib >=3.4
+  - pytest >=6
   - pytest-mpl >=0.12
   - setuptools >=42
   - setuptools_scm >=3.4
   - scipy >=1.4.1
-  - iminuit >=1.3.8
+  - iminuit >=2.0
   - flatbuffers >=1.8.0
-  - aghast >=0.2.1
-  - uproot >=3.11.3
-  - uproot-methods >=0.7.3
-  - mypy >=0.770
+  - uproot >=4.1
+  - awkward >=1.0
   - uncertainties >=3
+  - mplhep>=0.1.27
+  - histoprint>=2.2.0
   - pip:
-    - mplhep>=0.1.27
-    - histoprint>=2.2.0
     - -e .
