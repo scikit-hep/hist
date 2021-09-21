@@ -67,26 +67,44 @@ class Stack:
 
         return cls(*new_dict.values())
 
+    def _get_index(self, name: str | int) -> int:
+        "Returns the index associated with a name. Passes through ints"
+        if not isinstance(name, str):
+            return name
+
+        for n, h in enumerate(self._stack):
+            if h.name == name:
+                return n
+        else:
+            raise IndexError(f"Name not found: {name}")
+
     @typing.overload
-    def __getitem__(self, val: int) -> BaseHist:
+    def __getitem__(self, val: int | str) -> BaseHist:
         ...
 
     @typing.overload
     def __getitem__(self: T, val: slice) -> T:
         ...
 
-    def __getitem__(self: T, val: int | slice) -> BaseHist | T:
+    def __getitem__(self: T, val: int | slice | str) -> BaseHist | T:
+        if isinstance(val, str):
+            val = self._get_index(val)
         if isinstance(val, slice):
-            return self.__class__(*self._stack.__getitem__(val))
+            my_slice = slice(
+                self._get_index(val.start), self._get_index(val.stop), val.step
+            )
+            return self.__class__(*self._stack.__getitem__(my_slice))
 
         return self._stack.__getitem__(val)
 
-    def __setitem__(self: T, key: int, value: BaseHist) -> None:
+    def __setitem__(self: T, key: int | str, value: BaseHist) -> None:
         """
         Set a histogram in the Stack. Checks the axes of the histogram, they must match.
         """
         if not isinstance(value, BaseHist):
             raise ValueError("The value should be a histogram")
+        if isinstance(key, str):
+            key = self._get_index(key)
         if not value.axes == self._stack[key].axes:
             raise ValueError("The histogram axes don't match")
 
@@ -101,6 +119,11 @@ class Stack:
     def __repr__(self) -> str:
         str_stack = ", ".join(repr(h) for h in self)
         return f"{self.__class__.__name__}({str_stack})"
+
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, Stack):
+            return False
+        return self._stack == other._stack
 
     @property
     def axes(self) -> NamedAxesTuple:
@@ -119,9 +142,9 @@ class Stack:
         """
         Pretty print the stacked histograms to the console.
         """
-        if "label" not in kwargs:
+        if "labels" not in kwargs:
             if all(h.name is not None for h in self):
-                kwargs["label"] = [h.name for h in self]
+                kwargs["labels"] = [h.name for h in self]
 
         return histoprint.print_hist(list(self), stack=True, **kwargs)
 
