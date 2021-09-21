@@ -29,7 +29,14 @@ $ nox -s build  # Make an SDist and wheel
 ```
 
 Nox handles everything for you, including setting up an temporary virtual
-environment for each run.
+environment for each run. On Linux, it will run the `--mpl` tests. You can
+run the linux tests from anywhere with Docker:
+
+```bash
+docker run --rm -v $PWD:/nox -w /nox -t quay.io/pypa/manylinux2014_x86_64:latest pipx run nox -s tests-3.9
+# Regenerate the MPL comparison images:
+docker run --rm -v $PWD:/nox -w /nox -t quay.io/pypa/manylinux2014_x86_64:latest pipx run nox -s tests-3.9 -- --mpl-generate-path=tests/baseline
+```
 
 ### PyPI
 
@@ -60,7 +67,7 @@ You should prepare pre-commit, which will help you by checking that commits
 pass required checks:
 
 ```bash
-pip install pre-commit # or brew install pre-commit on macOS
+pipx install pre-commit # or brew install pre-commit on macOS
 pre-commit install # Will install a pre-commit hook into the git repo
 ```
 
