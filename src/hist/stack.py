@@ -33,7 +33,7 @@ class Stack:
         Initialize Stack of histograms.
         """
 
-        self._stack = args
+        self._stack = list(args)
 
         if len(args) == 0:
             raise ValueError("There should be histograms in the Stack")
@@ -59,6 +59,17 @@ class Stack:
             return self.__class__(*self._stack.__getitem__(val))
 
         return self._stack.__getitem__(val)
+
+    def __setitem__(self: T, key: int, value: BaseHist) -> None:
+        """
+        Set a histogram in the Stack. Checks the axes of the histogram, they must match.
+        """
+        if not isinstance(value, BaseHist):
+            raise ValueError("The value should be a histogram")
+        if not value.axes == self._stack[key].axes:
+            raise ValueError("The histogram axes don't match")
+
+        self._stack[key] = value
 
     def __iter__(self) -> Iterator[BaseHist]:
         return iter(self._stack)
