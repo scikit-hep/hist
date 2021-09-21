@@ -112,6 +112,12 @@ def test_stack_from_dict(hist_1d):
     assert stack[1].name == "two"
     assert stack[2].name == "three"
 
+    assert stack["one"].name == "one"
+    assert stack["two"].name == "two"
+    assert stack["three"].name == "three"
+
+    assert stack[0:1] == stack["one":"two"]
+
 
 def test_stack_constructor_fails():
     # Don't allow construction directly from axes with no Histograms
