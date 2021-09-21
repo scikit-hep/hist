@@ -20,6 +20,7 @@ Hist is an analyst-friendly front-end for
 [boost-histogram](https://github.com/scikit-hep/boost-histogram), designed for
 Python 3.7+ (3.6 users get version 2.4). See [what's new](https://hist.readthedocs.io/en/latest/changelog.html).
 
+
 ## Installation
 
 You can install this library from [PyPI](https://pypi.org/project/hist/) with pip:
@@ -35,39 +36,53 @@ If you do not need the plotting features, you can skip the `[plot]` extra.
 Hist currently provides everything boost-histogram provides, and the following enhancements:
 
 - Hist augments axes with names:
-  - `name=` is a unique label describing each axis
+  - `name=` is a unique label describing each axis.
   - `label=` is an optional string that is used in plotting (defaults to `name`
-    if not provided)
-  - Indexing, projection, and more support named axes
-  - Experimental `NamedHist` is a `Hist` that disables most forms of positional access
+    if not provided).
+  - Indexing, projection, and more support named axes.
+  - Experimental `NamedHist` is a `Hist` that disables most forms of positional access, forcing users to use only names.
 
-- The `Hist` class augments `bh.Histogram` with reduced typing construction:
-  - Optional import-free construction system
-  - `flow=False` is a fast way to turn off flow for the axes on construction
-  - Storages can be given by string
-  - `storage=` can be omitted
-  - `data=` can initialize a histogram with existing data
-  - `Hist.from_columns` can be used to initialize with a DataFrame or dict
+- The `Hist` class augments `bh.Histogram` with simpler construction:
+  - `flow=False` is a fast way to turn off flow for the axes on construction.
+  - Storages can be given by string.
+  - `storage=` can be omitted, strings and storages can be positional.
+  - `data=` can initialize a histogram with existing data.
+  - `Hist.from_columns` can be used to initialize with a DataFrame or dict.
+  - You can cast back and forth with boost-histogram (or any other extensions).
+
+- Hist support QuickConstruct, an import-free construction system that does not require extra imports:
+  - Use `Hist.new.<axis>().<axis>().<storage>()`.
+  - Axes names can be full (`Regular`) or short (`Reg`).
+  - Histogram arguments (like `data=`) can go in the storage.
+
+- Extended Histogram features:
+  - Direct support for `.name` and `.label`, like axes.
+  - `.density()` computes the density as an array.
+  - `.profile(remove_ax)` can convert a ND COUNT histogram into a (N-1)D MEAN histogram.
+  - `.sort(axis)` supports sorting a histogram by a categorical axis. Optionally takes a function to sort by.
 
 - Hist implements UHI+; an extension to the UHI (Unified Histogram Indexing) system designed for import-free interactivity:
-  - Uses `j` suffix to switch to data coordinates in access or slices
-  - Uses `j` suffix on slices to rebin
-  - Strings can be used directly to index into string category axes
+  - Uses `j` suffix to switch to data coordinates in access or slices.
+  - Uses `j` suffix on slices to rebin.
+  - Strings can be used directly to index into string category axes.
 
 - Quick plotting routines encourage exploration:
   - `.plot()` provides 1D and 2D plots (or use `plot1d()`, `plot2d()`)
-  - `.plot2d_full()` shows 1D projects around a 2D plot
-  - `.plot_ratio(...)` make a ratio plot between the histogram and another histogram or callable
-  - `.plot_pull(...)` performs a pull plot
-  - `.plot_pie()` makes a pie plot
-  - `.show()` provides a nice str printout using Histoprint
+  - `.plot2d_full()` shows 1D projects around a 2D plot.
+  - `.plot_ratio(...)` make a ratio plot between the histogram and another histogram or callable.
+  - `.plot_pull(...)` performs a pull plot.
+  - `.plot_pie()` makes a pie plot.
+  - `.show()` provides a nice str printout using Histoprint.
 
-- Extended Histogram features:
-  - `.density()` computes the density as an array
-  - `.profile(remove_ax)` can convert a ND COUNT histogram into a (N-1)D MEAN histogram
+- Stacks: work with groups of histograms with identical axes
+  - Stacks can be created with `h.stack(axis)`, using index or name of an axis (`StrCategory` axes ideal).
+  - You can also create with `hist.stacks.Stack(h1, h2, ...)`, or use `from_iter` or `from_dict`.
+  - You can index a stack, and set an entry with a matching histogram.
+  - Stacks support `.plot()` and `.show()`, with names (plot labels default to original axes info).
+  - Stacks pass through `.project`, `*`, `+`, and `-`.
 
 - New modules
-  - `intervals` supports frequentist coverage intervals
+  - `intervals` supports frequentist coverage intervals.
 
 - Notebook ready: Hist has gorgeous in-notebook representation.
   - No dependencies required
@@ -103,7 +118,7 @@ h.plot_pull(Callable)
 
 ## Development
 
-From a git checkout, run:
+From a git checkout, either use [nox](https://nox.thea.codes), or run:
 
 ```bash
 python -m pip install -e .[dev]
