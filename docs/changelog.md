@@ -28,7 +28,8 @@ Smaller features or fixes:
 
 * Dropped Python 3.6 support.
   [#194](https://github.com/scikit*hep/hist/pull/194)
-* Uses boost*histogram 1.2.x series, includes all features and fixes.
+* Uses boost-histogram 1.2.x series, includes all features and fixes,
+  and Python 3.10 support.
 * No longer require scipy or iminuit unless actually needed.
   [#316](https://github.com/scikit*hep/hist/pull/316)
 * Improve and clarify treatment of confidence intervals in `intervals`
