@@ -4,14 +4,22 @@ Changelog
 Version 2.5.0
 --------------------
 
+* Stacks support axes, math operations, projection, setting items, and iter/dict
+  construction. They also support histogram titles in legends. Added histoprint
+  support for Stacks.
+  `#291 <https://github.com/scikit-hep/hist/pull/291>`_
+  `#315 <https://github.com/scikit-hep/hist/pull/315>`_
+  `#317 <https://github.com/scikit-hep/hist/pull/317>`_
+  `#318 <https://github.com/scikit-hep/hist/pull/318>`_
+
 * Added ``name=`` and ``label=`` to histograms, include Hist arguments in QuickConstruct.
   `#297 <https://github.com/scikit-hep/hist/pull/297>`_
 
-* Added ``hist.new`` alias for ``hist.Hist.new``.
-  `#296 <https://github.com/scikit-hep/hist/pull/296>`_
-
 * AxesTuple now supports bulk name setting, ``h.axes.name = ("a", "b", ...)``.
   `#288 <https://github.com/scikit-hep/hist/pull/288>`_
+
+* Added ``hist.new`` alias for ``hist.Hist.new``.
+  `#296 <https://github.com/scikit-hep/hist/pull/296>`_
 
 * Added ``"efficiency"`` ``uncertainty_type`` option for ``ratio_plot`` API.
   `#266 <https://github.com/scikit-hep/hist/pull/266>`_
@@ -24,8 +32,8 @@ Smaller features or fixes:
 
 * Uses boost-histogram 1.2.x series, includes all features and fixes.
 
-* Support showing histogram titles in the legend, ``Stack.axes``, and histoprint for HistStack.
-  `#291 <https://github.com/scikit-hep/hist/pull/291>`_
+* No longer require scipy or iminuit unless actually needed.
+  `#316 <https://github.com/scikit-hep/hist/pull/316>`_
 
 * Improve and clarify treatment of confidence intervals in ``intervals`` submodule.
   `#281 <https://github.com/scikit-hep/hist/pull/281>`_
