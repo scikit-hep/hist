@@ -1,5 +1,13 @@
 # Changelog
 
+## Version 2.5.1
+
+* Support named stack indexing
+  [#325](https://github.com/scikit*hep/hist/pull/325)
+* Fix histoprint error with stacks
+  [#325](https://github.com/scikit*hep/hist/pull/325)
+* Better README
+
 ## Version 2.5.0
 
 * Stacks support axes, math operations, projection, setting items, and
