@@ -55,7 +55,7 @@ total = h.sum()
 \end{center}
 
 
-# Plotting: plot_ratio
+# Plotting: plot_pie
 
 \begin{center}
   \includegraphics[width=\textwidth]{docs/_images/pieplot_example.png}
