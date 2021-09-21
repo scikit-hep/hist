@@ -322,3 +322,21 @@ def test_project():
     s = s.project("first")
 
     assert s[0].values() == approx(2 * np.ones(10))
+
+
+def test_set_item():
+    h = Hist.new.Regular(10, 0, 1).StrCategory(["one", "two"], name="str").Double()
+    s = h.stack(1)
+    s[0] = Hist.new.Regular(10, 0, 1).Double() + 3
+    assert s[0].values() == approx(np.ones(10) * 3)
+
+    with pytest.raises(ValueError):
+        s[0] = (
+            Hist.new.Regular(10, 0, 1).StrCategory(["one", "two"], name="str").Double()
+        )
+
+    with pytest.raises(ValueError):
+        s[0] = Hist.new.Regular(10, 0, 2).Double()
+
+    with pytest.raises(ValueError):
+        s[0] = Hist.new.Regular(11, 0, 1).Double()
