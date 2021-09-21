@@ -4,7 +4,10 @@ import numpy as np
 import pytest
 from pytest import approx
 
-from hist import Hist, axis, intervals
+from hist import Hist, axis
+
+pytest.importorskip("scipy")
+intervals = pytest.importorskip("hist.intervals")
 
 
 @pytest.fixture(scope="session")

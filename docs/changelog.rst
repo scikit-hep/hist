@@ -41,6 +41,9 @@ Smaller features or fixes:
 * Use NumPy 1.21 for static typing.
   `#285 <https://github.com/scikit-hep/hist/pull/285>`_
 
+* Support running tests without plotting requirements.
+  `#321 <https://github.com/scikit-hep/hist/pull/321>`
+
 
 Version 2.4.0
 --------------------

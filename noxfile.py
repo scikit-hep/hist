@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import shutil
+import sys
 from pathlib import Path
 
 import nox
@@ -13,7 +14,7 @@ nox.options.sessions = ["lint", "tests"]
 DIR = Path(__file__).parent.resolve()
 
 
-@nox.session
+@nox.session(reuse_venv=True)
 def lint(session):
     """
     Run the linter.
@@ -22,22 +23,23 @@ def lint(session):
     session.run("pre-commit", "run", "--all-files", *session.posargs)
 
 
-@nox.session(python=ALL_PYTHONS)
+@nox.session(python=ALL_PYTHONS, reuse_venv=True)
 def tests(session):
     """
     Run the unit and regular tests.
     """
-    session.install(".[test]")
-    session.run("pytest", *session.posargs)
+    session.install("-e", ".[test,plot]")
+    args = ["--mpl"] if sys.platform.startswith("linux") else []
+    session.run("pytest", *args, *session.posargs)
 
 
-@nox.session
+@nox.session(reuse_venv=True)
 def docs(session):
     """
     Build the docs. Pass "serve" to serve.
     """
 
-    session.install(".[docs]")
+    session.install("-e", ".[docs]")
     session.chdir("docs")
     session.run("sphinx-build", "-M", "html", ".", "_build")
 

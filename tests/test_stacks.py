@@ -193,6 +193,9 @@ def test_stack_plot_construct():
     """
     Test stack plot -- whether Stack can be properly plot.
     """
+    pytest.importorskip("matplotlib")
+    pytest.importorskip("scipy")
+
     # not allow axes stack to plot
     with pytest.raises(Exception):
         Stack(reg_ax, reg_ax, reg_ax).plot()
@@ -261,6 +264,9 @@ def collect(*args, **kwargs):
 
 
 def test_stack_plot(monkeypatch):
+    pytest.importorskip("matplotlib")
+    pytest.importorskip("scipy")
+
     import hist.plot
 
     monkeypatch.setattr(hist.plot, "histplot", collect)
