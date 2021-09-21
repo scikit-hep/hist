@@ -33,6 +33,8 @@ __all__ = (
     "plot_pie",
 )
 
+_PLT_MISSING_MSG = "Hist plotting with fitting requires scipy and iminuit. Please install hist[plot] or manually install dependencies."
+
 
 class FitResultArtists(NamedTuple):
     line: matplotlib.lines.Line2D
@@ -135,7 +137,11 @@ def _curve_fit_wrapper(
     can be set in the function definition with defaults for kwargs
     (e.g., `func = lambda x,a=1.,b=2.: x+a+b`, will feed `p0 = [1.,2.]` to `curve_fit`)
     """
-    from scipy.optimize import curve_fit, minimize
+    try:
+        from scipy.optimize import curve_fit, minimize
+    except ModuleNotFoundError:
+        print(_PLT_MISSING_MSG, file=sys.stderr)
+        raise
 
     params = list(inspect.signature(func).parameters.values())
     p0 = [
@@ -153,7 +159,11 @@ def _curve_fit_wrapper(
         p0=p0,
     )
     if likelihood:
-        from iminuit import Minuit
+        try:
+            from iminuit import Minuit
+        except ModuleNotFoundError:
+            print(_PLT_MISSING_MSG, file=sys.stderr)
+            raise
         from scipy.special import gammaln
 
         def fnll(v: Iterable[np.typing.NDArray[Any]]) -> float:
@@ -534,16 +544,6 @@ def _plot_ratiolike(
 
     ``fit_fmt`` can be a string such as ``r"{name} = {value:.3g} $\pm$ {error:.3g}"``
     """
-
-    try:
-        from iminuit import Minuit  # noqa: F401
-        from scipy.optimize import curve_fit  # noqa: F401
-    except ModuleNotFoundError:
-        print(
-            f"Hist.plot_{view} requires scipy and iminuit. Please install hist[plot] or manually install dependencies.",
-            file=sys.stderr,
-        )
-        raise
 
     if self.ndim != 1:
         raise TypeError(
