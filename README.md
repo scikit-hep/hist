@@ -22,7 +22,6 @@ Python 3.7+ (3.6 users get version 2.4). See [what's new](https://hist.readthedo
 
 ![Slideshow of features. See docs/banner_slides.md for text if the image is not readable.](https://github.com/scikit-hep/hist/raw/main/docs/_images/banner.gif)
 
-
 ## Installation
 
 You can install this library from [PyPI](https://pypi.org/project/hist/) with pip:
@@ -160,7 +159,7 @@ This project follows the [all-contributors](https://github.com/all-contributors/
 
 ## Talks
 
-- [2021-07-07 PyHEP 2021 -- High-Performance Histogramming for HEP Analysis](https://indico.cern.ch/event/1019958/contributions/4430375/) [🎥](https://youtu.be/tmBA4zwpiO0)
+- [2021-07-07 PyHEP 2021 -- High-Performance Histogramming for HEP Analysis](https://indico.cern.ch/event/1019958/contributions/4430375/) [🎥](https://youtu.be/jewb5q6_Rpk)
 - [2020-09-08 IRIS-HEP/GSOC -- Hist: histogramming for analysis powered by boost-histogram](https://indico.cern.ch/event/950229/#3-hist-histogramming-for-analy) [🎥](https://www.youtube.com/watch?v=hIiEu7XFu5Y)
 - [2020-07-07 SciPy Proceedings](https://www.youtube.com/watch?v=ERraTfHkPd0&list=PLYx7XA2nY5GfY4WWJjG5cQZDc7DIUmn6Z&index=4) [🎥](https://youtu.be/ERraTfHkPd0)
 - [2020-07-17 PyHEP 2020](https://indico.cern.ch/event/882824/contributions/3931299/) [🎥](https://youtu.be/-g0mxopCJT8)
