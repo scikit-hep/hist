@@ -38,7 +38,7 @@ class NamedHist(BaseHist, family=hist):
                 f"Only projections by names are supported for {self.__class__.__name__}"
             )
 
-    def fill(  # type: ignore
+    def fill(  # type: ignore[override, override, override]
         self: T,
         weight: ArrayLike | None = None,
         sample: ArrayLike | None = None,
@@ -58,7 +58,7 @@ class NamedHist(BaseHist, family=hist):
                 f"Only fill by names are supported for {self.__class__.__name__}"
             )
 
-    def __getitem__(  # type: ignore
+    def __getitem__(  # type: ignore[override]
         self: T,
         index: IndexingExpr,
     ) -> T | float | bh.accumulators.Accumulator:
@@ -73,7 +73,7 @@ class NamedHist(BaseHist, family=hist):
 
         return super().__getitem__(index)
 
-    def __setitem__(  # type: ignore
+    def __setitem__(  # type: ignore[override]
         self,
         index: IndexingExpr,
         value: ArrayLike | bh.accumulators.Accumulator,

@@ -55,7 +55,7 @@ class NamedAxesTuple(AxesTuple):
         """
         The names of the axes. May be empty strings.
         """
-        return tuple(ax.name for ax in self)  # type: ignore
+        return tuple(ax.name for ax in self)  # type: ignore[return-value]
 
     @name.setter
     def name(self, values: Iterable[str]) -> None:
@@ -83,4 +83,4 @@ class NamedAxesTuple(AxesTuple):
         The labels of the axes. Defaults to name if label not given, or Axis N
         if neither was given.
         """
-        return tuple(ax.label for ax in self)  # type: ignore
+        return tuple(ax.label for ax in self)  # type: ignore[return-value]

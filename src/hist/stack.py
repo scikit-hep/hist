@@ -192,21 +192,21 @@ class Stack:
         """
         Subtract a scalar or array to the Stack.
         """
-        return self.__class__(*(h - other for h in self))  # type: ignore
+        return self.__class__(*(h - other for h in self))  # type: ignore[arg-type, operator]
 
     def __isub__(self: T, other: float | np.typing.NDArray[Any]) -> T:
         """
         Subtract a scalar or array to the Stack.
         """
         for h in self:
-            h -= other  # type: ignore
+            h -= other  # type: ignore[assignment, operator]
         return self
 
     def project(self: T, *args: int | str) -> T:
         """
         Project the Stack onto a new axes.
         """
-        return self.__class__(*(h.project(*args) for h in self))  # type: ignore
+        return self.__class__(*(h.project(*args) for h in self))  # type: ignore[arg-type]
 
 
 def __dir__() -> tuple[str, ...]:

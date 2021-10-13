@@ -441,5 +441,5 @@ class ConstructProxy(QuickConstruct):
 
 class MetaConstructor(type):
     @property
-    def new(cls: type[BaseHist]) -> QuickConstruct:  # type: ignore
+    def new(cls: type[BaseHist]) -> QuickConstruct:  # type: ignore[misc]
         return QuickConstruct(cls)
