@@ -80,8 +80,8 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
             args = args[:-1]
 
         # Support raw Quick Construct being accidentally passed in
-        args = [
-            a.axes[0]  # type: ignore
+        args = [  # type: ignore[assignment]
+            a.axes[0]  # type: ignore[union-attr, union-attr, union-attr, union-attr]
             if isinstance(a, hist.quick_construct.ConstructProxy) and len(a.axes) == 1
             else a
             for a in args
@@ -101,7 +101,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
                 )
                 warnings.warn(msg)
                 storage = storage()
-            super().__init__(*args, storage=storage, metadata=metadata)  # type: ignore
+            super().__init__(*args, storage=storage, metadata=metadata)  # type: ignore[call-overload]
 
             disallowed_names = {"weight", "sample", "threads"}
             for ax in self.axes:
@@ -169,11 +169,11 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         for ax in axes:
             if isinstance(ax, str):
                 assert ax in data, f"{ax} must be present in data={list(data)}"
-                cats = set(data[ax])  # type: ignore
+                cats = set(data[ax])  # type: ignore[arg-type]
                 if all(isinstance(a, str) for a in cats):
-                    axes_list.append(hist.axis.StrCategory(sorted(cats), name=ax))  # type: ignore
+                    axes_list.append(hist.axis.StrCategory(sorted(cats), name=ax))  # type: ignore[arg-type]
                 elif all(isinstance(a, int) for a in cats):
-                    axes_list.append(hist.axis.IntCategory(sorted(cats), name=ax))  # type: ignore
+                    axes_list.append(hist.axis.IntCategory(sorted(cats), name=ax))  # type: ignore[arg-type]
                 else:
                     raise TypeError(
                         f"{ax} must be all int or strings if axis not given"
@@ -187,7 +187,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
         self = cls(*axes_list, storage=storage)
         data_list = {x.name: data[x.name] for x in axes_list}
-        self.fill(**data_list, weight=weight_arr)  # type: ignore
+        self.fill(**data_list, weight=weight_arr)  # type: ignore[arg-type]
         return self
 
     def project(self: T, *args: int | str) -> T | float | bh.accumulators.Accumulator:
@@ -241,7 +241,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
             warnings.simplefilter("ignore")
             sorted_cats = sorted(self.axes[axis], key=key, reverse=reverse)
             # This can only return T, not float, etc., so we ignore the extra types here
-            return self[{axis: [bh.loc(x) for x in sorted_cats]}]  # type: ignore
+            return self[{axis: [bh.loc(x) for x in sorted_cats]}]  # type: ignore[dict-item, return-value]
 
     def _loc_shortcut(self, x: Any) -> Any:
         """
@@ -302,11 +302,11 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
             return new_indices
 
         elif not isinstance(index, tuple):
-            index = (index,)  # type: ignore
+            index = (index,)  # type: ignore[assignment]
 
-        return tuple(self._loc_shortcut(v) for v in index)  # type: ignore
+        return tuple(self._loc_shortcut(v) for v in index)  # type: ignore[union-attr, union-attr, union-attr, union-attr]
 
-    def __getitem__(  # type: ignore
+    def __getitem__(  # type: ignore[override]
         self: T, index: IndexingExpr
     ) -> T | float | bh.accumulators.Accumulator:
         """
@@ -315,7 +315,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
         return super().__getitem__(self._index_transform(index))
 
-    def __setitem__(  # type: ignore
+    def __setitem__(  # type: ignore[override]
         self, index: IndexingExpr, value: ArrayLike | bh.accumulators.Accumulator
     ) -> None:
         """
@@ -507,7 +507,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         """
         if self.ndim < 2:
             raise RuntimeError("Cannot stack with less than two axis")
-        stack_histograms: Iterator[BaseHist] = [  # type: ignore
+        stack_histograms: Iterator[BaseHist] = [  # type: ignore[assignment]
             self[{axis: i}] for i in range(len(self.axes[axis]))
         ]
         for name, h in zip(self.axes[axis], stack_histograms):

@@ -122,7 +122,7 @@ def _expr_to_lambda(expr: str) -> Callable[..., Any]:
         varnames.append(tokval)
     varnames = list(OrderedDict.fromkeys([name for name in varnames if name != "x"]))
     lambdastr = f"lambda x,{','.join(varnames)}: {expr}"
-    return eval(lambdastr)  # type: ignore
+    return eval(lambdastr)  # type: ignore[no-any-return]
 
 
 def _curve_fit_wrapper(
@@ -170,7 +170,7 @@ def _curve_fit_wrapper(
             ypred = func(xdata, *v)
             if (ypred <= 0.0).any():
                 return 1e6
-            return (  # type: ignore
+            return (  # type: ignore[no-any-return]
                 ypred.sum() - (ydata * np.log(ypred)).sum() + gammaln(ydata + 1).sum()
             )
 
@@ -339,7 +339,7 @@ def _fit_callable_to_hist(
         n_samples = 100
         vopts = np.random.multivariate_normal(popt, pcov, n_samples)
         sampled_ydata = np.vstack([model(xdata, *vopt).T for vopt in vopts])
-        model_uncert = np.nanstd(sampled_ydata, axis=0)  # type: ignore
+        model_uncert = np.nanstd(sampled_ydata, axis=0)  # type: ignore[no-untyped-call]
     else:
         model_uncert = np.zeros_like(hist_uncert)
 
