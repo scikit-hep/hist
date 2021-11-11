@@ -1,5 +1,9 @@
 # Changelog
 
+## WIP
+
+* Fix missing pass-through for stack plot
+
 ## Version 2.5.1
 
 * Support named stack indexing
