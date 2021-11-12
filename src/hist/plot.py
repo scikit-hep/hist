@@ -727,7 +727,7 @@ def plot_stack(
         if all(h.name is not None for h in self):
             kwargs["label"] = [h.name for h in self]
 
-    ret = histplot(list(self), **kwargs)
+    ret = histplot(list(self), ax=ax, **kwargs)
     ax = ret[0].stairs.axes
     _plot_keywords_wrapper(ax, legend=legend)
 
