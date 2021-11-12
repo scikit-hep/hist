@@ -1,5 +1,10 @@
 # Changelog
 
+## WIP
+
+* Fix missing pass-through for stack plot
+  [#339](https://github.com/scikit-hep/hist/pull/339)
+
 ## Version 2.5.1
 
 * Support named stack indexing

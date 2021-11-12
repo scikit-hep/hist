@@ -25,12 +25,13 @@ except ModuleNotFoundError:
     raise
 
 __all__ = (
-    "histplot",
     "hist2dplot",
+    "histplot",
     "plot2d_full",
-    "plot_ratio_array",
-    "plot_pull_array",
     "plot_pie",
+    "plot_pull_array",
+    "plot_ratio_array",
+    "plot_stack",
 )
 
 _PLT_MISSING_MSG = "Hist plotting with fitting requires scipy and iminuit. Please install hist[plot] or manually install dependencies."
@@ -728,7 +729,7 @@ def plot_stack(
             kwargs["label"] = [h.name for h in self]
 
     ret = histplot(list(self), ax=ax, **kwargs)
-    ax = ret[0].stairs.axes
-    _plot_keywords_wrapper(ax, legend=legend)
+    final_ax = ret[0].stairs.axes
+    _plot_keywords_wrapper(final_ax, legend=legend)
 
     return ret
