@@ -103,6 +103,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "meliache",
+      "name": "Michael Eliachevitch",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5121824?v=4",
+      "profile": "http://meliache.srht.site",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
