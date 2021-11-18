@@ -6,6 +6,9 @@ on:
     branches:
       - main
 
+env:
+  FORCE_COLOR: 3
+
 jobs:
   pre-commit:
     runs-on: ubuntu-latest
