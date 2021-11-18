@@ -1,7 +1,9 @@
 # Changelog
 
-## WIP
+## Version 2.5.2
 
+* Remove more-itertools requirement
+  [#347](https://github.com/scikit-hep/hist/pull/347)
 * Fix missing pass-through for stack plot
   [#339](https://github.com/scikit-hep/hist/pull/339)
 
