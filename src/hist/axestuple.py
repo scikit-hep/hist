@@ -9,14 +9,18 @@ from boost_histogram.axis import ArrayTuple, AxesTuple
 
 if sys.version_info < (3, 10):
     import builtins
-
-    import more_itertools
+    import itertools
 
     def zip(*iterables: Any, strict: bool = False) -> Iterator[tuple[Any, ...]]:
         if strict:
-            return more_itertools.zip_equal(*iterables)
+            marker = object()
+            for each in itertools.zip_longest(*iterables, fillvalue=marker):
+                for val in each:
+                    if val is marker:
+                        raise ValueError("zip() arguments are not the same length")
+                yield each
         else:
-            return builtins.zip(*iterables)
+            yield from builtins.zip(*iterables)
 
 
 __all__ = ("NamedAxesTuple", "AxesTuple", "ArrayTuple")
