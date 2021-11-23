@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import copy
-import sys
 import typing
 from typing import Any, Iterator, TypeVar
 
@@ -11,14 +10,9 @@ import numpy as np
 from .axestuple import NamedAxesTuple
 from .basehist import BaseHist
 
-try:
+if typing.TYPE_CHECKING:
     import matplotlib
-except ModuleNotFoundError:
-    print(
-        "Hist requires mplhep to plot, either install hist[plot] or mplhep",
-        file=sys.stderr,
-    )
-    raise
+
 
 __all__ = ("Stack",)
 
