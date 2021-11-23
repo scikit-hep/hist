@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import copy
-import sys
 import typing
 from typing import Any, Iterator, TypeVar
 
