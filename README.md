@@ -148,6 +148,7 @@ We would like to acknowledge the contributors that made this project possible ([
     <td align="center"><a href="http://dantrim.github.io"><img src="https://avatars.githubusercontent.com/u/7841565?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Daniel Antrim</b></sub></a><br /><a href="https://github.com/scikit-hep/hist/commits?author=dantrim" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/nsmith-"><img src="https://avatars.githubusercontent.com/u/6587412?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Nicholas Smith</b></sub></a><br /><a href="https://github.com/scikit-hep/hist/commits?author=nsmith-" title="Code">💻</a></td>
     <td align="center"><a href="http://meliache.srht.site"><img src="https://avatars.githubusercontent.com/u/5121824?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Michael Eliachevitch</b></sub></a><br /><a href="https://github.com/scikit-hep/hist/commits?author=meliache" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/jonas-eschle"><img src="https://avatars.githubusercontent.com/u/17454848?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Jonas Eschle</b></sub></a><br /><a href="https://github.com/scikit-hep/hist/commits?author=jonas-eschle" title="Documentation">📖</a></td>
   </tr>
 </table>
 
