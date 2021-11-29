@@ -25,19 +25,19 @@ You can make a histogram like this:
 
 .. code:: python3
 
-   hist = Hist(hist.axis.Regular(bins=10, start=0, stop=1, name="x"))
+   h = Hist(hist.axis.Regular(bins=10, start=0, stop=1, name="x"))
 
 If you’d like to type less, you can leave out the keywords for the numbers.
 
 .. code:: python3
 
-   hist = Hist(hist.axis.Regular(10, 0, 1, name="x"))
+   h = Hist(hist.axis.Regular(10, 0, 1, name="x"))
 
 Hist also supports a "quick-construct" system, which does not require using anything beyond the ``Hist`` class:
 
 .. code:: python3
 
-   hist = Hist.new.Regular(10, 0, 1, name="x").Double()
+   h = Hist.new.Regular(10, 0, 1, name="x").Double()
 
 Note that you have to specify the storage at the end (but this does make it easier to use ``Weight`` or other useful storages).
 
@@ -66,9 +66,9 @@ should give arrays, but single values work as well:
 
 .. code:: python3
 
-   hist = Hist(hist.axis.Regular(10, 0.0, 1.0, name="x"))
-   hist.fill(0.9)
-   hist.fill([0.9, 0.3, 0.4])
+   h = Hist(hist.axis.Regular(10, 0.0, 1.0, name="x"))
+   h.fill(0.9)
+   h.fill([0.9, 0.3, 0.4])
 
 
 Slicing and rebinning
@@ -80,12 +80,12 @@ in the third slice entry, or remove an entire axis using ``sum``:
 
 .. code:: python3
 
-    hist = Hist(
+    h = Hist(
         hist.axis.Regular(10, 0, 1, name="x"),
         hist.axis.Regular(10, 0, 1, name="y"),
         hist.axis.Regular(10, 0, 1, name="z"),
     )
-    mini = hist[1:5, .2j:.9j, sum]
+    mini = h[1:5, .2j:.9j, sum]
     # Will be 4 bins x 7 bins
 
 See :ref:`usage-indexing`.
@@ -107,7 +107,7 @@ storages.  Most methods offer an optional keyword argument that you can pass,
 
 .. code:: python3
 
-    np_array = hist.view()
+    np_array = h.view()
 
 
 Setting the contents
@@ -118,8 +118,8 @@ you can set either values or arrays at a time:
 
 .. code:: python3
 
-    hist[2] = 3.5
-    hist[hist.underflow] = 0  # set the underflow bin
+    h[2] = 3.5
+    h[hist.underflow] = 0  # set the underflow bin
     hist2d[3:5, 2:4] = np.eye(2)  # set with array
 
 For non-simple storages, you can add an extra dimension that matches the
@@ -128,7 +128,7 @@ a Weight histogram with three values, you can dimension:
 
 .. code:: python3
 
-    hist[0:3] = [[1, 0.1], [2, 0.2], [3, 0.3]]
+    h[0:3] = [[1, 0.1], [2, 0.2], [3, 0.3]]
 
 See :ref:`usage-indexing`.
 
@@ -141,8 +141,8 @@ properties and methods are also available directly on the ``axes`` tuple:
 
 .. code:: python3
 
-   ax0 = hist.axes[0]
-   X, Y = hist.axes.centers
+   ax0 = h.axes[0]
+   X, Y = h.axes.centers
 
 See :ref:`usage-axes`.
 
@@ -185,20 +185,20 @@ As an complete example, let's say you wanted to compute and plot the density, wi
     import hist
 
     # Make a 2D histogram
-    hist = hist.Hist(hist.axis.Regular(50, -3, 3), hist.axis.Regular(50, -3, 3))
+    hist2d = hist.Hist(hist.axis.Regular(50, -3, 3), hist.axis.Regular(50, -3, 3))
 
     # Fill with Gaussian random values
-    hist.fill(np.random.normal(size=1_000_000), np.random.normal(size=1_000_000))
+    hist2d.fill(np.random.normal(size=1_000_000), np.random.normal(size=1_000_000))
 
     # Compute the areas of each bin
-    areas = functools.reduce(operator.mul, hist.axes.widths)
+    areas = functools.reduce(operator.mul, hist2d.axes.widths)
 
     # Compute the density
-    density = hist.values() / hist.sum() / areas
+    density = hist2d.values() / hist2d.sum() / areas
 
     # Make the plot
     fig, ax = plt.subplots()
-    mesh = ax.pcolormesh(*hist.axes.edges.T, density.T)
+    mesh = ax.pcolormesh(*hist2d.axes.edges.T, density.T)
     fig.colorbar(mesh)
     plt.savefig("simple_density.png")
 
