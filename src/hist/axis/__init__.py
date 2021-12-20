@@ -54,7 +54,7 @@ class AxesMixin:
 
     # Support mixing before or after a bh class
     def __init_subclass__(cls, **kwargs: Any) -> None:
-        super().__init_subclass__(**kwargs)  # type: ignore[call-arg]
+        super().__init_subclass__(**kwargs)
 
     @property
     def name(self: AxisProtocol) -> str:
