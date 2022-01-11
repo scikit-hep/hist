@@ -6,7 +6,7 @@ from pathlib import Path
 
 import nox
 
-ALL_PYTHONS = ["3.7", "3.8", "3.9"]
+ALL_PYTHONS = ["3.7", "3.8", "3.9", "3.10"]
 
 nox.options.sessions = ["lint", "tests"]
 
@@ -31,6 +31,19 @@ def tests(session):
     session.install("-e", ".[test,plot]")
     args = ["--mpl"] if sys.platform.startswith("linux") else []
     session.run("pytest", *args, *session.posargs)
+
+
+@nox.session
+def regenerate(session):
+    """
+    Regenerate MPL images.
+    """
+    session.install("-e", ".[test,plot]")
+    if not sys.platform.startswith("linux"):
+        session.error(
+            "Must be run from Linux, images will be slightly different on macOS"
+        )
+    session.run("pytest", "--mpl-generate-path=tests/baseline", *session.posargs)
 
 
 @nox.session(reuse_venv=True)

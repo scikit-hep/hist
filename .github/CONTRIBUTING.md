@@ -35,7 +35,7 @@ run the linux tests from anywhere with Docker:
 ```bash
 docker run --rm -v $PWD:/nox -w /nox -t quay.io/pypa/manylinux2014_x86_64:latest pipx run nox -s tests-3.9
 # Regenerate the MPL comparison images:
-docker run --rm -v $PWD:/nox -w /nox -t quay.io/pypa/manylinux2014_x86_64:latest pipx run nox -s tests-3.9 -- --mpl-generate-path=tests/baseline
+docker run --rm -v $PWD:/nox -w /nox -t quay.io/pypa/manylinux2014_x86_64:latest pipx run nox -s regenerate
 ```
 
 ### PyPI
