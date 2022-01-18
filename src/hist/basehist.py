@@ -382,8 +382,8 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         """
         _has_categorical = 0
         if (
-            np.sum(self.axes.traits.ordered) == 1
-            and np.sum(self.axes.traits.discrete) == 1
+            sum(t.ordered for t in self.axes.traits) == 1
+            and sum(t.discrete for t in self.axes.traits) == 1
         ):
             _has_categorical = 1
         _project = _has_categorical or overlay is not None
