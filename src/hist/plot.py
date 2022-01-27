@@ -538,12 +538,12 @@ def plot_pull_array(
     right_edge = hist_.axes.edges[-1][-1]
 
     # Pull: plot the pulls using Matplotlib bar method
-    width = (right_edge - left_edge) / len(pulls)
-    bar_artists = ax.bar(x_values, pulls, width=width, **bar_kwargs)
+    bin_widths = __hist.axes[0].widths
+    bar_artists = ax.bar(x_values, pulls, width=bin_widths, **bar_kwargs)
 
     pp_num = pp_kwargs.pop("num", 5)
     patch_height = max(np.abs(pulls)) / pp_num
-    patch_width = width * len(pulls)
+    patch_width = right_edge - left_edge
     patch_artists = []
     base_alpha = pp_kwargs.get("alpha", 0.5)
     for i in range(pp_num):
