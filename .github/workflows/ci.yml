@@ -19,7 +19,9 @@ jobs:
       with:
         extra_args: --hook-stage manual check-manifest
     - name: PyLint
-      run: pipx run nox -s pylint
+      run: |
+        echo "::add-matcher::$GITHUB_WORKSPACE/.github/matchers/pylint.json"
+        pipx run nox -s pylint
 
   checks:
     runs-on: ubuntu-latest
