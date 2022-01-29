@@ -105,7 +105,8 @@ class Regular(AxesMixin, bha.Regular, family=hist):
         overflow: bool | None = None,
         growth: bool = False,
         circular: bool = False,
-        transform: bha.transform.AxisTransform | None = None,
+        transform: bha.transform.AxisTransform
+        | None = None,  # pylint: disable=redefined-outer-name
         __dict__: dict[str, Any] | None = None,
     ) -> None:
         super().__init__(

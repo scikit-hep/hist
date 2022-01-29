@@ -23,8 +23,7 @@ class XML:
     def start(self) -> str:
         if self.properties:
             ending = " " + " ".join(
-                '{}="{}"'.format(a.replace("_", "-"), b)
-                for a, b in self.properties.items()
+                f'{a.replace("_", "-")}="{b}"' for a, b in self.properties.items()
             )
         else:
             ending = ""

@@ -31,7 +31,7 @@ def main() -> None:
         "Classic hist interface - please use histoprint instead; this supports multiple file formats and much more!"
     )
 
-    with open(args.input) if args.input else sys.stdin as f:
+    with open(args.input, encoding="utf-8") if args.input else sys.stdin as f:
         values = [float(v) for v in f]
 
     h = bh.numpy.histogram(values, bins=args.buckets, histogram=hist.Hist)

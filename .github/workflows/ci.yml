@@ -18,6 +18,8 @@ jobs:
     - uses: pre-commit/action@v2.0.3
       with:
         extra_args: --hook-stage manual check-manifest
+    - name: PyLint
+      run: pipx run nox -s pylint
 
   checks:
     runs-on: ubuntu-latest
