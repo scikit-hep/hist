@@ -23,6 +23,17 @@ def lint(session):
     session.run("pre-commit", "run", "--all-files", *session.posargs)
 
 
+@nox.session
+def pylint(session: nox.Session) -> None:
+    """
+    Run pylint.
+    """
+
+    session.install("pylint")
+    session.install("-e", ".")
+    session.run("pylint", "src", *session.posargs)
+
+
 @nox.session(python=ALL_PYTHONS, reuse_venv=True)
 def tests(session):
     """

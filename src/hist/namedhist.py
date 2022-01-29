@@ -19,7 +19,7 @@ class NamedHist(BaseHist, family=hist):
         """
 
         super().__init__(*args, **kwargs)
-        if len(args) and "" in self.axes.name:
+        if args and "" in self.axes.name:
             raise RuntimeError(
                 f"Each axes in the {self.__class__.__name__} instance should have a name"
             )
@@ -33,12 +33,12 @@ class NamedHist(BaseHist, family=hist):
         if len(args) == 0 or all(isinstance(x, str) for x in args):
             return super().project(*args)
 
-        else:
-            raise TypeError(
-                f"Only projections by names are supported for {self.__class__.__name__}"
-            )
+        raise TypeError(
+            f"Only projections by names are supported for {self.__class__.__name__}"
+        )
 
-    def fill(  # type: ignore[override, override, override]
+    # pylint: disable-next=arguments-differ
+    def fill(  # type: ignore[override]
         self: T,
         weight: ArrayLike | None = None,
         sample: ArrayLike | None = None,
@@ -50,13 +50,12 @@ class NamedHist(BaseHist, family=hist):
             NamedHist object. NamedHist could only be filled by names.
         """
 
-        if len(kwargs) and all(isinstance(k, str) for k in kwargs.keys()):
+        if kwargs and all(isinstance(k, str) for k in kwargs):
             return super().fill(weight=weight, sample=sample, threads=threads, **kwargs)
 
-        else:
-            raise TypeError(
-                f"Only fill by names are supported for {self.__class__.__name__}"
-            )
+        raise TypeError(
+            f"Only fill by names are supported for {self.__class__.__name__}"
+        )
 
     def __getitem__(  # type: ignore[override]
         self: T,

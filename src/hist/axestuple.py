@@ -11,6 +11,7 @@ if sys.version_info < (3, 10):
     import builtins
     import itertools
 
+    # pylint: disable-next=redefined-builtin
     def zip(*iterables: Any, strict: bool = False) -> Iterator[tuple[Any, ...]]:
         if strict:
             marker = object()
