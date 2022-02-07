@@ -343,14 +343,14 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         count = np.sum(values, axis=iaxis)
 
         num = np.tensordot(values, centers, ([iaxis], [0]))
-        num_err = np.sqrt(np.tensordot(variances, centers ** 2, ([iaxis], [0])))
+        num_err = np.sqrt(np.tensordot(variances, centers**2, ([iaxis], [0])))
 
         den = np.sum(values, axis=iaxis)
         den_err = np.sqrt(np.sum(variances, axis=iaxis))
 
         with np.errstate(invalid="ignore"):
             new_values = num / den
-            new_variances = (num_err / den) ** 2 - (den_err * num / den ** 2) ** 2
+            new_variances = (num_err / den) ** 2 - (den_err * num / den**2) ** 2
 
         retval = self.__class__(*axes, storage=hist.storage.Mean())
         retval[...] = np.stack([count, new_values, count * new_variances], axis=-1)
