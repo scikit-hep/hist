@@ -225,7 +225,7 @@ def test_general_plot_pull():
     ).fill(np.random.normal(size=10))
 
     def pdf(x, a=1 / np.sqrt(2 * np.pi), x0=0, sigma=1, offset=0):
-        return a * np.exp(-((x - x0) ** 2) / (2 * sigma ** 2)) + offset
+        return a * np.exp(-((x - x0) ** 2) / (2 * sigma**2)) + offset
 
     assert h.plot_pull(
         pdf,
@@ -524,7 +524,7 @@ def test_named_plot_pull():
     ).fill(S=np.random.normal(size=10))
 
     def pdf(x, a=1 / np.sqrt(2 * np.pi), x0=0, sigma=1, offset=0):
-        return a * np.exp(-((x - x0) ** 2) / (2 * sigma ** 2)) + offset
+        return a * np.exp(-((x - x0) ** 2) / (2 * sigma**2)) + offset
 
     assert h.plot_pull(
         pdf,
@@ -648,7 +648,7 @@ def test_image_plot_pull():
     ).fill(np.random.normal(size=100))
 
     def pdf(x, a=1 / np.sqrt(2 * np.pi), x0=0, sigma=1, offset=0):
-        return a * np.exp(-((x - x0) ** 2) / (2 * sigma ** 2)) + offset
+        return a * np.exp(-((x - x0) ** 2) / (2 * sigma**2)) + offset
 
     fig = plt.figure()
 
@@ -708,7 +708,7 @@ def test_image_plot_ratio_callable():
     ).fill(np.random.normal(size=1000))
 
     def model(x, a=1 / np.sqrt(2 * np.pi), x0=0, sigma=1, offset=0):
-        return a * np.exp(-((x - x0) ** 2) / (2 * sigma ** 2)) + offset
+        return a * np.exp(-((x - x0) ** 2) / (2 * sigma**2)) + offset
 
     fig = plt.figure()
 
