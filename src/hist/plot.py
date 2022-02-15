@@ -425,7 +425,7 @@ def plot_ratio_array(
         )
         axis_artists = RatioErrorbarArtists(central_value_artist, errorbar_artists)
     elif uncert_draw_type == "bar":
-        bar_width = (right_edge - left_edge) / len(ratio)
+        bar_widths = __hist.axes[0].widths
 
         bar_top = ratio + ratio_uncert[1]
         bar_bottom = ratio - ratio_uncert[0]
@@ -440,7 +440,7 @@ def plot_ratio_array(
         bar_artists = ax.bar(
             x_values,
             height=bar_height,
-            width=bar_width,
+            width=bar_widths,
             bottom=bar_bottom,
             fill=False,
             linewidth=0,
