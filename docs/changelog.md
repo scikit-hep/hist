@@ -1,5 +1,10 @@
 # Changelog
 
+## WIP
+* Take into account the irregular bin widths of `Variable` axes in
+  `plot_pull_array` and `plot_ratio_array` when plotting bars
+  [#369](https://github.com/scikit-hep/hist/pull/369)
+
 ## Version 2.5.2
 
 * Remove more-itertools requirement
