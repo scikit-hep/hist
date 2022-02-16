@@ -13,9 +13,8 @@ from .typing import Literal
 
 try:
     import matplotlib.axes
-    import matplotlib.patches as patches
     import matplotlib.pyplot as plt
-    import matplotlib.transforms as transforms
+    from matplotlib import patches, transforms
     from mplhep.plot import Hist1DArtists, Hist2DArtists, hist2dplot, histplot
 except ModuleNotFoundError:
     print(
@@ -123,6 +122,7 @@ def _expr_to_lambda(expr: str) -> Callable[..., Any]:
         varnames.append(tokval)
     varnames = list(OrderedDict.fromkeys([name for name in varnames if name != "x"]))
     lambdastr = f"lambda x,{','.join(varnames)}: {expr}"
+    # pylint: disable-next=eval-used
     return eval(lambdastr)  # type: ignore[no-any-return]
 
 
@@ -462,7 +462,7 @@ def plot_ratio_array(
         # plot centered around central value with a scaled view range
         # the value _with_ the uncertainty in view is important so base
         # view range on extrema of value +/- uncertainty
-        valid_ratios_idx = np.where(np.isnan(ratio) == False)  # noqa: E712
+        valid_ratios_idx = np.where(~np.isnan(ratio))
         valid_ratios = ratio[valid_ratios_idx]
         extrema = np.array(
             [
@@ -696,10 +696,7 @@ def _plot_ratiolike(
 
 
 def get_center(x: str | int | tuple[float, float]) -> str | float:
-    if isinstance(x, tuple):
-        return (x[0] + x[1]) / 2
-    else:
-        return x
+    return (x[0] + x[1]) / 2 if isinstance(x, tuple) else x
 
 
 def plot_pie(

@@ -69,8 +69,8 @@ class Stack:
         for n, h in enumerate(self._stack):
             if h.name == name:
                 return n
-        else:
-            raise IndexError(f"Name not found: {name}")
+
+        raise IndexError(f"Name not found: {name}")
 
     @typing.overload
     def __getitem__(self, val: int | str) -> BaseHist:

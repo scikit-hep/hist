@@ -133,14 +133,13 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
     def _repr_html_(self) -> str:
         if self.size == 0:
             return str(self)
-        elif self.ndim == 1:
+        if self.ndim == 1:
             if self.axes[0].traits.circular:
                 return str(html_hist(self, svg_hist_1d_c))
-            else:
-                return str(html_hist(self, svg_hist_1d))
-        elif self.ndim == 2:
+            return str(html_hist(self, svg_hist_1d))
+        if self.ndim == 2:
             return str(html_hist(self, svg_hist_2d))
-        elif self.ndim > 2:
+        if self.ndim > 2:
             return str(html_hist(self, svg_hist_nd))
 
         return str(self)
@@ -165,7 +164,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         weight: str | None = None,
         storage: hist.storage.Storage = hist.storage.Double(),  # noqa: B008
     ) -> T:
-        axes_list: list[Any] = list()
+        axes_list: list[Any] = []
         for ax in axes:
             if isinstance(ax, str):
                 assert ax in data, f"{ax} must be present in data={list(data)}"
@@ -250,23 +249,22 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
         if isinstance(x, list):
             return [self._loc_shortcut(each) for each in x]
-        elif isinstance(x, slice):
+        if isinstance(x, slice):
             return slice(
                 self._loc_shortcut(x.start),
                 self._loc_shortcut(x.stop),
                 self._step_shortcut(x.step),
             )
-        elif isinstance(x, complex):
+        if isinstance(x, complex):
             if x.real % 1 != 0:
                 raise ValueError("The real part should be an integer")
-            else:
-                return bh.loc(x.imag, int(x.real))
-        elif isinstance(x, str):
+            return bh.loc(x.imag, int(x.real))
+        if isinstance(x, str):
             return bh.loc(x)
-        else:
-            return x
+        return x
 
-    def _step_shortcut(self, x: Any) -> Any:
+    @staticmethod
+    def _step_shortcut(x: Any) -> Any:
         """
         Convert some specific indices to step.
         """
@@ -276,10 +274,9 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
         if x.real != 0:
             raise ValueError("The step should not have real part")
-        elif x.imag % 1 != 0:
+        if x.imag % 1 != 0:
             raise ValueError("The imaginary part should be an integer")
-        else:
-            return bh.rebin(int(x.imag))
+        return bh.rebin(int(x.imag))
 
     def _index_transform(
         self, index: list[IndexingExpr] | IndexingExpr
@@ -301,7 +298,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
                 )
             return new_indices
 
-        elif not isinstance(index, tuple):
+        if not isinstance(index, tuple):
             index = (index,)  # type: ignore[assignment]
 
         return tuple(self._loc_shortcut(v) for v in index)  # type: ignore[union-attr, union-attr, union-attr, union-attr]
@@ -346,14 +343,14 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         count = np.sum(values, axis=iaxis)
 
         num = np.tensordot(values, centers, ([iaxis], [0]))
-        num_err = np.sqrt(np.tensordot(variances, centers ** 2, ([iaxis], [0])))
+        num_err = np.sqrt(np.tensordot(variances, centers**2, ([iaxis], [0])))
 
         den = np.sum(values, axis=iaxis)
         den_err = np.sqrt(np.sum(variances, axis=iaxis))
 
         with np.errstate(invalid="ignore"):
             new_values = num / den
-            new_variances = (num_err / den) ** 2 - (den_err * num / den ** 2) ** 2
+            new_variances = (num_err / den) ** 2 - (den_err * num / den**2) ** 2
 
         retval = self.__class__(*axes, storage=hist.storage.Mean())
         retval[...] = np.stack([count, new_values, count * new_variances], axis=-1)
@@ -389,10 +386,10 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         _project = _has_categorical or overlay is not None
         if self.ndim == 1 or (self.ndim == 2 and _project):
             return self.plot1d(*args, overlay=overlay, **kwargs)
-        elif self.ndim == 2:
+        if self.ndim == 2:
             return self.plot2d(*args, **kwargs)
-        else:
-            raise NotImplementedError("Please project to 1D or 2D before calling plot")
+
+        raise NotImplementedError("Please project to 1D or 2D before calling plot")
 
     def plot1d(
         self,
@@ -405,17 +402,17 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         Plot1d method for BaseHist object.
         """
 
-        import hist.plot
+        from hist import plot
 
         if self.ndim == 1:
-            return hist.plot.histplot(self, ax=ax, **_proc_kw_for_lw(kwargs))
+            return plot.histplot(self, ax=ax, **_proc_kw_for_lw(kwargs))
         if overlay is None:
             (overlay,) = (i for i, ax in enumerate(self.axes) if ax.traits.discrete)
         assert overlay is not None
         cat_ax = self.axes[overlay]
         cats = cat_ax if cat_ax.traits.discrete else np.arange(len(cat_ax.centers))
         d1hists = [self[{overlay: cat}] for cat in cats]
-        return hist.plot.histplot(d1hists, ax=ax, label=cats, **_proc_kw_for_lw(kwargs))
+        return plot.histplot(d1hists, ax=ax, label=cats, **_proc_kw_for_lw(kwargs))
 
     def plot2d(
         self,
@@ -427,9 +424,9 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         Plot2d method for BaseHist object.
         """
 
-        import hist.plot
+        from hist import plot
 
-        return hist.plot.hist2dplot(self, ax=ax, **_proc_kw_for_lw(kwargs))
+        return plot.hist2dplot(self, ax=ax, **_proc_kw_for_lw(kwargs))
 
     def plot2d_full(
         self,
@@ -444,9 +441,9 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         """
         # Type judgement
 
-        import hist.plot
+        from hist import plot
 
-        return hist.plot.plot2d_full(self, ax_dict=ax_dict, **kwargs)
+        return plot.plot2d_full(self, ax_dict=ax_dict, **kwargs)
 
     def plot_ratio(
         self,
@@ -464,9 +461,9 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         ``(main_ax_artists, subplot_ax_artists)``
         """
 
-        import hist.plot
+        from hist import plot
 
-        return hist.plot._plot_ratiolike(
+        return plot._plot_ratiolike(
             self, other, ax_dict=ax_dict, view="ratio", **kwargs
         )
 
@@ -484,11 +481,9 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         ``(main_ax_artists, subplot_ax_artists)``
         """
 
-        import hist.plot
+        from hist import plot
 
-        return hist.plot._plot_ratiolike(
-            self, func, ax_dict=ax_dict, view="pull", **kwargs
-        )
+        return plot._plot_ratiolike(self, func, ax_dict=ax_dict, view="pull", **kwargs)
 
     def plot_pie(
         self,
@@ -497,9 +492,9 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         **kwargs: Any,
     ) -> Any:
 
-        import hist.plot
+        from hist import plot
 
-        return hist.plot.plot_pie(self, ax=ax, **kwargs)
+        return plot.plot_pie(self, ax=ax, **kwargs)
 
     def stack(self, axis: int | str) -> hist.stack.Stack:
         """
