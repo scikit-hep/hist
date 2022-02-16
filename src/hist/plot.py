@@ -334,7 +334,7 @@ def _fit_callable_to_hist(
 
     # For axes with varying bin widths correct hist values with widths while maintaing
     # normalization.
-    bin_widths = histogram.axes[0].width
+    bin_widths = histogram.axes[0].widths
     bin_width_fractions = bin_widths / np.sum(bin_widths)
     h_values_width_corrected = histogram.values() / bin_width_fractions
 
