@@ -1,5 +1,16 @@
 # Changelog
 
+## Version 2.6.0
+
+* Using [boost-histogram 1.3](https://boost-histogram.readthedocs.io/en/latest/CHANGELOG.html#version-1-3)
+* Fix runtime dependency on matplotlib when not plotting
+  [#353](https://github.com/scikit-hep/hist/pull/353)
+* Fix `.plot` shortcut failure
+  [#368](https://github.com/scikit-hep/hist/pull/368)
+* New nox sessions: `regenerate` and `pylint`
+* Update tests for latest matplotlib
+
+
 ## Version 2.5.2
 
 * Remove more-itertools requirement
