@@ -3,8 +3,6 @@ name: Feature request
 about: Suggest an idea for this project
 title: "[FEATURE] "
 labels: enhancement
-assignees: henryiii, LovelyBuggies
-
 ---
 
 <!-- Consider opening an Discussion instead! -->
