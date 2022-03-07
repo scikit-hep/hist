@@ -42,7 +42,7 @@ repos:
 
 # Notebook formatting
 - repo: https://github.com/nbQA-dev/nbQA
-  rev: 1.2.3
+  rev: 1.3.0
   hooks:
   - id: nbqa-pyupgrade
     additional_dependencies: [pyupgrade==2.25.0]
