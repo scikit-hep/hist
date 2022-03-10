@@ -31,6 +31,7 @@ extras_require["dev"] = [*extras_require["test"], *extras_require["plot"], "ipyk
 
 extras_require["docs"] = [
     *extras_require["plot"],
+    "ipython_genutils",
     "nbsphinx",
     "Sphinx >=3.0.0",
     "sphinx_copybutton",
