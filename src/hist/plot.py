@@ -8,7 +8,6 @@ import numpy as np
 
 import hist
 
-from .intervals import ratio_uncertainty
 from .typing import Literal
 
 try:
@@ -545,6 +544,7 @@ def _plot_ratiolike(
 
     ``fit_fmt`` can be a string such as ``r"{name} = {value:.3g} $\pm$ {error:.3g}"``
     """
+    from .intervals import ratio_uncertainty
 
     if self.ndim != 1:
         raise TypeError(
