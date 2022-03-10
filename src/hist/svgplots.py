@@ -193,32 +193,3 @@ def svg_hist_2d(h: hist.BaseHist) -> svg:
     ]
 
     return svg(*texts, *boxes, viewBox=f"{-20} {-height - 20} {width+40} {height+40}")
-
-
-def svg_hist_nd(h: hist.BaseHist) -> svg:
-    assert h.ndim > 2, "Must be more than 2D"
-
-    width = 200
-    height = 200
-
-    boxes = [
-        rect(
-            x=20 * i,
-            y=20 * i,
-            width=width - 40,
-            height=height - 40,
-            style="fill:white;opacity:.5;stroke-width:2;stroke:currentColor;",
-        )
-        for i in range(3)
-    ]
-
-    nd = text(
-        f"{h.ndim}D",
-        x=height / 2 + 20,
-        y=width / 2 + 20,
-        style="font-size: 26pt; font-family: verdana; font-style: bold; fill: black;",
-        text_anchor="middle",
-        alignment_baseline="middle",
-    )
-
-    return svg(*boxes, nd, viewBox=f"-10 -10 {height + 20} {width + 20}")
