@@ -509,3 +509,24 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
             h.name = name
 
         return hist.stack.Stack(*stack_histograms)
+
+    def sum(self, flow: bool = False) -> float | bh.accumulators.Accumulator:
+        """
+        Compute the sum over the histogram bins (optionally including the flow bins).
+        """
+        # TODO: This method will go away in the future.
+        if any(x == 0 for x in (self.axes.extent if flow else self.axes.size)):
+            storage = self._storage_type
+            if issubclass(storage, (bh.storage.AtomicInt64, bh.storage.Int64)):
+                return 0
+            if issubclass(storage, (bh.storage.Double, bh.storage.Unlimited)):
+                return 0.0
+            if issubclass(storage, bh.storage.Weight):
+                return bh.accumulators.WeightedSum(0, 0)
+            if issubclass(storage, bh.storage.Mean):
+                return bh.accumulators.Mean(0, 0, 0)
+            if issubclass(storage, bh.storage.WeightedMean):
+                return bh.accumulators.WeightedMean(0, 0, 0, 0)
+            raise AssertionError(f"Unsupported storage type {storage}")
+
+        return super().sum(flow=flow)
