@@ -374,7 +374,10 @@ def _plot_fit_result(
         )
     hist_uncert = np.sqrt(variances)
 
-    errorbars = ax.errorbar(x_values, __hist.values(), hist_uncert, **eb_kwargs)
+    bin_widths = __hist.axes[0].widths
+    bin_width_fractions = bin_widths / np.sum(bin_widths) * len(bin_widths)
+    h_values_width_corrected = __hist.values() / bin_width_fractions
+    errorbars = ax.errorbar(x_values, h_values_width_corrected, hist_uncert, **eb_kwargs)
 
     # Ensure zorder draws data points above model
     line_zorder = errorbars[0].get_zorder() - 1
