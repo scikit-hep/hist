@@ -699,8 +699,8 @@ def _make_plot_ratio_callable_test_figure(hist_axis, n_numbers):
     The purpose is to create tests for histograms with different hist_axes, e.g.
     regular and various variable binnings.
     """
-    rng = np.random.default_rng(42)
-    hist_1 = Hist(hist_axis).fill(rng.normal(size=n_numbers))
+    np.random.seed(42)
+    hist_1 = Hist(hist_axis).fill(np.random.normal(size=n_numbers))
 
     def model(x, a=1 / np.sqrt(2 * np.pi), x0=0, sigma=1, offset=0):
         return a * np.exp(-((x - x0) ** 2) / (2 * sigma**2)) + offset
