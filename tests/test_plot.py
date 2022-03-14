@@ -691,6 +691,7 @@ def test_image_plot_ratio_hist():
 
     return fig
 
+
 def _make_plot_ratio_callable_test_figure(hist_axis, n_numbers):
     """
     Helper function to create a plot_ratio figure with a gaussian model.
@@ -710,6 +711,7 @@ def _make_plot_ratio_callable_test_figure(hist_axis, n_numbers):
     )
     return fig
 
+
 @pytest.mark.mpl_image_compare(baseline_dir="baseline", savefig_kwargs={"dpi": 50})
 def test_image_plot_ratio_callable():
     """
@@ -724,7 +726,9 @@ def test_image_plot_ratio_callable():
 
 
 @pytest.mark.mpl_image_compare(
-    baseline_dir="baseline", filename="test_image_plot_ratio_callable.png", savefig_kwargs={"dpi": 50}
+    baseline_dir="baseline",
+    filename="test_image_plot_ratio_callable.png",
+    savefig_kwargs={"dpi": 50},
 )
 def test_image_plot_ratio_variable_axis_with_regular_bins():
     """
@@ -735,9 +739,14 @@ def test_image_plot_ratio_variable_axis_with_regular_bins():
     """
 
     hist_axis = axis.Variable(
-        np.linspace(-5, 5, 51), name="X", label="x [units]", underflow=False, overflow=False
+        np.linspace(-5, 5, 51),
+        name="X",
+        label="x [units]",
+        underflow=False,
+        overflow=False,
     )
     return _make_plot_ratio_callable_test_figure(hist_axis, 1000)
+
 
 @pytest.mark.mpl_image_compare(baseline_dir="baseline", savefig_kwargs={"dpi": 50})
 def test_image_plot_ratio_callable_bayesian_blocks_bins():
@@ -750,9 +759,20 @@ def test_image_plot_ratio_callable_bayesian_blocks_bins():
     """
     # bin edges generated via hepstats.modeling.bayesian_blocks on 5k random-distributed numbers
     bayesian_bin_edges = np.array(
-        [-3.24126734, -3.01357225, -2.22544451, -1.61651199, -1.13075189,
-       -0.65398704,  0.72260413,  1.23926518,  1.67818774,  2.09883056,
-        2.63836271,  3.92623771]
+        [
+            -3.24126734,
+            -3.01357225,
+            -2.22544451,
+            -1.61651199,
+            -1.13075189,
+            -0.65398704,
+            0.72260413,
+            1.23926518,
+            1.67818774,
+            2.09883056,
+            2.63836271,
+            3.92623771,
+        ]
     )
     hist_axis = axis.Variable(
         bayesian_bin_edges, name="X", label="x [units]", underflow=False, overflow=False
