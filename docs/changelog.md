@@ -6,6 +6,18 @@
   `plot_pull_array` and `plot_ratio_array` when plotting bars
   [#369](https://github.com/scikit-hep/hist/pull/369)
 
+## Version 2.6.1
+
+* Fall back on normal repr when histogram is too large
+  [#388](https://github.com/scikit-hep/hist/pull/388)
+* Fix issue with no-axis histogram
+  [#388](https://github.com/scikit-hep/hist/pull/388)
+* Fix issue with empty axis causing segfault until fixed upstream
+  [#387](https://github.com/scikit-hep/hist/pull/387)
+* Only require SciPy if using SciPy
+  [#386](https://github.com/scikit-hep/hist/pull/386)
+
+
 ## Version 2.6.0
 
 * Using [boost-histogram 1.3](https://boost-histogram.readthedocs.io/en/latest/CHANGELOG.html#version-1-3)

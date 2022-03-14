@@ -16,7 +16,7 @@ from .axestuple import NamedAxesTuple
 from .axis import AxisProtocol
 from .quick_construct import MetaConstructor
 from .storage import Storage
-from .svgplots import html_hist, svg_hist_1d, svg_hist_1d_c, svg_hist_2d, svg_hist_nd
+from .svgplots import html_hist, svg_hist_1d, svg_hist_1d_c, svg_hist_2d
 from .typing import ArrayLike, Protocol, SupportsIndex
 
 if typing.TYPE_CHECKING:
@@ -87,37 +87,37 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
             for a in args
         ]
 
-        if args:
-            if isinstance(storage, str):
-                storage_str = storage.title()
-                if storage_str == "Atomicint64":
-                    storage_str = "AtomicInt64"
-                elif storage_str == "Weightedmean":
-                    storage_str = "WeightedMean"
-                storage = getattr(bh.storage, storage_str)()
-            elif isinstance(storage, type):
-                msg = (
-                    f"Please use '{storage.__name__}()' instead of '{storage.__name__}'"
-                )
-                warnings.warn(msg)
-                storage = storage()
-            super().__init__(*args, storage=storage, metadata=metadata)  # type: ignore[call-overload]
+        if isinstance(storage, str):
+            storage_str = storage.title()
+            if storage_str == "Atomicint64":
+                storage_str = "AtomicInt64"
+            elif storage_str == "Weightedmean":
+                storage_str = "WeightedMean"
+            storage = getattr(bh.storage, storage_str)()
+        elif isinstance(storage, type):
+            msg = f"Please use '{storage.__name__}()' instead of '{storage.__name__}'"
+            warnings.warn(msg)
+            storage = storage()
 
-            disallowed_names = {"weight", "sample", "threads"}
-            for ax in self.axes:
-                if ax.name in disallowed_names:
-                    disallowed_warning = f"{ax.name} is a protected keyword and cannot be used as axis name"
-                    warnings.warn(disallowed_warning)
+        super().__init__(*args, storage=storage, metadata=metadata)  # type: ignore[call-overload]
 
-            valid_names = [ax.name for ax in self.axes if ax.name]
-            if len(valid_names) != len(set(valid_names)):
-                raise KeyError(
-                    f"{self.__class__.__name__} instance cannot contain axes with duplicated names"
+        disallowed_names = {"weight", "sample", "threads"}
+        for ax in self.axes:
+            if ax.name in disallowed_names:
+                disallowed_warning = (
+                    f"{ax.name} is a protected keyword and cannot be used as axis name"
                 )
-            for i, ax in enumerate(self.axes):
-                # label will return name if label is not set, so this is safe
-                if not ax.label:
-                    ax.label = f"Axis {i}"
+                warnings.warn(disallowed_warning)
+
+        valid_names = [ax.name for ax in self.axes if ax.name]
+        if len(valid_names) != len(set(valid_names)):
+            raise KeyError(
+                f"{self.__class__.__name__} instance cannot contain axes with duplicated names"
+            )
+        for i, ax in enumerate(self.axes):
+            # label will return name if label is not set, so this is safe
+            if not ax.label:
+                ax.label = f"Axis {i}"
 
         if data is not None:
             self[...] = data
@@ -130,19 +130,24 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
         return NamedAxesTuple(self._axis(i) for i in range(self.ndim))
 
-    def _repr_html_(self) -> str:
+    def _repr_html_(self) -> str | None:
         if self.size == 0:
-            return str(self)
-        if self.ndim == 1:
-            if self.axes[0].traits.circular:
-                return str(html_hist(self, svg_hist_1d_c))
-            return str(html_hist(self, svg_hist_1d))
-        if self.ndim == 2:
-            return str(html_hist(self, svg_hist_2d))
-        if self.ndim > 2:
-            return str(html_hist(self, svg_hist_nd))
+            return None
 
-        return str(self)
+        if self.ndim == 1:
+            if len(self.axes[0]) <= 1000:
+                return str(
+                    html_hist(
+                        self,
+                        svg_hist_1d_c if self.axes[0].traits.circular else svg_hist_1d,
+                    )
+                )
+
+        if self.ndim == 2:
+            if len(self.axes[0]) <= 200 and len(self.axes[1]) <= 200:
+                return str(html_hist(self, svg_hist_2d))
+
+        return None
 
     def _name_to_index(self, name: str) -> int:
         """
@@ -509,3 +514,24 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
             h.name = name
 
         return hist.stack.Stack(*stack_histograms)
+
+    def sum(self, flow: bool = False) -> float | bh.accumulators.Accumulator:
+        """
+        Compute the sum over the histogram bins (optionally including the flow bins).
+        """
+        # TODO: This method will go away in the future.
+        if any(x == 0 for x in (self.axes.extent if flow else self.axes.size)):
+            storage = self._storage_type
+            if issubclass(storage, (bh.storage.AtomicInt64, bh.storage.Int64)):
+                return 0
+            if issubclass(storage, (bh.storage.Double, bh.storage.Unlimited)):
+                return 0.0
+            if issubclass(storage, bh.storage.Weight):
+                return bh.accumulators.WeightedSum(0, 0)
+            if issubclass(storage, bh.storage.Mean):
+                return bh.accumulators.Mean(0, 0, 0)
+            if issubclass(storage, bh.storage.WeightedMean):
+                return bh.accumulators.WeightedMean(0, 0, 0, 0)
+            raise AssertionError(f"Unsupported storage type {storage}")
+
+        return super().sum(flow=flow)

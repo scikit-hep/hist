@@ -81,13 +81,18 @@ def test_ND_empty_repr(named_hist):
         .Double()
     )
     html = h._repr_html_()
-    assert html
-    assert "name='x'" in repr(h)
-    assert "name='p'" in repr(h)
-    assert "name='a'" in repr(h)
-    assert "label='y'" in repr(h)
-    assert "label='q'" in repr(h)
-    assert "label='b'" in repr(h)
+    assert html is None
+
+
+def test_empty_mega_repr(named_hist):
+
+    h = named_hist.new.Reg(1001, -1, 1, name="x").Double()
+    html = h._repr_html_()
+    assert html is None
+
+    h = named_hist.new.Reg(201, -1, 1, name="x").Reg(100, 0, 1, name="y").Double()
+    html = h._repr_html_()
+    assert html is None
 
 
 def test_stack_repr(named_hist):

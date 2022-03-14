@@ -9,13 +9,17 @@ from __future__ import annotations
 from setuptools import setup
 
 extras_require = {
-    "plot": [
+    "mpl": [
         "matplotlib >=3.0",
-        "scipy >=1.4",
-        "iminuit >=2",
         "mplhep >=0.2.16",
     ]
 }
+
+extras_require["plot"] = [
+    *extras_require["mpl"],
+    "scipy >=1.4",
+    "iminuit >=2",
+]
 
 
 extras_require["test"] = [
@@ -27,6 +31,7 @@ extras_require["dev"] = [*extras_require["test"], *extras_require["plot"], "ipyk
 
 extras_require["docs"] = [
     *extras_require["plot"],
+    "ipython_genutils",
     "nbsphinx",
     "Sphinx >=3.0.0",
     "sphinx_copybutton",

@@ -173,7 +173,7 @@ Category axis
    :alt: Regular axis illustration
    :align: center
 
-.. py:function:: hist.axis.IntCategory([value1, ...], name, label, metadata="", grow=False)
+.. py:function:: hist.axis.IntCategory([value1, ...], name, label, metadata="", growth=False)
    :noindex:
 
    You should put integers in a category axis; but unlike an integer axis, the integers do not need to be adjacent.
@@ -200,7 +200,7 @@ You can sort the Categorty axes via ``.sort()`` method:
     h.sort(1, reverse=True).axes[1] # StrCategory(['Teacher', 'Police', 'Artist'], label='Profession')
 
 
-.. py:function:: hist.axis.StrCategory([str1, ...], name, label, metadata="", grow=False)
+.. py:function:: hist.axis.StrCategory([str1, ...], name, label, metadata="", growth=False)
    :noindex:
 
    You can put strings in a category axis as well. The fill method supports lists or arrays of strings
