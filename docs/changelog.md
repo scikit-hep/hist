@@ -2,8 +2,10 @@
 
 ## WIP
 
-* Take into account the irregular bin widths of `Variable` axes in
-  `plot_pull_array` and `plot_ratio_array` when plotting bars
+* When plotting a histogram against a PDF or other histogram with
+  `plot_pull` or `plot_ratio`, normalize the histogram values to the mean bin
+  width to correct for irregular bin widths when using axes of type
+  `axis.Variable`.
   [#369](https://github.com/scikit-hep/hist/pull/369)
 
 ## Version 2.6.1
