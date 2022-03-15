@@ -623,6 +623,9 @@ def _plot_ratiolike(
 
     # Computation and Fit
     hist_values = self.values()
+    bin_widths = self.axes[0].widths
+    bin_width_fractions = bin_widths / np.mean(bin_widths)
+    hist_values_width_corrected = hist_values / bin_width_fractions
 
     main_ax_artists: MainAxisArtists  # Type now due to control flow
     if callable(other) or isinstance(other, str):
@@ -662,7 +665,8 @@ def _plot_ratiolike(
             ub_kwargs=ub_kwargs,
         )
     else:
-        compare_values = other.values()
+        other_bin_width_fractions = other.axes[0].widths / np.mean(bin_widths)
+        compare_values = other.values() / other_bin_width_fractions
 
         self_artists = histplot(self, ax=main_ax, label=rp_kwargs["num_label"])
         other_artists = histplot(other, ax=main_ax, label=rp_kwargs["denom_label"])
@@ -673,9 +677,9 @@ def _plot_ratiolike(
     # Compute ratios: containing no INF values
     with np.errstate(divide="ignore", invalid="ignore"):
         if view == "ratio":
-            ratios = hist_values / compare_values
+            ratios = hist_values_width_corrected / compare_values
             ratio_uncert = ratio_uncertainty(
-                num=hist_values,
+                num=hist_values_width_corrected,
                 denom=compare_values,
                 uncertainty_type=rp_kwargs["uncertainty_type"],
             )
@@ -686,7 +690,7 @@ def _plot_ratiolike(
 
         elif view == "pull":
             pulls: np.typing.NDArray[Any] = (
-                hist_values - compare_values
+                hist_values_width_corrected - compare_values
             ) / hist_values_uncert
 
             pulls[np.isnan(pulls) | np.isinf(pulls)] = 0
