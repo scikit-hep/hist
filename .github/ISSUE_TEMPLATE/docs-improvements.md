@@ -3,8 +3,6 @@ name: Docs improvements
 about: Describe the defects and expectations in docs
 title: "[DOCS] "
 labels: documentation
-assignees: henryiii, LovelyBuggies
-
 ---
 
 <!-- Consider opening an Discussion instead! -->
