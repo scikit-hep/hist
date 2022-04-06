@@ -7,20 +7,17 @@ write_to = "src/hist/version.py"
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = "-ra -Wd --strict-markers"
+addopts = ["-ra", "--strict-markers", "--strict-config"]
 xfail_strict = true
 testpaths = ["tests"]
 required_plugins = ["pytest-mpl"]
 log_cli_level = "DEBUG"
 
-
 [tool.nbqa.mutate]
-black = 1
 pyupgrade = 1
 
 [tool.isort]
 profile = "black"
-multi_line_output = 3
 
 [tool.check-manifest]
 ignore = [
@@ -46,6 +43,8 @@ warn_unused_configs = true
 files = "src"
 python_version = "3.7"
 strict = true
+show_error_codes = true
+enable_error_code = ["ignore-without-code", "truthy-bool"]
 
 [[tool.mypy.overrides]]
 module = [
@@ -56,7 +55,6 @@ module = [
     "scipy.*",
     "iminuit.*",
     "mplhep.*",
-    "hist.version",
 ]
 ignore_missing_imports = true
 
