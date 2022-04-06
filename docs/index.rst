@@ -23,15 +23,19 @@ To get an idea of creating histograms in Hist looks like, you can take a look at
    :caption: User Guide
    :glob:
 
-   installation
+   user-guide/installation
    user-guide/quickstart
    user-guide/axes
    user-guide/storages
    user-guide/accumulators
    user-guide/notebooks/Transform
+   user-guide/indexing
    user-guide/notebooks/Reprs
    user-guide/notebooks/Plots
    user-guide/analyses
+   user-guide/numpy
+   user-guide/subclassing
+   user-guide/comparison
    user-guide/notebooks/Histogram
    user-guide/notebooks/Stack
    user-guide/notebooks/Interpolation
