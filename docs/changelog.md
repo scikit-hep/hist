@@ -11,7 +11,6 @@
 * Only require SciPy if using SciPy
   [#386](https://github.com/scikit-hep/hist/pull/386)
 
-
 ## Version 2.6.0
 
 * Using [boost-histogram 1.3](https://boost-histogram.readthedocs.io/en/latest/CHANGELOG.html#version-1-3)
@@ -21,7 +20,6 @@
   [#368](https://github.com/scikit-hep/hist/pull/368)
 * New nox sessions: `regenerate` and `pylint`
 * Update tests for latest matplotlib
-
 
 ## Version 2.5.2
 
