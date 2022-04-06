@@ -1,4 +1,3 @@
-
 See the [Scikit-HEP Developer introduction][skhep-dev-intro] for a
 detailed description of best practices for developing Scikit-HEP packages.
 
