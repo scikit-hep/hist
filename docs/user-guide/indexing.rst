@@ -3,7 +3,7 @@
 Indexing
 ========
 
-Hist implements the UHI indexing protocol. You can read more about it on the `UHI Indexing <https://uhi.readthedocs.io/en/latest/indexing.html>`_ page.
+Hist implements the UHI and UHI+ indexing protocols. You can read more about them on the `Indexing <https://uhi.readthedocs.io/en/latest/indexing.html>`_ and `Indexing+ <https://uhi.readthedocs.io/en/latest/indexing%2B.html>`_ pages.
 
 
 Hist specific details
