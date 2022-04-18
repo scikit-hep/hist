@@ -35,7 +35,6 @@ To get an idea of creating histograms in Hist looks like, you can take a look at
    user-guide/analyses
    user-guide/numpy
    user-guide/subclassing
-   user-guide/comparison
    user-guide/notebooks/Histogram
    user-guide/notebooks/Stack
    user-guide/notebooks/Interpolation
