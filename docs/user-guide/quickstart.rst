@@ -90,6 +90,8 @@ in the third slice entry, or remove an entire axis using ``sum``:
 
 See :ref:`usage-indexing`.
 
+.. _accessing-the-contents:
+
 Accessing the contents
 ----------------------
 

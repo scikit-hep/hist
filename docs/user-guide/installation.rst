@@ -1,7 +1,7 @@
 Installation
 ===========================
 
-Hist is available on PyPI. You can install this library from PyPI with pip:
+Hist is available on `PyPI <https://pypi.org/project/hist/>`__. You can install this library from PyPI with pip:
 
 .. code-block:: bash
 
