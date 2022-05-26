@@ -14,6 +14,7 @@
 
 [![GitHub Discussion][github-discussions-badge]][github-discussions-link]
 [![Gitter][gitter-badge]][gitter-link]
+[![Binder][binder-badge]][binder-link]
 [![Scikit-HEP][sk-badge]](https://scikit-hep.org/)
 
 Hist is an analyst-friendly front-end for
@@ -176,6 +177,8 @@ Support for this work was provided by the National Science Foundation cooperativ
 
 [actions-badge]:            https://github.com/scikit-hep/hist/workflows/CI/badge.svg
 [actions-link]:             https://github.com/scikit-hep/hist/actions
+[binder-badge]:             https://mybinder.org/badge_logo.svg
+[binder-link]:              https://mybinder.org/v2/gh/scikit-hep/hist/HEAD
 [black-badge]:              https://img.shields.io/badge/code%20style-black-000000.svg
 [black-link]:               https://github.com/psf/black
 [conda-badge]:              https://img.shields.io/conda/vn/conda-forge/hist
