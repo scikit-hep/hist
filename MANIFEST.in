@@ -3,3 +3,4 @@ recursive-include tests *.py *.png
 recursive-include src *.py
 recursive-include src *.pyi
 recursive-include src py.typed
+recursive-exclude binder *
