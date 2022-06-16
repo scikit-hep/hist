@@ -58,7 +58,7 @@ To get an idea of creating histograms in Hist looks like, you can take a look at
    examples/HistDemo
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 6
    :titlesonly:
    :caption: API Reference
    :glob:
