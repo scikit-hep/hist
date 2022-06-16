@@ -1,0 +1,2 @@
+python -m pip install --upgrade .[plot]
+python -m pip install uncertainties
