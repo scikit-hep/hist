@@ -5,113 +5,25 @@ Subpackages
 -----------
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 5
 
    hist.axis
 
 Submodules
 ----------
 
-hist.accumulators module
-------------------------
+.. toctree::
+   :maxdepth: 1
 
-.. automodule:: hist.accumulators
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-hist.axestuple module
----------------------
-
-.. automodule:: hist.axestuple
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-hist.basehist module
---------------------
-
-.. automodule:: hist.basehist
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-hist.classichist module
------------------------
-
-.. automodule:: hist.classichist
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-hist.hist module
-----------------
-
-.. automodule:: hist.hist
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-hist.intervals module
----------------------
-
-.. automodule:: hist.intervals
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-hist.namedhist module
----------------------
-
-.. automodule:: hist.namedhist
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-hist.numpy module
------------------
-
-.. automodule:: hist.numpy
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-hist.stack module
--------------------
-
-.. automodule:: hist.stack
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-hist.storage module
--------------------
-
-.. automodule:: hist.storage
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-hist.tag module
----------------
-
-.. automodule:: hist.tag
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-hist.version module
--------------------
-
-.. automodule:: hist.version
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: hist
-   :members:
-   :undoc-members:
-   :show-inheritance:
+   hist.accumulators
+   hist.axestuple
+   hist.basehist
+   hist.classichist
+   hist.hist
+   hist.intervals
+   hist.namedhist
+   hist.numpy
+   hist.stack
+   hist.storage
+   hist.tag
+   hist.version
