@@ -87,4 +87,5 @@ messages_control.disable = [
   "import-outside-toplevel",
   "import-error",
   "disallowed-name",
+  "cyclic-import",
 ]
