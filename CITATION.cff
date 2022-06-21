@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: "Please cite the following works when using this software."
+type: software
+title: "hist: v2.6.1"
+abstract: "Hist is an analyst-friendly front-end for boost-histogram, designed for Python 3.7+."
+authors:
+- family-names: "Schreiner"
+  given-names: "Henry"
+  orcid: "https://orcid.org/0000-0002-7833-783X"
+  affiliation: "Princeton University"
+- family-names: "Liu"
+  given-names: "Shuo"
+  affiliation: "Columbia University in the City of New York"
+- family-names: "Goel"
+  given-names: "Aman"
+  orcid: "https://orcid.org/0000-0003-3567-2096"
+  affiliation: "University of Delhi"
+version: 2.6.1
+doi: 10.5281/zenodo.4057112
+repository-code: "https://github.com/scikit-hep/hist/releases/tag/v2.6.1"
+url: "https://hist.readthedocs.io/"
+keywords:
+  - python
+  - histogram
+  - scikit-hep
+license: "BSD-3-Clause"
