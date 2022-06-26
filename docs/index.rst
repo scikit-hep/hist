@@ -7,7 +7,7 @@ Welcome to Hist's documentation!
 ================================
 
 |Actions Status| |Documentation Status| |pre-commit.ci Status| |Code style: black| |PyPI version|
-|Conda-Forge| |PyPI platforms| |DOI| |GitHub Discussion| |Gitter| |Scikit-HEP|
+|Conda-Forge| |PyPI platforms| |DOI| |License| |GitHub Discussion| |Gitter| |Binder| |Scikit-HEP|
 
 Introduction
 ------------
@@ -90,9 +90,13 @@ Indices and tables
    :target: https://pypi.org/project/hist/
 .. |DOI| image:: https://zenodo.org/badge/239605861.svg
    :target: https://zenodo.org/badge/latestdoi/239605861
+.. |License| image:: https://img.shields.io/badge/License-BSD_3--Clause-blue.svg
+   :target: https://opensource.org/licenses/BSD-3-Clause
 .. |GitHub Discussion| image:: https://img.shields.io/static/v1?label=Discussions&message=Ask&color=blue&logo=github
    :target: https://github.com/scikit-hep/hist/discussions
 .. |Gitter| image:: https://badges.gitter.im/HSF/PyHEP-histogramming.svg
    :target: https://gitter.im/HSF/PyHEP-histogramming?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
+.. |Binder| image:: https://mybinder.org/badge_logo.svg
+   :target: https://mybinder.org/v2/gh/scikit-hep/hist/HEAD
 .. |Scikit-HEP| image:: https://scikit-hep.org/assets/images/Scikit--HEP-Project-blue.svg
    :target: https://scikit-hep.org/
