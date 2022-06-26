@@ -10,12 +10,13 @@
 [![PyPI version][pypi-version]][pypi-link]
 [![Conda-Forge][conda-badge]][conda-link]
 [![PyPI platforms][pypi-platforms]][pypi-link]
-[![DOI](https://zenodo.org/badge/239605861.svg)](https://zenodo.org/badge/latestdoi/239605861)
+[![DOI][doi-badge]][doi-link]
+[![License][license-badge]][license-link]
 
 [![GitHub Discussion][github-discussions-badge]][github-discussions-link]
 [![Gitter][gitter-badge]][gitter-link]
 [![Binder][binder-badge]][binder-link]
-[![Scikit-HEP][sk-badge]](https://scikit-hep.org/)
+[![Scikit-HEP][sk-badge]][sk-link]
 
 Hist is an analyst-friendly front-end for
 [boost-histogram](https://github.com/scikit-hep/boost-histogram), designed for
@@ -183,10 +184,14 @@ Support for this work was provided by the National Science Foundation cooperativ
 [black-link]:               https://github.com/psf/black
 [conda-badge]:              https://img.shields.io/conda/vn/conda-forge/hist
 [conda-link]:               https://github.com/conda-forge/hist-feedstock
+[doi-badge]:                https://zenodo.org/badge/239605861.svg
+[doi-link]:                 https://zenodo.org/badge/latestdoi/239605861
 [github-discussions-badge]: https://img.shields.io/static/v1?label=Discussions&message=Ask&color=blue&logo=github
 [github-discussions-link]:  https://github.com/scikit-hep/hist/discussions
 [gitter-badge]:             https://badges.gitter.im/HSF/PyHEP-histogramming.svg
 [gitter-link]:              https://gitter.im/HSF/PyHEP-histogramming?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
+[license-badge]:            https://img.shields.io/badge/License-BSD_3--Clause-blue.svg
+[license-link]:             https://opensource.org/licenses/BSD-3-Clause
 [pre-commit-badge]:         https://results.pre-commit.ci/badge/github/scikit-hep/hist/main.svg
 [pre-commit-link]:          https://results.pre-commit.ci/repo/github/scikit-hep/hist
 [pypi-link]:                https://pypi.org/project/hist/
@@ -195,3 +200,4 @@ Support for this work was provided by the National Science Foundation cooperativ
 [rtd-badge]:                https://readthedocs.org/projects/hist/badge/?version=latest
 [rtd-link]:                 https://hist.readthedocs.io/en/latest/?badge=latest
 [sk-badge]:                 https://scikit-hep.org/assets/images/Scikit--HEP-Project-blue.svg
+[sk-link]:                  https://scikit-hep.org/
