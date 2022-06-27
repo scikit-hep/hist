@@ -1,0 +1,5 @@
+[flake8]
+extend-select = B, B9
+extend-ignore = E203, E501, B950
+per-file-ignores =
+    tests/test_plot.py: B008

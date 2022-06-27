@@ -136,6 +136,9 @@ dmypy.json
 
 .idea
 
+# General
+.DS_Store
+
 # Yarn (for all-contributors local running)
 /node_modules/*
 /package.json
