@@ -503,7 +503,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         assert overlay is not None
         cat_ax = self.axes[overlay]
         cats = cat_ax if cat_ax.traits.discrete else np.arange(len(cat_ax.centers))
-        d1hists = [self[{overlay: cat}] for cat in cats]
+        d1hists = [self[{overlay: hist.tag.loc(cat)}] for cat in cats]
         if "label" in kwargs:
             if not isinstance(kwargs["label"], str) and len(kwargs["label"]) == len(
                 cats
