@@ -140,7 +140,7 @@ dmypy.json
 .DS_Store
 
 # Yarn (for all-contributors local running)
-/node_modules/*
+/node_modules/
 /package.json
 /yarn.lock
 
