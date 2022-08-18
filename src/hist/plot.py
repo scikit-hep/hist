@@ -330,8 +330,15 @@ def _fit_callable_to_hist(
 
     # Infer best fit model parameters and covariance matrix
     xdata = histogram.axes[0].centers
+
+    # For axes with varying bin widths correct hist values with widths while
+    # maintaining normalization.
+    bin_widths = histogram.axes[0].widths
+    bin_width_fractions = bin_widths / np.mean(bin_widths)
+    h_values_width_corrected = histogram.values() / bin_width_fractions
+
     popt, pcov = _curve_fit_wrapper(
-        model, xdata, histogram.values(), hist_uncert, likelihood=likelihood
+        model, xdata, h_values_width_corrected, hist_uncert, likelihood=likelihood
     )
     model_values = model(xdata, *popt)
 
@@ -366,7 +373,14 @@ def _plot_fit_result(
         )
     hist_uncert = np.sqrt(variances)
 
-    errorbars = ax.errorbar(x_values, __hist.values(), hist_uncert, **eb_kwargs)
+    bin_widths = __hist.axes[0].widths
+    bin_width_fractions = bin_widths / np.sum(bin_widths) * len(bin_widths)
+
+    h_values_width_corrected = __hist.values() / bin_width_fractions
+    hist_uncert_width_corrected = hist_uncert / bin_width_fractions
+    errorbars = ax.errorbar(
+        x_values, h_values_width_corrected, hist_uncert_width_corrected, **eb_kwargs
+    )
 
     # Ensure zorder draws data points above model
     line_zorder = errorbars[0].get_zorder() - 1
@@ -424,7 +438,7 @@ def plot_ratio_array(
         )
         axis_artists = RatioErrorbarArtists(central_value_artist, errorbar_artists)
     elif uncert_draw_type == "bar":
-        bar_width = (right_edge - left_edge) / len(ratio)
+        bar_widths = __hist.axes[0].widths
 
         bar_top = ratio + ratio_uncert[1]
         bar_bottom = ratio - ratio_uncert[0]
@@ -439,7 +453,7 @@ def plot_ratio_array(
         bar_artists = ax.bar(
             x_values,
             height=bar_height,
-            width=bar_width,
+            width=bar_widths,
             bottom=bar_bottom,
             fill=False,
             linewidth=0,
@@ -493,12 +507,12 @@ def plot_pull_array(
     right_edge = __hist.axes.edges[-1][-1]
 
     # Pull: plot the pulls using Matplotlib bar method
-    width = (right_edge - left_edge) / len(pulls)
-    bar_artists = ax.bar(x_values, pulls, width=width, **bar_kwargs)
+    bin_widths = __hist.axes[0].widths
+    bar_artists = ax.bar(x_values, pulls, width=bin_widths, **bar_kwargs)
 
     pp_num = pp_kwargs.pop("num", 5)
     patch_height = max(np.abs(pulls)) / pp_num
-    patch_width = width * len(pulls)
+    patch_width = right_edge - left_edge
     patch_artists = []
     for i in range(pp_num):
         # gradient color patches
@@ -609,6 +623,9 @@ def _plot_ratiolike(
 
     # Computation and Fit
     hist_values = self.values()
+    bin_widths = self.axes[0].widths
+    bin_width_fractions = bin_widths / np.mean(bin_widths)
+    hist_values_width_corrected = hist_values / bin_width_fractions
 
     main_ax_artists: MainAxisArtists  # Type now due to control flow
     if callable(other) or isinstance(other, str):
@@ -648,7 +665,8 @@ def _plot_ratiolike(
             ub_kwargs=ub_kwargs,
         )
     else:
-        compare_values = other.values()
+        other_bin_width_fractions = other.axes[0].widths / np.mean(bin_widths)
+        compare_values = other.values() / other_bin_width_fractions
 
         self_artists = histplot(self, ax=main_ax, label=rp_kwargs["num_label"])
         other_artists = histplot(other, ax=main_ax, label=rp_kwargs["denom_label"])
@@ -659,9 +677,9 @@ def _plot_ratiolike(
     # Compute ratios: containing no INF values
     with np.errstate(divide="ignore", invalid="ignore"):
         if view == "ratio":
-            ratios = hist_values / compare_values
+            ratios = hist_values_width_corrected / compare_values
             ratio_uncert = ratio_uncertainty(
-                num=hist_values,
+                num=hist_values_width_corrected,
                 denom=compare_values,
                 uncertainty_type=rp_kwargs["uncertainty_type"],
             )
@@ -672,7 +690,7 @@ def _plot_ratiolike(
 
         elif view == "pull":
             pulls: np.typing.NDArray[Any] = (
-                hist_values - compare_values
+                hist_values_width_corrected - compare_values
             ) / hist_values_uncert
 
             pulls[np.isnan(pulls) | np.isinf(pulls)] = 0
