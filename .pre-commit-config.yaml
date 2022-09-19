@@ -29,7 +29,7 @@ repos:
     args: ["-a", "from __future__ import annotations"]
 
 - repo: https://github.com/asottile/pyupgrade
-  rev: v2.37.3
+  rev: v2.38.0
   hooks:
   - id: pyupgrade
     args: [--py37-plus]
@@ -41,7 +41,7 @@ repos:
 
 # Notebook formatting
 - repo: https://github.com/nbQA-dev/nbQA
-  rev: 1.4.0
+  rev: 1.5.0
   hooks:
   - id: nbqa-pyupgrade
     additional_dependencies: [pyupgrade==2.31.1]
