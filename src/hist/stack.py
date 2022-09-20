@@ -111,8 +111,9 @@ class Stack:
         return len(self._stack)
 
     def __repr__(self) -> str:
-        str_stack = ", ".join(repr(h) for h in self)
-        return f"{self.__class__.__name__}({str_stack})"
+        names = ", ".join(repr(getattr(h, "name", f"H{i}")) for i, h in enumerate(self))
+        h = repr(self[0]) if len(self) else "Empty stack"
+        return f"{self.__class__.__name__}<({names}) of {h}>"
 
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, Stack):
