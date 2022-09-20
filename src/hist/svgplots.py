@@ -27,7 +27,7 @@ def _desc_hist(h: hist.BaseHist) -> str:
 
     output = "<br/>\n".join(str(h) for h in h.axes)
     output += '<br/>\n<hr style="margin-top:.2em; margin-bottom:.2em;"/>\n'
-    output += f"{h._storage_type()} "
+    output += f"{h.storage_type()} "
     output += f"Σ={main_sum}"
     if main_sum != flow_too_sum:
         output += f" <em>({flow_too_sum} with flow)</em>"

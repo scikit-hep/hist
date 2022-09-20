@@ -429,15 +429,15 @@ class TestGeneralStorageProxy:
             h.Double()
 
         assert (
-            Hist(axis.Regular(10, 0, 1, name="x"), "double")._storage_type
+            Hist(axis.Regular(10, 0, 1, name="x"), "double").storage_type
             == storage.Double
         )
         assert (
-            Hist(axis.Regular(10, 0, 1, name="x"), storage="DouBle")._storage_type
+            Hist(axis.Regular(10, 0, 1, name="x"), storage="DouBle").storage_type
             == storage.Double
         )
         assert (
-            Hist(axis.Regular(10, 0, 1, name="x"), storage.Double())._storage_type
+            Hist(axis.Regular(10, 0, 1, name="x"), storage.Double()).storage_type
             == storage.Double
         )
 
@@ -451,15 +451,15 @@ class TestGeneralStorageProxy:
             h.Int64()
 
         assert (
-            Hist(axis.Regular(10, 0, 1, name="x"), "int64")._storage_type
+            Hist(axis.Regular(10, 0, 1, name="x"), "int64").storage_type
             == storage.Int64
         )
         assert (
-            Hist(axis.Regular(10, 0, 1, name="x"), storage="INT64")._storage_type
+            Hist(axis.Regular(10, 0, 1, name="x"), storage="INT64").storage_type
             == storage.Int64
         )
         assert (
-            Hist(axis.Regular(10, 0, 1, name="x"), storage.Int64())._storage_type
+            Hist(axis.Regular(10, 0, 1, name="x"), storage.Int64()).storage_type
             == storage.Int64
         )
 
@@ -473,15 +473,15 @@ class TestGeneralStorageProxy:
             h.AtomicInt64()
 
         assert (
-            Hist(axis.Regular(10, 0, 1, name="x"), "atomicint64")._storage_type
+            Hist(axis.Regular(10, 0, 1, name="x"), "atomicint64").storage_type
             == storage.AtomicInt64
         )
         assert (
-            Hist(axis.Regular(10, 0, 1, name="x"), storage="AtomicINT64")._storage_type
+            Hist(axis.Regular(10, 0, 1, name="x"), storage="AtomicINT64").storage_type
             == storage.AtomicInt64
         )
         assert (
-            Hist(axis.Regular(10, 0, 1, name="x"), storage.AtomicInt64())._storage_type
+            Hist(axis.Regular(10, 0, 1, name="x"), storage.AtomicInt64()).storage_type
             == storage.AtomicInt64
         )
 
@@ -495,15 +495,15 @@ class TestGeneralStorageProxy:
             h.Weight()
 
         assert (
-            Hist(axis.Regular(10, 0, 1, name="x"), "WeighT")._storage_type
+            Hist(axis.Regular(10, 0, 1, name="x"), "WeighT").storage_type
             == storage.Weight
         )
         assert (
-            Hist(axis.Regular(10, 0, 1, name="x"), storage="weight")._storage_type
+            Hist(axis.Regular(10, 0, 1, name="x"), storage="weight").storage_type
             == storage.Weight
         )
         assert (
-            Hist(axis.Regular(10, 0, 1, name="x"), storage.Weight())._storage_type
+            Hist(axis.Regular(10, 0, 1, name="x"), storage.Weight()).storage_type
             == storage.Weight
         )
 
@@ -522,14 +522,14 @@ class TestGeneralStorageProxy:
             h.Mean()
 
         assert (
-            Hist(axis.Regular(10, 0, 1, name="x"), "MEAn")._storage_type == storage.Mean
+            Hist(axis.Regular(10, 0, 1, name="x"), "MEAn").storage_type == storage.Mean
         )
         assert (
-            Hist(axis.Regular(10, 0, 1, name="x"), storage="mean")._storage_type
+            Hist(axis.Regular(10, 0, 1, name="x"), storage="mean").storage_type
             == storage.Mean
         )
         assert (
-            Hist(axis.Regular(10, 0, 1, name="x"), storage.Mean())._storage_type
+            Hist(axis.Regular(10, 0, 1, name="x"), storage.Mean()).storage_type
             == storage.Mean
         )
 
@@ -549,15 +549,15 @@ class TestGeneralStorageProxy:
             h.WeightedMean()
 
         assert (
-            Hist(axis.Regular(10, 0, 1, name="x"), "WeighTEDMEAn")._storage_type
+            Hist(axis.Regular(10, 0, 1, name="x"), "WeighTEDMEAn").storage_type
             == storage.WeightedMean
         )
         assert (
-            Hist(axis.Regular(10, 0, 1, name="x"), storage="weightedMean")._storage_type
+            Hist(axis.Regular(10, 0, 1, name="x"), storage="weightedMean").storage_type
             == storage.WeightedMean
         )
         assert (
-            Hist(axis.Regular(10, 0, 1, name="x"), storage.WeightedMean())._storage_type
+            Hist(axis.Regular(10, 0, 1, name="x"), storage.WeightedMean()).storage_type
             == storage.WeightedMean
         )
 
@@ -570,15 +570,15 @@ class TestGeneralStorageProxy:
             h.Unlimited()
 
         assert (
-            Hist(axis.Regular(10, 0, 1, name="x"), "unlimited")._storage_type
+            Hist(axis.Regular(10, 0, 1, name="x"), "unlimited").storage_type
             == storage.Unlimited
         )
         assert (
-            Hist(axis.Regular(10, 0, 1, name="x"), storage="UNLImited")._storage_type
+            Hist(axis.Regular(10, 0, 1, name="x"), storage="UNLImited").storage_type
             == storage.Unlimited
         )
         assert (
-            Hist(axis.Regular(10, 0, 1, name="x"), storage.Unlimited())._storage_type
+            Hist(axis.Regular(10, 0, 1, name="x"), storage.Unlimited()).storage_type
             == storage.Unlimited
         )
 

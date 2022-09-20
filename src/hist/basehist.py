@@ -122,6 +122,13 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         if data is not None:
             self[...] = data
 
+    # Backport of storage_type from boost-histogram 1.3.2:
+    if not hasattr(bh.Histogram, "storage_type"):
+
+        @property
+        def storage_type(self) -> type[bh.storage.Storage]:
+            return self._storage_type
+
     def _generate_axes_(self) -> NamedAxesTuple:
         """
         This is called to fill in the axes. Subclasses can override it if they need
@@ -532,9 +539,9 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         """
         Compute the sum over the histogram bins (optionally including the flow bins).
         """
-        # TODO: This method will go away in the future.
+        # TODO: This method will go away once we can guarantee a modern boost-histogram (1.3.2 or better)
         if any(x == 0 for x in (self.axes.extent if flow else self.axes.size)):
-            storage = self._storage_type
+            storage = self.storage_type
             if issubclass(storage, (bh.storage.AtomicInt64, bh.storage.Int64)):
                 return 0
             if issubclass(storage, (bh.storage.Double, bh.storage.Unlimited)):
