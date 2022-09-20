@@ -2,12 +2,14 @@
 
 ## Version 2.6.2
 
+* Nicer stacks repr
+  [#449](https://github.com/scikit-hep/hist/pull/449)
 * Backport `storage_type` if boost-histogram < 1.3.2
   [#447](https://github.com/scikit-hep/hist/pull/447)
 * Allow overwriting labels for plot/overlay
   [#414](https://github.com/scikit-hep/hist/pull/414)
 * Use Hatching to build the package
-  [#418](https://github.com/scikit-hep/hist/pull/414)
+  [#418](https://github.com/scikit-hep/hist/pull/418)
 * Support git archival version numbers
   [#441](https://github.com/scikit-hep/hist/pull/441)
 

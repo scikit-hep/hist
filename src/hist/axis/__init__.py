@@ -82,7 +82,7 @@ class AxesMixin:
 
         if self.name:
             ret.append(f"name={self.name!r}")
-        if self.label:
+        if self.label and self.label != self.name:
             ret.append(f"label={self.label!r}")
 
         return ret
