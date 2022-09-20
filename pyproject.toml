@@ -59,8 +59,8 @@ mpl = [
 plot = [
     "matplotlib >=3.0",
     "mplhep >=0.2.16",
-    "scipy >=1.4",
-    "iminuit >=2",
+    "scipy >=1.4; python_version<'3.11'",
+    "iminuit >=2; python_version<'3.11'",
 ]
 test = [
     "pytest >=6",
@@ -71,8 +71,8 @@ dev = [
     "pytest-mpl >=0.12",
     "matplotlib >=3.0",
     "mplhep >=0.2.16",
-    "scipy >=1.4",
-    "iminuit >=2",
+    "scipy >=1.4; python_version<'3.11'",
+    "iminuit >=2; python_version<'3.11'",
     "ipykernel",
 ]
 docs = [
@@ -80,8 +80,8 @@ docs = [
     "pytest-mpl >=0.12",
     "matplotlib >=3.0",
     "mplhep >=0.2.16",
-    "scipy >=1.4",
-    "iminuit >=2",
+    "scipy >=1.4; python_version<'3.11'",
+    "iminuit >=2; python_version<'3.11'",
     "ipython_genutils",
     "nbsphinx",
     "Sphinx >=3.0.0",
