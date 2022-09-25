@@ -118,25 +118,6 @@ pyupgrade = 1
 [tool.isort]
 profile = "black"
 
-[tool.check-manifest]
-ignore = [
-    ".pre-commit-config.yaml",
-    ".readthedocs.yml",
-    "examples/**",
-    "notebooks/**",
-    "docs/**",
-    "CONTRIBUTING.md",
-    "*.html",
-    "*.in",
-    "*.json",
-    "*.yml",
-    "src/hist/version.py",
-    "tests/.pytest_cache/**",
-    ".all-contributorsrc",
-    "noxfile.py",
-]
-
-
 [tool.mypy]
 warn_unused_configs = true
 files = "src"
