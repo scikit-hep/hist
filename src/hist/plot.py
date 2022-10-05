@@ -114,9 +114,9 @@ def _expr_to_lambda(expr: str) -> Callable[..., Any]:
         tokval = x[1]
         if toknum != NAME:
             continue
-        if ix > 0 and g[ix - 1][1] in ["."]:
+        if ix > 0 and g[ix - 1][1] in {"."}:
             continue
-        if ix < len(g) - 1 and g[ix + 1][1] in [".", "("]:
+        if ix < len(g) - 1 and g[ix + 1][1] in {".", "("}:
             continue
         varnames.append(tokval)
     varnames = list(OrderedDict.fromkeys([name for name in varnames if name != "x"]))
