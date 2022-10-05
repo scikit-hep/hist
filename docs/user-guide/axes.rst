@@ -15,12 +15,12 @@ Names are pretty useful for some histogramming shortcuts, thus
 greatly facilitate HEP’s studies. Note that the name is the identifier
 for an axis in a histogram and must be unique.
 
-.. code:: python3
+.. code-block:: python3
 
     import hist
     from hist import Hist
 
-.. code:: python3
+.. code-block:: python3
 
     axis0 = hist.axis.Regular(10, -5, 5, overflow=False, underflow=False, name="A")
     axis1 = hist.axis.Boolean(name="B")
@@ -37,12 +37,12 @@ currently. You can either fill a histogram object with axes or add axes to a
 histogram object. You cannot add axes to an existing histogram. *Note that to distinguish
 these two method, the second way has different axis type names (abbr.).*
 
-.. code:: python3
+.. code-block:: python3
 
     # fill the axes
     h = Hist(axis0, axis1, axis2, axis3, axis4, axis5)
 
-.. code:: python3
+.. code-block:: python3
 
     # add the axes using the shortcut method
     h = (
@@ -59,7 +59,7 @@ Hist adds a new ``flow=False`` shortcut to axes that take ``underflow`` and ``ov
 
 AxesTuple is a new feature since boost-histogram 0.8.0, which provides you free access to axis properties in a histogram.
 
-.. code:: python3
+.. code-block:: python3
 
     assert h.axes[0].name == axis0.name
     assert h.axes[1].label == axis1.name  # label will be returned as name if not provided
@@ -159,7 +159,7 @@ Integer axis
 
 One common use for an integer axis could be a true/false axis:
 
-.. code:: python3
+.. code-block:: python3
 
    bool_axis = hist.axis.Integer(0, 2, underflow=False, overflow=False)
 
@@ -180,7 +180,7 @@ Category axis
 
 One use for an IntCategory axis is for an IntEnum:
 
-.. code:: python3
+.. code-block:: python3
 
     import enum
 
@@ -193,7 +193,7 @@ One use for an IntCategory axis is for an IntEnum:
 
 You can sort the Categorty axes via ``.sort()`` method:
 
-.. code:: python3
+.. code-block:: python3
 
     h = Hist(axis.IntCategory([3, 1, 2], label="Number"), axis.StrCategory(["Teacher", "Police", "Artist"], label="Profession"))
     h.sort(0).axes[0] # IntCategory([1, 2, 3], label='Number')

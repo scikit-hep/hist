@@ -29,7 +29,7 @@ up to 53 bits of information (9 quadrillion) counts per cell, and supports
 weighted fills. It can also be scaled by a floating point values without making
 a copy.
 
-.. code:: python3
+.. code-block:: python3
 
     # Method 1
     h = Hist(hist.axis.Regular(10, -5, 5, name="x"), storage=hist.storage.Double())
@@ -38,12 +38,12 @@ a copy.
     print(h[1.5j])
     print(h[2.5j])
 
-.. code:: text
+.. code-block:: text
 
     0.5
     1.5
 
-.. code:: python3
+.. code-block:: python3
 
     # Method 2
     h = (
@@ -56,7 +56,7 @@ a copy.
     print(h[0.5j, 0.2j])
     print(h[0.5j, 0.6j])
 
-.. code:: text
+.. code-block:: text
 
     1.0
     1.0
@@ -77,7 +77,7 @@ A true integer storage is provided, as well; this storage has the ``np.uint64``
 datatype.  This eventually should provide type safety by not accepting
 non-integer fills for data that should represent raw, unweighed counts.
 
-.. code:: python3
+.. code-block:: python3
 
     # Method 1
     h = Hist(hist.axis.Regular(10, -5, 5, name="x"), storage=hist.storage.Int64())
@@ -86,12 +86,12 @@ non-integer fills for data that should represent raw, unweighed counts.
     print(h[1.5j])
     print(h[2.5j])
 
-.. code:: text
+.. code-block:: text
 
     1
     3
 
-.. code:: python3
+.. code-block:: python3
 
     # Method 2
     h = (
@@ -102,7 +102,7 @@ non-integer fills for data that should represent raw, unweighed counts.
 
     print(h[0.5j])
 
-.. code:: text
+.. code-block:: text
 
     2
 
