@@ -233,8 +233,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
         data = (data_dict[i] for i in range(len(args), self.ndim))
 
-        total_data = tuple(args) + tuple(data)  # Python 2 can't unpack twice
-        return super().fill(*total_data, weight=weight, sample=sample, threads=threads)
+        return super().fill(*args, *data, weight=weight, sample=sample, threads=threads)
 
     def sort(
         self: T,
@@ -389,15 +388,14 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         """
         Plot method for BaseHist object.
         """
-        _has_categorical = 0
-        if (
-            sum(t.ordered for t in self.axes.traits) == 1
-            and sum(t.discrete for t in self.axes.traits) == 1
-        ):
-            _has_categorical = 1
+        ordered_traits = sum(t.ordered for t in self.axes.traits)
+        discrete_traits = sum(t.discrete for t in self.axes.traits)
+        _has_categorical = ordered_traits == discrete_traits == 1
         _project = _has_categorical or overlay is not None
+
         if self.ndim == 1 or (self.ndim == 2 and _project):
             return self.plot1d(*args, overlay=overlay, **kwargs)
+
         if self.ndim == 2:
             return self.plot2d(*args, **kwargs)
 

@@ -30,7 +30,7 @@ class Stack:
 
         self._stack = list(args)
 
-        if len(args) == 0:
+        if not args:
             raise ValueError("There should be histograms in the Stack")
 
         if not all(isinstance(a, BaseHist) for a in args):

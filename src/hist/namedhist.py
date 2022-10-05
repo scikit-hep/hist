@@ -30,7 +30,7 @@ class NamedHist(BaseHist, family=hist):
         Projection of axis idx.
         """
 
-        if len(args) == 0 or all(isinstance(x, str) for x in args):
+        if not args or all(isinstance(x, str) for x in args):
             return super().project(*args)
 
         raise TypeError(
