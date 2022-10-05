@@ -5,7 +5,7 @@ Quickstart
 
 All of the examples will assume the following import:
 
-.. code:: python3
+.. code-block:: python3
 
    import hist
    from hist import Hist
@@ -23,19 +23,19 @@ Making a histogram
 
 You can make a histogram like this:
 
-.. code:: python3
+.. code-block:: python3
 
    h = Hist(hist.axis.Regular(bins=10, start=0, stop=1, name="x"))
 
 If you’d like to type less, you can leave out the keywords for the numbers.
 
-.. code:: python3
+.. code-block:: python3
 
    h = Hist(hist.axis.Regular(10, 0, 1, name="x"))
 
 Hist also supports a "quick-construct" system, which does not require using anything beyond the ``Hist`` class:
 
-.. code:: python3
+.. code-block:: python3
 
    h = Hist.new.Regular(10, 0, 1, name="x").Double()
 
@@ -43,7 +43,7 @@ Note that you have to specify the storage at the end (but this does make it easi
 
 The exact same syntax is used any number of dimensions:
 
-.. code:: python3
+.. code-block:: python3
 
    hist3D = (
         Hist.new
@@ -64,7 +64,7 @@ Filling a histogram
 Once you have a histogram, you can fill it using ``.fill``. Ideally, you
 should give arrays, but single values work as well:
 
-.. code:: python3
+.. code-block:: python3
 
    h = Hist(hist.axis.Regular(10, 0.0, 1.0, name="x"))
    h.fill(0.9)
@@ -78,7 +78,7 @@ You can slice into a histogram using bin coordinates or data coordinates by
 appending a ``j`` to an index. You can also rebin with a number ending in ``j``
 in the third slice entry, or remove an entire axis using ``sum``:
 
-.. code:: python3
+.. code-block:: python3
 
     h = Hist(
         hist.axis.Regular(10, 0, 1, name="x"),
@@ -107,7 +107,7 @@ NumPy array for simple storages or a RecArray-like wrapper for non-simple
 storages.  Most methods offer an optional keyword argument that you can pass,
 ``flow=True``, to enable the under and overflow bins (disabled by default).
 
-.. code:: python3
+.. code-block:: python3
 
     np_array = h.view()
 
@@ -118,7 +118,7 @@ Setting the contents
 You can set the contents directly as you would a NumPy array;
 you can set either values or arrays at a time:
 
-.. code:: python3
+.. code-block:: python3
 
     h[2] = 3.5
     h[hist.underflow] = 0  # set the underflow bin
@@ -128,7 +128,7 @@ For non-simple storages, you can add an extra dimension that matches the
 constructor arguments of that accumulator. For example, if you want to fill
 a Weight histogram with three values, you can dimension:
 
-.. code:: python3
+.. code-block:: python3
 
     h[0:3] = [[1, 0.1], [2, 0.2], [3, 0.3]]
 
@@ -141,7 +141,7 @@ The axes are directly available in the histogram, and you can access
 a variety of properties, such as the ``edges`` or the ``centers``. All
 properties and methods are also available directly on the ``axes`` tuple:
 
-.. code:: python3
+.. code-block:: python3
 
    ax0 = h.axes[0]
    X, Y = h.axes.centers
@@ -154,7 +154,7 @@ Saving Histograms
 
 You can save histograms using pickle:
 
-.. code:: python3
+.. code-block:: python3
 
     import pickle
 
@@ -176,7 +176,7 @@ Computing with Histograms
 
 As an complete example, let's say you wanted to compute and plot the density, without using ``.density()``:
 
-.. code:: python3
+.. code-block:: python3
 
     import functools
     import operator

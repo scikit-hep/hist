@@ -8,7 +8,7 @@ Subclassing hist components is supported, but requires a little extra care to en
 
 When you subclass, you will need to add a family. Any object can be used - the module for your library is a good choice if you only have one "family" of histograms. Hist uses ``hist``, Boost-histogram uses ``boost_histogram``. You can use anything you want, though; a custom tag object like ``MY_FAMILY = object()`` works well too. It just has to support ``is``, and be the exact same object on all your subclasses.
 
-.. code:: python3
+.. code-block:: python3
 
     import hist
     import my_package
@@ -25,7 +25,7 @@ If you use Mixins, special care needs to be taken if you need a left-acting
 Mixin, since class keywords are handled via ``super()`` left to right. This is
 a Mixin that will work on either side:
 
-.. code:: python3
+.. code-block:: python3
 
     class AxisMixin:
         def __init_subclass__(cls, **kwargs):
