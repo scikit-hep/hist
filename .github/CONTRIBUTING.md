@@ -21,6 +21,7 @@ Python on your system, skipping ones that are not installed. You can also run
 specific jobs:
 
 ```console
+$ nox -l # List all the defined sessions
 $ nox -s lint  # Lint only
 $ nox -s tests-3.9  # Python 3.9 tests only
 $ nox -s docs -- serve  # Build and serve the docs
