@@ -6,7 +6,7 @@ from pathlib import Path
 
 import nox
 
-ALL_PYTHONS = ["3.7", "3.8", "3.9", "3.10"]
+ALL_PYTHONS = ["3.7", "3.8", "3.9", "3.10", "3.11"]
 
 nox.options.sessions = ["lint", "tests"]
 
@@ -29,7 +29,7 @@ def pylint(session: nox.Session) -> None:
     Run pylint.
     """
 
-    session.install("pylint~=2.14.0")
+    session.install("pylint~=2.15.0")
     session.install("-e", ".")
     session.run("pylint", "src", *session.posargs)
 
