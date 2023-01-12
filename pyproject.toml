@@ -69,6 +69,7 @@ dask = [
 test = [
     "pytest >=6",
     "pytest-mpl >=0.12",
+    "dask_histogram >=2023.1; python_version>'3.8'",
 ]
 dev = [
     "pytest >=6",
@@ -78,6 +79,7 @@ dev = [
     "scipy >=1.4; python_version<'3.11'",
     "iminuit >=2; python_version<'3.11'",
     "ipykernel",
+    "dask_histogram >=2023.1; python_version>'3.8'",
 ]
 docs = [
     "pytest >=6",
