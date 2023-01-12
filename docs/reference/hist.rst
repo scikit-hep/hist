@@ -9,6 +9,12 @@ Subpackages
 
    hist.axis
 
+.. toctree::
+   :maxdepth: 5
+
+   hist.dask
+
+
 Submodules
 ----------
 

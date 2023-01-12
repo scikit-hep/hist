@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import numpy as np
-import hist
 import pytest
 
-dah = pytest.importorskip('hist.dask')
+import hist
+
+dah = pytest.importorskip("hist.dask")
 import dask.array as da
+
 
 @pytest.mark.parametrize("use_weights", [True, False])
 def test_unnamed_5D_strcat_intcat_rectangular(unnamed_dask_hist, use_weights):
@@ -33,8 +35,22 @@ def test_unnamed_5D_strcat_intcat_rectangular(unnamed_dask_hist, use_weights):
     control = h.__class__(*h.axes, storage=h.storage_type())
     xTc = x.compute().T
     if use_weights:
-        control.fill(strcat="testcat1", intcat=1, x=xTc[0], y=xTc[1], z=xTc[2], weight=weights.compute())
-        control.fill(strcat="testcat2", intcat=2, x=xTc[0], y=xTc[1], z=xTc[2], weight=weights.compute())
+        control.fill(
+            strcat="testcat1",
+            intcat=1,
+            x=xTc[0],
+            y=xTc[1],
+            z=xTc[2],
+            weight=weights.compute(),
+        )
+        control.fill(
+            strcat="testcat2",
+            intcat=2,
+            x=xTc[0],
+            y=xTc[1],
+            z=xTc[2],
+            weight=weights.compute(),
+        )
     else:
         control.fill(strcat="testcat1", intcat=1, x=xTc[0], y=xTc[1], z=xTc[2])
         control.fill(strcat="testcat2", intcat=2, x=xTc[0], y=xTc[1], z=xTc[2])
@@ -48,6 +64,7 @@ def test_unnamed_5D_strcat_intcat_rectangular(unnamed_dask_hist, use_weights):
 
     assert len(h.axes[1]) == 2 and len(control.axes[1]) == 2
     assert all(cx == hx for cx, hx in zip(control.axes[1], h.axes[1]))
+
 
 @pytest.mark.parametrize("use_weights", [True, False])
 def test_named_5D_strcat_intcat_rectangular(named_dask_hist, use_weights):
@@ -75,8 +92,22 @@ def test_named_5D_strcat_intcat_rectangular(named_dask_hist, use_weights):
     control = h.__class__(*h.axes, storage=h.storage_type())
     xTc = x.compute().T
     if use_weights:
-        control.fill(strcat="testcat1", intcat=1, x=xTc[0], y=xTc[1], z=xTc[2], weight=weights.compute())
-        control.fill(strcat="testcat2", intcat=2, x=xTc[0], y=xTc[1], z=xTc[2], weight=weights.compute())
+        control.fill(
+            strcat="testcat1",
+            intcat=1,
+            x=xTc[0],
+            y=xTc[1],
+            z=xTc[2],
+            weight=weights.compute(),
+        )
+        control.fill(
+            strcat="testcat2",
+            intcat=2,
+            x=xTc[0],
+            y=xTc[1],
+            z=xTc[2],
+            weight=weights.compute(),
+        )
     else:
         control.fill(strcat="testcat1", intcat=1, x=xTc[0], y=xTc[1], z=xTc[2])
         control.fill(strcat="testcat2", intcat=2, x=xTc[0], y=xTc[1], z=xTc[2])
