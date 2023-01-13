@@ -1,5 +1,12 @@
 # Changelog
 
+## Version 2.6.3
+
+* Experimental dask support
+  [#471](https://github.com/scikit-hep/hist/pull/471)
+* Some minor cleanups from refurb
+  [#453](https://github.com/scikit-hep/hist/pull/453)
+
 ## Version 2.6.2
 
 * Nicer stacks repr
@@ -12,7 +19,6 @@
   [#418](https://github.com/scikit-hep/hist/pull/418)
 * Support git archival version numbers
   [#441](https://github.com/scikit-hep/hist/pull/441)
-
 
 ## Version 2.6.1
 
