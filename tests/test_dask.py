@@ -5,8 +5,8 @@ import pytest
 
 import hist
 
+da = pytest.importorskip("dask.array")
 dah = pytest.importorskip("hist.dask")
-import dask.array as da
 
 
 @pytest.mark.parametrize("use_weights", [True, False])
