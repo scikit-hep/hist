@@ -339,7 +339,7 @@ def _fit_callable_to_hist(
         n_samples = 100
         vopts = np.random.multivariate_normal(popt, pcov, n_samples)
         sampled_ydata = np.vstack([model(xdata, *vopt).T for vopt in vopts])
-        model_uncert = np.nanstd(sampled_ydata, axis=0)  # type: ignore[no-untyped-call]
+        model_uncert = np.nanstd(sampled_ydata, axis=0)
     else:
         model_uncert = np.zeros_like(hist_uncert)
 
