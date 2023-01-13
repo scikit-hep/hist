@@ -64,13 +64,13 @@ plot = [
     "iminuit >=2; python_version<'3.11'",
 ]
 dask = [
-    "dask[dataframe] > 2022; python_version>'3.7'",
+    "dask[dataframe] >=2022; python_version>'3.7'",
     "dask_histogram >=2023.1; python_version>'3.7'"
 ]
 test = [
     "pytest >=6",
     "pytest-mpl >=0.12",
-    "dask[dataframe] > 2022; python_version>'3.7'",
+    "dask[dataframe] >=2022; python_version>'3.7'",
     "dask_histogram >=2023.1; python_version>'3.7'",
 ]
 dev = [
@@ -81,7 +81,7 @@ dev = [
     "scipy >=1.4; python_version<'3.11'",
     "iminuit >=2; python_version<'3.11'",
     "ipykernel",
-    "dask[dataframe] > 2022; python_version>'3.7'",
+    "dask[dataframe] >=2022; python_version>'3.7'",
     "dask_histogram >=2023.1; python_version>'3.7'",
 ]
 docs = [
