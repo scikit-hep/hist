@@ -31,6 +31,7 @@ classifiers = [
 keywords = [
     "histogram",
     "boost-histogram",
+    "dask-histogram",
 ]
 requires-python = ">=3.7"
 dependencies = [
@@ -62,9 +63,15 @@ plot = [
     "scipy >=1.4; python_version<'3.11'",
     "iminuit >=2; python_version<'3.11'",
 ]
+dask = [
+    "dask[dataframe] >=2022; python_version>'3.7'",
+    "dask_histogram >=2023.1; python_version>'3.7'"
+]
 test = [
     "pytest >=6",
     "pytest-mpl >=0.12",
+    "dask[dataframe] >=2022; python_version>'3.7'",
+    "dask_histogram >=2023.1; python_version>'3.7'",
 ]
 dev = [
     "pytest >=6",
@@ -74,6 +81,8 @@ dev = [
     "scipy >=1.4; python_version<'3.11'",
     "iminuit >=2; python_version<'3.11'",
     "ipykernel",
+    "dask[dataframe] >=2022; python_version>'3.7'",
+    "dask_histogram >=2023.1; python_version>'3.7'",
 ]
 docs = [
     "pytest >=6",
@@ -83,6 +92,9 @@ docs = [
     "scipy >=1.4; python_version<'3.11'",
     "iminuit >=2; python_version<'3.11'",
     "ipython_genutils",
+    "graphviz >=0.20.1",
+    "dask[dataframe] >=2022; python_version>'3.7'",
+    "dask_histogram >=2023.1; python_version>'3.7'",
     "nbsphinx",
     "Sphinx >=3.0.0",
     "sphinx_copybutton",
@@ -135,6 +147,7 @@ module = [
     "scipy.*",
     "iminuit.*",
     "mplhep.*",
+    "dask_histogram.*",
 ]
 ignore_missing_imports = true
 
