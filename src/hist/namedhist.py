@@ -79,7 +79,7 @@ class NamedHist(BaseHist, family=hist):
             if kwargs:
                 raise TypeError(
                     "Only explicit keyword arguments, or a single structured object is supported by "
-                    f"`fill_flattened`, but both were given"
+                    f"`fill_flattened`, but not both."
                 )
 
             destructured = interop.destructure(obj)
