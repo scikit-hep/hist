@@ -13,8 +13,7 @@ from typing import (
     Sequence,
     Tuple,
     TypeVar,
-    Union,
-    overload,
+    Union
 )
 
 import boost_histogram as bh

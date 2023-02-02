@@ -25,6 +25,9 @@ M = TypeVar("M", bound=HistogramModuleProtocol)
 
 
 def histogram_module_for(cls: type) -> Callable[[M], M]:
+    """
+    Register a histogram-module object for the given class.
+    """
     def wrapper(obj: M) -> M:
         _histogram_modules[cls] = obj
         return obj
@@ -33,6 +36,9 @@ def histogram_module_for(cls: type) -> Callable[[M], M]:
 
 
 def find_histogram_modules(*objects: Any) -> Iterator[HistogramModuleProtocol]:
+    """
+    Yield histogram-module objects that are known to support any of the given objects.
+    """
     for arg in objects:
         try:
             yield arg._histogram_module_
@@ -46,12 +52,22 @@ def find_histogram_modules(*objects: Any) -> Iterator[HistogramModuleProtocol]:
 
 
 def destructure(obj: Any) -> dict[str, Any] | None:
+    """
+    Pull out named histogram-module arrays from the given structured object as a mapping.
+    The returned arrays should be compatible with `broadcast_and_flatten`.
+    If the argument is not understood as a structured object by any histogram modules,
+    return `None`.
+    """
     for module in find_histogram_modules(obj):
         return module.unpack(obj)
     raise TypeError(f"No histogram module found for {obj!r}")
 
 
 def broadcast_and_flatten(args: Sequence[Any]) -> tuple[ArrayLike]:
+    """
+    Convert the given histogram-module arrays into a set of consistent 1D NumPy arrays
+    for histogram filling. For NumPy this entails broadcasting and flattening.
+    """
     for module in find_histogram_modules(*args):
         result = module.broadcast_and_flatten(args)
         if result is not NotImplemented:
