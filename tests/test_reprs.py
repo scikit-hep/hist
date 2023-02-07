@@ -4,7 +4,6 @@ from hist import Hist, Stack, axis
 
 
 def test_1D_empty_repr(named_hist):
-
     h = named_hist.new.Reg(10, -1, 1, name="x", label="y").Double()
     html = h._repr_html_()
     assert html
@@ -13,7 +12,6 @@ def test_1D_empty_repr(named_hist):
 
 
 def test_1D_var_empty_repr(named_hist):
-
     h = named_hist.new.Var(range(10), name="x", label="y").Double()
     html = h._repr_html_()
     assert html
@@ -22,7 +20,6 @@ def test_1D_var_empty_repr(named_hist):
 
 
 def test_1D_int_empty_repr(named_hist):
-
     h = named_hist.new.Int(-9, 9, name="x", label="y").Double()
     html = h._repr_html_()
     assert html
@@ -31,7 +28,6 @@ def test_1D_int_empty_repr(named_hist):
 
 
 def test_1D_intcat_empty_repr(named_hist):
-
     h = named_hist.new.IntCat([1, 3, 5], name="x", label="y").Double()
     html = h._repr_html_()
     assert html
@@ -40,7 +36,6 @@ def test_1D_intcat_empty_repr(named_hist):
 
 
 def test_1D_strcat_empty_repr(named_hist):
-
     h = named_hist.new.StrCat(["1", "3", "5"], name="x", label="y").Double()
     html = h._repr_html_()
     assert html
@@ -49,7 +44,6 @@ def test_1D_strcat_empty_repr(named_hist):
 
 
 def test_2D_empty_repr(named_hist):
-
     h = (
         named_hist.new.Reg(10, -1, 1, name="x", label="y")
         .Int(0, 15, name="p", label="q")
@@ -64,7 +58,6 @@ def test_2D_empty_repr(named_hist):
 
 
 def test_1D_circ_empty_repr(named_hist):
-
     h = named_hist.new.Reg(10, -1, 1, circular=True, name="R", label="r").Double()
     html = h._repr_html_()
     assert html
@@ -73,7 +66,6 @@ def test_1D_circ_empty_repr(named_hist):
 
 
 def test_ND_empty_repr(named_hist):
-
     h = (
         named_hist.new.Reg(10, -1, 1, name="x", label="y")
         .Reg(12, -3, 3, name="p", label="q")
@@ -85,7 +77,6 @@ def test_ND_empty_repr(named_hist):
 
 
 def test_empty_mega_repr(named_hist):
-
     h = named_hist.new.Reg(1001, -1, 1, name="x").Double()
     html = h._repr_html_()
     assert html is None
@@ -96,7 +87,6 @@ def test_empty_mega_repr(named_hist):
 
 
 def test_stack_repr(named_hist):
-
     a1 = axis.Regular(
         50, -5, 5, name="A", label="a [unit]", underflow=False, overflow=False
     )
