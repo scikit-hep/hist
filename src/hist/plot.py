@@ -698,7 +698,6 @@ def plot_pie(
     ax: matplotlib.axes.Axes | None = None,
     **kwargs: Any,
 ) -> Any:
-
     if ax is None:
         fig = plt.gcf()
         ax = fig.add_subplot(111)
@@ -717,7 +716,6 @@ def plot_stack(
     legend: bool | None = False,
     **kwargs: Any,
 ) -> Any:
-
     if self[0].ndim != 1:
         raise NotImplementedError("Please project to 1D before calling plot")
 

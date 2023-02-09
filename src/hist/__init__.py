@@ -52,7 +52,6 @@ def __dir__() -> tuple[str, ...]:
 
 
 def __getattr__(name: str) -> ModuleType:
-
     if name == "axes":
         msg = f"Misspelling error, '{name}' should be 'axis'"
         warnings.warn(msg)
