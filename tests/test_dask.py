@@ -59,10 +59,12 @@ def test_unnamed_5D_strcat_intcat_rectangular(unnamed_dask_hist, use_weights):
     if use_weights:
         assert np.allclose(h.variances(), control.variances())
 
-    assert len(h.axes[0]) == 2 and len(control.axes[0]) == 2
+    assert len(h.axes[0]) == 2
+    assert len(control.axes[0]) == 2
     assert all(cx == hx for cx, hx in zip(control.axes[0], h.axes[0]))
 
-    assert len(h.axes[1]) == 2 and len(control.axes[1]) == 2
+    assert len(h.axes[1]) == 2
+    assert len(control.axes[1]) == 2
     assert all(cx == hx for cx, hx in zip(control.axes[1], h.axes[1]))
 
 
@@ -116,8 +118,10 @@ def test_named_5D_strcat_intcat_rectangular(named_dask_hist, use_weights):
     if use_weights:
         assert np.allclose(h.variances(), control.variances())
 
-    assert len(h.axes[0]) == 2 and len(control.axes[0]) == 2
+    assert len(h.axes[0]) == 2
+    assert len(control.axes[0]) == 2
     assert all(cx == hx for cx, hx in zip(control.axes[0], h.axes[0]))
 
-    assert len(h.axes[1]) == 2 and len(control.axes[1]) == 2
+    assert len(h.axes[1]) == 2
+    assert len(control.axes[1]) == 2
     assert all(cx == hx for cx, hx in zip(control.axes[1], h.axes[1]))

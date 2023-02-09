@@ -16,7 +16,7 @@ try:
     from matplotlib import patches, transforms
     from mplhep.plot import Hist1DArtists, Hist2DArtists, hist2dplot, histplot
 except ModuleNotFoundError:
-    print(
+    print(  # noqa: T201
         "Hist requires mplhep to plot, either install hist[plot] or mplhep",
         file=sys.stderr,
     )
@@ -122,7 +122,7 @@ def _expr_to_lambda(expr: str) -> Callable[..., Any]:
     varnames = list(OrderedDict.fromkeys([name for name in varnames if name != "x"]))
     lambdastr = f"lambda x,{','.join(varnames)}: {expr}"
     # pylint: disable-next=eval-used
-    return eval(lambdastr)  # type: ignore[no-any-return]
+    return eval(lambdastr)  # type: ignore[no-any-return]  # noqa: PGH001
 
 
 def _curve_fit_wrapper(
@@ -140,7 +140,7 @@ def _curve_fit_wrapper(
     try:
         from scipy.optimize import curve_fit, minimize
     except ModuleNotFoundError:
-        print(_PLT_MISSING_MSG, file=sys.stderr)
+        print(_PLT_MISSING_MSG, file=sys.stderr)  # noqa: T201
         raise
 
     params = list(inspect.signature(func).parameters.values())
@@ -162,7 +162,7 @@ def _curve_fit_wrapper(
         try:
             from iminuit import Minuit
         except ModuleNotFoundError:
-            print(_PLT_MISSING_MSG, file=sys.stderr)
+            print(_PLT_MISSING_MSG, file=sys.stderr)  # noqa: T201
             raise
         from scipy.special import gammaln
 
@@ -721,9 +721,8 @@ def plot_stack(
     if self[0].ndim != 1:
         raise NotImplementedError("Please project to 1D before calling plot")
 
-    if "label" not in kwargs:
-        if all(h.name is not None for h in self):
-            kwargs["label"] = [h.name for h in self]
+    if "label" not in kwargs and all(h.name is not None for h in self):
+        kwargs["label"] = [h.name for h in self]
 
     ret = histplot(list(self), ax=ax, **kwargs)
     final_ax = ret[0].stairs.axes

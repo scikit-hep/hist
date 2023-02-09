@@ -141,18 +141,16 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         if self.size == 0:
             return None
 
-        if self.ndim == 1:
-            if len(self.axes[0]) <= 1000:
-                return str(
-                    html_hist(
-                        self,
-                        svg_hist_1d_c if self.axes[0].traits.circular else svg_hist_1d,
-                    )
+        if self.ndim == 1 and len(self.axes[0]) <= 1000:
+            return str(
+                html_hist(
+                    self,
+                    svg_hist_1d_c if self.axes[0].traits.circular else svg_hist_1d,
                 )
+            )
 
-        if self.ndim == 2:
-            if len(self.axes[0]) <= 200 and len(self.axes[1]) <= 200:
-                return str(html_hist(self, svg_hist_2d))
+        if self.ndim == 2 and len(self.axes[0]) <= 200 and len(self.axes[1]) <= 200:
+            return str(html_hist(self, svg_hist_2d))
 
         return None
 
@@ -191,7 +189,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
                     )
             elif not ax.name or ax.name not in data:
                 raise TypeError("All axes must have names present in the data")
-            else:
+            else:  # noqa: RET506
                 axes_list.append(ax)
 
         weight_arr = data[weight] if weight else None

@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import shutil
 import sys
+from pathlib import Path
 
 import boost_histogram as bh
 from histoprint import print_hist
@@ -27,11 +28,11 @@ def main() -> None:
     parser.add_argument("-o", "--output-image", type=str, help="save image to file")
     args = parser.parse_args()
 
-    print(
+    print(  # noqa: T201
         "Classic hist interface - please use histoprint instead; this supports multiple file formats and much more!"
     )
 
-    with open(args.input, encoding="utf-8") if args.input else sys.stdin as f:
+    with Path(args.input).open(encoding="utf-8") if args.input else sys.stdin as f:
         values = [float(v) for v in f]
 
     h = bh.numpy.histogram(values, bins=args.buckets, histogram=hist.Hist)

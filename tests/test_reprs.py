@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from hist import Hist, Stack, axis
+from hist import Stack, axis
 
 
 def test_1D_empty_repr(named_hist):
@@ -103,5 +103,5 @@ def test_stack_repr(named_hist):
     a2 = axis.Regular(
         50, -5, 5, name="A", label="a [unit]", underflow=False, overflow=False
     )
-    assert "name='A'" in repr(Stack(Hist(a1), Hist(a2)))
-    assert "label='a [unit]'" in repr(Stack(Hist(a1), Hist(a2)))
+    assert "name='A'" in repr(Stack(named_hist(a1), named_hist(a2)))
+    assert "label='a [unit]'" in repr(Stack(named_hist(a1), named_hist(a2)))

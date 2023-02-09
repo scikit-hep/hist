@@ -11,7 +11,7 @@ try:
 except ModuleNotFoundError:
     from sys import stderr
 
-    print(
+    print(  # noqa: T201
         "hist.intervals requires scipy. Please install hist[plot] or manually install scipy.",
         file=stderr,
     )
@@ -74,8 +74,7 @@ def poisson_interval(
             scale * stats.chi2.ppf((1 + coverage) / 2, 2 * (counts + 1)) / 2.0
         )
         interval_max[values == 0.0] = np.nan
-    interval = np.stack((interval_min, interval_max))
-    return interval  # type: ignore[no-any-return]
+    return np.stack((interval_min, interval_max))
 
 
 def clopper_pearson_interval(

@@ -11,7 +11,7 @@ from .axestuple import NamedAxesTuple
 from .basehist import BaseHist
 
 if typing.TYPE_CHECKING:
-    import matplotlib
+    import matplotlib as mpl
 
 
 __all__ = ("Stack",)
@@ -124,7 +124,7 @@ class Stack:
     def axes(self) -> NamedAxesTuple:
         return self._stack[0].axes
 
-    def plot(self, *, ax: matplotlib.axes.Axes | None = None, **kwargs: Any) -> Any:
+    def plot(self, *, ax: mpl.axes.Axes | None = None, **kwargs: Any) -> Any:
         """
         Plot method for Stack object.
         """
@@ -137,9 +137,8 @@ class Stack:
         """
         Pretty print the stacked histograms to the console.
         """
-        if "labels" not in kwargs:
-            if all(h.name is not None for h in self):
-                kwargs["labels"] = [h.name for h in self]
+        if "labels" not in kwargs and all(h.name is not None for h in self):
+            kwargs["labels"] = [h.name for h in self]
 
         return histoprint.print_hist(list(self), stack=True, **kwargs)
 

@@ -664,9 +664,8 @@ def test_general_transform_proxy():
     #     4, -1, 5, forward=ftype(math.log), inverse=ftype(math.log)
     # ).Double()
 
-    with pytest.raises(ValueError):
-        with pytest.warns(RuntimeWarning):
-            Hist.new.Func(4, -1, 5, forward=ftype(np.log), inverse=ftype(np.log))
+    with pytest.raises(ValueError), pytest.warns(RuntimeWarning):
+        Hist.new.Func(4, -1, 5, forward=ftype(np.log), inverse=ftype(np.log))
 
     # lack args
     with pytest.raises(TypeError):
@@ -838,7 +837,7 @@ def test_from_columns(named_hist):
 
 
 def test_from_array(named_hist):
-    h = Hist(
+    h = named_hist(
         axis.Regular(10, 1, 2, name="A"),
         axis.Regular(7, 1, 3, name="B"),
         data=np.ones((10, 7)),
@@ -847,7 +846,7 @@ def test_from_array(named_hist):
     assert h.sum() == approx(70)
     assert h.sum(flow=True) == approx(70)
 
-    h = Hist(
+    h = named_hist(
         axis.Regular(10, 1, 2, name="A"),
         axis.Regular(7, 1, 3, name="B"),
         data=np.ones((12, 9)),
@@ -859,7 +858,7 @@ def test_from_array(named_hist):
     assert h.sum(flow=True) == approx(12 * 9)
 
     with pytest.raises(ValueError):
-        h = Hist(
+        h = named_hist(
             axis.Regular(10, 1, 2, name="A"),
             axis.Regular(7, 1, 3, name="B"),
             data=np.ones((11, 9)),
