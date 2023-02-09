@@ -13,12 +13,12 @@ except ImportError:
 
 @pytest.fixture(params=[Hist, BaseHist, NamedHist])
 def named_hist(request):
-    yield request.param
+    return request.param
 
 
 @pytest.fixture(params=[Hist, BaseHist])
 def unnamed_hist(request):
-    yield request.param
+    return request.param
 
 
 dask_params_named = []
@@ -30,9 +30,9 @@ if dah is not None:
 
 @pytest.fixture(params=dask_params_named)
 def named_dask_hist(request):
-    yield request.param
+    return request.param
 
 
 @pytest.fixture(params=dask_params_unnamed)
 def unnamed_dask_hist(request):
-    yield request.param
+    return request.param

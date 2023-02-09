@@ -705,11 +705,10 @@ def test_named_transform_proxy():
     #     4, -1, 5, name="x", forward=ftype(math.log), inverse=ftype(math.log)
     # )
 
-    with pytest.raises(ValueError):
-        with pytest.warns(RuntimeWarning):
-            NamedHist.new.Func(
-                4, -1, 5, name="x", forward=ftype(np.log), inverse=ftype(np.log)
-            )
+    with pytest.raises(ValueError), pytest.warns(RuntimeWarning):
+        NamedHist.new.Func(
+            4, -1, 5, name="x", forward=ftype(np.log), inverse=ftype(np.log)
+        )
 
     # lack args
     with pytest.raises(TypeError):
