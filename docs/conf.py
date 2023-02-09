@@ -106,7 +106,6 @@ def clean_up(app, exception):
 
 
 def setup(app):
-
     # Copy the file in
     app.connect("builder-inited", prepare)
 

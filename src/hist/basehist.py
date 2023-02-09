@@ -512,7 +512,6 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         ax: matplotlib.axes.Axes | None = None,
         **kwargs: Any,
     ) -> Any:
-
         from hist import plot
 
         return plot.plot_pie(self, ax=ax, **kwargs)
