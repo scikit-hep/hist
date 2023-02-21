@@ -23,7 +23,7 @@ repos:
   - id: trailing-whitespace
 
 - repo: https://github.com/charliermarsh/ruff-pre-commit
-  rev: v0.0.246
+  rev: v0.0.249
   hooks:
   - id: ruff
     args: ["--fix"]
@@ -35,14 +35,14 @@ repos:
 
 # Notebook formatting
 - repo: https://github.com/nbQA-dev/nbQA
-  rev: 1.6.1
+  rev: 1.6.3
   hooks:
   - id: nbqa-pyupgrade
     additional_dependencies: [pyupgrade==3.3.1]
     args: ["--py37-plus"]
 
 - repo: https://github.com/pre-commit/mirrors-mypy
-  rev: v1.0.0
+  rev: v1.0.1
   hooks:
   - id: mypy
     files: ^src
