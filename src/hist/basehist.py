@@ -189,7 +189,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
                     )
             elif not ax.name or ax.name not in data:
                 raise TypeError("All axes must have names present in the data")
-            else:  # noqa: RET506
+            else:
                 axes_list.append(ax)
 
         weight_arr = data[weight] if weight else None
