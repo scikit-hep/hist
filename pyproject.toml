@@ -175,6 +175,7 @@ messages_control.disable = [
   "import-error",
   "disallowed-name",
   "cyclic-import",
+  "redefined-builtin",
 ]
 
 [tool.ruff]

@@ -8,7 +8,6 @@ if sys.version_info < (3, 10):
     from collections.abc import Iterator
     from typing import Any
 
-    # pylint: disable-next=redefined-builtin
     def zip(*iterables: Any, strict: bool = False) -> Iterator[tuple[Any, ...]]:
         if strict:
             marker = object()

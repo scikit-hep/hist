@@ -13,7 +13,7 @@ from .basehist import BaseHist
 from .hist import Hist
 from .namedhist import NamedHist
 from .stack import Stack
-from .tag import (  # pylint: disable=redefined-builtin
+from .tag import (
     loc,
     overflow,
     rebin,
