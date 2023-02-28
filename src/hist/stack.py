@@ -153,7 +153,7 @@ class Stack:
         Multiply each histogram in the Stack by a scalar.
         """
         for h in self:
-            h *= other
+            h *= other  # noqa: PLW2901
         return self
 
     def __rmul__(self: T, other: float) -> T:
@@ -173,7 +173,7 @@ class Stack:
         Add a scalar or array to the Stack.
         """
         for h in self:
-            h += other
+            h += other  # noqa: PLW2901
         return self
 
     def __radd__(self: T, other: float | np.typing.NDArray[Any]) -> T:
@@ -193,7 +193,7 @@ class Stack:
         Subtract a scalar or array to the Stack.
         """
         for h in self:
-            h -= other
+            h -= other  # noqa: PLW2901
         return self
 
     def project(self: T, *args: int | str) -> T:
