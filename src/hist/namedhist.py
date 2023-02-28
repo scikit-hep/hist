@@ -1,15 +1,13 @@
 from __future__ import annotations
 
-from typing import Any, TypeVar
+from typing import Any
 
 import boost_histogram as bh
 
 import hist
 
+from ._compat.typing import ArrayLike, Self
 from .basehist import BaseHist, IndexingExpr
-from .typing import ArrayLike
-
-T = TypeVar("T", bound="NamedHist")
 
 
 class NamedHist(BaseHist, family=hist):
@@ -25,7 +23,7 @@ class NamedHist(BaseHist, family=hist):
             )
 
     # TODO: This can return a single value
-    def project(self: T, *args: int | str) -> T | float | bh.accumulators.Accumulator:
+    def project(self, *args: int | str) -> Self | float | bh.accumulators.Accumulator:
         """
         Projection of axis idx.
         """
@@ -39,12 +37,12 @@ class NamedHist(BaseHist, family=hist):
 
     # pylint: disable-next=arguments-differ
     def fill(  # type: ignore[override]
-        self: T,
+        self,
         weight: ArrayLike | None = None,
         sample: ArrayLike | None = None,
         threads: int | None = None,
         **kwargs: ArrayLike,
-    ) -> T:
+    ) -> Self:
         """
             Insert data into the histogram using names and return a \
             NamedHist object. NamedHist could only be filled by names.
@@ -58,9 +56,9 @@ class NamedHist(BaseHist, family=hist):
         )
 
     def __getitem__(  # type: ignore[override]
-        self: T,
+        self,
         index: IndexingExpr,
-    ) -> T | float | bh.accumulators.Accumulator:
+    ) -> Self | float | bh.accumulators.Accumulator:
         """
         Get histogram item.
         """

@@ -2,11 +2,12 @@ from __future__ import annotations
 
 import copy
 import typing
-from typing import Any, Iterator, TypeVar
+from typing import Any, Iterator
 
 import histoprint
 import numpy as np
 
+from ._compat.typing import Self
 from .axestuple import NamedAxesTuple
 from .basehist import BaseHist
 
@@ -15,8 +16,6 @@ if typing.TYPE_CHECKING:
 
 
 __all__ = ("Stack",)
-
-T = TypeVar("T", bound="Stack")
 
 
 class Stack:
@@ -42,14 +41,14 @@ class Stack:
                 raise ValueError("The Histogram axes don't match")
 
     @classmethod
-    def from_iter(cls: type[T], iterable: typing.Iterable[BaseHist]) -> T:
+    def from_iter(cls, iterable: typing.Iterable[BaseHist]) -> Self:
         """
         Create a Stack from an iterable of histograms.
         """
         return cls(*iterable)
 
     @classmethod
-    def from_dict(cls: type[T], d: typing.Mapping[str, BaseHist]) -> T:
+    def from_dict(cls, d: typing.Mapping[str, BaseHist]) -> Self:
         """
         Create a Stack from a dictionary of histograms. The keys of the
         dictionary are used as names.
@@ -77,10 +76,10 @@ class Stack:
         ...
 
     @typing.overload
-    def __getitem__(self: T, val: slice) -> T:
+    def __getitem__(self, val: slice) -> Self:
         ...
 
-    def __getitem__(self: T, val: int | slice | str) -> BaseHist | T:
+    def __getitem__(self, val: int | slice | str) -> BaseHist | Self:
         if isinstance(val, str):
             val = self._get_index(val)
         if isinstance(val, slice):
@@ -91,7 +90,7 @@ class Stack:
 
         return self._stack.__getitem__(val)
 
-    def __setitem__(self: T, key: int | str, value: BaseHist) -> None:
+    def __setitem__(self, key: int | str, value: BaseHist) -> None:
         """
         Set a histogram in the Stack. Checks the axes of the histogram, they must match.
         """
@@ -133,7 +132,7 @@ class Stack:
 
         return hist.plot.plot_stack(self, ax=ax, **kwargs)
 
-    def show(self, **kwargs: Any) -> Any:
+    def show(self, **kwargs: object) -> Any:
         """
         Pretty print the stacked histograms to the console.
         """
@@ -142,13 +141,13 @@ class Stack:
 
         return histoprint.print_hist(list(self), stack=True, **kwargs)
 
-    def __mul__(self: T, other: float) -> T:
+    def __mul__(self, other: float) -> Self:
         """
         Multiply the Stack by a scalar.
         """
         return self.__class__(*(h * other for h in self))
 
-    def __imul__(self: T, other: float) -> T:
+    def __imul__(self, other: float) -> Self:
         """
         Multiply each histogram in the Stack by a scalar.
         """
@@ -156,19 +155,19 @@ class Stack:
             h *= other  # noqa: PLW2901
         return self
 
-    def __rmul__(self: T, other: float) -> T:
+    def __rmul__(self, other: float) -> Self:
         """
         Multiply the Stack by a scalar.
         """
         return self.__mul__(other)
 
-    def __add__(self: T, other: float | np.typing.NDArray[Any]) -> T:
+    def __add__(self, other: float | np.typing.NDArray[Any]) -> Self:
         """
         Add a scalar or array to the Stack.
         """
         return self.__class__(*(h + other for h in self))
 
-    def __iadd__(self: T, other: float | np.typing.NDArray[Any]) -> T:
+    def __iadd__(self, other: float | np.typing.NDArray[Any]) -> Self:
         """
         Add a scalar or array to the Stack.
         """
@@ -176,19 +175,19 @@ class Stack:
             h += other  # noqa: PLW2901
         return self
 
-    def __radd__(self: T, other: float | np.typing.NDArray[Any]) -> T:
+    def __radd__(self, other: float | np.typing.NDArray[Any]) -> Self:
         """
         Add a scalar or array to the Stack.
         """
         return self.__add__(other)
 
-    def __sub__(self: T, other: float | np.typing.NDArray[Any]) -> T:
+    def __sub__(self, other: float | np.typing.NDArray[Any]) -> Self:
         """
         Subtract a scalar or array to the Stack.
         """
         return self.__class__(*(h - other for h in self))
 
-    def __isub__(self: T, other: float | np.typing.NDArray[Any]) -> T:
+    def __isub__(self, other: float | np.typing.NDArray[Any]) -> Self:
         """
         Subtract a scalar or array to the Stack.
         """
@@ -196,7 +195,7 @@ class Stack:
             h -= other  # noqa: PLW2901
         return self
 
-    def project(self: T, *args: int | str) -> T:
+    def project(self, *args: int | str) -> Self:
         """
         Project the Stack onto a new axes.
         """

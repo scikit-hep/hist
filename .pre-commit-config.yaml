@@ -26,7 +26,7 @@ repos:
   rev: v0.0.253
   hooks:
   - id: ruff
-    args: ["--fix"]
+    args: ["--fix", "--show-fixes"]
 
 - repo: https://github.com/asottile/setup-cfg-fmt
   rev: v2.2.0
@@ -37,9 +37,9 @@ repos:
 - repo: https://github.com/nbQA-dev/nbQA
   rev: 1.6.3
   hooks:
-  - id: nbqa-pyupgrade
-    additional_dependencies: [pyupgrade==3.3.1]
-    args: ["--py37-plus"]
+  - id: nbqa-ruff
+    additional_dependencies: [ruff==0.0.253]
+    args: ["--extend-ignore=B008,T20,I002,E402", "--fix", "--show-fixes"]
 
 - repo: https://github.com/pre-commit/mirrors-mypy
   rev: v1.0.1

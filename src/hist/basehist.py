@@ -4,7 +4,7 @@ import functools
 import operator
 import typing
 import warnings
-from typing import Any, Callable, Iterator, Mapping, Sequence, Tuple, TypeVar, Union
+from typing import Any, Callable, Iterator, Mapping, Sequence, Tuple, Union
 
 import boost_histogram as bh
 import histoprint
@@ -12,12 +12,12 @@ import numpy as np
 
 import hist
 
+from ._compat.typing import ArrayLike, Protocol, Self, SupportsIndex
 from .axestuple import NamedAxesTuple
 from .axis import AxisProtocol
 from .quick_construct import MetaConstructor
 from .storage import Storage
 from .svgplots import html_hist, svg_hist_1d, svg_hist_1d_c, svg_hist_2d
-from .typing import ArrayLike, Protocol, SupportsIndex
 
 if typing.TYPE_CHECKING:
     from builtins import ellipsis
@@ -50,9 +50,6 @@ def _proc_kw_for_lw(kwargs: Mapping[str, Any]) -> dict[str, Any]:
         else k: v
         for k, v in kwargs.items()
     }
-
-
-T = TypeVar("T", bound="BaseHist")
 
 
 class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
@@ -167,13 +164,13 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
     @classmethod
     def from_columns(
-        cls: type[T],
+        cls,
         data: Mapping[str, ArrayLike],
         axes: Sequence[str | AxisProtocol],
         *,
         weight: str | None = None,
         storage: hist.storage.Storage = hist.storage.Double(),  # noqa: B008
-    ) -> T:
+    ) -> Self:
         axes_list: list[Any] = []
         for ax in axes:
             if isinstance(ax, str):
@@ -199,7 +196,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         self.fill(**data_list, weight=weight_arr)  # type: ignore[arg-type]
         return self
 
-    def project(self: T, *args: int | str) -> T | float | bh.accumulators.Accumulator:
+    def project(self, *args: int | str) -> Self | float | bh.accumulators.Accumulator:
         """
         Projection of axis idx.
         """
@@ -207,13 +204,13 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         return super().project(*int_args)
 
     def fill(
-        self: T,
+        self,
         *args: ArrayLike,
         weight: ArrayLike | None = None,
         sample: ArrayLike | None = None,
         threads: int | None = None,
         **kwargs: ArrayLike,
-    ) -> T:
+    ) -> Self:
         """
         Insert data into the histogram using names and indices, return
         a Hist object.
@@ -234,13 +231,13 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         return super().fill(*args, *data, weight=weight, sample=sample, threads=threads)
 
     def sort(
-        self: T,
+        self,
         axis: int | str,
         key: (
             Callable[[int], SupportsLessThan] | Callable[[str], SupportsLessThan] | None
         ) = None,
         reverse: bool = False,
-    ) -> T:
+    ) -> Self:
         """
         Sort a categorical axis.
         """
@@ -248,7 +245,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             sorted_cats = sorted(self.axes[axis], key=key, reverse=reverse)
-            # This can only return T, not float, etc., so we ignore the extra types here
+            # This can only return Self, not float, etc., so we ignore the extra types here
             return self[{axis: [bh.loc(x) for x in sorted_cats]}]  # type: ignore[dict-item, return-value]
 
     def _loc_shortcut(self, x: Any) -> Any:
@@ -313,8 +310,8 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         return tuple(self._loc_shortcut(v) for v in index)  # type: ignore[union-attr, union-attr, union-attr, union-attr]
 
     def __getitem__(  # type: ignore[override]
-        self: T, index: IndexingExpr
-    ) -> T | float | bh.accumulators.Accumulator:
+        self, index: IndexingExpr
+    ) -> Self | float | bh.accumulators.Accumulator:
         """
         Get histogram item.
         """
@@ -330,7 +327,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
         return super().__setitem__(self._index_transform(index), value)
 
-    def profile(self: T, axis: int | str) -> T:
+    def profile(self, axis: int | str) -> Self:
         """
         Returns a profile (Mean/WeightedMean) histogram from a normal histogram
         with N-1 axes. The axis given is profiled over and removed from the
