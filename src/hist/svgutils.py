@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-from typing import TypeVar
-
-from .typing import Protocol
+from .typing import Protocol, Self
 
 
 class SupportsStr(Protocol):
@@ -66,13 +64,10 @@ class div(XML):
     pass
 
 
-T = TypeVar("T", bound="rect")
-
-
 class rect(XML):
     @classmethod
     def pad(
-        cls: type[T],
+        cls,
         x: float,
         y: float,
         scale_x: float,
@@ -84,7 +79,7 @@ class rect(XML):
         pad_y: float = 0,
         opacity: float = 1,
         stroke_width: float = 2,
-    ) -> T:
+    ) -> Self:
         width = right_edge - left_edge
         top_y = y
 
