@@ -12,12 +12,12 @@ import numpy as np
 
 import hist
 
+from ._compat.typing import ArrayLike, Protocol, Self, SupportsIndex
 from .axestuple import NamedAxesTuple
 from .axis import AxisProtocol
 from .quick_construct import MetaConstructor
 from .storage import Storage
 from .svgplots import html_hist, svg_hist_1d, svg_hist_1d_c, svg_hist_2d
-from .typing import ArrayLike, Protocol, Self, SupportsIndex
 
 if typing.TYPE_CHECKING:
     from builtins import ellipsis

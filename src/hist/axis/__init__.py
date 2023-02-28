@@ -1,18 +1,13 @@
 from __future__ import annotations
 
-import sys
 from typing import Any, Iterable
 
 import boost_histogram.axis as bha
 
 import hist
-from hist.axestuple import ArrayTuple, NamedAxesTuple
 
-if sys.version_info >= (3, 8):
-    from typing import Protocol
-else:
-    from typing_extensions import Protocol
-
+from .._compat.typing import Protocol
+from ..axestuple import ArrayTuple, NamedAxesTuple
 from . import transform
 
 __all__ = (

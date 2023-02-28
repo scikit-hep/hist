@@ -7,9 +7,9 @@ from typing import Any, Iterator
 import histoprint
 import numpy as np
 
+from ._compat.typing import Self
 from .axestuple import NamedAxesTuple
 from .basehist import BaseHist
-from .typing import Self
 
 if typing.TYPE_CHECKING:
     import matplotlib as mpl

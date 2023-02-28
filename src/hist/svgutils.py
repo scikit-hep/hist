@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from .typing import Protocol, Self
+from ._compat.typing import Protocol, Self
 
 
 class SupportsStr(Protocol):

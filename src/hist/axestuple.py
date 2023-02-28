@@ -1,28 +1,12 @@
 from __future__ import annotations
 
-import sys
 import warnings
-from collections.abc import Iterable, Iterator
+from collections.abc import Iterable
 from typing import Any
 
 from boost_histogram.axis import ArrayTuple, AxesTuple
 
-if sys.version_info < (3, 10):
-    import builtins
-    import itertools
-
-    # pylint: disable-next=redefined-builtin
-    def zip(*iterables: Any, strict: bool = False) -> Iterator[tuple[Any, ...]]:
-        if strict:
-            marker = object()
-            for each in itertools.zip_longest(*iterables, fillvalue=marker):
-                for val in each:
-                    if val is marker:
-                        raise ValueError("zip() arguments are not the same length")
-                yield each
-        else:
-            yield from builtins.zip(*iterables)
-
+from ._compat.builtins import zip
 
 __all__ = ("NamedAxesTuple", "AxesTuple", "ArrayTuple")
 

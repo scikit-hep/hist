@@ -124,9 +124,6 @@ filterwarnings = [
     "ignore::matplotlib._api.deprecation.MatplotlibDeprecationWarning"
 ]
 
-[tool.nbqa.mutate]
-pyupgrade = 1
-
 [tool.mypy]
 warn_unused_configs = true
 files = "src"
@@ -203,7 +200,7 @@ select = [
 ]
 extend-ignore = ["PLR", "E501", "PT011", "PT013", "PT004"]
 target-version = "py37"
-typing-modules = ["hist.typing"]
+typing-modules = ["hist._compat.typing"]
 src = ["src"]
 unfixable = ["T20", "F841"]
 exclude = []

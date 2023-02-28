@@ -4,7 +4,7 @@ from typing import Any
 
 import numpy as np
 
-from .typing import Literal
+from ._compat.typing import Literal
 
 try:
     from scipy import stats

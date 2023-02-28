@@ -6,8 +6,8 @@ import boost_histogram as bh
 
 import hist
 
+from ._compat.typing import ArrayLike, Self
 from .basehist import BaseHist, IndexingExpr
-from .typing import ArrayLike, Self
 
 
 class NamedHist(BaseHist, family=hist):

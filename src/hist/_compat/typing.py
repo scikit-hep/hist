@@ -21,8 +21,8 @@ else:
     Ufunc = Any
 
 
-__all__ = ("Literal", "Protocol", "SupportsIndex", "Ufunc", "ArrayLike", "Self")
+__all__ = ["Literal", "Protocol", "SupportsIndex", "Ufunc", "ArrayLike", "Self"]
 
 
-def __dir__() -> tuple[str, ...]:
+def __dir__() -> list[str]:
     return __all__
