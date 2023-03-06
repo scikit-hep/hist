@@ -1,25 +1,25 @@
 hist package
 ============
 
+.. automodule:: hist
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Subpackages
 -----------
 
 .. toctree::
-   :maxdepth: 5
+   :maxdepth: 4
 
    hist.axis
-
-.. toctree::
-   :maxdepth: 5
-
    hist.dask
-
 
 Submodules
 ----------
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 4
 
    hist.accumulators
    hist.axestuple
@@ -29,7 +29,11 @@ Submodules
    hist.intervals
    hist.namedhist
    hist.numpy
+   hist.plot
+   hist.quick_construct
    hist.stack
    hist.storage
+   hist.svgplots
+   hist.svgutils
    hist.tag
    hist.version

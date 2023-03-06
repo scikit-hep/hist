@@ -2,6 +2,6 @@ hist
 ====
 
 .. toctree::
-   :maxdepth: 5
+   :maxdepth: 4
 
    hist
