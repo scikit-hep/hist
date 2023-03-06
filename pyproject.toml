@@ -60,46 +60,46 @@ mpl = [
 plot = [
     "matplotlib >=3.0",
     "mplhep >=0.2.16",
-    "scipy >=1.4; python_version<'3.11'",
-    "iminuit >=2; python_version<'3.11'",
+    "scipy >=1.4",
+    "iminuit >=2",
 ]
 dask = [
-    "dask[dataframe] >=2022; python_version>'3.7'",
-    "dask_histogram >=2023.1; python_version>'3.7'"
+    "dask[dataframe] >=2022; python_version>='3.8'",
+    "dask_histogram >=2023.1; python_version>='3.8'"
 ]
 test = [
     "pytest >=6",
     "pytest-mpl >=0.12",
-    "dask[dataframe] >=2022; python_version>'3.7'",
-    "dask_histogram >=2023.1; python_version>'3.7'",
+    "dask[dataframe] >=2022; python_version>='3.8'",
+    "dask_histogram >=2023.1; python_version>='3.8'",
 ]
 dev = [
     "pytest >=6",
     "pytest-mpl >=0.12",
     "matplotlib >=3.0",
     "mplhep >=0.2.16",
-    "scipy >=1.4; python_version<'3.11'",
+    "scipy >=1.4",
     "iminuit >=2; python_version<'3.11'",
     "ipykernel",
-    "dask[dataframe] >=2022; python_version>'3.7'",
-    "dask_histogram >=2023.1; python_version>'3.7'",
+    "dask[dataframe] >=2022; python_version>='3.8'",
+    "dask_histogram >=2023.1; python_version>='3.8'",
 ]
 docs = [
     "pytest >=6",
     "pytest-mpl >=0.12",
     "matplotlib >=3.0",
     "mplhep >=0.2.16",
-    "scipy >=1.4; python_version<'3.11'",
-    "iminuit >=2; python_version<'3.11'",
+    "scipy >=1.4",
+    "iminuit >=2",
     "ipython_genutils",
     "graphviz >=0.20.1",
-    "dask[dataframe] >=2022; python_version>'3.7'",
-    "dask_histogram >=2023.1; python_version>'3.7'",
+    "dask[dataframe] >=2022; python_version>='3.8'",
+    "dask_histogram >=2023.1; python_version>='3.8'",
     "nbsphinx",
-    "Sphinx >=3.0.0",
+    "sphinx >=3.0.0",
     "sphinx_copybutton",
-    "sphinx_rtd_theme >=0.5.0",
     "sphinx_book_theme >=0.0.38",
+    "sphinxcontrib-programoutput",
     "ipython",
     "ipykernel",
     "pillow",

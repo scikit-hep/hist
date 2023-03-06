@@ -8,22 +8,12 @@ from __future__ import annotations
 
 # Warning: do not change the path here. To use autodoc, you need to install the
 # package first.
-import os
-import shutil
-import sys
-from pathlib import Path
-
 from pkg_resources import get_distribution
-
-DIR = Path(__file__).parent.resolve()
-BASEDIR = DIR.parent
-
-sys.path.append(str(BASEDIR / "src/hist"))
 
 # -- Project information -----------------------------------------------------
 
 project = "Hist"
-copyright = "2020-2021, Henry Schreiner"
+copyright = "2020, Henry Schreiner"
 author = "Henry Schreiner and Nino Lau"
 version = get_distribution("hist").version
 
@@ -34,12 +24,13 @@ version = get_distribution("hist").version
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    "sphinx.ext.autodoc",
+    "myst_parser",
     "nbsphinx",
+    "sphinx.ext.autodoc",
     "sphinx.ext.mathjax",
     "sphinx.ext.napoleon",
     "sphinx_copybutton",
-    "myst_parser",
+    "sphinxcontrib.programoutput",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -48,7 +39,16 @@ templates_path = ["_templates"]
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ["_build", "**.ipynb_checkpoints", "Thumbs.db", ".DS_Store", ".env"]
+exclude_patterns = [
+    "**.ipynb_checkpoints",
+    ".DS_Store",
+    ".env",
+    "user-guide/notebooks/SVGHistogram.ipynb",
+    "Thumbs.db",
+    "_build",
+    "banner_slides.md",
+    "build",
+]
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -91,23 +91,3 @@ nbsphinx_execute_arguments = [
 ]
 
 nbsphinx_kernel_name = "python3"
-
-
-def prepare(app):
-    outer = BASEDIR / ".github"
-    inner = DIR
-    contributing = "CONTRIBUTING.md"
-    shutil.copy(outer / contributing, inner / "contributing.md")
-
-
-def clean_up(app, exception):
-    inner = DIR
-    os.unlink(inner / "contributing.md")
-
-
-def setup(app):
-    # Copy the file in
-    app.connect("builder-inited", prepare)
-
-    # Clean up the generated file
-    app.connect("build-finished", clean_up)

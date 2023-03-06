@@ -38,6 +38,7 @@ To get an idea of creating histograms in Hist looks like, you can take a look at
    user-guide/notebooks/Histogram
    user-guide/notebooks/Stack
    user-guide/notebooks/Interpolation
+   user-guide/cli
 
 .. toctree::
    :maxdepth: 2

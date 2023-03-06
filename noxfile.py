@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import shutil
 import sys
 from pathlib import Path
@@ -29,7 +30,7 @@ def pylint(session: nox.Session) -> None:
     Run pylint.
     """
 
-    session.install("pylint~=2.15.0")
+    session.install("pylint~=2.16.0")
     session.install("-e", ".")
     session.run("pylint", "src", *session.posargs)
 
@@ -58,24 +59,44 @@ def regenerate(session):
 
 
 @nox.session(reuse_venv=True)
-def docs(session):
+def docs(session: nox.Session) -> None:
     """
-    Build the docs. Pass "serve" to serve.
+    Build the docs. Pass "--serve" to serve.
     """
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--serve", action="store_true", help="Serve after building")
+    args = parser.parse_args(session.posargs)
 
     session.install("-e", ".[docs]")
     session.chdir("docs")
     session.run("sphinx-build", "-M", "html", ".", "_build")
 
-    if session.posargs:
-        if "serve" in session.posargs:
-            print("Launching docs at http://localhost:8001/ - use Ctrl-C to quit")
-            session.run("python", "-m", "http.server", "8001", "-d", "_build/html")
-        else:
-            print("Unsupported argument to docs")
+    if args.serve:
+        print("Launching docs at http://localhost:8000/ - use Ctrl-C to quit")
+        session.run("python", "-m", "http.server", "8000", "-d", "_build/html")
 
 
-@nox.session
+@nox.session(reuse_venv=True)
+def build_api_docs(session: nox.Session) -> None:
+    """
+    Build (regenerate) API docs.
+    """
+
+    session.install("sphinx")
+    session.chdir("docs")
+    session.run(
+        "sphinx-apidoc",
+        "-o",
+        "reference/",
+        "--separate",
+        "--force",
+        "--module-first",
+        "../src/hist",
+    )
+
+
+@nox.session(reuse_venv=True)
 def build(session):
     """
     Build an SDist and wheel.
