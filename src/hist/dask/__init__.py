@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 try:
-    import dask_histogram  # noqa: F401
+    import dask_histogram
 except ModuleNotFoundError as err:
     raise ModuleNotFoundError(
         """for hist.dask, install the 'dask_histogram' package with:
