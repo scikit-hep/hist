@@ -93,7 +93,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
             storage = getattr(bh.storage, storage_str)()
         elif isinstance(storage, type):
             msg = f"Please use '{storage.__name__}()' instead of '{storage.__name__}'"
-            warnings.warn(msg)
+            warnings.warn(msg, stacklevel=2)
             storage = storage()
 
         super().__init__(*args, storage=storage, metadata=metadata)  # type: ignore[call-overload]
@@ -104,7 +104,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
                 disallowed_warning = (
                     f"{ax.name} is a protected keyword and cannot be used as axis name"
                 )
-                warnings.warn(disallowed_warning)
+                warnings.warn(disallowed_warning, stacklevel=2)
 
         valid_names = [ax.name for ax in self.axes if ax.name]
         if len(valid_names) != len(set(valid_names)):

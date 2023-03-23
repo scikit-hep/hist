@@ -54,6 +54,6 @@ def __dir__() -> tuple[str, ...]:
 def __getattr__(name: str) -> ModuleType:
     if name == "axes":
         msg = f"Misspelling error, '{name}' should be 'axis'"
-        warnings.warn(msg)
+        warnings.warn(msg, stacklevel=2)
         return axis
     raise AttributeError(f"module {__name__} has no attribute {name}")

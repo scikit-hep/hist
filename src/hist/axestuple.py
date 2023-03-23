@@ -58,7 +58,7 @@ class NamedAxesTuple(AxesTuple):
                 disallowed_warning = (
                     f"{ax.name} is a protected keyword and cannot be used as axis name"
                 )
-                warnings.warn(disallowed_warning)
+                warnings.warn(disallowed_warning, stacklevel=2)
 
         valid_names = [ax.name for ax in self if ax.name]
         if len(valid_names) != len(set(valid_names)):
