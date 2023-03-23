@@ -23,7 +23,7 @@ repos:
   - id: trailing-whitespace
 
 - repo: https://github.com/charliermarsh/ruff-pre-commit
-  rev: v0.0.255
+  rev: v0.0.258
   hooks:
   - id: ruff
     args: ["--fix", "--show-fixes"]
@@ -35,7 +35,7 @@ repos:
 
 # Notebook formatting
 - repo: https://github.com/nbQA-dev/nbQA
-  rev: 1.6.3
+  rev: 1.6.4
   hooks:
   - id: nbqa-ruff
     additional_dependencies: [ruff==0.0.253]
