@@ -8,6 +8,8 @@ from pytest import approx
 
 from hist import Hist, NamedHist, Stack, axis
 
+np.random.seed(42)
+
 # different histograms here!
 reg_ax = axis.Regular(10, 0, 1)
 boo_ax = axis.Boolean()
