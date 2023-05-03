@@ -725,8 +725,7 @@ def test_named_hist_proxy():
 
     assert type(h) is NamedHist
 
-    with pytest.raises(AttributeError):
-        NamedHist().new
+    assert not hasattr(NamedHist(), "new")
 
     h = (
         NamedHist.new.Reg(10, 0, 1, name="x")

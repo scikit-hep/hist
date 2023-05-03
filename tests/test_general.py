@@ -687,8 +687,7 @@ def test_hist_proxy():
 
     assert type(h) == Hist
 
-    with pytest.raises(AttributeError):
-        Hist().new
+    assert not hasattr(Hist(), "new")
 
     h = (
         Hist.new.Reg(10, 0, 1, name="x")
