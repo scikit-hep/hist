@@ -4,17 +4,7 @@ import functools
 import operator
 import typing
 import warnings
-
-from typing import (
-    Any,
-    Callable,
-    Iterator,
-    Mapping,
-    Sequence,
-    Tuple,
-    TypeVar,
-    Union
-)
+from typing import Any, Callable, Iterator, Mapping, Sequence, Tuple, Union
 
 import boost_histogram as bh
 import histoprint
@@ -22,8 +12,8 @@ import numpy as np
 
 import hist
 
-from ._compat.typing import ArrayLike, Protocol, Self, SupportsIndex
 from . import interop
+from ._compat.typing import ArrayLike, Protocol, Self, SupportsIndex
 from .axestuple import NamedAxesTuple
 from .axis import AxisProtocol
 from .quick_construct import MetaConstructor
@@ -271,9 +261,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
                 # Partition out non-user args
                 user_args_broadcast = broadcast[:1]
                 user_kwargs_broadcast = {}
-                non_user_kwargs_broadcast = {
-                    k: v for k, v in zip(non_user_kwargs.keys(), broadcast[1:])
-                }
+                non_user_kwargs_broadcast = dict(zip(non_user_kwargs.keys(), broadcast[1:]))
             else:
                 # Result must be broadcast, so unpack and rebuild
                 broadcast = interop.broadcast_and_flatten(
@@ -286,23 +274,14 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
                     for k, v in zip(destructured, broadcast[: len(destructured)])
                     if k in axis_names
                 }
-                non_user_kwargs_broadcast = {
-                    k: v
-                    for k, v in zip(non_user_kwargs, broadcast[len(destructured) :])
-                }
+                non_user_kwargs_broadcast = dict(zip(non_user_kwargs, broadcast[len(destructured) :]))
         # Multiple args: broadcast and flatten!
         else:
-            inputs = tuple([*args, *kwargs.values(), *non_user_kwargs])
+            inputs = (*args, *kwargs.values(), *non_user_kwargs)
             broadcast = interop.broadcast_and_flatten(inputs)
             user_args_broadcast = broadcast[: len(args)]
-            user_kwargs_broadcast = {
-                k: v
-                for k, v in zip(kwargs, broadcast[len(args) : len(args) + len(kwargs)])
-            }
-            non_user_kwargs_broadcast = {
-                k: v
-                for k, v in zip(non_user_kwargs, broadcast[len(args) + len(kwargs) :])
-            }
+            user_kwargs_broadcast = dict(zip(kwargs, broadcast[len(args) : len(args) + len(kwargs)]))
+            non_user_kwargs_broadcast = dict(zip(non_user_kwargs, broadcast[len(args) + len(kwargs) :]))
         return self.fill(
             *user_args_broadcast,
             **user_kwargs_broadcast,

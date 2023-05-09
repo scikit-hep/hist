@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-import numpy as np
 from typing import Any, Callable, Iterator, TypeVar
-from .typing import ArrayLike, Protocol
 
+import numpy as np
+
+from .typing import ArrayLike, Protocol
 
 T = TypeVar("T")
 U = TypeVar("U")
@@ -28,6 +29,7 @@ def histogram_module_for(cls: type) -> Callable[[M], M]:
     """
     Register a histogram-module object for the given class.
     """
+
     def wrapper(obj: M) -> M:
         _histogram_modules[cls] = obj
         return obj
