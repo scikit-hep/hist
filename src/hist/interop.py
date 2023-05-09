@@ -5,7 +5,6 @@ import numpy as np
 from _compat.typing import ArrayLike, Protocol
 from typing import Any, Callable, Iterator, TypeVar
 
-
 T = TypeVar("T")
 U = TypeVar("U")
 

@@ -6,8 +6,8 @@ import boost_histogram as bh
 
 import hist
 
-from ._compat.typing import ArrayLike, Self
 from . import interop
+from ._compat.typing import ArrayLike, Self
 from .basehist import BaseHist, IndexingExpr
 
 
@@ -79,7 +79,7 @@ class NamedHist(BaseHist, family=hist):
             if kwargs:
                 raise TypeError(
                     "Only explicit keyword arguments, or a single structured object is supported by "
-                    f"`fill_flattened`, but not both."
+                    "`fill_flattened`, but not both."
                 )
 
             destructured = interop.destructure(obj)
@@ -100,19 +100,13 @@ class NamedHist(BaseHist, family=hist):
                 for k, v in zip(destructured, broadcast[: len(destructured)])
                 if k in axis_names
             }
-            non_user_kwargs_broadcast = {
-                k: v for k, v in zip(non_user_kwargs, broadcast[len(destructured) :])
-            }
+            non_user_kwargs_broadcast = dict(zip(non_user_kwargs, broadcast[len(destructured) :]))
         # Multiple args: broadcast and flatten!
         else:
-            inputs = tuple([*kwargs.values(), *non_user_kwargs])
+            inputs = (*kwargs.values(), *non_user_kwargs)
             broadcast = interop.broadcast_and_flatten(inputs)
-            user_kwargs_broadcast = {
-                k: v for k, v in zip(kwargs, broadcast[: len(kwargs)])
-            }
-            non_user_kwargs_broadcast = {
-                k: v for k, v in zip(non_user_kwargs, broadcast[len(kwargs) :])
-            }
+            user_kwargs_broadcast = dict(zip(kwargs, broadcast[: len(kwargs)]))
+            non_user_kwargs_broadcast = dict(zip(non_user_kwargs, broadcast[len(kwargs) :]))
         return self.fill(
             **user_kwargs_broadcast,
             threads=threads,
