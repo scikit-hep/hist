@@ -7,6 +7,7 @@ import boost_histogram as bh
 import hist
 
 from ._compat.typing import ArrayLike, Self
+from . import interop
 from .basehist import BaseHist, IndexingExpr
 
 
@@ -53,6 +54,69 @@ class NamedHist(BaseHist, family=hist):
 
         raise TypeError(
             f"Only fill by names are supported for {self.__class__.__name__}"
+        )
+
+    def fill_flattened(
+        self: T,
+        obj: Any = None,
+        *,
+        weight: Any | None = None,
+        sample: Any | None = None,
+        threads: int | None = None,
+        **kwargs,
+    ) -> T:
+        axis_names = {ax.name for ax in self.axes}
+
+        non_user_kwargs = {}
+        if weight is not None:
+            non_user_kwargs["weight"] = weight
+        if sample is not None:
+            non_user_kwargs["sample"] = sample
+
+        # Single arguments are either arrays for single-dimensional histograms, or
+        # structures for multi-dimensional hists that must first be unpacked
+        if obj is not None:
+            if kwargs:
+                raise TypeError(
+                    "Only explicit keyword arguments, or a single structured object is supported by "
+                    f"`fill_flattened`, but both were given"
+                )
+
+            destructured = interop.destructure(obj)
+            # Try to unpack the array, if it's valid to do so, i.e. is the Awkward Array a record array?
+            if destructured is None:
+                raise TypeError(
+                    f"Only fill by names are supported for {self.__class__.__name__}. A single object was given to "
+                    "`fill_flattened`, but it could not be destructed into name-array pairs."
+                )
+
+            # Result must be broadcast, so unpack and rebuild
+            broadcast = interop.broadcast_and_flatten(
+                (*destructured.values(), *non_user_kwargs.values())
+            )
+            # Partition into user and non-user args
+            user_kwargs_broadcast = {
+                k: v
+                for k, v in zip(destructured, broadcast[: len(destructured)])
+                if k in axis_names
+            }
+            non_user_kwargs_broadcast = {
+                k: v for k, v in zip(non_user_kwargs, broadcast[len(destructured) :])
+            }
+        # Multiple args: broadcast and flatten!
+        else:
+            inputs = tuple([*kwargs.values(), *non_user_kwargs])
+            broadcast = interop.broadcast_and_flatten(inputs)
+            user_kwargs_broadcast = {
+                k: v for k, v in zip(kwargs, broadcast[: len(kwargs)])
+            }
+            non_user_kwargs_broadcast = {
+                k: v for k, v in zip(non_user_kwargs, broadcast[len(kwargs) :])
+            }
+        return self.fill(
+            **user_kwargs_broadcast,
+            threads=threads,
+            **non_user_kwargs_broadcast,
         )
 
     def __getitem__(  # type: ignore[override]
