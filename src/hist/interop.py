@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 import numpy as np
 from ._compat.typing import ArrayLike, Protocol
-from typing import Any, Callable, Iterator, TypeVar
+from typing import Any, Callable, Iterator, TypeVar, cast
 
 T = TypeVar("T", contravariant=True)
 U = TypeVar("U")
@@ -14,7 +14,9 @@ class HistogramModuleProtocol(Protocol[T, U]):
     def unpack(self, obj: T) -> dict[str, U] | None:
         ...
 
-    def broadcast_and_flatten(self, objects: Sequence[U]) -> tuple[ArrayLike]:
+    def broadcast_and_flatten(
+        self, objects: Sequence[U | ArrayLike]
+    ) -> tuple[np.typing.NDArray[Any], ...]:
         ...
 
 
@@ -65,7 +67,7 @@ def destructure(obj: Any) -> dict[str, Any] | None:
     raise TypeError(f"No histogram module found for {obj!r}")
 
 
-def broadcast_and_flatten(args: Sequence[Any]) -> tuple[ArrayLike]:
+def broadcast_and_flatten(args: Sequence[Any]) -> tuple[np.typing.NDArray[Any], ...]:
     """
     Convert the given histogram-module arrays into a set of consistent 1D NumPy arrays
     for histogram filling. For NumPy this entails broadcasting and flattening.
@@ -82,13 +84,15 @@ def broadcast_and_flatten(args: Sequence[Any]) -> tuple[ArrayLike]:
 class NumpyHistogramModule:
     @staticmethod
     def unpack(obj: np.typing.NDArray[Any]) -> dict[str, np.typing.NDArray[Any]] | None:
-        if obj.dtype.names is None:
+        if obj.dtype.fields is None:
             return None
         else:
             return {k: obj[k] for k in obj.dtype.fields}
 
     @staticmethod
-    def broadcast_and_flatten(args: Sequence[ArrayLike]) -> tuple[np.typing.NDArray[Any], ...]:
+    def broadcast_and_flatten(
+        args: Sequence[np.typing.NDArray[Any] | ArrayLike],
+    ) -> tuple[np.typing.NDArray[Any], ...]:
         arrays = []
         for arg in args:
             # If we can't interpret this argument, it's not NumPy-friendly!
@@ -109,13 +113,13 @@ else:
     @histogram_module_for(pd.DataFrame)
     class PandasHistogramModule:
         @staticmethod
-        def unpack(obj: pd.DataFrame) -> dict[str, pd.Series] | None:
-            return obj.to_dict("series")
+        def unpack(obj: pd.DataFrame) -> dict[str, pd.Series[Any]]:
+            return cast(dict[str, pd.Series[Any]], obj.to_dict("series"))
 
         @staticmethod
         def broadcast_and_flatten(
-            args: Sequence[pd.Series | ArrayLike],
-        ) -> tuple[np.ndarray, ...]:
+            args: Sequence[pd.Series[Any] | ArrayLike],
+        ) -> tuple[np.typing.NDArray[Any], ...]:
             arrays = []
             for arg in args:
                 # If we can't interpret this argument, it's not NumPy-friendly!

@@ -56,7 +56,8 @@ class NamedHist(BaseHist, family=hist):
             f"Only fill by names are supported for {self.__class__.__name__}"
         )
 
-    def fill_flattened(
+    # pylint: disable-next=arguments-differ
+    def fill_flattened(  # type: ignore[override]
         self: Self,
         obj: Any = None,
         *,
