@@ -232,13 +232,13 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         return super().fill(*args, *data, weight=weight, sample=sample, threads=threads)
 
     def fill_flattened(
-        self: T,
+        self: Self,
         *args: Any,
         weight: Any | None = None,
         sample: Any | None = None,
         threads: int | None = None,
         **kwargs,
-    ) -> T:
+    ) -> Self:
         axis_names = {ax.name for ax in self.axes}
 
         non_user_kwargs = {}

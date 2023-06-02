@@ -57,14 +57,14 @@ class NamedHist(BaseHist, family=hist):
         )
 
     def fill_flattened(
-        self: T,
+        self: Self,
         obj: Any = None,
         *,
         weight: Any | None = None,
         sample: Any | None = None,
         threads: int | None = None,
         **kwargs,
-    ) -> T:
+    ) -> Self:
         axis_names = {ax.name for ax in self.axes}
 
         non_user_kwargs = {}
