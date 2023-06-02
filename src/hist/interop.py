@@ -88,8 +88,8 @@ class NumpyHistogramModule:
     def unpack(obj: np.typing.NDArray[Any]) -> dict[str, np.typing.NDArray[Any]] | None:
         if obj.dtype.fields is None:
             return None
-        else:
-            return {k: obj[k] for k in obj.dtype.fields}
+
+        return {k: obj[k] for k in obj.dtype.fields}
 
     @staticmethod
     def broadcast_and_flatten(
