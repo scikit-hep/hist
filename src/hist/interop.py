@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-import numpy as np
-from ._compat.typing import ArrayLike, Protocol
 from typing import Any, Callable, Iterator, TypeVar, cast
+
+import numpy as np
+
+from ._compat.typing import ArrayLike, Protocol
 
 T = TypeVar("T", contravariant=True)
 U = TypeVar("U")

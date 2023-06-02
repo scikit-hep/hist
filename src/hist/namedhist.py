@@ -101,13 +101,17 @@ class NamedHist(BaseHist, family=hist):
                 for k, v in zip(destructured, broadcast[: len(destructured)])
                 if k in axis_names
             }
-            non_user_kwargs_broadcast = dict(zip(non_user_kwargs, broadcast[len(destructured) :]))
+            non_user_kwargs_broadcast = dict(
+                zip(non_user_kwargs, broadcast[len(destructured) :])
+            )
         # Multiple args: broadcast and flatten!
         else:
             inputs = (*kwargs.values(), *non_user_kwargs)
             broadcast = interop.broadcast_and_flatten(inputs)
             user_kwargs_broadcast = dict(zip(kwargs, broadcast[: len(kwargs)]))
-            non_user_kwargs_broadcast = dict(zip(non_user_kwargs, broadcast[len(kwargs) :]))
+            non_user_kwargs_broadcast = dict(
+                zip(non_user_kwargs, broadcast[len(kwargs) :])
+            )
         return self.fill(
             **user_kwargs_broadcast,
             threads=threads,
