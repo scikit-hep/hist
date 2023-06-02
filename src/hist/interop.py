@@ -5,8 +5,9 @@ import numpy as np
 from ._compat.typing import ArrayLike, Protocol
 from typing import Any, Callable, Iterator, TypeVar
 
-T = TypeVar("T")
+T = TypeVar("T", contravariant=True)
 U = TypeVar("U")
+V = TypeVar("V")
 
 
 class HistogramModuleProtocol(Protocol[T, U]):
@@ -17,25 +18,26 @@ class HistogramModuleProtocol(Protocol[T, U]):
         ...
 
 
-_histogram_modules: dict[type, HistogramModuleProtocol] = {}
+_histogram_modules: dict[type, HistogramModuleProtocol[Any, Any]] = {}
 
 
-M = TypeVar("M", bound=HistogramModuleProtocol)
-
-
-def histogram_module_for(cls: type) -> Callable[[M], M]:
+def histogram_module_for(
+    cls: type,
+) -> Callable[[HistogramModuleProtocol[U, V]], HistogramModuleProtocol[U, V]]:
     """
     Register a histogram-module object for the given class.
     """
 
-    def wrapper(obj: M) -> M:
+    def wrapper(obj: HistogramModuleProtocol[U, V]) -> HistogramModuleProtocol[U, V]:
         _histogram_modules[cls] = obj
         return obj
 
     return wrapper
 
 
-def find_histogram_modules(*objects: Any) -> Iterator[HistogramModuleProtocol]:
+def find_histogram_modules(
+    *objects: Any,
+) -> Iterator[HistogramModuleProtocol[Any, Any]]:
     """
     Yield histogram-module objects that are known to support any of the given objects.
     """
@@ -79,14 +81,14 @@ def broadcast_and_flatten(args: Sequence[Any]) -> tuple[ArrayLike]:
 @histogram_module_for(np.ndarray)
 class NumpyHistogramModule:
     @staticmethod
-    def unpack(obj: np.ndarray) -> dict[str, np.ndarray] | None:
+    def unpack(obj: np.typing.NDArray[Any]) -> dict[str, np.typing.NDArray[Any]] | None:
         if obj.dtype.names is None:
             return None
         else:
             return {k: obj[k] for k in obj.dtype.fields}
 
     @staticmethod
-    def broadcast_and_flatten(args: Sequence[ArrayLike]) -> tuple[np.ndarray]:
+    def broadcast_and_flatten(args: Sequence[ArrayLike]) -> tuple[np.typing.NDArray[Any], ...]:
         arrays = []
         for arg in args:
             # If we can't interpret this argument, it's not NumPy-friendly!
@@ -113,7 +115,7 @@ else:
         @staticmethod
         def broadcast_and_flatten(
             args: Sequence[pd.Series | ArrayLike],
-        ) -> tuple[np.ndarray]:
+        ) -> tuple[np.ndarray, ...]:
             arrays = []
             for arg in args:
                 # If we can't interpret this argument, it's not NumPy-friendly!

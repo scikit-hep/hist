@@ -63,7 +63,7 @@ class NamedHist(BaseHist, family=hist):
         weight: Any | None = None,
         sample: Any | None = None,
         threads: int | None = None,
-        **kwargs,
+        **kwargs: Any,
     ) -> Self:
         axis_names = {ax.name for ax in self.axes}
 
