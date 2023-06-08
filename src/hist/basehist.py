@@ -547,3 +547,23 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
             raise AssertionError(f"Unsupported storage type {storage}")
 
         return super().sum(flow=flow)
+
+    def chisquare_1samp(self) -> str | NotImplementedError:
+        from hist import stats
+
+        return stats.chisquare_1samp(self)
+
+    def chisquare_2samp(self) -> str | NotImplementedError:
+        from hist import stats
+
+        return stats.chisquare_2samp(self)
+
+    def ks_1samp(self) -> str | NotImplementedError:
+        from hist import stats
+
+        return stats.ks_1samp(self)
+
+    def ks_2samp(self) -> str | NotImplementedError:
+        from hist import stats
+
+        return stats.ks_2samp(self)
