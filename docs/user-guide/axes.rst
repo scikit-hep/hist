@@ -201,10 +201,8 @@ You can sort the Categorty axes via ``.sort()`` method:
         axis.IntCategory([3, 1, 2], label="Number"),
         axis.StrCategory(["Teacher", "Police", "Artist"], label="Profession"),
     )
-    h.sort(0).axes[0]  # IntCategory([1, 2, 3], label='Number')
-    h.sort(1, reverse=True).axes[
-        1
-    ]  # StrCategory(['Teacher', 'Police', 'Artist'], label='Profession')
+    # Sort Number axis increasing and Profession axis decreasing
+    h1 = h.sort("Number").sort("Profession", reverse=True)
 
 
 .. py:function:: hist.axis.StrCategory([str1, ...], name, label, metadata="", growth=False)
