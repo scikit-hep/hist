@@ -41,11 +41,13 @@ If you try the following in an IPython session, you will get:
    import numpy as np
    import hist
 
-   norm_vals = np.concatenate([
-       np.random.normal(loc=5, scale=1, size=1_000_000),
-       np.random.normal(loc=2, scale=.2, size=200_000),
-       np.random.normal(loc=8, scale=.2, size=200_000),
-   ])
+   norm_vals = np.concatenate(
+       [
+           np.random.normal(loc=5, scale=1, size=1_000_000),
+           np.random.normal(loc=2, scale=0.2, size=200_000),
+           np.random.normal(loc=8, scale=0.2, size=200_000),
+       ]
+   )
 
 .. code-block:: ipython
 
@@ -95,10 +97,7 @@ So you can transition your code slowly to hist.
 
 .. code-block:: python3
 
-   data  = np.random.multivariate_normal(
-       (0, 0),
-       ((1, 0),(0, .5)),
-       10_000_000).T.copy()
+   data = np.random.multivariate_normal((0, 0), ((1, 0), (0, 0.5)), 10_000_000).T.copy()
 
 We can check the performance against NumPy again; NumPy does not do well
 with regular spaced bins in more than 1D:
