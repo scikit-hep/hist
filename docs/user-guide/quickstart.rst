@@ -46,8 +46,7 @@ The exact same syntax is used any number of dimensions:
 .. code-block:: python3
 
    hist3D = (
-        Hist.new
-       .Regular(10, 0, 100, circular=True, name="x")
+       Hist.new.Regular(10, 0, 100, circular=True, name="x")
        .Regular(10, 0.0, 10.0, name="y")
        .Variable([1, 2, 3, 4, 5, 5.5, 6], name="z")
        .Weight()
@@ -85,7 +84,7 @@ in the third slice entry, or remove an entire axis using ``sum``:
         hist.axis.Regular(10, 0, 1, name="y"),
         hist.axis.Regular(10, 0, 1, name="z"),
     )
-    mini = h[1:5, .2j:.9j, sum]
+    mini = h[1:5, 0.2j:0.9j, sum]
     # Will be 4 bins x 7 bins
 
 See :ref:`usage-indexing`.
