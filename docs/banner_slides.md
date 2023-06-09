@@ -16,12 +16,10 @@ Converted to GIF with ezgif.com, 300 ms delay time.
 import hist
 
 # Make a histogram
-h = hist.Hist(
-    hist.axes.Regular(10, 0, 1, name="x")
-)
+h = hist.Hist(hist.axes.Regular(10, 0, 1, name="x"))
 
 # Fill it with events
-h.fill(x=[.2, .3, .6, .9])
+h.fill(x=[0.2, 0.3, 0.6, 0.9])
 
 # Compute the sum
 total = h.sum()
@@ -36,7 +34,7 @@ from hist import Hist
 h = Hist.new.Reg(10, 0, 1, name="x").Double()
 
 # Fill it with events
-h.fill(x=[.2, .3, .6, .9])
+h.fill(x=[0.2, 0.3, 0.6, 0.9])
 
 # Compute the sum
 total = h.sum()
@@ -66,7 +64,7 @@ total = h.sum()
 
 ```python
 # Slice in data coordinates
-sliced_h = h[.5j:1.5j]
+sliced_h = h[0.5j:1.5j]
 
 # Sum over and rebin easily
 smaller_1d = h_2d[sum, 2j]
@@ -137,6 +135,7 @@ Supports the UHI `PlottableHistogram` protocol!
 
 ```python
 import mplhep
+
 mplhep.histplot(h)
 ```
 
