@@ -548,22 +548,32 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
         return super().sum(flow=flow)
 
-    def chisquare_1samp(self) -> str | NotImplementedError:
+    def chisquare_1samp(
+        self: hist.BaseHist,
+        distribution: str | Callable[..., Any],
+        args: Any = (),
+        kwds: Any = None,
+    ) -> Any:
         from hist import stats
 
-        return stats.chisquare_1samp(self)
+        return stats.chisquare_1samp(self, distribution, args, kwds)
 
-    def chisquare_2samp(self) -> str | NotImplementedError:
+    def chisquare_2samp(self, other: hist.BaseHist) -> Any:
         from hist import stats
 
-        return stats.chisquare_2samp(self)
+        return stats.chisquare_2samp(self, other)
 
-    def ks_1samp(self) -> str | NotImplementedError:
+    def ks_1samp(
+        self: hist.BaseHist,
+        distribution: str | Callable[..., Any],
+        args: Any = (),
+        kwds: Any = None,
+    ) -> Any:
         from hist import stats
 
-        return stats.ks_1samp(self)
+        return stats.ks_1samp(self, distribution, args, kwds)
 
-    def ks_2samp(self) -> str | NotImplementedError:
+    def ks_2samp(self, other: hist.BaseHist) -> Any:
         from hist import stats
 
-        return stats.ks_2samp(self)
+        return stats.ks_2samp(self, other)
