@@ -47,7 +47,7 @@ If you try the following in an IPython session, you will get:
        np.random.normal(loc=8, scale=.2, size=200_000),
    ])
 
-.. code-block:: python3
+.. code-block:: ipython
 
    %%timeit
    bins, edges = np.histogram(norm_vals, bins=100, range=(0, 10))
@@ -64,7 +64,7 @@ ND histograms. But if you already use NumPy histograms and you really
 don’t want to rewrite your code, hist has adaptors for the
 three histogram functions in NumPy:
 
-.. code-block:: python3
+.. code-block:: ipython
 
    %%timeit
    bins, edges = hist.numpy.histogram(norm_vals, bins=100, range=(0, 10))
@@ -103,7 +103,7 @@ So you can transition your code slowly to hist.
 We can check the performance against NumPy again; NumPy does not do well
 with regular spaced bins in more than 1D:
 
-.. code-block:: python3
+.. code-block:: ipython
 
    %%timeit
    np.histogram2d(*data, bins=(400, 200), range=((-2, 2), (-1, 1)))
@@ -112,7 +112,7 @@ with regular spaced bins in more than 1D:
 
    1.31 s ± 17.3 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
 
-.. code-block:: python3
+.. code-block:: ipython
 
    %%timeit
    hist.numpy.histogram2d(*data, bins=(400, 200), range=((-2, 2), (-1, 1)))
