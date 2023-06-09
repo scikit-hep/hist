@@ -43,9 +43,9 @@ def chisquare_1samp(
     totalentries = self.sum()
     expected = np.diff(cdf(self.axes[0].edges, *args, **kwds)) * totalentries
     where = variances != 0
-    squares = (expected[where] - observed[where]) ** 2 / variances[where]
+    squares = (expected - observed) ** 2
     ndof = len(observed) - 1
-    chisq = np.sum(squares)
+    chisq = np.sum(squares[where] / variances[where])
     pvalue = spstats.chi2.sf(chisq, ndof)
 
     return chisq, ndof, pvalue

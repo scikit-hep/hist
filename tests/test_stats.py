@@ -8,7 +8,7 @@ import hist
 from hist import Hist
 
 
-def test_stattest():
+def test_chisquare_1samp():
     from numba_stats import norm
 
     np.random.seed(42)
@@ -26,6 +26,26 @@ def test_stattest():
     assert ndof == 19
     assert pvalue == pytest.approx(0.9647461095072625)
 
+    h = Hist(hist.axis.Regular(20, -5, 5), hist.axis.Regular(20, -5, 5))
+    h.fill(np.random.normal(size=1000), np.random.normal(size=1000))
+    with pytest.raises(NotImplementedError):
+        h.chisquare_1samp("norm")
+
+    h = Hist(hist.axis.Regular(20, -5, 5))
+    h.fill(np.random.normal(size=1000), weight=np.random.randint(0, 10, size=1000))
+    with pytest.raises(RuntimeError):
+        h.chisquare_1samp("norm")
+
+    h = Hist(hist.axis.Regular(20, -5, 5))
+    h.fill(np.random.normal(size=1000))
+    with pytest.raises(ValueError):
+        h.chisquare_1samp("not_a_distribution")
+
+    with pytest.raises(TypeError):
+        h.chisquare_1samp(1)
+
+
+def test_chisquare_2samp():
     np.random.seed(42)
 
     h1 = Hist(hist.axis.Regular(20, -5, 5, name="norm"))
@@ -50,10 +70,50 @@ def test_stattest():
     assert ndof == 14
     assert pvalue == pytest.approx(0.4816525905214355)
 
+    h = Hist(hist.axis.Regular(20, -5, 5), hist.axis.Regular(20, -5, 5))
+    h.fill(np.random.normal(size=1000), np.random.normal(size=1000))
+    with pytest.raises(NotImplementedError):
+        h.chisquare_2samp(h2)
+
+    h = Hist(hist.axis.Regular(20, -5, 5))
+    h.fill(np.random.normal(size=1000), weight=np.random.randint(0, 10, size=1000))
+    with pytest.raises(RuntimeError):
+        h.chisquare_2samp(h2)
+
+    with pytest.raises(TypeError):
+        h.chisquare_2samp(1)
+
+
+def test_ks_1samp():
+    np.random.seed(42)
+
+    h = Hist(hist.axis.Regular(20, -5, 5))
+    h.fill(np.random.normal(size=1000))
+
     assert np.all(
         h.ks_1samp("norm") == spstats.norm.cdf(h.axes[0].edges)
     )  # placeholder to pass test for now
 
+    h = Hist(hist.axis.Regular(20, -5, 5), hist.axis.Regular(20, -5, 5))
+    h.fill(np.random.normal(size=1000), np.random.normal(size=1000))
+    with pytest.raises(NotImplementedError):
+        h.ks_1samp("norm")
+
+    h = Hist(hist.axis.Regular(20, -5, 5))
+    h.fill(np.random.normal(size=1000), weight=np.random.randint(0, 10, size=1000))
+    with pytest.raises(RuntimeError):
+        h.ks_1samp("norm")
+
+    h = Hist(hist.axis.Regular(20, -5, 5))
+    h.fill(np.random.normal(size=1000))
+    with pytest.raises(ValueError):
+        h.ks_1samp("not_a_distribution")
+
+    with pytest.raises(TypeError):
+        h.ks_1samp(1)
+
+
+def test_ks_2samp():
     np.random.seed(42)
 
     h1 = Hist(hist.axis.Regular(20, -5, 5, name="norm"))
@@ -66,37 +126,12 @@ def test_stattest():
     h = Hist(hist.axis.Regular(20, -5, 5), hist.axis.Regular(20, -5, 5))
     h.fill(np.random.normal(size=1000), np.random.normal(size=1000))
     with pytest.raises(NotImplementedError):
-        h.chisquare_1samp("norm")
-    with pytest.raises(NotImplementedError):
-        h.chisquare_2samp(h2)
-    with pytest.raises(NotImplementedError):
-        h.ks_1samp("norm")
-    with pytest.raises(NotImplementedError):
         h.ks_2samp(h2)
 
     h = Hist(hist.axis.Regular(20, -5, 5))
     h.fill(np.random.normal(size=1000), weight=np.random.randint(0, 10, size=1000))
     with pytest.raises(RuntimeError):
-        h.chisquare_1samp("norm")
-    with pytest.raises(RuntimeError):
-        h.chisquare_2samp(h2)
-    with pytest.raises(RuntimeError):
-        h.ks_1samp("norm")
-    with pytest.raises(RuntimeError):
         h.ks_2samp(h2)
 
-    h = Hist(hist.axis.Regular(20, -5, 5))
-    h.fill(np.random.normal(size=1000))
-    with pytest.raises(ValueError):
-        h.chisquare_1samp("not_a_distribution")
-    with pytest.raises(ValueError):
-        h.ks_1samp("not_a_distribution")
-
-    with pytest.raises(TypeError):
-        h.chisquare_1samp(1)
-    with pytest.raises(TypeError):
-        h.chisquare_2samp(1)
-    with pytest.raises(TypeError):
-        h.ks_1samp(1)
     with pytest.raises(TypeError):
         h.ks_2samp(1)
