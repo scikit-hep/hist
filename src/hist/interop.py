@@ -7,13 +7,13 @@ import numpy as np
 
 from ._compat.typing import ArrayLike, Protocol
 
-T = TypeVar("T", contravariant=True)
+T_contra = TypeVar("T_contra", contravariant=True)
 U = TypeVar("U")
 V = TypeVar("V")
 
 
-class HistogramModuleProtocol(Protocol[T, U]):
-    def unpack(self, obj: T) -> dict[str, U] | None:
+class HistogramModuleProtocol(Protocol[T_contra, U]):
+    def unpack(self, obj: T_contra) -> dict[str, U] | None:
         ...
 
     def broadcast_and_flatten(
@@ -103,7 +103,7 @@ class NumpyHistogramModule:
             except (TypeError, ValueError):
                 return NotImplemented
 
-        return tuple([np.ravel(x) for x in np.broadcast_arrays(*arrays)])
+        return tuple(np.ravel(x) for x in np.broadcast_arrays(*arrays))
 
 
 try:
@@ -130,4 +130,4 @@ else:
                 except (TypeError, ValueError):
                     return NotImplemented
 
-            return tuple([np.ravel(x) for x in np.broadcast_arrays(*arrays)])
+            return tuple(np.ravel(x) for x in np.broadcast_arrays(*arrays))
