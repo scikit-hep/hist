@@ -38,7 +38,7 @@ def test_chisquare_1samp():
 
     h = Hist(hist.axis.Regular(20, -5, 5))
     h.fill(np.random.normal(size=1000))
-    with pytest.raises(ValueError):
+    with pytest.raises(TypeError):
         h.chisquare_1samp("not_a_distribution")
 
     with pytest.raises(TypeError):
@@ -106,7 +106,7 @@ def test_ks_1samp():
 
     h = Hist(hist.axis.Regular(20, -5, 5))
     h.fill(np.random.normal(size=1000))
-    with pytest.raises(ValueError):
+    with pytest.raises(TypeError):
         h.ks_1samp("not_a_distribution")
 
     with pytest.raises(TypeError):

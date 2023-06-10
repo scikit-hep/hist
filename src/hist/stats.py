@@ -4,8 +4,25 @@ from typing import Any, Callable
 
 import numpy as np
 from scipy import stats as spstats
+from scipy.stats import rv_continuous, rv_discrete
 
 import hist
+
+
+def _get_cdf_if_valid(obj: Any) -> Any:
+    if isinstance(obj, (rv_continuous, rv_discrete)):
+        return obj.cdf
+    if isinstance(obj, str) and hasattr(spstats, obj):
+        dist = getattr(spstats, obj)
+        if isinstance(dist, (rv_continuous, rv_discrete)):
+            return dist.cdf
+    if hasattr(obj, "cdf") and callable(obj.cdf):
+        return obj.cdf
+    if callable(obj):
+        return obj
+    raise TypeError(
+        f"Unknown distribution type {obj}, try one of the scipy distributions, an object with a cdf method, or a callable cdf implementation"
+    )
 
 
 def chisquare_1samp(
@@ -20,18 +37,7 @@ def chisquare_1samp(
         raise NotImplementedError(
             f"Only 1D-histogram supports chisquare_1samp, try projecting {self.__class__.__name__} to 1D"
         )
-    if isinstance(distribution, str):
-        if not hasattr(spstats, distribution):
-            raise ValueError(
-                f"Unknown distribution {distribution}, try one of the defined scipy distributions"
-            )
-        cdf = getattr(spstats, distribution).cdf
-    elif callable(distribution):
-        cdf = distribution
-    else:
-        raise TypeError(
-            f"Unknown distribution type {distribution}, try one of the defined scipy distributions or a callable CDF"
-        )
+    cdf = _get_cdf_if_valid(distribution)
 
     variances = self.variances()
     if variances is None:
@@ -42,9 +48,12 @@ def chisquare_1samp(
     observed = self.values()
     totalentries = self.sum()
     expected = np.diff(cdf(self.axes[0].edges, *args, **kwds)) * totalentries
+    variances = (
+        expected  # TODO: check if variances or expected should go in the denominator
+    )
     where = variances != 0
     squares = (expected - observed) ** 2
-    ndof = len(observed) - 1
+    ndof = where.sum() - 1
     chisq = np.sum(squares[where] / variances[where])
     pvalue = spstats.chi2.sf(chisq, ndof)
 
@@ -63,6 +72,11 @@ def chisquare_2samp(self: hist.BaseHist, other: hist.BaseHist) -> Any:
     if not isinstance(other, hist.hist.Hist):
         raise TypeError(
             f"Unknown type {other.__class__.__name__}, other must be a hist.Hist object"
+        )
+    # TODO: add support for compatible rebinning
+    if not np.allclose(self.axes[0].edges, other.axes[0].edges):
+        raise NotImplementedError(
+            "Cannot compute chi2 from histograms with different binning, try rebinning"
         )
 
     variances1 = self.variances()
@@ -100,18 +114,7 @@ def ks_1samp(
         raise NotImplementedError(
             f"Only 1D-histogram supports ks_1samp, try projecting {self.__class__.__name__} to 1D"
         )
-    if isinstance(distribution, str):
-        if not hasattr(spstats, distribution):
-            raise ValueError(
-                f"Unknown distribution {distribution}, try one of the defined scipy distributions"
-            )
-        cdf = getattr(spstats, distribution).cdf
-    elif callable(distribution):
-        cdf = distribution
-    else:
-        raise TypeError(
-            f"Unknown distribution type {distribution}, try one of the defined scipy distributions or a callable CDF"
-        )
+    cdf = _get_cdf_if_valid(distribution)
 
     variances = self.variances()
     if variances is None:
@@ -134,6 +137,11 @@ def ks_2samp(self: hist.BaseHist, other: hist.BaseHist) -> Any:
     if not isinstance(other, hist.hist.Hist):
         raise TypeError(
             f"Unknown type {other.__class__.__name__}, other must be a hist.Hist object"
+        )
+    # TODO: add support for compatible rebinning
+    if not np.allclose(self.axes[0].edges, other.axes[0].edges):
+        raise NotImplementedError(
+            "Cannot compute chi2 from histograms with different binning, try rebinning"
         )
 
     variances1 = self.variances()
