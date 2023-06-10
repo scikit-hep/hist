@@ -94,11 +94,7 @@ non-integer fills for data that should represent raw, unweighed counts.
 .. code-block:: python3
 
     # Method 2
-    h = (
-        Hist.new.Reg(10, 0, 1, name="x")
-        .Int64()
-        .fill([0.5, 0.5])
-    )
+    h = Hist.new.Reg(10, 0, 1, name="x").Int64().fill([0.5, 0.5])
 
     print(h[0.5j])
 

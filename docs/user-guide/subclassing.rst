@@ -13,8 +13,10 @@ When you subclass, you will need to add a family. Any object can be used - the m
     import hist
     import my_package
 
+
     class Histogram(hist.Hist, family=my_package):
         ...
+
 
     class Regular(hist.axis.Regular, family=my_package):
         ...
