@@ -74,6 +74,10 @@ def chisquare_2samp(self: hist.BaseHist, other: hist.BaseHist) -> Any:
             f"Unknown type {other.__class__.__name__}, other must be a hist.Hist object"
         )
     # TODO: add support for compatible rebinning
+    if self.size != other.size:
+        raise NotImplementedError(
+            "Cannot compute chi2 from histograms with different binning, try rebinning"
+        )
     if not np.allclose(self.axes[0].edges, other.axes[0].edges):
         raise NotImplementedError(
             "Cannot compute chi2 from histograms with different binning, try rebinning"
@@ -96,7 +100,7 @@ def chisquare_2samp(self: hist.BaseHist, other: hist.BaseHist) -> Any:
     where = variances != 0
     chisq = np.sum(squares[where] / variances[where])
     k = where.sum()
-    ndof = k - 1 if self.sum() == other.sum() else k
+    ndof = k if self.sum() == other.sum() else k - 1
     pvalue = spstats.chi2.sf(chisq, ndof)
 
     return chisq, ndof, pvalue
@@ -139,6 +143,10 @@ def ks_2samp(self: hist.BaseHist, other: hist.BaseHist) -> Any:
             f"Unknown type {other.__class__.__name__}, other must be a hist.Hist object"
         )
     # TODO: add support for compatible rebinning
+    if self.size != other.size:
+        raise NotImplementedError(
+            "Cannot compute chi2 from histograms with different binning, try rebinning"
+        )
     if not np.allclose(self.axes[0].edges, other.axes[0].edges):
         raise NotImplementedError(
             "Cannot compute chi2 from histograms with different binning, try rebinning"
