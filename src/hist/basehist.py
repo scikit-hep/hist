@@ -526,6 +526,21 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
             h.name = name
 
         return hist.stack.Stack(*stack_histograms)
+    
+    def integrate(
+        self,
+        name: int | str,
+        i_or_list: Loc | list[str | int] | None = None,
+        j: Loc | None = None,
+    ) -> Self:
+        if isinstance(i_or_list, list):
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                
+                return self[{name: i_or_list}][{name: slice(0, len(i_or_list), sum)}]
+
+        return self[{name: slice(i_or_list, j, sum)}]
+        
 
     def sum(self, flow: bool = False) -> float | bh.accumulators.Accumulator:
         """
