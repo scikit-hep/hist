@@ -925,3 +925,17 @@ def test_quick_construct_direct():
     assert tuple(h.sort(0, key=lambda x: -x).axes[0]) == (4, 2, 1)
     assert tuple(h.sort(1).axes[1]) == ("AB", "BC", "BCC")
     assert tuple(h.sort(1, reverse=True).axes[1]) == ("BCC", "BC", "AB")
+
+
+def test_integrate():
+    h = (
+        hist.new.IntCat([4, 1, 2], name="x")
+        .StrCat(["AB", "BCC", "BC"], name="y")
+        .Int(1, 10)  # To provide the start and stop values as arguments to the Int() constructor
+    )
+    h.fill(4, "AB", 1)
+    h.fill(4, "BCC", 2)
+    h.fill(4, "BC", 4)
+    h.fill(4, "X", 8)
+    h1 = h.integrate("y", ["AB", "BC"])
+    assert h1[{ "x": 4 }] == 5

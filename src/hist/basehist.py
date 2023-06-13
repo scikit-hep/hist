@@ -500,6 +500,13 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         import hist.plot
 
         return hist.plot.plot_pie(self, ax=ax, **kwargs)
+    
+    def integrate(self, name: int | str, i_or_list: Loc | list[str | int] | None = None, j: Loc | None = None) -> Self:
+        if isinstance(i_or_list, list):
+            return self[{name: i_or_list}][{name: slice(0, len(i_or_list), sum)}]
+        
+        return self[{name: slice(i_or_list, j, sum)}]
+
 
     def stack(self, axis: int | str) -> hist.stack.Stack:
         """
