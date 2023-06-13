@@ -46,7 +46,7 @@ def chisquare_1samp(
         )
 
     observed = self.values()
-    totalentries = self.sum()
+    totalentries = self.sum(flow=True)
     expected = np.diff(cdf(self.axes[0].edges, *args, **kwds)) * totalentries
     variances = (
         expected  # TODO: check if variances or expected should go in the denominator
@@ -92,15 +92,18 @@ def chisquare_2samp(self: hist.BaseHist, other: hist.BaseHist) -> Any:
 
     counts1 = self.values()
     counts2 = other.values()
+    totalentries1 = self.values(flow=True).sum()
+    totalentries2 = other.values(flow=True).sum()
     squares = (
-        counts1 * np.sqrt(counts2.sum() / counts1.sum())
-        - counts2 * np.sqrt(counts1.sum() / counts2.sum())
+        counts1 * np.sqrt(totalentries2 / totalentries1)
+        - counts2 * np.sqrt(totalentries1 / totalentries2)
     ) ** 2
     variances = variances1 + variances2
     where = variances != 0
     chisq = np.sum(squares[where] / variances[where])
     k = where.sum()
-    ndof = k if self.sum() == other.sum() else k - 1
+    # TODO: check if ndof = k if totalentries1 == totalentries2 else k - 1 is correct
+    ndof = k - 1
     pvalue = spstats.chi2.sf(chisq, ndof)
 
     return chisq, ndof, pvalue
@@ -120,13 +123,32 @@ def ks_1samp(
         )
     cdf = _get_cdf_if_valid(distribution)
 
-    variances = self.variances()
-    if variances is None:
-        raise RuntimeError(
-            "Cannot compute from a variance-less histogram, try a Weight storage"
-        )
+    cdflocs = self.axes[0].edges[:-1]
+    cdfvals = cdf(cdflocs, *args, **kwds)
+    observed = self.values(flow=True)
+    totalentries = self.sum(flow=True)
+    ecdf = np.cumsum(observed) / totalentries
+    ecdfplus = ecdf[1:-1]
+    ecdfminus = ecdf[0:-2]
+    dplus_index = (ecdfplus - cdfvals).argmax()
+    dminus_index = (cdfvals - ecdfminus).argmax()
+    Dplus = (ecdfplus - cdfvals)[dplus_index]
+    Dminus = (cdfvals - ecdfminus)[dminus_index]
+    dplus_location = cdflocs[dplus_index]
+    dminus_location = cdflocs[dminus_index]
 
-    return cdf(self.axes[0].edges, *args, **kwds)  # placeholder to pass pre-commit
+    if Dplus > Dminus:
+        D = Dplus
+        d_location = dplus_location
+        d_sign = 1
+    else:
+        D = Dminus
+        d_location = dminus_location
+        d_sign = -1
+
+    pvalue = spstats.kstwo.sf(D, self.sum(flow=True))
+
+    return D, Dplus, Dminus, dplus_location, dminus_location, d_location, d_sign, pvalue
 
 
 def ks_2samp(self: hist.BaseHist, other: hist.BaseHist) -> Any:
