@@ -936,21 +936,20 @@ def test_integrate():
     h.fill(4, "BCC", 2)
     h.fill(4, "BC", 4)
     h.fill(4, "X", 8)
-    h1 = h.integrate("y", ["AB", "BC"]).integrate("z")
-    assert h1[{"x": 4j}] == 2
 
-    # Verify the result for x=2
     h.fill(2, "aAB", 3)
     h.fill(2, "BCC", 5)
     h.fill(2, "AB", 2)
     h.fill(2, "X", 1)
-    h2 = h.integrate("y", ["AB", "BC"]).integrate("z")
-    assert h2[{"x": 2j}] == 1
 
-    # Verify the result for x=1
     h.fill(1, "AB", 3)
     h.fill(1, "BCC", 1)
     h.fill(1, "BC", 5)
     h.fill(1, "X", 2)
-    h1 = h.integrate("y", ["AB", "BC", "BCC"]).integrate("z")
-    assert h1[{"x": 1j}] == 3
+
+    h1 = h.integrate("y", ["AB", "BC"]).integrate("z")
+    h2 = h.integrate("y", ["AB", "BC", "BCC"]).integrate("z")
+
+    assert h1[{"x": 4j}] == 2
+    assert h1[{"x": 2j}] == 1
+    assert h2[{"x": 1j}] == 3

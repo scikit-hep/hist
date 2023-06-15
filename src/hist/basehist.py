@@ -530,14 +530,16 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
     def integrate(
         self,
         name: int | str,
-        i_or_list: Loc | list[str | int] | None = None,
-        j: Loc | None = None,
-    ) -> Self:
+        i_or_list: InnerIndexing | list[str | int] | None = None,
+        j: InnerIndexing | None = None,
+    ) -> Self | float | bh.accumulators.Accumulator:
         if isinstance(i_or_list, list):
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
 
-                return self[{name: i_or_list}][{name: slice(0, len(i_or_list), sum)}]
+                # TODO: We could teach the typing system that list always returns Self type
+                selection: Self = self[{name: i_or_list}]  # type: ignore[assignment, dict-item]
+                return selection[{name: slice(0, len(i_or_list), sum)}]
 
         return self[{name: slice(i_or_list, j, sum)}]
 
