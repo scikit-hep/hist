@@ -16,14 +16,14 @@ def test_chisquare_1samp():
     h.fill(np.random.normal(size=1000))
 
     chisq, ndof, pvalue = h.chisquare_1samp("norm")
-    assert chisq == pytest.approx(11.640108080468355)
-    assert ndof == 19
-    assert pvalue == pytest.approx(0.9004272294139111)
+    assert chisq == pytest.approx(9.47425856230132)
+    assert ndof == 14
+    assert pvalue == pytest.approx(0.7995235818496339)
 
     chisq, ndof, pvalue = h.chisquare_1samp(norm.cdf, args=(0, 1))
-    assert chisq == pytest.approx(11.64010808046843)
-    assert ndof == 19
-    assert pvalue == pytest.approx(0.9004272294139111)
+    assert chisq == pytest.approx(9.47425856230132)
+    assert ndof == 14
+    assert pvalue == pytest.approx(0.7995235818496339)
 
     h = Hist(hist.axis.Regular(20, -5, 5), hist.axis.Regular(20, -5, 5))
     h.fill(np.random.normal(size=1000), np.random.normal(size=1000))

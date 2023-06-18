@@ -141,7 +141,7 @@ def ks_1samp(
 
     cdf = _get_cdf_if_valid(distribution)
 
-    cdflocs = self.axes[0].edges[:-1]
+    cdflocs = self.axes[0].centers
     cdfvals = cdf(cdflocs, *args, **kwds)
     observed = self.values(flow=True)
     totalentries = observed.sum(dtype=int)
