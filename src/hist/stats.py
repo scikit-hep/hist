@@ -48,7 +48,7 @@ def chisquare_1samp(
         )
 
     observed = self.values()
-    totalentries = self.values(flow=True).sum()
+    totalentries = self.values(flow=True).sum(dtype=int)
     expected = np.diff(cdf(self.axes[0].edges, *args, **kwds)) * totalentries
     # TODO: check if variances or expected should go in the denominator
     where = expected != 0
@@ -92,8 +92,8 @@ def chisquare_2samp(self: hist.BaseHist, other: hist.BaseHist) -> Any:
 
     counts1 = self.values()
     counts2 = other.values()
-    totalentries1 = self.values(flow=True).sum()
-    totalentries2 = other.values(flow=True).sum()
+    totalentries1 = self.values(flow=True).sum(dtype=int)
+    totalentries2 = other.values(flow=True).sum(dtype=int)
     squares = (
         counts1 * np.sqrt(totalentries2 / totalentries1)
         - counts2 * np.sqrt(totalentries1 / totalentries2)
@@ -137,7 +137,7 @@ def ks_1samp(
     cdflocs = self.axes[0].edges[:-1]
     cdfvals = cdf(cdflocs, *args, **kwds)
     observed = self.values(flow=True)
-    totalentries = observed.sum()
+    totalentries = observed.sum(dtype=int)
     ecdf = np.cumsum(observed) / totalentries
     ecdfplus = ecdf[1:-1]
     ecdfminus = ecdf[0:-2]
@@ -200,12 +200,12 @@ def ks_2samp(
 
     if equal_bins:
         if self.size != other.size:
-            raise NotImplementedError(
-                "Cannot compute KS from histograms with different binning, try rebinning"
+            raise ValueError(
+                "Cannot compute KS from histograms with different binning, use equal_bins=False"
             )
         if not np.allclose(self.axes[0].edges, other.axes[0].edges):
-            raise NotImplementedError(
-                "Cannot compute KS from histograms with different binning, try rebinning"
+            raise ValueError(
+                "Cannot compute KS from histograms with different binning, use equal_bins=False"
             )
 
     if mode not in ["auto", "exact", "asymp"]:
@@ -218,8 +218,8 @@ def ks_2samp(
 
     data1 = self.values(flow=True)
     data2 = other.values(flow=True)
-    n1 = data1.sum()
-    n2 = data2.sum()
+    n1 = data1.sum(dtype=int)
+    n2 = data2.sum(dtype=int)
     edges1 = self.axes[0].edges[:-1]
     edges2 = other.axes[0].edges[:-1]
     cdf1 = np.cumsum(data1) / n1
