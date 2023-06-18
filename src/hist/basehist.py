@@ -584,12 +584,20 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         distribution: str | Callable[..., Any],
         args: Any = (),
         kwds: Any = None,
+        alternative: str = "two-sided",
+        mode: str = "auto",
     ) -> Any:
         from hist import stats
 
-        return stats.ks_1samp(self, distribution, args, kwds)
+        return stats.ks_1samp(self, distribution, args, kwds, alternative, mode)
 
-    def ks_2samp(self, other: hist.BaseHist) -> Any:
+    def ks_2samp(
+        self: hist.BaseHist,
+        other: hist.BaseHist,
+        equal_bins: bool = True,
+        alternative: str = "two-sided",
+        mode: str = "auto",
+    ) -> Any:
         from hist import stats
 
-        return stats.ks_2samp(self, other)
+        return stats.ks_2samp(self, other, equal_bins, alternative, mode)
