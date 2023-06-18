@@ -30,6 +30,7 @@ def _get_cdf_if_valid(obj: Any) -> Any:
 def chisquare_1samp(
     self: hist.BaseHist,
     distribution: str | Callable[..., Any],
+    flow: bool = False,
     args: Any = (),
     kwds: Any = None,
 ) -> Any:
@@ -41,26 +42,32 @@ def chisquare_1samp(
         )
     cdf = _get_cdf_if_valid(distribution)
 
-    variances = self.variances()
+    variances = self.variances(flow=flow)
     if variances is None:
         raise RuntimeError(
             "Cannot compute from a variance-less histogram, try a Weight storage"
         )
 
-    observed = self.values()
+    observed = self.values(flow=flow)
     totalentries = self.values(flow=True).sum(dtype=int)
-    expected = np.diff(cdf(self.axes[0].edges, *args, **kwds)) * totalentries
+    cdfvals = cdf(self.axes[0].edges, *args, **kwds)
+    if flow:
+        cdfvals = np.concatenate([[0], cdfvals, [1]])
+    expected = np.diff(cdfvals) * totalentries
     # TODO: check if variances or expected should go in the denominator
-    where = expected != 0
+    # variances fails if bins have low statistics
+    where = variances != 0
     squares = (expected - observed) ** 2
     ndof = np.sum(where) - 1
-    chisq = np.sum(squares[where] / expected[where])
+    chisq = np.sum(squares[where] / variances[where])
     pvalue = spstats.chi2.sf(chisq, ndof)
 
     return chisq, ndof, pvalue
 
 
-def chisquare_2samp(self: hist.BaseHist, other: hist.BaseHist) -> Any:
+def chisquare_2samp(
+    self: hist.BaseHist, other: hist.BaseHist, flow: bool = False
+) -> Any:
     if self.ndim != 1:
         raise NotImplementedError(
             f"Only 1D-histogram supports chisquare_2samp, try projecting {self.__class__.__name__} to 1D"
@@ -83,15 +90,15 @@ def chisquare_2samp(self: hist.BaseHist, other: hist.BaseHist) -> Any:
             "Cannot compute chi2 from histograms with different binning, try rebinning"
         )
 
-    variances1 = self.variances()
-    variances2 = other.variances()
+    variances1 = self.variances(flow=flow)
+    variances2 = other.variances(flow=flow)
     if variances1 is None or variances2 is None:
         raise RuntimeError(
             "Cannot compute from variance-less histograms, try a Weight storage"
         )
 
-    counts1 = self.values()
-    counts2 = other.values()
+    counts1 = self.values(flow=flow)
+    counts2 = other.values(flow=flow)
     totalentries1 = self.values(flow=True).sum(dtype=int)
     totalentries2 = other.values(flow=True).sum(dtype=int)
     squares = (
