@@ -12,6 +12,7 @@ import numpy as np
 
 import hist
 
+from . import interop
 from ._compat.typing import ArrayLike, Protocol, Self, SupportsIndex
 from .axestuple import NamedAxesTuple
 from .axis import AxisProtocol
@@ -229,6 +230,72 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         data = (data_dict[i] for i in range(len(args), self.ndim))
 
         return super().fill(*args, *data, weight=weight, sample=sample, threads=threads)
+
+    def fill_flattened(
+        self: Self,
+        *args: Any,
+        weight: Any | None = None,
+        sample: Any | None = None,
+        threads: int | None = None,
+        **kwargs: Any,
+    ) -> Self:
+        axis_names = {ax.name for ax in self.axes}
+
+        non_user_kwargs = {}
+        if weight is not None:
+            non_user_kwargs["weight"] = weight
+        if sample is not None:
+            non_user_kwargs["sample"] = sample
+
+        # Single arguments are either arrays for single-dimensional histograms, or
+        # structures for multi-dimensional hists that must first be unpacked
+        if len(args) == 1 and not kwargs:
+            (arg,) = args
+            destructured = interop.destructure(arg)
+            # Try to unpack the array, if it's valid to do so, i.e. is the Awkward Array a record array?
+            if destructured is None:
+                # Can't unpack, fall back on broadcasting single array (to flatten and convert)
+                broadcast = interop.broadcast_and_flatten(
+                    (arg, *non_user_kwargs.values())
+                )
+                # Partition out non-user args
+                user_args_broadcast = broadcast[:1]
+                user_kwargs_broadcast = {}
+                non_user_kwargs_broadcast = dict(
+                    zip(non_user_kwargs.keys(), broadcast[1:])
+                )
+            else:
+                # Result must be broadcast, so unpack and rebuild
+                broadcast = interop.broadcast_and_flatten(
+                    (*destructured.values(), *non_user_kwargs.values())
+                )
+                # Partition into user and non-user args
+                user_args_broadcast = ()
+                user_kwargs_broadcast = {
+                    k: v
+                    for k, v in zip(destructured, broadcast[: len(destructured)])
+                    if k in axis_names
+                }
+                non_user_kwargs_broadcast = dict(
+                    zip(non_user_kwargs, broadcast[len(destructured) :])
+                )
+        # Multiple args: broadcast and flatten!
+        else:
+            inputs = (*args, *kwargs.values(), *non_user_kwargs)
+            broadcast = interop.broadcast_and_flatten(inputs)
+            user_args_broadcast = broadcast[: len(args)]
+            user_kwargs_broadcast = dict(
+                zip(kwargs, broadcast[len(args) : len(args) + len(kwargs)])
+            )
+            non_user_kwargs_broadcast = dict(
+                zip(non_user_kwargs, broadcast[len(args) + len(kwargs) :])
+            )
+        return self.fill(
+            *user_args_broadcast,
+            **user_kwargs_broadcast,
+            threads=threads,
+            **non_user_kwargs_broadcast,
+        )
 
     def sort(
         self,
