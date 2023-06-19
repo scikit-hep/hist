@@ -663,9 +663,10 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         self,
         other: hist.BaseHist,
         equal_bins: bool = True,
+        flow: bool = False,
         alternative: str = "two-sided",
         mode: str = "auto",
     ) -> Any:
         from hist import stats
 
-        return stats.ks_2samp(self, other, equal_bins, alternative, mode)
+        return stats.ks_2samp(self, other, equal_bins, flow, alternative, mode)

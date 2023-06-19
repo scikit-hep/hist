@@ -189,6 +189,7 @@ def ks_2samp(
     self: hist.BaseHist,
     other: hist.BaseHist,
     equal_bins: bool = True,
+    flow: bool = False,
     alternative: str = "two-sided",
     mode: str = "auto",
 ) -> Any:
@@ -227,21 +228,30 @@ def ks_2samp(
     data2 = other.values(flow=True)
     n1 = data1.sum(dtype=int)
     n2 = data2.sum(dtype=int)
-    edges1 = self.axes[0].edges[:-1]
-    edges2 = other.axes[0].edges[:-1]
+    edges1 = self.axes[0].centers
+    edges2 = other.axes[0].centers
     cdf1 = np.cumsum(data1) / n1
     cdf2 = np.cumsum(data2) / n2
+    if flow:
+        edges1 = np.concatenate([[-np.inf], edges1, [np.inf]])
+        edges2 = np.concatenate([[-np.inf], edges2, [np.inf]])
 
     if equal_bins:
         cdflocs = edges1
 
-        cdf1 = cdf1[1:-1]
-        cdf2 = cdf2[1:-1]
+        if not flow:
+            cdf1 = cdf1[1:-1]
+            cdf2 = cdf2[1:-1]
+
         cddiffs = cdf1 - cdf2
 
     elif not equal_bins:
         edges_all = np.sort(np.concatenate([edges1, edges2]))
         cdflocs = edges_all
+
+        if flow:
+            cdf1 = np.concatenate([[0], cdf1])
+            cdf2 = np.concatenate([[0], cdf2])
 
         # Use np.searchsorted to get the CDF values at all bin edges
         cdf1_all = cdf1[np.searchsorted(edges1, edges_all, side="right")]
