@@ -1,16 +1,18 @@
 from __future__ import annotations
 
+import functools
+
 import numpy as np
 import pytest
+from numba_stats import norm
 
 import hist
 from hist import Hist
-from numba_stats import norm
-import functools
 
-cdf =functools.partial(norm.cdf, loc=0, scale=1)
+cdf = functools.partial(norm.cdf, loc=0, scale=1)
 
 pytest.importorskip("scipy")
+
 
 @pytest.mark.parametrize("arg", ["norm", cdf])
 def test_chisquare_1samp(arg):
@@ -23,7 +25,8 @@ def test_chisquare_1samp(arg):
     assert chisq == pytest.approx(9.47425856230132)
     assert ndof == 14
     assert pvalue == pytest.approx(0.7995235818496339)
-    
+
+
 def test_chisquare_1samp_2d():
     np.random.seed(42)
 
@@ -32,11 +35,13 @@ def test_chisquare_1samp_2d():
     with pytest.raises(NotImplementedError):
         h.chisquare_1samp("norm")
 
+
 def test_chisquare_1samp_weight():
     np.random.seed(42)
     h = Hist(hist.axis.Regular(20, -5, 5), storage=hist.storage.Weight())
     h.fill(np.random.normal(size=1000), weight=np.random.randint(0, 10, size=1000))
-    h.chisquare_1samp("norm")   
+    h.chisquare_1samp("norm")
+
 
 def test_chisquare_1samp_weight_raises():
     np.random.seed(42)
@@ -44,6 +49,7 @@ def test_chisquare_1samp_weight_raises():
     h.fill(np.random.normal(size=1000), weight=np.random.randint(0, 10, size=1000))
     with pytest.raises(RuntimeError):
         h.chisquare_1samp("norm")
+
 
 def test_chisquare_1samp_invalid_args():
     h = Hist(hist.axis.Regular(20, -5, 5))
