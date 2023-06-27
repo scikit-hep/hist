@@ -29,7 +29,7 @@ repos:
   - id: trailing-whitespace
 
 - repo: https://github.com/charliermarsh/ruff-pre-commit
-  rev: v0.0.272
+  rev: v0.0.275
   hooks:
   - id: ruff
     args: ["--fix", "--show-fixes"]
@@ -43,7 +43,7 @@ repos:
     args: ["--extend-ignore=B008,T20,I002,E402", "--fix", "--show-fixes"]
 
 - repo: https://github.com/pre-commit/mirrors-mypy
-  rev: v1.3.0
+  rev: v1.4.1
   hooks:
   - id: mypy
     files: ^src
