@@ -7,6 +7,7 @@ import pytest
 from pytest import approx
 
 from hist import Hist, NamedHist, Stack, axis
+pytest.importorskip("mplhep")
 
 np.random.seed(42)
 
