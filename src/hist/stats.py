@@ -4,9 +4,9 @@ import warnings
 from typing import Any, Callable
 
 import numpy as np
+from scipy import special
 from scipy import stats as spstats
 from scipy.stats import rv_continuous, rv_discrete
-from scipy.stats._stats_py import _attempt_exact_2kssamp
 
 import hist
 
@@ -25,6 +25,262 @@ def _get_cdf_if_valid(obj: Any) -> Any:
     raise TypeError(
         f"Unknown distribution type {obj}, try one of the scipy distributions, an object with a cdf method, or a callable cdf implementation"
     )
+
+
+def _compute_outer_prob_inside_method(m: int, n: int, g: int, h: int) -> Any:
+    """
+    Count the proportion of paths that do not stay strictly inside two
+    diagonal lines.
+
+    Parameters
+    ----------
+    m : integer
+        m > 0
+    n : integer
+        n > 0
+    g : integer
+        g is greatest common divisor of m and n
+    h : integer
+        0 <= h <= lcm(m,n)
+
+    Returns
+    -------
+    p : float
+        The proportion of paths that do not stay inside the two lines.
+
+    The classical algorithm counts the integer lattice paths from (0, 0)
+    to (m, n) which satisfy |x/m - y/n| < h / lcm(m, n).
+    The paths make steps of size +1 in either positive x or positive y
+    directions.
+    We are, however, interested in 1 - proportion to computes p-values,
+    so we change the recursion to compute 1 - p directly while staying
+    within the "inside method" a described by Hodges.
+
+    We generally follow Hodges' treatment of Drion/Gnedenko/Korolyuk.
+    Hodges, J.L. Jr.,
+    "The Significance Probability of the Smirnov Two-Sample Test,"
+    Arkiv fiur Matematik, 3, No. 43 (1958), 469-86.
+
+    For the recursion for 1-p see
+    Viehmann, T.: "Numerically more stable computation of the p-values
+    for the two-sample Kolmogorov-Smirnov test," arXiv: 2102.08037
+
+    """
+    # Probability is symmetrical in m, n.  Computation below uses m >= n.
+    if m < n:
+        m, n = n, m
+    mg = m // g
+    ng = n // g
+
+    # Count the integer lattice paths from (0, 0) to (m, n) which satisfy
+    # |nx/g - my/g| < h.
+    # Compute matrix A such that:
+    #  A(x, 0) = A(0, y) = 1
+    #  A(x, y) = A(x, y-1) + A(x-1, y), for x,y>=1, except that
+    #  A(x, y) = 0 if |x/m - y/n|>= h
+    # Probability is A(m, n)/binom(m+n, n)
+    # Optimizations exist for m==n, m==n*p.
+    # Only need to preserve a single column of A, and only a
+    # sliding window of it.
+    # minj keeps track of the slide.
+    minj, maxj = 0, min(int(np.ceil(h / mg)), n + 1)
+    curlen = maxj - minj
+    # Make a vector long enough to hold maximum window needed.
+    lenA = min(2 * maxj + 2, n + 1)
+    # This is an integer calculation, but the entries are essentially
+    # binomial coefficients, hence grow quickly.
+    # Scaling after each column is computed avoids dividing by a
+    # large binomial coefficient at the end, but is not sufficient to avoid
+    # the large dyanamic range which appears during the calculation.
+    # Instead we rescale based on the magnitude of the right most term in
+    # the column and keep track of an exponent separately and apply
+    # it at the end of the calculation.  Similarly when multiplying by
+    # the binomial coefficient
+    dtype = np.float64
+    A = np.ones(lenA, dtype=dtype)
+    # Initialize the first column
+    A[minj:maxj] = 0.0
+    for i in range(1, m + 1):
+        # Generate the next column.
+        # First calculate the sliding window
+        lastminj, lastlen = minj, curlen
+        minj = max(int(np.floor((ng * i - h) / mg)) + 1, 0)
+        minj = min(minj, n)
+        maxj = min(int(np.ceil((ng * i + h) / mg)), n + 1)
+        if maxj <= minj:
+            return 1.0
+        # Now fill in the values. We cannot use cumsum, unfortunately.
+        val = 0.0 if minj == 0 else 1.0
+        for jj in range(maxj - minj):
+            j = jj + minj
+            val = (A[jj + minj - lastminj] * i + val * j) / (i + j)
+            A[jj] = val
+        curlen = maxj - minj
+        if lastlen > curlen:
+            # Set some carried-over elements to 1
+            A[maxj - minj : maxj - minj + (lastlen - curlen)] = 1
+
+    return A[maxj - minj - 1]
+
+
+def _compute_prob_outside_square(n: int, h: int) -> Any:
+    """
+    Compute the proportion of paths that pass outside the two diagonal lines.
+
+    Parameters
+    ----------
+    n : integer
+        n > 0
+    h : integer
+        0 <= h <= n
+
+    Returns
+    -------
+    p : float
+        The proportion of paths that pass outside the lines x-y = +/-h.
+
+    """
+    # Compute Pr(D_{n,n} >= h/n)
+    # Prob = 2 * ( binom(2n, n-h) - binom(2n, n-2a) + binom(2n, n-3a) - ... )
+    # / binom(2n, n)
+    # This formulation exhibits subtractive cancellation.
+    # Instead divide each term by binom(2n, n), then factor common terms
+    # and use a Horner-like algorithm
+    # P = 2 * A0 * (1 - A1*(1 - A2*(1 - A3*(1 - A4*(...)))))
+
+    P = 0.0
+    k = int(np.floor(n / h))
+    while k >= 0:
+        p1 = 1.0
+        # Each of the Ai terms has numerator and denominator with
+        # h simple terms.
+        for j in range(h):
+            p1 = (n - k * h - j) * p1 / (n + k * h + j + 1)
+        P = p1 * (1.0 - P)
+        k -= 1
+    return 2 * P
+
+
+def _count_paths_outside_method(m: int, n: int, g: int, h: int) -> Any:
+    """Count the number of paths that pass outside the specified diagonal.
+
+    Parameters
+    ----------
+    m : integer
+        m > 0
+    n : integer
+        n > 0
+    g : integer
+        g is greatest common divisor of m and n
+    h : integer
+        0 <= h <= lcm(m,n)
+
+    Returns
+    -------
+    p : float
+        The number of paths that go low.
+        The calculation may overflow - check for a finite answer.
+
+    Notes
+    -----
+    Count the integer lattice paths from (0, 0) to (m, n), which at some
+    point (x, y) along the path, satisfy:
+      m*y <= n*x - h*g
+    The paths make steps of size +1 in either positive x or positive y
+    directions.
+
+    We generally follow Hodges' treatment of Drion/Gnedenko/Korolyuk.
+    Hodges, J.L. Jr.,
+    "The Significance Probability of the Smirnov Two-Sample Test,"
+    Arkiv fiur Matematik, 3, No. 43 (1958), 469-86.
+
+    """
+    # Compute #paths which stay lower than x/m-y/n = h/lcm(m,n)
+    # B(x, y) = #{paths from (0,0) to (x,y) without
+    #             previously crossing the boundary}
+    #         = binom(x, y) - #{paths which already reached the boundary}
+    # Multiply by the number of path extensions going from (x, y) to (m, n)
+    # Sum.
+
+    # Probability is symmetrical in m, n.  Computation below assumes m >= n.
+    if m < n:
+        m, n = n, m
+    mg = m // g
+    ng = n // g
+
+    # Not every x needs to be considered.
+    # xj holds the list of x values to be checked.
+    # Wherever n*x/m + ng*h crosses an integer
+    lxj = n + (mg - h) // mg
+    xj = [(h + mg * j + ng - 1) // ng for j in range(lxj)]
+    # B is an array just holding a few values of B(x,y), the ones needed.
+    # B[j] == B(x_j, j)
+    if lxj == 0:
+        return special.binom(m + n, n)
+    B = np.zeros(lxj)
+    B[0] = 1
+    # Compute the B(x, y) terms
+    for j in range(1, lxj):
+        Bj = special.binom(xj[j] + j, j)
+        for i in range(j):
+            bin = special.binom(xj[j] - xj[i] + j - i, j - i)
+            Bj -= bin * B[i]
+        B[j] = Bj
+    # Compute the number of path extensions...
+    num_paths = 0
+    for j in range(lxj):
+        bin = special.binom((m - xj[j]) + (n - j), n - j)
+        term = B[j] * bin
+        num_paths += term
+    return num_paths
+
+
+def _attempt_exact_2kssamp(n1: int, n2: int, g: int, d: float, alternative: str) -> Any:
+    """Attempts to compute the exact 2sample probability.
+
+    n1, n2 are the sample sizes
+    g is the gcd(n1, n2)
+    d is the computed max difference in ECDFs
+
+    Returns (success, d, probability)
+    """
+    lcm = (n1 // g) * n2
+    h = int(np.round(d * lcm))
+    d = h * 1.0 / lcm
+    if h == 0:
+        return True, d, 1.0
+    saw_fp_error, prob = False, np.nan
+    try:
+        with np.errstate(invalid="raise", over="raise"):
+            if alternative == "two-sided":
+                if n1 == n2:
+                    prob = _compute_prob_outside_square(n1, h)
+                else:
+                    prob = _compute_outer_prob_inside_method(n1, n2, g, h)
+            else:
+                if n1 == n2:
+                    # prob = binom(2n, n-h) / binom(2n, n)
+                    # Evaluating in that form incurs roundoff errors
+                    # from special.binom. Instead calculate directly
+                    jrange = np.arange(h)
+                    prob = float(np.prod((n1 - jrange) / (n1 + jrange + 1.0)))
+                else:
+                    with np.errstate(over="raise"):
+                        num_paths = _count_paths_outside_method(n1, n2, g, h)
+                    bin = special.binom(n1 + n2, n1)
+                    if num_paths > bin or np.isinf(bin):
+                        saw_fp_error = True
+                    else:
+                        prob = num_paths / bin
+
+    except (FloatingPointError, OverflowError):
+        saw_fp_error = True
+
+    if saw_fp_error:
+        return False, d, np.nan
+    if not (0 <= prob <= 1):
+        return False, d, prob
+    return True, d, prob
 
 
 def chisquare_1samp(
