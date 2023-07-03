@@ -200,7 +200,6 @@ select = [
   "YTT",         # flake8-2020
 ]
 extend-ignore = ["PLR", "E501", "PT011", "PT013", "PT004", "B017"]
-target-version = "py37"
 typing-modules = ["hist._compat.typing"]
 src = ["src"]
 unfixable = ["T20", "F841"]
