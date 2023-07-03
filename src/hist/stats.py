@@ -181,8 +181,6 @@ def _count_paths_outside_method(m: int, n: int, g: int, h: int) -> Any:
         The number of paths that go low.
         The calculation may overflow - check for a finite answer.
 
-    Notes
-    -----
     Count the integer lattice paths from (0, 0) to (m, n), which at some
     point (x, y) along the path, satisfy:
       m*y <= n*x - h*g
@@ -238,11 +236,27 @@ def _count_paths_outside_method(m: int, n: int, g: int, h: int) -> Any:
 def _attempt_exact_2kssamp(n1: int, n2: int, g: int, d: float, alternative: str) -> Any:
     """Attempts to compute the exact 2sample probability.
 
-    n1, n2 are the sample sizes
-    g is the gcd(n1, n2)
-    d is the computed max difference in ECDFs
+    Parameters
+    ----------
+    n1 : integer
+        sample size of sample 1
+    n2 : integer
+        sample size of sample 2
+    g : integer
+        greatest common divisor of n1 and n2
+    d : float
+        max difference in ECDFs
+    alternative : string
+        alternative hypothesis, either 'two-sided', 'less' or 'greater'
 
-    Returns (success, d, probability)
+    Returns
+    -------
+    success : bool
+        True if the calculation was successful
+    d : float
+        max difference in ECDFs
+    prob : float
+        The probability of the test statistic under the null hypothesis.
     """
     lcm = (n1 // g) * n2
     h = int(np.round(d * lcm))
