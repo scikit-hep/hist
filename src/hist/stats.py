@@ -292,7 +292,7 @@ def _attempt_exact_2kssamp(n1: int, n2: int, g: int, d: float, alternative: str)
 
     if saw_fp_error:
         return False, d, np.nan
-    if not (0 <= prob <= 1):
+    if not 0 <= prob <= 1:
         return False, d, prob
     return True, d, prob
 
