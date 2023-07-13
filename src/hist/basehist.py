@@ -72,6 +72,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         self.axes: NamedAxesTuple
         self.name = name
         self.label = label
+        useless = None
 
         if args and storage is None and isinstance(args[-1], (Storage, str)):
             storage = args[-1]
