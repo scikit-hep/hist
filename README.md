@@ -29,10 +29,11 @@ Python 3.7+ (3.6 users get version 2.4). See [what's new](https://hist.readthedo
 You can install this library from [PyPI](https://pypi.org/project/hist/) with pip:
 
 ```bash
-python3 -m pip install "hist[plot]"
+python3 -m pip install "hist[plot,fit]"
 ```
 
-If you do not need the plotting features, you can skip the `[plot]` extra.
+If you do not need the plotting features, you can skip the `[plot]` and/or
+`[fit]` extras. `[fit]` is not currently supported in WebAssembly.
 
 ## Features
 
