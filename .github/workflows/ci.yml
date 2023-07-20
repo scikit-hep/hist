@@ -10,7 +10,7 @@ env:
   FORCE_COLOR: 3
 
 concurrency:
-  group: ${ github.workflow }-${ github.head_ref }
+  group: ${ github.workflow }-${ github.ref }
   cancel-in-progress: true
 
 jobs:
