@@ -32,7 +32,7 @@ __all__ = (
     "plot_stack",
 )
 
-_PLT_MISSING_MSG = "Hist plotting with fitting requires scipy and iminuit. Please install hist[plot] or manually install dependencies."
+_PLT_MISSING_MSG = "Hist plotting with fitting requires scipy and iminuit. Please install hist[plot,fit] or manually install dependencies."
 
 
 class FitResultArtists(NamedTuple):

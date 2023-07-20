@@ -60,6 +60,8 @@ mpl = [
 plot = [
     "matplotlib >=3.0",
     "mplhep >=0.2.16",
+]
+fit = [
     "scipy >=1.4",
     "iminuit >=2",
 ]
