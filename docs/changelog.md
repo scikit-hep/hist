@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 2.7.1
+
+* `[plot]` extra split into `[fit]`
+  [#515](https://github.com/scikit-hep/hist/pull/515)
+* Use PyPI trusted publisher to deploy
+  [#516](https://github.com/scikit-hep/hist/pull/516)
 
 ## Version 2.7.0
 
