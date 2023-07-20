@@ -63,6 +63,8 @@ Hist currently provides everything boost-histogram provides, and the following e
   - `.density()` computes the density as an array.
   - `.profile(remove_ax)` can convert a ND COUNT histogram into a (N-1)D MEAN histogram.
   - `.sort(axis)` supports sorting a histogram by a categorical axis. Optionally takes a function to sort by.
+  - `.fill_flattened(...)` will flatten and fill, including support for AwkwardArray.
+  - `.integrate(...)`, which takes the opposite arguments as `.project`.
 
 - Hist implements UHI+; an extension to the UHI (Unified Histogram Indexing) system designed for import-free interactivity:
   - Uses `j` suffix to switch to data coordinates in access or slices.

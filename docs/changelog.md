@@ -1,5 +1,25 @@
 # Changelog
 
+
+## Version 2.7.0
+
+Features:
+
+* Add a function to integrate axes
+  [#505](https://github.com/scikit-hep/hist/pull/505)
+* Add `fill_flattened` support
+  [#474](https://github.com/scikit-hep/hist/pull/474)
+
+Various other items:
+
+* Move linting to using Ruff
+  [#475](https://github.com/scikit-hep/hist/pull/475)
+* `Self` & `_compat`
+  [#479](https://github.com/scikit-hep/hist/pull/479)
+* Rework and rerun docs API
+  [#481](https://github.com/scikit-hep/hist/pull/481)
+
+
 ## Version 2.6.3
 
 * Experimental dask support
