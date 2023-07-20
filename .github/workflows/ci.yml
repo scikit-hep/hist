@@ -6,9 +6,6 @@ on:
     branches:
       - main
 
-env:
-  FORCE_COLOR: 3
-
 concurrency:
   group: ${ github.workflow }-${ github.head_ref }
   cancel-in-progress: true
