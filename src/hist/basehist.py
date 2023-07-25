@@ -630,3 +630,43 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
             raise AssertionError(f"Unsupported storage type {storage}")
 
         return super().sum(flow=flow)
+
+    def chisquare_1samp(
+        self,
+        distribution: str | Callable[..., Any],
+        flow: bool = False,
+        args: Any = (),
+        kwds: Any = None,
+    ) -> Any:
+        from hist import stats
+
+        return stats.chisquare_1samp(self, distribution, flow, args, kwds)
+
+    def chisquare_2samp(self, other: hist.BaseHist, flow: bool = False) -> Any:
+        from hist import stats
+
+        return stats.chisquare_2samp(self, other, flow)
+
+    def ks_1samp(
+        self,
+        distribution: str | Callable[..., Any],
+        args: Any = (),
+        kwds: Any = None,
+        alternative: str = "two-sided",
+        mode: str = "auto",
+    ) -> Any:
+        from hist import stats
+
+        return stats.ks_1samp(self, distribution, args, kwds, alternative, mode)
+
+    def ks_2samp(
+        self,
+        other: hist.BaseHist,
+        equal_bins: bool = True,
+        flow: bool = False,
+        alternative: str = "two-sided",
+        mode: str = "auto",
+    ) -> Any:
+        from hist import stats
+
+        return stats.ks_2samp(self, other, equal_bins, flow, alternative, mode)

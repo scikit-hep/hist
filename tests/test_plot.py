@@ -7,6 +7,7 @@ from hist import Hist, NamedHist, axis
 
 plt = pytest.importorskip("matplotlib.pyplot")
 pytest.importorskip("scipy")
+pytest.importorskip("mplhep")
 
 
 def test_general_plot1d():

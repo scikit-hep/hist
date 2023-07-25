@@ -74,6 +74,7 @@ test = [
     "pytest-mpl >=0.12",
     "dask[dataframe] >=2022; python_version>='3.8'",
     "dask_histogram >=2023.1; python_version>='3.8'",
+    "numba_stats",
 ]
 dev = [
     "pytest >=6",
@@ -85,6 +86,7 @@ dev = [
     "ipykernel",
     "dask[dataframe] >=2022; python_version>='3.8'",
     "dask_histogram >=2023.1; python_version>='3.8'",
+    "numba_stats",
 ]
 docs = [
     "pytest >=6",
@@ -178,6 +180,7 @@ messages_control.disable = [
   "disallowed-name",
   "cyclic-import",
   "redefined-builtin",
+  "too-many-public-methods",
 ]
 
 [tool.ruff]
