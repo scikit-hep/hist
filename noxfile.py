@@ -30,9 +30,9 @@ def pylint(session: nox.Session) -> None:
     Run pylint.
     """
 
-    session.install("pylint~=2.16.0")
-    session.install("-e", ".")
-    session.run("pylint", "src", *session.posargs)
+    session.install("pylint~=2.17.0")
+    session.install("-e.")
+    session.run("pylint", "hist", *session.posargs)
 
 
 @nox.session(python=ALL_PYTHONS, reuse_venv=True)
