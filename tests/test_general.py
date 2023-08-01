@@ -953,3 +953,23 @@ def test_integrate():
     assert h1[{"x": 4j}] == 2
     assert h1[{"x": 2j}] == 1
     assert h2[{"x": 1j}] == 3
+
+
+def test_T_property():
+    # Create a 2D histogram with some data
+    hist_data = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+    h = hist.Hist(
+        hist.axis.Regular(3, 0, 1, flow=False),
+        hist.axis.Regular(3, 5, 6, flow=False),
+        data=hist_data,
+    )
+
+    assert h.T.values() == approx(h.values().T)
+    assert h.T.axes[0] == h.axes[1]
+    assert h.T.axes[1] == h.axes[0]
+
+
+def test_T_empty():
+    hist_empty = hist.Hist()
+    hist_T_empty = hist_empty.T
+    assert hist_empty == hist_T_empty

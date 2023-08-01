@@ -204,6 +204,10 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         int_args = [self._name_to_index(a) if isinstance(a, str) else a for a in args]
         return super().project(*int_args)
 
+    @property
+    def T(self) -> Self:
+        return self.project(*reversed(range(self.ndim)))  # type: ignore[return-value]
+
     def fill(
         self,
         *args: ArrayLike,
