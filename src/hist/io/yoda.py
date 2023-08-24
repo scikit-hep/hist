@@ -1,6 +1,7 @@
 from __future__ import annotations
 import numpy as np
-from .. import Hist, overflow, underflow
+
+from .. import Hist, overflow, underflow, axis, storage
 
 
 __all__ =["to_yoda_str", "read_yoda_str"]
@@ -134,18 +135,20 @@ def read_yoda_str(input: str) -> dict[str, tuple[str, str]]:
         line = lines[i]
 
         if line.startswith("BEGIN"):
-            #Begin
             path = line.split()[2]
             class_name = line.split()[1][:-3]
 
-            body = line + "\n"  # to include the "BEGIN" line
+            body = line + "\n"
             i += 1
             while i < num_lines and not lines[i].startswith("END"):
                 body += lines[i] + "\n"
                 i += 1
 
-            body += lines[i] + "\n"  # to include the "END" line
+            body += lines[i]
             yoda_dict[path] = (class_name, body)
+        
+            data=np.array()
+            yoda_dict[path]=Hist(axis.Variable[1,2,3]),storage=storage.Weight(),data=data()
 
         i += 1
 
