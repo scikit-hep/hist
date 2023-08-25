@@ -126,7 +126,7 @@ def _to_single_yoda_2d(path: str, h: Hist) -> str:
     return res
 
 
-def read_yoda_str(input: str) -> dict[str, tuple[str, str]]:
+def read_yoda_str(input: str) -> dict[str, tuple[str, str, str]]:
     yoda_dict = {}
     lines = input.split("\n")
     num_lines = len(lines)
@@ -137,20 +137,18 @@ def read_yoda_str(input: str) -> dict[str, tuple[str, str]]:
         if line.startswith("BEGIN"):
             path = line.split()[2]
             class_name = line.split()[1][:-3]
-
-            body = line + "\n"
-            i += 1
+            
+            body = ""
+            header = ""
+            while i < num_lines and lines[i].strip()=="---":
+                header += lines[i] + "\n"
+                i +=1
             while i < num_lines and not lines[i].startswith("END"):
                 body += lines[i] + "\n"
                 i += 1
 
             body += lines[i]
-            yoda_dict[path] = (class_name, body)
-        
-            data=np.array()
-            yoda_dict[path]=Hist(axis.Variable[1,2,3]),storage=storage.Weight(),data=data()
-
+            yoda_dict[path] = (class_name, header, body)
+            
         i += 1
-
     return yoda_dict
-
