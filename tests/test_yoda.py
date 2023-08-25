@@ -5,8 +5,8 @@ import pytest
 import hist
 from hist import Hist, axis, storage
 
-def test_read_yoda_str():
-    
+def test_read_yoda_str_1d():
+
     h1d = {
         "/some_h1d": Hist(hist.axis.Variable([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0]), name="Histogram 1D")
     }
@@ -17,17 +17,16 @@ def test_read_yoda_str():
     
     expected_results = {}
 
-    for path, (class_name, body) in yoda_data.items():
-        expected_results[path] = (class_name, body.strip())
+    for path, (class_name, header, body) in yoda_data.items():
+        expected_results[path] = (class_name, header, body.strip())
 
-    for path, (class_name, body) in yoda_data.items():
+    for path, (class_name, header, body) in yoda_data.items():
 
-
-        # Test the extracted information against the expected results
         if path in expected_results:
-            expected_class, expected_body = expected_results[path]
+            expected_class, expected_header, expected_body = expected_results[path]
             assert class_name == expected_class
             assert body == expected_body
+            assert header == expected_header
 
 def test_read_yoda_str_2d():
 
@@ -48,14 +47,13 @@ def test_read_yoda_str_2d():
 
     expected_results = {}
 
-    for path, (class_name, body) in yoda_data2D.items():
-        expected_results[path] = (class_name, body.strip())
+    for path, (class_name, header, body) in yoda_data2D.items():
+        expected_results[path] = (class_name, header, body.strip())
 
-    for path, (class_name, body) in yoda_data2D.items():
-    
+    for path, (class_name, header, body) in yoda_data2D.items():
 
-        # Test the extracted information against the expected results
         if path in expected_results:
-            expected_class, expected_body = expected_results[path]
+            expected_class, expected_header, expected_body = expected_results[path]
             assert class_name == expected_class
             assert body == expected_body
+            assert header == expected_header

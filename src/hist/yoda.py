@@ -140,9 +140,11 @@ def read_yoda_str(input: str) -> dict[str, tuple[str, str, str]]:
             
             body = ""
             header = ""
+            
             while i < num_lines and lines[i].strip()=="---":
                 header += lines[i] + "\n"
                 i +=1
+                
             while i < num_lines and not lines[i].startswith("END"):
                 body += lines[i] + "\n"
                 i += 1
