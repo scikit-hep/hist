@@ -1,59 +1,49 @@
 from __future__ import annotations
+
+import ctypes
+import math
+
 import numpy as np
 import pytest
 
+
 import hist
-from hist import Hist, axis, storage
+from hist import Hist
 
 def test_read_yoda_str_1d():
-
-    h1d = {
-        "/some_h1d": Hist(hist.axis.Variable([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0]), name="Histogram 1D")
+    
+    yoda_data = {
+        "/some_h1d": (
+            "YODA_HISTO1D_V2", 
+            "some: stuff\n---\n",
+            "# xlow\txhigh\tsumw\tsumw2\tsumwx\tsumwx2\tnumEntries\n"
+            "1.000000e+00\t2.000000e+00\t1.000000e+00\t1.000000e+00\t1.500000e+00\t2.250000e+00\t1.000000e+02\n"
+            "END"
+        ),
+    
     }
-    
-    h1d["/some_h1d"].fill(np.linspace(1,10,100))
-    yoda_file1D = to_yoda_str(h1d)
-    yoda_data = read_yoda_str(yoda_file1D)
-    
-    expected_results = {}
 
     for path, (class_name, header, body) in yoda_data.items():
-        expected_results[path] = (class_name, header, body.strip())
+        yoda_result = yoda_data.read_yoda_str(f"BEGIN {class_name} {path}\nPath: {path}\nTitle: Histogram 1D\nType: Histo1D\n{header}{body}\nEND {class_name}\n")
 
-    for path, (class_name, header, body) in yoda_data.items():
-
-        if path in expected_results:
-            expected_class, expected_header, expected_body = expected_results[path]
-            assert class_name == expected_class
-            assert body == expected_body
-            assert header == expected_header
+        expected_class, expected_header, expected_body = yoda_data[path]
+        assert yoda_result[path] == (expected_class, expected_header, expected_body.strip())
 
 def test_read_yoda_str_2d():
 
-    h2d = {
-        "/some_h2d": Hist(
-            hist.axis.Variable([1.0, 2.0, 3.0, 4.0, 5.0]),
-            hist.axis.Variable([6.0, 7.0, 8.0, 9.0, 10.0]),
-            name="Histogram 2D")
+    yoda_data = {
+        "/some_h2d": (
+            "YODA_HISTO2D_V2", 
+            "some: stuff\n---\n", 
+            "# xlow\txhigh\tylow\tyhigh\tsumw\tsumw2\tsumwx\tsumwx2\tsumwy\tsumwy2\tsumwxy\tnumEntries\n"
+            "1.000000e+00\t2.000000e+00\t6.000000e+00\t7.000000e+00\t1.000000e+00\t1.000000e+00\t1.500000e+00\t2.250000e+00\t6.500000e+00\t4.225000e+01\t9.750000e+00\t1.000000e+02\n"
+            "END" 
+        ),
     }
 
-    x_data = np.random.uniform(1, 5, 100)  
-    y_data = np.random.uniform(6, 10, 100)  
+    for path, (class_name, header, body) in yoda_data.items():
+        
+        yoda_result = yoda_data.read_yoda_str(f"BEGIN {class_name} {path}\nPath: {path}\nTitle: Histogram 2D\nType: Histo2D\n{header}{body}\nEND {class_name}\n")
 
-    h2d["/some_h2d"].fill(x_data, y_data)
-    yoda_file2D = to_yoda_str(h2d)
-
-    yoda_data2D = read_yoda_str(yoda_file2D)
-
-    expected_results = {}
-
-    for path, (class_name, header, body) in yoda_data2D.items():
-        expected_results[path] = (class_name, header, body.strip())
-
-    for path, (class_name, header, body) in yoda_data2D.items():
-
-        if path in expected_results:
-            expected_class, expected_header, expected_body = expected_results[path]
-            assert class_name == expected_class
-            assert body == expected_body
-            assert header == expected_header
+        expected_class, expected_header, expected_body = yoda_data[path]
+        assert yoda_result[path] == (expected_class, expected_header, expected_body.strip())
