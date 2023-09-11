@@ -35,17 +35,21 @@ named_str_cat_ax = axis.StrCategory(["F", "T"], name="F")
 named_reg_hist = NamedHist(named_reg_ax).fill(A=np.random.randn(10))
 named_boo_hist = NamedHist(named_boo_ax).fill(B=[True, False, True])
 named_var_hist = NamedHist(named_var_ax).fill(C=np.random.randn(10))
-named_int_hist = NamedHist(named_int_ax).fill(D=np.random.randn(10))
-named_int_cat_hist = NamedHist(named_int_cat_ax).fill(E=np.random.randn(10))
+named_int_hist = NamedHist(named_int_ax).fill(D=np.random.randint(-3, 3, size=10))
+named_int_cat_hist = NamedHist(named_int_cat_ax).fill(
+    E=np.random.randint(-3, 3, size=10)
+)
 named_str_cat_hist = NamedHist(named_str_cat_ax).fill(F=["T", "F", "T"])
 
 reg_hist_2d = Hist(reg_ax, reg_ax).fill(np.random.randn(10), np.random.randn(10))
 
 boo_hist_2d = Hist(boo_ax, boo_ax).fill([True, False, True], [True, False, True])
 var_hist_2d = Hist(var_ax, var_ax).fill(np.random.randn(10), np.random.randn(10))
-int_hist_2d = Hist(int_ax, int_ax).fill(np.random.randn(10), np.random.randn(10))
+int_hist_2d = Hist(int_ax, int_ax).fill(
+    np.random.randint(-3, 3, size=10), np.random.randint(-3, 3, size=10)
+)
 int_cat_hist_2d = Hist(int_cat_ax, int_cat_ax).fill(
-    np.random.randn(10), np.random.randn(10)
+    np.random.randint(-3, 3, size=10), np.random.randint(-3, 3, size=10)
 )
 str_cat_hist_2d = Hist(str_cat_ax, str_cat_ax).fill(["T", "F", "T"], ["T", "F", "T"])
 
@@ -60,7 +64,7 @@ def hist_1d(request):
         ax, fill = request.param
         h = Hist(ax)
         if fill is int:
-            h.fill(np.random.randn(10))
+            h.fill(np.random.randint(-3, 3, size=10))
         elif fill is bool:
             h.fill(np.random.randint(0, 1, size=10) == 1)
         elif fill is str:
