@@ -22,7 +22,7 @@ reg_hist = Hist(reg_ax).fill(np.random.randn(10))
 boo_hist = Hist(boo_ax).fill([True, False, True])
 var_hist = Hist(var_ax).fill(np.random.randn(10))
 int_hist = Hist(int_ax).fill(np.random.randint(-3, 3, size=10))
-int_cat_hist = Hist(int_cat_ax).fill(np.random.randn(10))
+int_cat_hist = Hist(int_cat_ax).fill(np.random.randint(-3, 3, size=10))
 str_cat_hist = Hist(str_cat_ax).fill(["T", "F", "T"])
 
 named_reg_ax = axis.Regular(10, 0, 1, name="A")
