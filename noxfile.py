@@ -108,3 +108,28 @@ def build(session):
 
     session.install("build")
     session.run("python", "-m", "build")
+
+
+@nox.session()
+def boost(session):
+    """
+    Build against latest boost-histogram.
+    """
+
+    tmpdir = session.create_tmp()
+    session.chdir(tmpdir)
+    # Support running with -r/-R
+    if not Path("boost-histogram").is_dir():
+        session.run(
+            "git",
+            "clone",
+            "--recursive",
+            "https://github.com/scikit-hep/boost-histogram",
+            external=True,
+        )
+        session.chdir("boost-histogram")
+        session.install(".")
+    session.chdir(DIR)
+    session.install("-e.[test,plot]")
+    session.run("pip", "list")
+    session.run("pytest", *session.posargs)

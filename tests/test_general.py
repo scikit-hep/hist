@@ -54,12 +54,12 @@ def test_init_and_fill(unnamed_hist):
 
     assert unnamed_hist(
         axis.Integer(-3, 3, name="x"), axis.Integer(-3, 3, name="y")
-    ).fill(np.random.randn(10), np.random.randn(10))
+    ).fill(np.random.randint(-3, 3, 10), np.random.randint(-3, 3, 10))
 
     assert unnamed_hist(
         axis.IntCategory(range(-3, 3), name="x"),
         axis.IntCategory(range(-3, 3), name="y"),
-    ).fill(np.random.randn(10), np.random.randn(10))
+    ).fill(np.random.randint(-3, 3, 10), np.random.randint(-3, 3, 10))
 
     assert unnamed_hist(
         axis.StrCategory(["F", "T"], name="x"), axis.StrCategory("FT", name="y")
@@ -181,8 +181,8 @@ def test_general_fill():
         axis.Integer(0, 10, name="y"),
         axis.Integer(0, 2, name="z"),
     ).fill(
-        [3.5, 3.5, 3.5, 4.5, 5.5, 5.5, 5.5],
-        [3.5, 3.5, 4.5, 4.5, 4.5, 4.5, 4.5],
+        [3, 3, 3, 4, 5, 5, 5],
+        [3, 3, 4, 4, 4, 4, 4],
         [0, 0, 1, 1, 1, 1, 1],
     )
 
@@ -202,8 +202,8 @@ def test_general_fill():
         axis.IntCategory(range(10), name="y"),
         axis.IntCategory(range(2), name="z"),
     ).fill(
-        x=[3.5, 3.5, 3.5, 4.5, 5.5, 5.5, 5.5],
-        y=[3.5, 3.5, 4.5, 4.5, 4.5, 4.5, 4.5],
+        x=[3, 3, 3, 4, 5, 5, 5],
+        y=[3, 3, 4, 4, 4, 4, 4],
         z=[0, 0, 1, 1, 1, 1, 1],
     )
 
@@ -248,13 +248,13 @@ def test_general_fill():
     ).fill(x=np.random.randn(10), y=np.random.randn(10))
 
     assert Hist(axis.Integer(-3, 3, name="x"), axis.Integer(-3, 3, name="y")).fill(
-        x=np.random.randn(10), y=np.random.randn(10)
+        x=np.random.randint(-3, 3, 10), y=np.random.randint(-3, 3, 10)
     )
 
     assert Hist(
         axis.IntCategory(range(-3, 3), name="x"),
         axis.IntCategory(range(-3, 3), name="y"),
-    ).fill(x=np.random.randn(10), y=np.random.randn(10))
+    ).fill(x=np.random.randint(-3, 3, 10), y=np.random.randint(-3, 3, 10))
 
     assert Hist(
         axis.StrCategory(["F", "T"], name="x"), axis.StrCategory("FT", name="y")
@@ -290,7 +290,7 @@ def test_general_access():
         np.random.uniform(size=1000),
         ["hi"] * 800 + ["hello"] * 200,
         [True] * 600 + [False] * 400,
-        np.ones(1000),
+        np.ones(1000, dtype=int),
     )
 
     assert h[0j, -0j + 2, "hi", True, 1]
@@ -373,7 +373,7 @@ def test_general_index_access():
         np.ones(10) * 2,
         ["hi"] * 8 + ["hello"] * 2,
         [True] * 6 + [False] * 4,
-        np.ones(10),
+        np.ones(10, dtype=int),
     )
 
     assert h[1j, 2j, "hi", True, 1] == 6
