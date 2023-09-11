@@ -38,6 +38,6 @@ def test_integer_plot():
         .Reg(10, 0, 10, name="good", label="y-axis")
         .Int64()
     )
-    testInt.fill(nice=np.random.normal(5, 1, 10), good=np.random.normal(5, 1, 10))
+    testInt.fill(nice=np.random.randint(1, 10, 10), good=np.random.normal(5, 1, 10))
 
     assert testInt.plot() == "called plot2d"
