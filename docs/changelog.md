@@ -1,5 +1,18 @@
 # Changelog
 
+## Version 2.7.2
+
+* Support boost-histogram 1.4.0 in addition to 1.3.x, including Python 3.12,
+  flow disabling for categories, and integer arrays required for integer axes
+  [#535](https://github.com/scikit-hep/hist/pull/535) and
+  [#532](https://github.com/scikit-hep/hist/pull/532)
+* Add a `.T` shortcut
+  [#521](https://github.com/scikit-hep/hist/pull/521)
+* Support ND quick constructs being mistakenly passed in
+  [#528](https://github.com/scikit-hep/hist/pull/528)
+* Add `boost` nox job to test upstream changes easily
+  [#533](https://github.com/scikit-hep/hist/pull/533)
+
 ## Version 2.7.1
 
 * `[plot]` extra split into `[fit]`
