@@ -198,14 +198,18 @@ def test_general_fill():
 
     # IntCategory
     h = Hist(
-        axis.IntCategory(range(10), name="x"),
-        axis.IntCategory(range(10), name="y"),
+        axis.IntCategory(range(10), name="x", flow=False),
+        axis.IntCategory(range(10), name="y", overflow=False),
         axis.IntCategory(range(2), name="z"),
     ).fill(
         x=[3, 3, 3, 4, 5, 5, 5],
         y=[3, 3, 4, 4, 4, 4, 4],
         z=[0, 0, 1, 1, 1, 1, 1],
     )
+
+    assert not h.axes[0].traits.overflow
+    assert not h.axes[1].traits.overflow
+    assert h.axes[2].traits.overflow
 
     z_one_only = h[{2: bh.loc(1)}]
     for idx_x in range(10):
@@ -219,14 +223,18 @@ def test_general_fill():
 
     # StrCategory
     h = Hist(
-        axis.StrCategory("FT", name="x"),
-        axis.StrCategory(list("FT"), name="y"),
+        axis.StrCategory("FT", name="x", flow=False),
+        axis.StrCategory(list("FT"), name="y", overflow=False),
         axis.StrCategory(["F", "T"], name="z"),
     ).fill(
         ["T", "T", "T", "T", "T", "F", "T"],
         ["F", "T", "T", "F", "F", "T", "F"],
         ["F", "F", "T", "T", "T", "T", "T"],
     )
+
+    assert not h.axes[0].traits.overflow
+    assert not h.axes[1].traits.overflow
+    assert h.axes[2].traits.overflow
 
     z_one_only = h[{2: bh.loc("T")}]
     assert z_one_only[bh.loc("F"), bh.loc("F")] == 0
@@ -282,7 +290,7 @@ def test_general_access():
     h = Hist(
         axis.Regular(50, -5, 5, name="Norm", label="normal distribution"),
         axis.Regular(50, -5, 5, name="Unif", label="uniform distribution"),
-        axis.StrCategory(["hi", "hello"], name="Greet"),
+        axis.StrCategory(["hi", "hello"], name="Greet", flow=False),
         axis.Boolean(name="Yes"),
         axis.Integer(0, 1000, name="Int"),
     ).fill(

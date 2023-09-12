@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Any, Iterable
 
+import boost_histogram as bh
 import boost_histogram.axis as bha
 
 import hist
@@ -212,12 +213,23 @@ class IntCategory(AxesMixin, bha.IntCategory, family=hist):
         label: str = "",
         metadata: Any = None,
         growth: bool = False,
+        flow: bool = True,
+        overflow: bool | None = None,
         __dict__: dict[str, Any] | None = None,
     ) -> None:
+        has_flow = flow if overflow is None else overflow
+        if tuple(int(x) for x in bh.__version__.split(".")[:2]) < (1, 4):
+            if not has_flow:
+                msg = "Boost-histogram 1.4+ required for flowless Category axes"
+                raise TypeError(msg)
+            kwargs = {}
+        else:
+            kwargs = {"overflow": has_flow}
         super().__init__(
             categories,
             metadata=metadata,
             growth=growth,
+            **kwargs,
             __dict__=__dict__,
         )
         self._ax.metadata["name"] = name
@@ -235,12 +247,23 @@ class StrCategory(AxesMixin, bha.StrCategory, family=hist):
         label: str = "",
         metadata: Any = None,
         growth: bool = False,
+        flow: bool = True,
+        overflow: bool | None = None,
         __dict__: dict[str, Any] | None = None,
     ) -> None:
+        has_flow = flow if overflow is None else overflow
+        if tuple(int(x) for x in bh.__version__.split(".")[:2]) < (1, 4):
+            if not has_flow:
+                msg = "Boost-histogram 1.4+ required for flowless Category axes"
+                raise TypeError(msg)
+            kwargs = {}
+        else:
+            kwargs = {"overflow": has_flow}
         super().__init__(
             categories,
             metadata=metadata,
             growth=growth,
+            **kwargs,
             __dict__=__dict__,
         )
         self._ax.metadata["name"] = name
