@@ -11,6 +11,8 @@ from pytest import approx
 import hist
 from hist import Hist, axis, storage
 
+BHV = tuple(int(x) for x in bh.__version__.split(".")[:2])
+
 # TODO: specify what error is raised
 
 
@@ -111,7 +113,7 @@ def test_duplicated_names_init(named_hist):
         )
 
 
-def test_general_fill():
+def test_general_fill_regular():
     """
     Test general fill -- whether Hist can be properly filled.
     """
@@ -137,6 +139,8 @@ def test_general_fill():
             else:
                 assert z_one_only[idx_x, idx_y] == 0
 
+
+def test_general_fill_bool():
     # Boolean
     h = Hist(
         axis.Boolean(name="x"),
@@ -154,7 +158,8 @@ def test_general_fill():
     assert z_one_only[True, False] == 3
     assert z_one_only[True, True] == 1
 
-    # Variable
+
+def test_general_fill_variable():
     h = Hist(
         axis.Variable(range(11), name="x"),
         axis.Variable(range(11), name="y"),
@@ -175,7 +180,8 @@ def test_general_fill():
             else:
                 assert z_one_only[idx_x, idx_y] == 0
 
-    # Integer
+
+def test_general_fill_integer():
     h = Hist(
         axis.Integer(0, 10, name="x"),
         axis.Integer(0, 10, name="y"),
@@ -196,10 +202,11 @@ def test_general_fill():
             else:
                 assert z_one_only[idx_x, idx_y] == 0
 
-    # IntCategory
+
+def test_general_fill_int_cat():
     h = Hist(
-        axis.IntCategory(range(10), name="x", flow=False),
-        axis.IntCategory(range(10), name="y", overflow=False),
+        axis.IntCategory(range(10), name="x", flow=BHV < (1, 4)),
+        axis.IntCategory(range(10), name="y", overflow=BHV < (1, 4)),
         axis.IntCategory(range(2), name="z"),
     ).fill(
         x=[3, 3, 3, 4, 5, 5, 5],
@@ -207,8 +214,12 @@ def test_general_fill():
         z=[0, 0, 1, 1, 1, 1, 1],
     )
 
-    assert not h.axes[0].traits.overflow
-    assert not h.axes[1].traits.overflow
+    if BHV < (1, 4):
+        assert h.axes[0].traits.overflow
+        assert h.axes[1].traits.overflow
+    else:
+        assert not h.axes[0].traits.overflow
+        assert not h.axes[1].traits.overflow
     assert h.axes[2].traits.overflow
 
     z_one_only = h[{2: bh.loc(1)}]
@@ -221,10 +232,11 @@ def test_general_fill():
             else:
                 assert z_one_only[idx_x, idx_y] == 0
 
-    # StrCategory
+
+def test_general_fill_str_cat():
     h = Hist(
-        axis.StrCategory("FT", name="x", flow=False),
-        axis.StrCategory(list("FT"), name="y", overflow=False),
+        axis.StrCategory("FT", name="x", flow=BHV < (1, 4)),
+        axis.StrCategory(list("FT"), name="y", overflow=BHV < (1, 4)),
         axis.StrCategory(["F", "T"], name="z"),
     ).fill(
         ["T", "T", "T", "T", "T", "F", "T"],
@@ -232,8 +244,12 @@ def test_general_fill():
         ["F", "F", "T", "T", "T", "T", "T"],
     )
 
-    assert not h.axes[0].traits.overflow
-    assert not h.axes[1].traits.overflow
+    if BHV < (1, 4):
+        assert h.axes[0].traits.overflow
+        assert h.axes[1].traits.overflow
+    else:
+        assert not h.axes[0].traits.overflow
+        assert not h.axes[1].traits.overflow
     assert h.axes[2].traits.overflow
 
     z_one_only = h[{2: bh.loc("T")}]
@@ -242,7 +258,8 @@ def test_general_fill():
     assert z_one_only[bh.loc("T"), bh.loc("F")] == 3
     assert z_one_only[bh.loc("T"), bh.loc("T")] == 1
 
-    # with names
+
+def test_general_fill_names():
     assert Hist(
         axis.Regular(50, -3, 3, name="x"), axis.Regular(50, -3, 3, name="y")
     ).fill(x=np.random.randn(10), y=np.random.randn(10))
@@ -268,7 +285,7 @@ def test_general_fill():
         axis.StrCategory(["F", "T"], name="x"), axis.StrCategory("FT", name="y")
     ).fill(x=["T", "F", "T"], y=["T", "F", "T"])
 
-    h = Hist(
+    Hist(
         axis.Regular(
             50, -4, 4, name="X", label="s [units]", underflow=False, overflow=False
         )
@@ -290,7 +307,7 @@ def test_general_access():
     h = Hist(
         axis.Regular(50, -5, 5, name="Norm", label="normal distribution"),
         axis.Regular(50, -5, 5, name="Unif", label="uniform distribution"),
-        axis.StrCategory(["hi", "hello"], name="Greet", flow=False),
+        axis.StrCategory(["hi", "hello"], name="Greet", flow=BHV < (1, 4)),
         axis.Boolean(name="Yes"),
         axis.Integer(0, 1000, name="Int"),
     ).fill(

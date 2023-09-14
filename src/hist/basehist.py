@@ -231,6 +231,13 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         a Hist object.
         """
 
+        if (
+            issubclass(self.storage_type, (bh.storage.Mean, bh.storage.WeightedMean))
+            and sample is None
+        ):
+            msg = "A Mean-based storage requires a sample= argument with the values to average"
+            raise TypeError(msg)
+
         data_dict = {
             self._name_to_index(k) if isinstance(k, str) else k: v  # type: ignore[redundant-expr]
             for k, v in kwargs.items()
