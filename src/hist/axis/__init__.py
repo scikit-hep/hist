@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from typing import Any, Iterable
+import typing
+from collections.abc import Iterable
+from typing import Any
 
 import boost_histogram as bh
 import boost_histogram.axis as bha
@@ -57,7 +59,7 @@ class AxesMixin:
         """
         Get the name for the Regular axis
         """
-        return self._ax.metadata.get("name", "")
+        return typing.cast(str, self._ax.metadata.get("name", ""))
 
     @property
     def label(self: AxisProtocol) -> str:

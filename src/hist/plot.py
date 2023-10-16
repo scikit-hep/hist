@@ -193,7 +193,7 @@ def _plot_keywords_wrapper(ax: matplotlib.axes.Axes, legend: bool | None) -> Non
     # Todo: more keywords here
     if legend:
         if ax.get_legend_handles_labels()[0]:
-            legend = ax.legend()
+            ax.legend()
         else:
             raise ValueError("No labels to legend")
 
@@ -517,7 +517,8 @@ def plot_pull_array(
             downRect_startpoint, patch_width, patch_height, **pp_kwargs
         )
         ax.add_patch(downRect)
-        patch_artists.append((downRect, upRect))
+        patch_artists.append(downRect)
+        patch_artists.append(upRect)
 
     ax.set_xlim(left_edge, right_edge)
 
