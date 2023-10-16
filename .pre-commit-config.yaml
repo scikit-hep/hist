@@ -15,7 +15,7 @@ repos:
     additional_dependencies: [black==23.7.0]
 
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v4.4.0
+  rev: v4.5.0
   hooks:
   - id: check-added-large-files
   - id: check-case-conflict
@@ -29,7 +29,7 @@ repos:
   - id: trailing-whitespace
 
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.0.288
+  rev: v0.0.292
   hooks:
   - id: ruff
     args: ["--fix", "--show-fixes"]
@@ -43,7 +43,7 @@ repos:
     args: ["--extend-ignore=B008,T20,I002,E402", "--fix", "--show-fixes"]
 
 - repo: https://github.com/pre-commit/mirrors-mypy
-  rev: v1.5.1
+  rev: v1.6.0
   hooks:
   - id: mypy
     files: ^src
@@ -51,7 +51,7 @@ repos:
     additional_dependencies: ["numpy~=1.24.0", "matplotlib>=3.4", "boost-histogram~=1.3.1", "uhi~=0.3.1", "pandas-stubs>=2.0.1.230501"]
 
 - repo: https://github.com/codespell-project/codespell
-  rev: v2.2.5
+  rev: v2.2.6
   hooks:
   - id: codespell
     args: ["-Lhist,gaus,nd"]
@@ -66,6 +66,6 @@ repos:
   - id: rst-inline-touching-normal
 
 - repo: https://github.com/shellcheck-py/shellcheck-py
-  rev: v0.9.0.5
+  rev: v0.9.0.6
   hooks:
   - id: shellcheck
