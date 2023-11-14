@@ -73,7 +73,9 @@ def svg_hist_1d(h: hist.BaseHist) -> svg:
     max_dens = np.amax(density) or 1
     norm_vals: np.typing.NDArray[Any] = density / max_dens
 
-    arr = np.empty((2, len(norm_vals) * 2 + 2), dtype=float)
+    arr: np.typing.NDArray[np.float64] = np.empty(
+        (2, len(norm_vals) * 2 + 2), dtype=float
+    )
     arr[0, 0:-1:2] = arr[0, 1::2] = width * norm_edges
     arr[1, 1:-2:2] = arr[1, 2:-1:2] = -height * norm_vals
     arr[1, 0] = arr[1, -1] = 0
@@ -122,7 +124,7 @@ def svg_hist_1d_c(h: hist.BaseHist) -> svg:
     max_dens = np.amax(density) or 1
     norm_vals: np.typing.NDArray[Any] = density / max_dens
 
-    arr = np.empty((2, len(norm_vals) * 2), dtype=float)
+    arr: np.typing.NDArray[np.float64] = np.empty((2, len(norm_vals) * 2), dtype=float)
     arr[0, :-1:2] = arr[0, 1::2] = norm_edges[:-1]
     arr[1, :-1:2] = arr[1, 1::2] = inner_radius + norm_vals * (radius - inner_radius)
     arr[1] = np.roll(arr[1], shift=1)
