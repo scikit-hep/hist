@@ -5,7 +5,6 @@
 [![Actions Status][actions-badge]][actions-link]
 [![Documentation Status][rtd-badge]][rtd-link]
 [![pre-commit.ci status][pre-commit-badge]][pre-commit-link]
-[![Code style: black][black-badge]][black-link]
 
 [![PyPI version][pypi-version]][pypi-link]
 [![Conda-Forge][conda-badge]][conda-link]
@@ -182,8 +181,6 @@ Support for this work was provided by the National Science Foundation cooperativ
 [actions-link]:             https://github.com/scikit-hep/hist/actions
 [binder-badge]:             https://mybinder.org/badge_logo.svg
 [binder-link]:              https://mybinder.org/v2/gh/scikit-hep/hist/HEAD
-[black-badge]:              https://img.shields.io/badge/code%20style-black-000000.svg
-[black-link]:               https://github.com/psf/black
 [conda-badge]:              https://img.shields.io/conda/vn/conda-forge/hist
 [conda-link]:               https://github.com/conda-forge/hist-feedstock
 [doi-badge]:                https://zenodo.org/badge/239605861.svg
