@@ -6,7 +6,7 @@
 Welcome to Hist's documentation!
 ================================
 
-|Actions Status| |Documentation Status| |pre-commit.ci Status| |Code style: black| |PyPI version|
+|Actions Status| |Documentation Status| |pre-commit.ci Status| |PyPI version|
 |Conda-Forge| |PyPI platforms| |DOI| |License| |GitHub Discussion| |Gitter| |Binder| |Scikit-HEP|
 
 Introduction
@@ -81,8 +81,6 @@ Indices and tables
    :target: https://hist.readthedocs.io/en/latest/?badge=latest
 .. |pre-commit.ci Status| image:: https://results.pre-commit.ci/badge/github/scikit-hep/hist/main.svg
    :target: https://results.pre-commit.ci/repo/github/scikit-hep/hist
-.. |Code style: black| image:: https://img.shields.io/badge/code%20style-black-000000.svg
-   :target: https://github.com/psf/black
 .. |PyPI version| image:: https://badge.fury.io/py/hist.svg
    :target: https://pypi.org/project/hist/
 .. |Conda-Forge| image:: https://img.shields.io/conda/vn/conda-forge/hist

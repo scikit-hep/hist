@@ -132,7 +132,6 @@ warn_unused_configs = true
 files = "src"
 python_version = "3.8"
 strict = true
-show_error_codes = true
 enable_error_code = ["ignore-without-code", "truthy-bool", "redundant-expr"]
 warn_unreachable = true
 
@@ -208,9 +207,8 @@ extend-select = [
   "UP",          # pyupgrade
   "YTT",         # flake8-2020
 ]
-ignore = ["PLR", "E501", "PT011", "PT013", "PT004", "B017"]
+ignore = ["PLR", "E501", "PT011", "PT013", "PT004", "B017", "ISC001"]
 typing-modules = ["hist._compat.typing"]
-unfixable = ["T20", "F841"]
 isort.required-imports = ["from __future__ import annotations"]
 flake8-unused-arguments.ignore-variadic-names = true
 
