@@ -83,6 +83,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         self.axes: NamedAxesTuple
         self.name = name
         self.label = label
+        useless = None
 
         args: tuple[AxisTypes, ...]
 
