@@ -30,8 +30,7 @@ if typing.TYPE_CHECKING:
 
 
 class SupportsLessThan(Protocol):
-    def __lt__(self, __other: Any) -> bool:
-        ...
+    def __lt__(self, __other: Any) -> bool: ...
 
 
 InnerIndexing = Union[

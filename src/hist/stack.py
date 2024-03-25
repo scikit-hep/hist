@@ -72,12 +72,10 @@ class Stack:
         raise IndexError(f"Name not found: {name}")
 
     @typing.overload
-    def __getitem__(self, val: int | str) -> BaseHist:
-        ...
+    def __getitem__(self, val: int | str) -> BaseHist: ...
 
     @typing.overload
-    def __getitem__(self, val: slice) -> Self:
-        ...
+    def __getitem__(self, val: slice) -> Self: ...
 
     def __getitem__(self, val: int | slice | str) -> BaseHist | Self:
         if isinstance(val, str):

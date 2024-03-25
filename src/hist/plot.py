@@ -122,7 +122,7 @@ def _expr_to_lambda(expr: str) -> Callable[..., Any]:
     varnames = list(OrderedDict.fromkeys([name for name in varnames if name != "x"]))
     lambdastr = f"lambda x,{','.join(varnames)}: {expr}"
     # pylint: disable-next=eval-used
-    return eval(lambdastr)  # type: ignore[no-any-return]  # noqa: PGH001
+    return eval(lambdastr)  # type: ignore[no-any-return]
 
 
 def _curve_fit_wrapper(
