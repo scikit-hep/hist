@@ -13,13 +13,11 @@ V = TypeVar("V")
 
 
 class HistogramModuleProtocol(Protocol[T_contra, U]):
-    def unpack(self, obj: T_contra) -> dict[str, U] | None:
-        ...
+    def unpack(self, obj: T_contra) -> dict[str, U] | None: ...
 
     def broadcast_and_flatten(
         self, objects: Sequence[U | ArrayLike]
-    ) -> tuple[np.typing.NDArray[Any], ...]:
-        ...
+    ) -> tuple[np.typing.NDArray[Any], ...]: ...
 
 
 _histogram_modules: dict[type, HistogramModuleProtocol[Any, Any]] = {}

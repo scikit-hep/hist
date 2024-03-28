@@ -4,8 +4,7 @@ from ._compat.typing import Protocol, Self
 
 
 class SupportsStr(Protocol):
-    def __str__(self) -> str:
-        ...
+    def __str__(self) -> str: ...
 
 
 class XML:
