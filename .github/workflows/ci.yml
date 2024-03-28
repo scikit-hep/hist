@@ -54,7 +54,7 @@ jobs:
         uv-venv: ".venv"
 
     - name: Requirements check
-      run: up pip list
+      run: uv pip list
 
     - name: Install package
       run: uv pip install -e ".[test]"
