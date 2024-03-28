@@ -14,18 +14,20 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  pre-commit:
+  pylint:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - uses: actions/setup-python@v5
+    - name: Setup uv
+      uses: yezz123/setup-uv@v4
       with:
-        python-version: "3.x"
-    - uses: pre-commit/action@v3.0.1
+        uv-venv: ".venv"
+    - name: Install nox
+      run: uv pip install nox
     - name: PyLint
       run: |
         echo "::add-matcher::$GITHUB_WORKSPACE/.github/matchers/pylint.json"
-        pipx run nox -s pylint
+        nox -s pylint
 
   checks:
     runs-on: ubuntu-latest
