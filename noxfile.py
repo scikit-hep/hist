@@ -7,10 +7,9 @@ from pathlib import Path
 
 import nox
 
-ALL_PYTHONS = ["3.7", "3.8", "3.9", "3.10", "3.11"]
-
+nox.needs_version = ">=2024.3.2"
 nox.options.sessions = ["lint", "tests"]
-
+nox.options.default_venv_backend = "uv|virtualenv"
 
 DIR = Path(__file__).parent.resolve()
 
@@ -35,7 +34,7 @@ def pylint(session: nox.Session) -> None:
     session.run("pylint", "hist", *session.posargs)
 
 
-@nox.session(python=ALL_PYTHONS, reuse_venv=True)
+@nox.session(reuse_venv=True)
 def tests(session):
     """
     Run the unit and regular tests.
@@ -102,12 +101,9 @@ def build(session):
     Build an SDist and wheel.
     """
 
-    build_p = DIR.joinpath("build")
-    if build_p.exists():
-        shutil.rmtree(build_p)
-
-    session.install("build")
-    session.run("python", "-m", "build")
+    args = [] if shutil.which("uv") else ["uv"]
+    session.install("build==1.2.0", *args)
+    session.run("python", "-m", "build", "--installer=uv")
 
 
 @nox.session()
@@ -130,6 +126,6 @@ def boost(session):
         session.chdir("boost-histogram")
         session.install(".")
     session.chdir(DIR)
-    session.install("-e.[test,plot]")
+    session.install("-e.[test,plot]", "pip")
     session.run("pip", "list")
     session.run("pytest", *session.posargs)
