@@ -1,5 +1,36 @@
 # Changelog
 
+## Version 2.7.3
+
+This release fixes an issue with Python 3.12 pulling in NumPy 2 pre-releases.
+
+Fixes:
+
+* Sample required error message
+  [#538](https://github.com/scikit-hep/hist/pull/538)
+* `hist.dask.new` to match top-level package
+  [#563](https://github.com/scikit-hep/hist/pull/563)
+
+Docs:
+
+* Clarify sample term required for Mean storage
+  [#536](https://github.com/scikit-hep/hist/pull/536)
+
+CI:
+
+* Move to using Ruff Jupyter support
+  [#543](https://github.com/scikit-hep/hist/pull/543)
+* Move to using Ruff formatter
+  [#544](https://github.com/scikit-hep/hist/pull/544)
+* Group dependabot updates
+  [#554](https://github.com/scikit-hep/hist/pull/554)
+* Use uv
+  [#564](https://github.com/scikit-hep/hist/pull/564)
+* Add GitHub artifact attestations to package distribution
+  [#568](https://github.com/scikit-hep/hist/pull/568)
+* Reduce update frequency
+  [#571](https://github.com/scikit-hep/hist/pull/571)
+
 ## Version 2.7.2
 
 * Support boost-histogram 1.4.0 in addition to 1.3.x, including Python 3.12,
