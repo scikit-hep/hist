@@ -1,5 +1,10 @@
 # Changelog
 
+## WIP
+
+* Support IntCat for plot1d overlay
+  [#419](https://github.com/scikit-hep/hist/pull/419)
+
 ## Version 2.7.3
 
 This release fixes an issue with Python 3.12 pulling in NumPy 2 pre-releases.
