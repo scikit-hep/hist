@@ -502,8 +502,9 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
             (overlay,) = (i for i, ax in enumerate(self.axes) if ax.traits.discrete)
         assert overlay is not None
         cat_ax = self.axes[overlay]
-        cats = cat_ax if cat_ax.traits.discrete else np.arange(len(cat_ax.centers))
-        d1hists = [self[{overlay: cat}] for cat in cats]
+        icats = np.arange(len(cat_ax))
+        cats = cat_ax if cat_ax.traits.discrete else icats
+        d1hists = [self[{overlay: cat}] for cat in icats]
         if "label" in kwargs:
             if not isinstance(kwargs["label"], str) and len(kwargs["label"]) == len(
                 cats
