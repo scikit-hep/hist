@@ -699,7 +699,7 @@ def test_general_transform_proxy():
 
 def test_hist_proxy_matches(named_hist):
     h = named_hist.new.Reg(10, 0, 1, name="x").Double()
-    assert type(h) == named_hist
+    assert type(h) is named_hist
 
 
 def test_hist_proxy():
@@ -710,7 +710,7 @@ def test_hist_proxy():
     h = Hist.new.Reg(10, 0, 1, name="x").Double().fill([0.5, 0.5])
     assert h[0.5j] == 2
 
-    assert type(h) == Hist
+    assert type(h) is Hist
 
     assert not hasattr(Hist(), "new")
 
