@@ -2,13 +2,11 @@ from __future__ import annotations
 
 import inspect
 import sys
-from typing import Any, Callable, Iterable, NamedTuple, Union
+from typing import Any, Callable, Iterable, Literal, NamedTuple, Union
 
 import numpy as np
 
 import hist
-
-from ._compat.typing import Literal
 
 try:
     import matplotlib.axes
