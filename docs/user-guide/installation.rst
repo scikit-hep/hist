@@ -17,5 +17,4 @@ You can also install it with Conda from conda-forge.
 
 
 Supported platforms are identical to
-`boost-histogram <https://boost-histogram.readthedocs.io/en/latest/usage/installation.html>`_,
-though for the latest version of Hist you need Python 3.7+.
+`boost-histogram <https://boost-histogram.readthedocs.io/en/latest/usage/installation.html>`_.

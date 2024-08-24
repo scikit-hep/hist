@@ -2,14 +2,13 @@ from __future__ import annotations
 
 import typing
 from collections.abc import Iterable
-from typing import Any
+from typing import Any, Protocol
 
 import boost_histogram as bh
 import boost_histogram.axis as bha
 
 import hist
 
-from .._compat.typing import Protocol
 from ..axestuple import ArrayTuple, NamedAxesTuple
 from . import transform
 

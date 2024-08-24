@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-from typing import Any, Callable, Iterator, TypeVar, cast
+from typing import Any, Callable, Iterator, Protocol, TypeVar, cast
 
 import numpy as np
 
-from ._compat.typing import ArrayLike, Protocol
+from ._compat.typing import ArrayLike
 
 T_contra = TypeVar("T_contra", contravariant=True)
 U = TypeVar("U")

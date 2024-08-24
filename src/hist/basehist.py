@@ -4,7 +4,18 @@ import functools
 import operator
 import typing
 import warnings
-from typing import Any, Callable, Generator, Iterator, Mapping, Sequence, Tuple, Union
+from typing import (
+    Any,
+    Callable,
+    Generator,
+    Iterator,
+    Mapping,
+    Protocol,
+    Sequence,
+    SupportsIndex,
+    Tuple,
+    Union,
+)
 
 import boost_histogram as bh
 import histoprint
@@ -13,7 +24,7 @@ import numpy as np
 import hist
 
 from . import interop
-from ._compat.typing import ArrayLike, Protocol, Self, SupportsIndex
+from ._compat.typing import ArrayLike, Self
 from .axestuple import NamedAxesTuple
 from .axis import AxisProtocol
 from .quick_construct import MetaConstructor

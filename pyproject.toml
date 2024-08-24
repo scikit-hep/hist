@@ -17,12 +17,12 @@ classifiers = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Scientific/Engineering",
     "Topic :: Scientific/Engineering :: Information Analysis",
     "Topic :: Scientific/Engineering :: Mathematics",
@@ -34,9 +34,9 @@ keywords = [
     "boost-histogram",
     "dask-histogram",
 ]
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 dependencies = [
-    "boost-histogram>=1.3.1,<1.5",
+    "boost-histogram>=1.3.1,<1.6",
     "histoprint>=2.2.0",
     'numpy>=1.14.5',
     'typing-extensions>=4;python_version<"3.11"',
@@ -67,14 +67,14 @@ fit = [
     "iminuit >=2",
 ]
 dask = [
-    "dask[dataframe] >=2022; python_version>='3.8'",
-    "dask_histogram >=2023.1; python_version>='3.8'"
+    "dask[dataframe] >=2022",
+    "dask_histogram >=2023.1",
 ]
 test = [
     "pytest >=6",
     "pytest-mpl >=0.12",
-    "dask[dataframe] >=2022; python_version>='3.8' and python_version<'3.12'",
-    "dask_histogram >=2023.1; python_version>='3.8' and python_version<'3.12'",
+    "dask[dataframe] >=2022; python_version<'3.13'",
+    "dask_histogram >=2023.1; python_version<'3.13'",
 ]
 dev = [
     "pytest >=6",
@@ -84,8 +84,8 @@ dev = [
     "scipy >=1.4",
     "iminuit >=2; python_version<'3.11'",
     "ipykernel",
-    "dask[dataframe] >=2022; python_version>='3.8'",
-    "dask_histogram >=2023.1; python_version>='3.8'",
+    "dask[dataframe] >=2022",
+    "dask_histogram >=2023.1",
 ]
 docs = [
     "pytest >=6",
@@ -96,8 +96,8 @@ docs = [
     "iminuit >=2",
     "ipython_genutils",
     "graphviz >=0.20.1",
-    "dask[dataframe] >=2022; python_version>='3.8'",
-    "dask_histogram >=2023.1; python_version>='3.8'",
+    "dask[dataframe] >=2022",
+    "dask_histogram >=2023.1",
     "nbsphinx",
     "sphinx >=3.0.0",
     "sphinx_copybutton",
@@ -150,7 +150,7 @@ ignore_missing_imports = true
 
 
 [tool.pylint]
-py-version = "3.7"
+py-version = "3.8"
 extension-pkg-allow-list = ["boost_histogram._core"]
 reports.output-format = "colorized"
 similarities.ignore-imports = "yes"
