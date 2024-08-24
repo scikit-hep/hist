@@ -2,8 +2,19 @@
 
 ## WIP
 
+## Version 2.8.0
+
+Features:
+
+* Support boost-histogram 1.5; drop support for Python 3.7, add support for
+  Python 3.13 / 3.13t
+  [#582](https://github.com/scikit-hep/hist/pull/582)
+
+Fixes:
+
 * Support IntCat for plot1d overlay
   [#419](https://github.com/scikit-hep/hist/pull/419)
+
 
 ## Version 2.7.3
 
