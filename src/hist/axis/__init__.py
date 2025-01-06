@@ -13,17 +13,17 @@ from ..axestuple import ArrayTuple, NamedAxesTuple
 from . import transform
 
 __all__ = (
-    "AxisProtocol",
-    "AxesMixin",
-    "Regular",
-    "Variable",
-    "Integer",
-    "IntCategory",
-    "StrCategory",
-    "Boolean",
-    "transform",
-    "NamedAxesTuple",
     "ArrayTuple",
+    "AxesMixin",
+    "AxisProtocol",
+    "Boolean",
+    "IntCategory",
+    "Integer",
+    "NamedAxesTuple",
+    "Regular",
+    "StrCategory",
+    "Variable",
+    "transform",
 )
 
 

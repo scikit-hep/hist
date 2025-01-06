@@ -8,7 +8,7 @@ from boost_histogram.axis import ArrayTuple, AxesTuple
 
 from ._compat.builtins import zip
 
-__all__ = ("NamedAxesTuple", "AxesTuple", "ArrayTuple")
+__all__ = ("ArrayTuple", "AxesTuple", "NamedAxesTuple")
 
 
 def __dir__() -> tuple[str, ...]:
