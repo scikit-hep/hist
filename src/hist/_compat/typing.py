@@ -16,7 +16,7 @@ else:
     Ufunc = Any
 
 
-__all__ = ["Ufunc", "ArrayLike", "Self"]
+__all__ = ["ArrayLike", "Self", "Ufunc"]
 
 
 def __dir__() -> list[str]:

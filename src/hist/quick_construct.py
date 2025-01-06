@@ -19,8 +19,8 @@ class QuickConstruct:
     """
 
     __slots__ = (
-        "hist_class",
         "axes",
+        "hist_class",
     )
 
     def __repr__(self) -> str:

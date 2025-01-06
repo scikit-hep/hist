@@ -132,7 +132,7 @@ def test_general_fill_regular():
     z_one_only = h[{2: bh.loc(1)}]
     for idx_x in range(10):
         for idx_y in range(10):
-            if idx_x == 3 and idx_y == 4 or idx_x == 4 and idx_y == 4:
+            if (idx_x == 3 and idx_y == 4) or (idx_x == 4 and idx_y == 4):
                 assert z_one_only[idx_x, idx_y] == 1
             elif idx_x == 5 and idx_y == 4:
                 assert z_one_only[idx_x, idx_y] == 3
@@ -173,7 +173,7 @@ def test_general_fill_variable():
     z_one_only = h[{2: bh.loc(1)}]
     for idx_x in range(10):
         for idx_y in range(10):
-            if idx_x == 3 and idx_y == 4 or idx_x == 4 and idx_y == 4:
+            if (idx_x == 3 and idx_y == 4) or (idx_x == 4 and idx_y == 4):
                 assert z_one_only[idx_x, idx_y] == 1
             elif idx_x == 5 and idx_y == 4:
                 assert z_one_only[idx_x, idx_y] == 3
@@ -195,7 +195,7 @@ def test_general_fill_integer():
     z_one_only = h[{2: bh.loc(1)}]
     for idx_x in range(10):
         for idx_y in range(10):
-            if idx_x == 3 and idx_y == 4 or idx_x == 4 and idx_y == 4:
+            if (idx_x == 3 and idx_y == 4) or (idx_x == 4 and idx_y == 4):
                 assert z_one_only[idx_x, idx_y] == 1
             elif idx_x == 5 and idx_y == 4:
                 assert z_one_only[idx_x, idx_y] == 3
@@ -225,7 +225,7 @@ def test_general_fill_int_cat():
     z_one_only = h[{2: bh.loc(1)}]
     for idx_x in range(10):
         for idx_y in range(10):
-            if idx_x == 3 and idx_y == 4 or idx_x == 4 and idx_y == 4:
+            if (idx_x == 3 and idx_y == 4) or (idx_x == 4 and idx_y == 4):
                 assert z_one_only[idx_x, idx_y] == 1
             elif idx_x == 5 and idx_y == 4:
                 assert z_one_only[idx_x, idx_y] == 3

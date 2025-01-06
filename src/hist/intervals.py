@@ -15,7 +15,7 @@ except ModuleNotFoundError:
     )
     raise
 
-__all__ = ("poisson_interval", "clopper_pearson_interval", "ratio_uncertainty")
+__all__ = ("clopper_pearson_interval", "poisson_interval", "ratio_uncertainty")
 
 
 def __dir__() -> tuple[str, ...]:
