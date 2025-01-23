@@ -67,37 +67,21 @@ fit = [
     "iminuit >=2",
 ]
 dask = [
-    "dask[dataframe] >=2022",
+    "dask[dataframe] >=2022,<2025",
     "dask_histogram >=2023.1",
 ]
 test = [
     "pytest >=6",
     "pytest-mpl >=0.12",
-    "dask[dataframe] >=2022; python_version<'3.13'",
-    "dask_histogram >=2023.1; python_version<'3.13'",
 ]
 dev = [
-    "pytest >=6",
-    "pytest-mpl >=0.12",
-    "matplotlib >=3.0",
-    "mplhep >=0.2.16",
-    "scipy >=1.4",
-    "iminuit >=2; python_version<'3.11'",
+    "hist[mpl,fit,test,dask]",
     "ipykernel",
-    "dask[dataframe] >=2022",
-    "dask_histogram >=2023.1",
 ]
 docs = [
-    "pytest >=6",
-    "pytest-mpl >=0.12",
-    "matplotlib >=3.0",
-    "mplhep >=0.2.16",
-    "scipy >=1.4",
-    "iminuit >=2",
+    "hist[test,plot,fit,dask]",
     "ipython_genutils",
     "graphviz >=0.20.1",
-    "dask[dataframe] >=2022",
-    "dask_histogram >=2023.1",
     "nbsphinx",
     "sphinx >=3.0.0",
     "sphinx_copybutton",
@@ -115,6 +99,10 @@ docs = [
 version.source = "vcs"
 build.hooks.vcs.version-file = "src/hist/version.py"
 
+[tool.uv]
+dev-dependencies = ["hist[dev]", "ipython"]
+
+
 [tool.pytest.ini_options]
 minversion = "6.0"
 addopts = ["-ra", "--strict-markers", "--strict-config"]
@@ -124,7 +112,7 @@ required_plugins = ["pytest-mpl"]
 log_cli_level = "DEBUG"
 filterwarnings = [
     "error",
-    "ignore::matplotlib._api.deprecation.MatplotlibDeprecationWarning"
+    "ignore::matplotlib._api.deprecation.MatplotlibDeprecationWarning",
 ]
 
 [tool.mypy]
@@ -173,6 +161,7 @@ messages_control.disable = [
   "too-many-locals",
   "too-many-return-statements",
   "too-many-statements",
+  "too-many-positional-arguments",
   "wrong-import-position",
   "duplicate-code",
   "import-outside-toplevel",
@@ -183,9 +172,6 @@ messages_control.disable = [
   "unused-argument",  # Handled better by Ruff
 ]
 
-
-[tool.ruff]
-src = ["src"]
 
 [tool.ruff.lint]
 extend-select = [
