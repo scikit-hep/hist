@@ -59,7 +59,7 @@ jobs:
       run: uv pip list
 
     - name: Install package
-      run: uv pip install -e ".[test]"
+      run: uv pip install -e ".[test,dask]"
 
     - name: Test package
       run: python -m pytest
