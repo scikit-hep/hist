@@ -19,8 +19,9 @@ def test_axestuple():
     assert h.axes[0].label == "A-unit"
     assert h.axes[1].label == "B-unit"
 
-    with pytest.warns(UserWarning, match="weight is a protected keyword"), pytest.warns(
-        UserWarning, match="sample is a protected keyword"
+    with (
+        pytest.warns(UserWarning, match="weight is a protected keyword"),
+        pytest.warns(UserWarning, match="sample is a protected keyword"),
     ):
         h.axes.name = ("weight", "sample")
 

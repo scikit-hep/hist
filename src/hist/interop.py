@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
-from typing import Any, Callable, Iterator, Protocol, TypeVar, cast
+from collections.abc import Iterator, Sequence
+from typing import Any, Callable, Protocol, TypeVar, cast
 
 import numpy as np
 
