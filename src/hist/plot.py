@@ -460,7 +460,7 @@ def plot_ratio_array(
                 valid_ratios + ratio_uncert[1][valid_ratios_idx],
             ]
         )
-        max_delta = np.amax(np.abs(extrema - central_value))
+        max_delta: float = np.amax(np.abs(extrema - central_value))
         ratio_extrema = np.abs(max_delta + central_value)
 
         _alpha = 2.0

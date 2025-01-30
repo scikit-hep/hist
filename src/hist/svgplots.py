@@ -70,7 +70,7 @@ def svg_hist_1d(h: hist.BaseHist) -> svg:
     (edges,) = h.axes.edges
     norm_edges = (edges - edges[0]) / (edges[-1] - edges[0])
     density = h.density()
-    max_dens = np.amax(density) or 1
+    max_dens: float = np.amax(density) or 1  # type: ignore[redundant-expr, unreachable]
     norm_vals: np.typing.NDArray[Any] = density / max_dens
 
     arr: np.typing.NDArray[np.float64] = np.empty(
@@ -121,7 +121,7 @@ def svg_hist_1d_c(h: hist.BaseHist) -> svg:
     (edges,) = h.axes.edges
     norm_edges = (edges - edges[0]) / (edges[-1] - edges[0]) * np.pi * 2
     density = h.density()
-    max_dens = np.amax(density) or 1
+    max_dens = np.amax(density) or 1  # type: ignore[redundant-expr, var-annotated, unreachable]
     norm_vals: np.typing.NDArray[Any] = density / max_dens
 
     arr: np.typing.NDArray[np.float64] = np.empty((2, len(norm_vals) * 2), dtype=float)
@@ -155,7 +155,7 @@ def svg_hist_2d(h: hist.BaseHist) -> svg:
     ey = -(e1 - e1[0]) / (e1[-1] - e1[0]) * height
 
     density = h.density()
-    max_dens = np.amax(density) or 1
+    max_dens = np.amax(density) or 1  # type: ignore[redundant-expr, var-annotated, unreachable]
     norm_vals: np.typing.NDArray[Any] = density / max_dens
 
     boxes = []

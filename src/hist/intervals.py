@@ -107,7 +107,7 @@ def clopper_pearson_interval(
     interval = np.stack((interval_min, interval_max))
     interval[0, num == 0.0] = 0.0
     interval[1, num == denom] = 1.0
-    return interval  # type: ignore[no-any-return]
+    return interval
 
 
 def ratio_uncertainty(

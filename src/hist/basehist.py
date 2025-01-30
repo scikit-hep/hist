@@ -196,11 +196,11 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         for ax in axes:
             if isinstance(ax, str):
                 assert ax in data, f"{ax} must be present in data={list(data)}"
-                cats = set(data[ax])  # type: ignore[arg-type]
+                cats = set(data[ax])
                 if all(isinstance(a, str) for a in cats):
-                    axes_list.append(hist.axis.StrCategory(sorted(cats), name=ax))  # type: ignore[arg-type]
+                    axes_list.append(hist.axis.StrCategory(sorted(cats), name=ax))
                 elif all(isinstance(a, int) for a in cats):
-                    axes_list.append(hist.axis.IntCategory(sorted(cats), name=ax))  # type: ignore[arg-type]
+                    axes_list.append(hist.axis.IntCategory(sorted(cats), name=ax))
                 else:
                     raise TypeError(
                         f"{ax} must be all int or strings if axis not given"
@@ -214,7 +214,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
         self = cls(*axes_list, storage=storage)
         data_list = {x.name: data[x.name] for x in axes_list}
-        self.fill(**data_list, weight=weight_arr)  # type: ignore[arg-type]
+        self.fill(**data_list, weight=weight_arr)
         return self
 
     def project(self, *args: int | str) -> Self | float | bh.accumulators.Accumulator:
