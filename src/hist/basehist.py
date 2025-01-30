@@ -4,16 +4,12 @@ import functools
 import operator
 import typing
 import warnings
+from collections.abc import Generator, Iterator, Mapping, Sequence
 from typing import (
     Any,
     Callable,
-    Generator,
-    Iterator,
-    Mapping,
     Protocol,
-    Sequence,
     SupportsIndex,
-    Tuple,
     Union,
 )
 
@@ -48,8 +44,8 @@ InnerIndexing = Union[
     SupportsIndex, str, Callable[[bh.axis.Axis], int], slice, "ellipsis"
 ]
 IndexingWithMapping = Union[InnerIndexing, Mapping[Union[int, str], InnerIndexing]]
-IndexingExpr = Union[IndexingWithMapping, Tuple[IndexingWithMapping, ...]]
-AxisTypes = Union[AxisProtocol, Tuple[int, float, float]]
+IndexingExpr = Union[IndexingWithMapping, tuple[IndexingWithMapping, ...]]
+AxisTypes = Union[AxisProtocol, tuple[int, float, float]]
 
 
 # Workaround for bug in mplhep
