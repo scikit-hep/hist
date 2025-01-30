@@ -99,7 +99,7 @@ class NumpyHistogramModule:
             try:
                 arrays.append(np.asarray(arg))
             except (TypeError, ValueError):
-                return NotImplemented
+                return NotImplemented  # type: ignore[no-any-return]
 
         return tuple(np.ravel(x) for x in np.broadcast_arrays(*arrays))
 
@@ -126,6 +126,6 @@ else:
                 try:
                     arrays.append(np.asarray(arg))
                 except (TypeError, ValueError):
-                    return NotImplemented
+                    return NotImplemented  # type: ignore[no-any-return]
 
             return tuple(np.ravel(x) for x in np.broadcast_arrays(*arrays))

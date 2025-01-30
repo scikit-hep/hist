@@ -25,14 +25,15 @@ from .tag import (
 from .version import version as __version__
 
 __all__ = (
-    "__version__",
-    "Hist",
     "BaseHist",
+    "Hist",
     "NamedHist",
     "Stack",
+    "__version__",
     "accumulators",
     "axis",
     "loc",
+    "new",
     "numpy",
     "overflow",
     "rebin",
@@ -40,7 +41,6 @@ __all__ = (
     "sum",
     "tag",
     "underflow",
-    "new",
 )
 
 
