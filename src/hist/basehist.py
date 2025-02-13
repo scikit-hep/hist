@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import fnmatch
 import functools
+import itertools
 import operator
 import typing
 import warnings
@@ -346,11 +348,42 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
             # This can only return Self, not float, etc., so we ignore the extra types here
             return self[{axis: [bh.loc(x) for x in sorted_cats]}]  # type: ignore[dict-item, return-value]
 
+    def _convert_index_wildcards(self, x: Any) -> Any:
+        """
+        Convert wildcards to available indices before passing to bh.loc
+        """
+
+        if not any(
+            isinstance(x, t) for t in [str, list]
+        ):  # Process only lists and strings
+            return x
+        _x = x if isinstance(x, list) else [x]  # Convert to list if not already
+        if not all(isinstance(n, str) for n in _x):
+            return x
+        if any(any(special in pattern for special in ["*", "?"]) for pattern in _x):
+            available = list(
+                itertools.chain.from_iterable(
+                    [n for n in ax if isinstance(n, str)] for ax in self.axes
+                )
+            )
+            all_matches = []
+            for pattern in _x:
+                all_matches.append(
+                    [k for k in available if fnmatch.fnmatch(k, pattern)]
+                )
+            matches = list(
+                dict.fromkeys(list(itertools.chain.from_iterable(all_matches)))
+            )
+            if len(matches) == 0:
+                raise ValueError(f"No matches found for {x}")
+            return matches
+        return x
+
     def _loc_shortcut(self, x: Any) -> Any:
         """
         Convert some specific indices to location.
         """
-
+        x = self._convert_index_wildcards(x)
         if isinstance(x, list):
             return [self._loc_shortcut(each) for each in x]
         if isinstance(x, slice):
