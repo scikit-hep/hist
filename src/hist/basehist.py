@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import fnmatch
 import functools
+import itertools
 import operator
 import typing
 import warnings
@@ -346,11 +348,38 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
             # This can only return Self, not float, etc., so we ignore the extra types here
             return self[{axis: [bh.loc(x) for x in sorted_cats]}]  # type: ignore[dict-item, return-value]
 
-    def _loc_shortcut(self, x: Any) -> Any:
+    def _convert_index_wildcards(self, x: Any, ax_id: str | int | None = None) -> Any:
+        """
+        Convert wildcards to available indices before passing to bh.loc
+        """
+
+        if not any(
+            isinstance(x, t) for t in [str, list]
+        ):  # Process only lists and strings
+            return x
+        _x = x if isinstance(x, list) else [x]  # Convert to list if not already
+        if not all(isinstance(n, str) for n in _x):
+            return x
+        if any(any(special in pattern for special in ["*", "?"]) for pattern in _x):
+            available = [n for n in self.axes[ax_id] if isinstance(n, str)]
+            all_matches = []
+            for pattern in _x:
+                all_matches.append(
+                    [k for k in available if fnmatch.fnmatch(k, pattern)]
+                )
+            matches = list(
+                dict.fromkeys(list(itertools.chain.from_iterable(all_matches)))
+            )
+            if len(matches) == 0:
+                raise ValueError(f"No matches found for {x}")
+            return matches
+        return x
+
+    def _loc_shortcut(self, x: Any, ax_id: str | int | None = None) -> Any:
         """
         Convert some specific indices to location.
         """
-
+        x = self._convert_index_wildcards(x, ax_id)
         if isinstance(x, list):
             return [self._loc_shortcut(each) for each in x]
         if isinstance(x, slice):
@@ -382,9 +411,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
             raise ValueError("The imaginary part should be an integer")
         return bh.rebin(int(x.imag))
 
-    def _index_transform(
-        self, index: list[IndexingExpr] | IndexingExpr
-    ) -> bh.IndexingExpr:
+    def _index_transform(self, index: list[IndexingExpr] | IndexingExpr) -> Any:
         """
         Auxiliary function for __getitem__ and __setitem__.
         """
@@ -393,7 +420,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
             new_indices = {
                 (
                     self._name_to_index(k) if isinstance(k, str) else k
-                ): self._loc_shortcut(v)
+                ): self._loc_shortcut(v, k)
                 for k, v in index.items()
             }
             if len(new_indices) != len(index):
@@ -405,7 +432,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         if not isinstance(index, tuple):
             index = (index,)  # type: ignore[assignment]
 
-        return tuple(self._loc_shortcut(v) for v in index)  # type: ignore[union-attr, union-attr, union-attr, union-attr]
+        return tuple(self._loc_shortcut(v, i) for i, (v) in enumerate(index))  # type: ignore[arg-type]
 
     def __getitem__(  # type: ignore[override]
         self, index: IndexingExpr

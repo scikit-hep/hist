@@ -932,6 +932,14 @@ def test_select_by_index_imag():
     assert tuple(h[[8j, 7j]].axes[0]) == (8, 7)
 
 
+@pytest.mark.filterwarnings("ignore:List indexing selection is experimental")
+def test_select_by_index_wildcards():
+    h = hist.new.Reg(10, 0, 10).StrCat(["ABC", "BCD", "CDE", "DEF"]).Weight()
+    assert tuple(h[:, "*E*"].axes[1]) == ("CDE", "DEF")
+    assert tuple(h[:, ["*B*", "CDE"]].axes[1]) == ("ABC", "BCD", "CDE")
+    assert tuple(h[:, ["*B*", "?D?"]].axes[1]) == ("ABC", "BCD", "CDE")
+
+
 def test_sorted_simple():
     h = Hist.new.IntCat([4, 1, 2]).StrCat(["AB", "BCC", "BC"]).Double()
     assert tuple(h.sort(0).axes[0]) == (1, 2, 4)
