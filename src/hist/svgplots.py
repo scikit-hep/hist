@@ -105,7 +105,7 @@ def svg_hist_1d(h: hist.BaseHist) -> svg:
         upper,
         label,
         bins,
-        viewBox=f"-10 {-height-5} {width+20} {height+20}",
+        viewBox=f"-10 {-height - 5} {width + 20} {height + 20}",
     )
 
 
@@ -142,7 +142,7 @@ def svg_hist_1d_c(h: hist.BaseHist) -> svg:
         style="fill:none;stroke-width:2;stroke:currentColor",
     )
 
-    return svg(bins, center, viewBox=f"{-width/2} {-height/2} {width} {height}")
+    return svg(bins, center, viewBox=f"{-width / 2} {-height / 2} {width} {height}")
 
 
 def svg_hist_2d(h: hist.BaseHist) -> svg:
@@ -190,8 +190,10 @@ def svg_hist_2d(h: hist.BaseHist) -> svg:
             h.axes[1],
             x=-10,
             y=-height / 2,
-            transform=f"rotate(-90,{-10},{-height/2})",
+            transform=f"rotate(-90,{-10},{-height / 2})",
         ),
     ]
 
-    return svg(*texts, *boxes, viewBox=f"{-20} {-height - 20} {width+40} {height+40}")
+    return svg(
+        *texts, *boxes, viewBox=f"{-20} {-height - 20} {width + 40} {height + 40}"
+    )
