@@ -2,6 +2,18 @@
 
 ## WIP
 
+## Version 2.8.1
+
+Features:
+
+* Allow wildcards in StrCat list indexing by @andrzejnovak
+  [#601](https://github.com/scikit-hep/hist/pull/601)
+
+Tests:
+
+* Limit dask version
+  [#596](https://github.com/scikit-hep/hist/pull/596)
+
 ## Version 2.8.0
 
 Features:
