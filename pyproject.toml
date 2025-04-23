@@ -73,6 +73,7 @@ dask = [
 test = [
     "pytest >=6",
     "pytest-mpl >=0.12",
+    "hist[plot]",
 ]
 dev = [
     "hist[mpl,fit,test,dask]",
