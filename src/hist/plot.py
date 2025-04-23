@@ -239,7 +239,7 @@ def plot2d_full(
     side_kwargs = _filter_dict(kwargs, "side_")
 
     # judge whether some arguments left
-    if len(kwargs):
+    if kwargs:
         raise ValueError(f"{set(kwargs)} not needed")
 
     # Plot: plot the 2d-histogram
