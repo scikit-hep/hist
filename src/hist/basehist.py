@@ -93,8 +93,8 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         """
         self._hist: Any = None
         self.axes: NamedAxesTuple
-        self.name = name
-        self.label = label
+
+        args: tuple[AxisTypes, ...]
 
         args: tuple[AxisTypes, ...]
 
@@ -121,6 +121,8 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
         super().__init__(*args, storage=storage, metadata=metadata)  # type: ignore[call-overload]
 
+        self.name = name
+        self.label = label
         disallowed_names = {"weight", "sample", "threads"}
         for ax in self.axes:
             if ax.name in disallowed_names:
