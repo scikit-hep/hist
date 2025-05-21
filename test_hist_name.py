@@ -1,5 +1,8 @@
-import hist
+from __future__ import annotations
+
 import boost_histogram as bh
+
+import hist
 
 # Test case 1: Creating from axes with name (should work)
 a = hist.axis.Regular(10, 0, 10, name="r")
