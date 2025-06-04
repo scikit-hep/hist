@@ -16,6 +16,7 @@
 [![Gitter][gitter-badge]][gitter-link]
 [![Binder][binder-badge]][binder-link]
 [![Scikit-HEP][sk-badge]][sk-link]
+[![SPEC 4 — Using and Creating Nightly Wheels][spec4-badge]][spec4-link]
 
 Hist is an analyst-friendly front-end for
 [boost-histogram](https://github.com/scikit-hep/boost-histogram), designed for
@@ -200,3 +201,5 @@ Support for this work was provided by the National Science Foundation cooperativ
 [rtd-link]:                 https://hist.readthedocs.io/en/latest/?badge=latest
 [sk-badge]:                 https://scikit-hep.org/assets/images/Scikit--HEP-Project-blue.svg
 [sk-link]:                  https://scikit-hep.org/
+[spec4-badge]:              https://img.shields.io/badge/SPEC-4-green?labelColor=%23004811&color=%235CA038
+[spec4-link]:               https://scientific-python.org/specs/spec-0004/
