@@ -106,7 +106,7 @@ class NamedHist(BaseHist, family=hist):
             )
         # Multiple args: broadcast and flatten!
         else:
-            inputs = (*kwargs.values(), *non_user_kwargs)
+            inputs = (*kwargs.values(), *non_user_kwargs.values())
             broadcast = interop.broadcast_and_flatten(inputs)
             user_kwargs_broadcast = dict(zip(kwargs, broadcast[: len(kwargs)]))
             non_user_kwargs_broadcast = dict(
