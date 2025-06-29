@@ -106,7 +106,7 @@ h = (
 )
 
 # Filling by names is allowed:
-h.fill(y=[1, 4, 6], x=[3, 5, 2])
+h.fill(y=[1, 4, 6], x=[.3, .5, .2])
 
 # Names can be used to manipulate the histogram:
 h.project("x")
