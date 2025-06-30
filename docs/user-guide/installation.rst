@@ -17,4 +17,4 @@ You can also install it with Conda from conda-forge.
 
 
 Supported platforms are identical to
-`boost-histogram <https://boost-histogram.readthedocs.io/en/latest/usage/installation.html>`_.
+`boost-histogram <https://boost-histogram.readthedocs.io/en/latest/user-guide/installation.html>`_.
