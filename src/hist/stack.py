@@ -40,6 +40,8 @@ class Stack:
             if first_axes != a.axes:
                 raise ValueError("The Histogram axes don't match")
 
+    __hash__ = None  # type: ignore[assignment]
+
     @classmethod
     def from_iter(cls, iterable: typing.Iterable[BaseHist]) -> Self:
         """

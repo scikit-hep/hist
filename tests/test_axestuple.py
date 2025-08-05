@@ -19,11 +19,14 @@ def test_axestuple():
     assert h.axes[0].label == "A-unit"
     assert h.axes[1].label == "B-unit"
 
-    with pytest.warns(UserWarning):
+    with pytest.warns(UserWarning, match="weight is a protected keyword"), pytest.warns(
+        UserWarning, match="sample is a protected keyword"
+    ):
         h.axes.name = ("weight", "sample")
 
-    with pytest.raises(Exception):
+    with pytest.raises(Exception, match="cannot contain axes with duplicated names"):
         h.axes.name = ("A", "A")
 
-    with pytest.raises(Exception):
+    # Our backport has a simpler error message
+    with pytest.raises(Exception, match="argument 2 is longer than argument 1|arguments are not the same length"):
         h.axes.name = ("A", "B", "C")

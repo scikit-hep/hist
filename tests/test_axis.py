@@ -58,9 +58,9 @@ def test_axis_flow():
 
 
 def test_axis_disallowed_names():
-    with pytest.warns(UserWarning):
+    with pytest.warns(UserWarning, match="weight is a protected keyword"):
         hist.Hist(axis.Regular(10, 0, 10, name="weight"))
-    with pytest.warns(UserWarning):
+    with pytest.warns(UserWarning, match="sample is a protected keyword"):
         hist.Hist(axis.Regular(10, 0, 10, name="sample"))
-    with pytest.warns(UserWarning):
+    with pytest.warns(UserWarning, match="threads is a protected keyword"):
         hist.Hist(axis.Regular(10, 0, 10, name="threads"))
