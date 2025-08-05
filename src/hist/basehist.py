@@ -314,7 +314,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
                 )
         # Multiple args: broadcast and flatten!
         else:
-            inputs = (*args, *kwargs.values(), *non_user_kwargs)
+            inputs = (*args, *kwargs.values(), *non_user_kwargs.values())
             broadcast = interop.broadcast_and_flatten(inputs)
             user_args_broadcast = broadcast[: len(args)]
             user_kwargs_broadcast = dict(
