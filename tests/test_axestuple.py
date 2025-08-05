@@ -28,5 +28,8 @@ def test_axestuple():
         h.axes.name = ("A", "A")
 
     # Our backport has a simpler error message
-    with pytest.raises(Exception, match="argument 2 is longer than argument 1|arguments are not the same length"):
+    with pytest.raises(
+        Exception,
+        match="argument 2 is longer than argument 1|arguments are not the same length",
+    ):
         h.axes.name = ("A", "B", "C")
