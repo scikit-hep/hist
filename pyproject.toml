@@ -64,7 +64,7 @@ plot = [
     "mplhep >=0.3.17",
 ]
 fit = [
-    "scipy >=1.4",
+    "scipy >=1.5.4",
     "iminuit >=2",
 ]
 dask = [
@@ -78,7 +78,7 @@ plot = [
     "mplhep >=0.3.17",
 ]
 fit = [
-    "scipy >=1.4",
+    "scipy >=1.5.4",
     "iminuit >=2; python_version<'3.14'",
 ]
 dask = [
