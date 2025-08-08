@@ -43,6 +43,7 @@ def tests(session):
     args = ["--mpl"] if sys.platform.startswith("linux") else []
     session.run("pytest", *args, *session.posargs)
 
+
 @nox.session(venv_backend="uv")
 def minimums(session):
     """
