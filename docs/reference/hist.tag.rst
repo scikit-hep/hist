@@ -5,3 +5,4 @@ hist.tag module
    :members:
    :undoc-members:
    :show-inheritance:
+   :exclude-members: Slicer
