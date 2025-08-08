@@ -107,7 +107,12 @@ def docs(session: nox.Session) -> None:
 @nox.session(reuse_venv=True, default=False)
 def build_api_docs(session: nox.Session) -> None:
     """
-    Build (regenerate) API docs.
+    Build (regenerate) API docs. Requires Linux.
+
+    For example:
+
+        docker run -v $PWD:/histogram -w /histogram -it quay.io/pypa/manylinux_2_28_x86_64
+        uvx nox -s regenerate
     """
 
     session.install("sphinx")
