@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import copy
 import typing
-from typing import Any, Iterator
+from collections.abc import Iterator
+from typing import Any
 
 import histoprint
 import numpy as np
