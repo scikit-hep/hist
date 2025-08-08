@@ -576,8 +576,21 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
         Parameters
         ----------
+        ax : matplotlib.axes.Axes, optional
+            Axes to plot on. If None, uses current axes or creates new ones.
+        overlay : str or int, optional
+            Name or index of the axis to overlay. If None, automatically selects
+            the first discrete axis for multi-dimensional histograms.
         legend : bool, default True
-            Whether to automatically add a legend (with axis label as title if available) when plotting stacked categories.
+            Whether to automatically add a legend when plotting stacked categories.
+            The legend title is set from the axis label if available.
+        **kwargs : Any
+            Additional keyword arguments passed to the underlying plot functions.
+        
+        Returns
+        -------
+        Hist1DArtists
+            The matplotlib artists created by the plot.
         """
 
         from hist import plot
@@ -609,6 +622,8 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
             # Try to set legend title from axis label if available
             if ax is None:
                 # Get axis from the first artist (mplhep returns Hist1DArtists tuple)
+                # This will raise an error if artists is empty or doesn't have the expected structure,
+                # which is intended behavior as specified in the requirements
                 ax = artists[0].stairs.axes
             handles, _ = ax.get_legend_handles_labels()
             if handles:
