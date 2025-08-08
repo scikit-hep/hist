@@ -8,14 +8,14 @@ from __future__ import annotations
 
 # Warning: do not change the path here. To use autodoc, you need to install the
 # package first.
-from pkg_resources import get_distribution
+import importlib.metadata
 
 # -- Project information -----------------------------------------------------
 
 project = "Hist"
 copyright = "2020, Henry Schreiner"
 author = "Henry Schreiner and Nino Lau"
-version = get_distribution("hist").version
+version = importlib.metadata.version("hist")
 
 
 # -- General configuration ---------------------------------------------------

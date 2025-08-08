@@ -1,3 +1,8 @@
+#!/usr/bin/env -S uv run -q
+# /// script
+# dependencies = ["nox>=2025.2.9"]
+# ///
+
 from __future__ import annotations
 
 import argparse
@@ -7,8 +12,7 @@ from pathlib import Path
 
 import nox
 
-nox.needs_version = ">=2024.3.2"
-nox.options.sessions = ["lint", "tests"]
+nox.needs_version = ">=2025.2.9"
 nox.options.default_venv_backend = "uv|virtualenv"
 
 DIR = Path(__file__).parent.resolve()
@@ -44,7 +48,7 @@ def tests(session):
     session.run("pytest", *args, *session.posargs)
 
 
-@nox.session(venv_backend="uv")
+@nox.session(venv_backend="uv", default=False)
 def minimums(session):
     """
     Run with the minimum dependencies.
@@ -54,7 +58,7 @@ def minimums(session):
     session.run("pytest", *session.posargs)
 
 
-@nox.session
+@nox.session(default=False)
 def regenerate(session):
     """
     Regenerate MPL images.
@@ -67,26 +71,40 @@ def regenerate(session):
     session.run("pytest", "--mpl-generate-path=tests/baseline", *session.posargs)
 
 
-@nox.session(reuse_venv=True)
+@nox.session(reuse_venv=True, default=False)
 def docs(session: nox.Session) -> None:
     """
-    Build the docs. Pass "--serve" to serve.
+    Build the docs. Use "--non-interactive" to avoid serving. Pass "-b linkcheck" to check links.
     """
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--serve", action="store_true", help="Serve after building")
-    args = parser.parse_args(session.posargs)
+    parser.add_argument(
+        "-b", dest="builder", default="html", help="Build target (default: html)"
+    )
+    args, posargs = parser.parse_known_args(session.posargs)
 
-    session.install("-e", ".[docs]")
+    serve = args.builder == "html" and session.interactive
+    extra_installs = ["sphinx-autobuild"] if serve else []
+    session.install("-e.[docs]", *extra_installs)
+
     session.chdir("docs")
-    session.run("sphinx-build", "-M", "html", ".", "_build")
 
-    if args.serve:
-        print("Launching docs at http://localhost:8000/ - use Ctrl-C to quit")
-        session.run("python", "-m", "http.server", "8000", "-d", "_build/html")
+    shared_args = (
+        "-n",  # nitpicky mode
+        "-T",  # full tracebacks
+        f"-b={args.builder}",
+        ".",
+        f"_build/{args.builder}",
+        *posargs,
+    )
+
+    if serve:
+        session.run("sphinx-autobuild", "--open-browser", *shared_args)
+    else:
+        session.run("sphinx-build", "--keep-going", *shared_args)
 
 
-@nox.session(reuse_venv=True)
+@nox.session(reuse_venv=True, default=False)
 def build_api_docs(session: nox.Session) -> None:
     """
     Build (regenerate) API docs.
@@ -105,18 +123,18 @@ def build_api_docs(session: nox.Session) -> None:
     )
 
 
-@nox.session(reuse_venv=True)
+@nox.session(reuse_venv=True, default=False)
 def build(session):
     """
     Build an SDist and wheel.
     """
 
     args = [] if shutil.which("uv") else ["uv"]
-    session.install("build==1.2.0", *args)
+    session.install("build", *args)
     session.run("python", "-m", "build", "--installer=uv")
 
 
-@nox.session()
+@nox.session(default=False)
 def boost(session):
     """
     Build against latest boost-histogram.
@@ -139,3 +157,7 @@ def boost(session):
     session.install("-e.[test,plot]", "pip")
     session.run("pip", "list")
     session.run("pytest", *session.posargs)
+
+
+if __name__ == "__main__":
+    nox.main()
