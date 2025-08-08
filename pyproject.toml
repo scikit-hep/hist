@@ -73,6 +73,11 @@ dask = [
 
 [dependency-groups]
 test = [
+    { include-group = "test-core" },
+    "scipy",
+    "iminuit; python_version<'3.14'",
+]
+test-core = [
     "pytest >=8",
     "pytest-mpl >=0.12",
     "hist[plot]",
@@ -83,7 +88,7 @@ dev = [
     { include-group = "test" },
 ]
 docs = [
-    { include-group = "test" },
+    { include-group = "test-core" },
     "hist[plot,fit,dask]",
     "ipython_genutils",
     "nbsphinx",
