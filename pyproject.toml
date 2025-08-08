@@ -37,7 +37,7 @@ requires-python = ">=3.9"
 dependencies = [
     "boost-histogram>=1.3.1,<1.6",
     "histoprint>=2.2.0",
-    'numpy>=1.14.5',
+    'numpy>=1.19.3',
     'typing-extensions>=4;python_version<"3.11"',
 ]
 dynamic = ["version"]
@@ -54,12 +54,12 @@ Changelog = "https://hist.readthedocs.io/en/latest/changelog.html"
 
 [project.optional-dependencies]
 mpl = [
-    "matplotlib >=3.0",
-    "mplhep >=0.2.16",
+    "matplotlib >=3.3.3",
+    "mplhep >=0.3.17",
 ]
 plot = [
-    "matplotlib >=3.0",
-    "mplhep >=0.2.16",
+    "matplotlib >=3.3.3",
+    "mplhep >=0.3.17",
 ]
 fit = [
     "scipy >=1.4",
@@ -70,7 +70,7 @@ dask = [
     "dask_histogram >=2023.1",
 ]
 test = [
-    "pytest >=6",
+    "pytest >=8",
     "pytest-mpl >=0.12",
     "hist[plot]",
 ]
@@ -104,7 +104,7 @@ dev-dependencies = ["hist[dev]", "ipython"]
 
 
 [tool.pytest.ini_options]
-minversion = "6.0"
+minversion = "8.0"
 addopts = ["-ra", "--strict-markers", "--strict-config"]
 xfail_strict = true
 testpaths = ["tests"]

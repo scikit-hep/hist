@@ -34,7 +34,7 @@ def pylint(session: nox.Session) -> None:
     session.run("pylint", "hist", *session.posargs)
 
 
-@nox.session(reuse_venv=True)
+@nox.session
 def tests(session):
     """
     Run the unit and regular tests.
@@ -42,6 +42,15 @@ def tests(session):
     session.install("-e", ".[test,plot]")
     args = ["--mpl"] if sys.platform.startswith("linux") else []
     session.run("pytest", *args, *session.posargs)
+
+@nox.session(venv_backend="uv")
+def minimums(session):
+    """
+    Run with the minimum dependencies.
+    """
+
+    session.install("-e", ".[test]", "--resolution=lowest-direct")
+    session.run("pytest", *session.posargs)
 
 
 @nox.session

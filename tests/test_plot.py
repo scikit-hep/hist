@@ -215,6 +215,7 @@ def test_general_plot_pull():
     """
     Test general plot_pull -- whether 1d-Hist can be plotted pull properly.
     """
+    pytest.importorskip("iminuit")
 
     np.random.seed(42)
 
@@ -619,6 +620,7 @@ def test_ratiolike_str_alias(str_alias, use_likelihood):
     """
     Test str alias for callable in plot_ratio and plot_pull
     """
+    pytest.importorskip("iminuit")
 
     np.random.seed(42)
 
