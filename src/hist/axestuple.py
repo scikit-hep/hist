@@ -50,7 +50,7 @@ class NamedAxesTuple(AxesTuple):
     def name(self, values: Iterable[str]) -> None:
         # strict = True from Python 3.10
         for ax, val in zip(self, values, strict=True):
-            ax._ax.metadata["name"] = val
+            ax._raw_metadata["name"] = val
 
         disallowed_names = {"weight", "sample", "threads"}
         for ax in self:
