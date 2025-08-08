@@ -8,21 +8,11 @@ version: 2
 build:
   os: "ubuntu-22.04"
   tools:
-    python: "3.10"
-  apt_packages:
-  - graphviz
-
-
-# Build documentation in the docs/ directory with Sphinx
-sphinx:
-  configuration: docs/conf.py
-
-# Include PDF and ePub
-formats: all
-
-python:
-  install:
-  - method: pip
-    path: .
-    extra_requirements:
-    - docs
+    python: "3.12"
+  commands:
+    - asdf plugin add uv
+    - asdf install uv latest
+    - asdf global uv latest
+    - uv venv
+    - uv pip install -e .[docs]
+    - . .venv/bin/activate && sphinx-build -T -b html -d docs/_build/doctrees -D language=en docs $READTHEDOCS_OUTPUT/html

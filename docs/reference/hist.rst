@@ -3,8 +3,8 @@ hist package
 
 .. automodule:: hist
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 Subpackages
 -----------
@@ -26,6 +26,7 @@ Submodules
    hist.basehist
    hist.classichist
    hist.hist
+   hist.interop
    hist.intervals
    hist.namedhist
    hist.numpy
