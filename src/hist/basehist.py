@@ -568,10 +568,16 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         *,
         ax: matplotlib.axes.Axes | None = None,
         overlay: str | int | None = None,
+        legend: bool = True,
         **kwargs: Any,
     ) -> Hist1DArtists:
         """
         Plot1d method for BaseHist object.
+
+        Parameters
+        ----------
+        legend : bool, default True
+            Whether to automatically add a legend (with axis label as title if available) when plotting stacked categories.
         """
 
         from hist import plot
@@ -598,7 +604,17 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
                 raise ValueError(
                     f"label ``{kwargs['label']}`` not understood for {len(cats)} categories"
                 )
-        return plot.histplot(d1hists, ax=ax, label=cats, **_proc_kw_for_lw(kwargs))
+        artists = plot.histplot(d1hists, ax=ax, label=cats, **_proc_kw_for_lw(kwargs))
+        if legend:
+            # Try to set legend title from axis label if available
+            if ax is None:
+                # Get axis from the first artist (mplhep returns Hist1DArtists tuple)
+                ax = artists[0].stairs.axes
+            handles, _ = ax.get_legend_handles_labels()
+            if handles:
+                title = getattr(cat_ax, "label", None)
+                ax.legend(title=title if title else None)
+        return artists
 
     def plot2d(
         self,
