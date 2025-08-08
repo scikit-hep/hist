@@ -3,6 +3,6 @@ hist.tag module
 
 .. automodule:: hist.tag
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
    :exclude-members: Slicer

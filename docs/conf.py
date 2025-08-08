@@ -22,9 +22,11 @@ version = importlib.metadata.version("hist")
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    "matplotlib.sphinxext.plot_directive",
     "myst_parser",
     "nbsphinx",
     "sphinx.ext.autodoc",
+    "sphinx.ext.intersphinx",
     "sphinx.ext.mathjax",
     "sphinx.ext.napoleon",
     "sphinx_copybutton",
@@ -48,6 +50,11 @@ exclude_patterns = [
     "build",
 ]
 
+
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3", None),
+    "boost_histogram": ("https://boost-histogram.readthedocs.io/en/latest", None),
+}
 
 # -- Options for HTML output -------------------------------------------------
 
