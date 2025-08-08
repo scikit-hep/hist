@@ -63,9 +63,30 @@ jobs:
     - name: Test plotting too
       run: .venv/bin/python -m pytest --mpl
 
+  minimums:
+    name: Check minimums
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.9'
+
+    - name: Setup uv
+      uses: astral-sh/setup-uv@v6
+
+    - name: Install nox
+      run: uv tool install nox
+
+    - name: Run nox
+      run: nox -s minimums
+
+
+
   pass:
     if: always()
-    needs: [pylint, checks]
+    needs: [pylint, checks, minimums]
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
