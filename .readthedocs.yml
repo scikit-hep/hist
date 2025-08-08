@@ -14,5 +14,5 @@ build:
     - asdf install uv latest
     - asdf global uv latest
     - uv venv
-    - uv pip install -e .[docs]
+    - uv pip install -e. --group docs
     - . .venv/bin/activate && sphinx-build -T -b html -d docs/_build/doctrees -D language=en docs $READTHEDOCS_OUTPUT/html

@@ -43,7 +43,7 @@ def tests(session):
     """
     Run the unit and regular tests.
     """
-    session.install("-e", ".[test,plot]")
+    session.install("-e.[plot]", "--group=test")
     args = ["--mpl"] if sys.platform.startswith("linux") else []
     session.run("pytest", *args, *session.posargs)
 
@@ -54,7 +54,7 @@ def minimums(session):
     Run with the minimum dependencies.
     """
 
-    session.install("-e", ".[test]", "--resolution=lowest-direct")
+    session.install("-e.", "--group=test", "--resolution=lowest-direct")
     session.run("pytest", *session.posargs)
 
 
@@ -63,7 +63,7 @@ def regenerate(session):
     """
     Regenerate MPL images.
     """
-    session.install("-e", ".[test,plot]")
+    session.install("-e.[plot]", "--group=test")
     if not sys.platform.startswith("linux"):
         session.error(
             "Must be run from Linux, images will be slightly different on macOS"
@@ -85,7 +85,7 @@ def docs(session: nox.Session) -> None:
 
     serve = args.builder == "html" and session.interactive
     extra_installs = ["sphinx-autobuild"] if serve else []
-    session.install("-e.[docs]", *extra_installs)
+    session.install("-e.", "--group=docs", *extra_installs)
 
     session.chdir("docs")
 
@@ -107,7 +107,12 @@ def docs(session: nox.Session) -> None:
 @nox.session(reuse_venv=True, default=False)
 def build_api_docs(session: nox.Session) -> None:
     """
-    Build (regenerate) API docs.
+    Build (regenerate) API docs. Requires Linux.
+
+    For example:
+
+        docker run -v $PWD:/histogram -w /histogram -it quay.io/pypa/manylinux_2_28_x86_64
+        uvx nox -s regenerate
     """
 
     session.install("sphinx")

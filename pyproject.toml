@@ -54,6 +54,7 @@ Discussions = "https://github.com/scikit-hep/hist/discussions"
 Changelog = "https://hist.readthedocs.io/en/latest/changelog.html"
 
 [project.optional-dependencies]
+# Keep in sync with dependency-groups below
 mpl = [
     "matplotlib >=3.3.3",
     "mplhep >=0.3.17",
@@ -63,24 +64,44 @@ plot = [
     "mplhep >=0.3.17",
 ]
 fit = [
-    "scipy >=1.4",
+    "scipy >=1.5.4",
     "iminuit >=2",
 ]
 dask = [
     "dask[dataframe] >=2022,<2025",
     "dask_histogram >=2023.1",
 ]
+
+[dependency-groups]
+plot = [
+    "matplotlib >=3.3.3",
+    "mplhep >=0.3.17",
+]
+fit = [
+    "scipy >=1.5.4",
+    "iminuit >=2; python_version<'3.14'",
+]
+dask = [
+    "dask[dataframe] >=2022,<2025",
+    "dask_histogram >=2023.1",
+]
 test = [
+    { include-group = "test-core" },
+    { include-group = "fit" },
+]
+test-core = [
     "pytest >=8",
     "pytest-mpl >=0.12",
-    "hist[plot]",
+    { include-group = "plot" },
 ]
 dev = [
-    "hist[mpl,fit,test,dask]",
     "ipykernel",
+    { include-group = "test" },
+    { include-group = "plot" },
+    { include-group = "dask" },
 ]
 docs = [
-    "hist[test,plot,fit,dask]",
+    { include-group = "dev" },
     "ipython_genutils",
     "nbsphinx",
     "sphinx >=3.0.0",
@@ -88,7 +109,6 @@ docs = [
     "sphinx_book_theme >=0.0.38",
     "sphinxcontrib-programoutput",
     "ipython",
-    "ipykernel",
     "pillow",
     "uncertainties>=3",
     "myst_parser>=0.14",
