@@ -53,11 +53,11 @@ jobs:
       run: uv venv
 
     - name: Install package
-      if: matrix.python-version == "3.14"
+      if: matrix.python-version == '3.14'
       run: uv pip install -e ".[test]"
 
     - name: Install package (dask)
-      if: matrix.python-version != "3.14"
+      if: matrix.python-version != '3.14'
       run: uv pip install -e ".[test,dask]"
 
     - name: Test package
