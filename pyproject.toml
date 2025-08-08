@@ -70,17 +70,21 @@ dask = [
     "dask[dataframe] >=2022,<2025",
     "dask_histogram >=2023.1",
 ]
+
+[dependency-groups]
 test = [
     "pytest >=8",
     "pytest-mpl >=0.12",
     "hist[plot]",
 ]
 dev = [
-    "hist[mpl,fit,test,dask]",
+    "hist[mpl,fit,dask]",
     "ipykernel",
+    { include-group = "test" },
 ]
 docs = [
-    "hist[test,plot,fit,dask]",
+    { include-group = "test" },
+    "hist[plot,fit,dask]",
     "ipython_genutils",
     "nbsphinx",
     "sphinx >=3.0.0",

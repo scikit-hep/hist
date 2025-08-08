@@ -28,6 +28,7 @@ jobs:
   checks:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         python-version:
         - "3.9"
@@ -54,17 +55,17 @@ jobs:
 
     - name: Install package
       if: matrix.python-version == '3.14'
-      run: uv pip install -e ".[test]"
+      run: uv pip install -e. --group test
 
     - name: Install package (dask)
       if: matrix.python-version != '3.14'
-      run: uv pip install -e ".[test,dask]"
+      run: uv pip install -e ".[dask]" --group test
 
     - name: Test package
       run: .venv/bin/python -m pytest
 
     - name: Install plotting requirements too
-      run: uv pip install -e ".[test,plot]"
+      run: uv pip install -e ".[plot]"
 
     - name: Test plotting too
       run: .venv/bin/python -m pytest --mpl
