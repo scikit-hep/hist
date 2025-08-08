@@ -8,11 +8,11 @@ description = "Hist classes and utilities"
 readme = { file = "README.md", content-type = "text/markdown" }
 authors = [ {name = "Henry Schreiner", email = "henry.schreiner@cern.ch"} ]
 maintainers = [ {name = "The Scikit-HEP admins", email = "scikit-hep-admins@googlegroups.com"} ]
+license = "BSD-3-Clause"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: BSD License",
     "Operating System :: OS Independent",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
@@ -118,9 +118,6 @@ docs = [
 [tool.hatch]
 version.source = "vcs"
 build.hooks.vcs.version-file = "src/hist/version.py"
-
-[tool.uv]
-dev-dependencies = ["hist[dev]", "ipython"]
 
 
 [tool.pytest.ini_options]
