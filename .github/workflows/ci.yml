@@ -1,6 +1,7 @@
 name: CI
 
 on:
+  workflow_dispatch:
   pull_request:
   push:
     branches:
@@ -18,16 +19,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Setup uv
-      uses: yezz123/setup-uv@v4
-      with:
-        uv-venv: ".venv"
+    - uses: astral-sh/setup-uv@v6
     - name: Install nox
-      run: uv pip install nox
+      run: uv tool install nox
     - name: PyLint
-      run: |
-        echo "::add-matcher::$GITHUB_WORKSPACE/.github/matchers/pylint.json"
-        nox -s pylint
+      run: nox -s pylint -- --output-format=github
 
   checks:
     runs-on: ubuntu-latest
@@ -50,24 +46,22 @@ jobs:
         allow-prereleases: true
 
     - name: Setup uv
-      uses: yezz123/setup-uv@v4
-      with:
-        uv-venv: ".venv"
+      uses: astral-sh/setup-uv@v6
 
-    - name: Requirements check
-      run: uv pip list
+    - name: Prepare venv
+      run: uv venv
 
     - name: Install package
       run: uv pip install -e ".[test,dask]"
 
     - name: Test package
-      run: python -m pytest
+      run: .venv/bin/python -m pytest
 
     - name: Install plotting requirements too
       run: uv pip install -e ".[test,plot]"
 
     - name: Test plotting too
-      run: python -m pytest --mpl
+      run: .venv/bin/python -m pytest --mpl
 
   pass:
     if: always()
