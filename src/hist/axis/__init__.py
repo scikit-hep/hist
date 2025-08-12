@@ -37,8 +37,6 @@ class CoreAxisProtocol(Protocol):
 
 
 class AxisProtocol(Protocol):
-    metadata: Any
-
     @property
     def name(self) -> str: ...
 
