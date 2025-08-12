@@ -72,14 +72,52 @@ def process_mistaken_quick_construct(
             yield ax
 
 
+NO_METADATA = object()
+
+
 class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
     __slots__ = ()
 
+    @typing.overload
     def __init__(
         self,
-        *in_args: AxisTypes | Storage | str,
+        arg: dict[str, Any],
+        /,
+        *,
+        data: np.typing.NDArray[Any] | None = ...,
+        metadata: Any = ...,
+        label: str | None = ...,
+        name: str | None = ...,
+    ) -> None: ...
+
+    @typing.overload
+    def __init__(
+        self,
+        arg: Self | bh.Histogram,
+        /,
+        *,
+        data: np.typing.NDArray[Any] | None = ...,
+        metadata: Any = ...,
+        label: str | None = ...,
+        name: str | None = ...,
+    ) -> None: ...
+
+    @typing.overload
+    def __init__(
+        self,
+        *axes: AxisTypes | Storage | str,
+        storage: Storage = ...,
+        metadata: Any = ...,
+        data: np.typing.NDArray[Any] | None = ...,
+        label: str | None = ...,
+        name: str | None = ...,
+    ) -> None: ...
+
+    def __init__(
+        self,
+        *in_args: Self | bh.Histogram | dict[str, Any] | AxisTypes | Storage | str,
         storage: Storage | str | None = None,
-        metadata: Any = None,
+        metadata: Any = NO_METADATA,
         data: np.typing.NDArray[Any] | None = None,
         label: str | None = None,
         name: str | None = None,
@@ -115,7 +153,10 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
             warnings.warn(msg, stacklevel=2)
             storage = storage()
 
-        super().__init__(*args, storage=storage, metadata=metadata)  # type: ignore[call-overload]
+        if metadata is NO_METADATA:
+            super().__init__(*args, storage=storage)  # type: ignore[call-overload]
+        else:
+            super().__init__(*args, storage=storage, metadata=metadata)  # type: ignore[call-overload]
 
         disallowed_names = {"weight", "sample", "threads"}
         for ax in self.axes:
@@ -180,6 +221,11 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
                 return index
 
         raise ValueError(f"The axis name {name} could not be found")
+
+    def _to_uhi_(self) -> dict[str, Any]:
+        from .serialization import to_uhi
+
+        return to_uhi(self)
 
     @classmethod
     def from_columns(

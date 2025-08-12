@@ -92,6 +92,7 @@ test = [
 test-core = [
     "pytest >=8",
     "pytest-mpl >=0.12",
+    "packaging >=23",
     { include-group = "plot" },
 ]
 dev = [
