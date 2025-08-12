@@ -45,6 +45,8 @@ def test_simple_to_dict(storage_type: hist.storage.Storage, expected_type: str) 
     assert data["storage"]["type"] == expected_type
     assert data["storage"]["values"] == pytest.approx(np.zeros(12))
     assert data["uhi_schema"] == 1
+    assert "version" in data["writer_info"]["boost-histogram"]
+    assert "version" in data["writer_info"]["hist"]
 
 
 def test_weighed_to_dict() -> None:

@@ -5,7 +5,7 @@ from typing import Any, TypeVar
 
 from boost_histogram import Histogram
 
-from .. import Hist
+from .. import Hist, __version__
 
 __all__ = ["from_uhi", "remove_writer_info", "to_uhi"]
 
@@ -19,7 +19,9 @@ def from_uhi(data: dict[str, Any], /) -> Hist:
 def to_uhi(h: Histogram, /) -> dict[str, Any]:
     import boost_histogram.serialization as bhs
 
-    return bhs.to_uhi(h)
+    d = bhs.to_uhi(h)
+    d["writer_info"]["hist"] = {"version": __version__}
+    return d
 
 
 T = TypeVar("T", bound="dict[str, Any]")
