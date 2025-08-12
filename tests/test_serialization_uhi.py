@@ -1,18 +1,19 @@
 from __future__ import annotations
 
+import importlib.metadata
+
 import numpy as np
+import packaging.version
 import pytest
 
 import hist
 from hist.serialization import from_uhi, to_uhi
-import packaging.version
-
-import importlib.metadata
 
 bhs = pytest.importorskip("boost_histogram.serialization")
 
 BHV = packaging.version.Version(importlib.metadata.version("boost_histogram"))
-BHMETADATA = BHV > packaging.version.Version("1.6.1dev0")
+BHMETADATA = packaging.version.Version("1.6.1dev0") < BHV
+
 
 @pytest.mark.parametrize(
     ("storage_type", "expected_type"),
@@ -148,7 +149,9 @@ def test_round_trip_simple(storage_type: hist.storage.Storage) -> None:
     data = to_uhi(h)
     h2 = from_uhi(data)
 
-    if BHMETADATA and isinstance(storage_type, (hist.storage.Int64, hist.storage.Double)):
+    if BHMETADATA and isinstance(
+        storage_type, (hist.storage.Int64, hist.storage.Double)
+    ):
         assert h._hist == h2._hist
         assert h == h2
 
@@ -164,9 +167,6 @@ def test_round_trip_weighted() -> None:
     h.fill(["1", "2", "3"], weight=[10, 20, 30])
     data = to_uhi(h)
     h2 = from_uhi(data)
-
-    print(h.view())
-    print(h2.view())
 
     assert pytest.approx(np.array(h.axes[0])) == np.array(h2.axes[0])
     assert np.asarray(h) == pytest.approx(h2)
@@ -209,6 +209,8 @@ def test_uhi_wrapper():
     data = h._to_uhi_()
     assert repr(from_uhi(data)) == repr(hist.Hist._from_uhi_(data))
 
+    assert "version" in data["writer_info"]["hist"]
+
 
 def test_uhi_direct_conversion():
     h = hist.Hist(
@@ -250,5 +252,3 @@ def test_round_trip_clean() -> None:
 
     assert isinstance(h2.axes[0], hist.axis.Regular)
     assert h2.storage_type is hist.storage.Int64
-
-

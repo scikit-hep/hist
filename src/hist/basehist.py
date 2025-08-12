@@ -222,6 +222,11 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
         raise ValueError(f"The axis name {name} could not be found")
 
+    def _to_uhi_(self) -> dict[str, Any]:
+        from .serialization import to_uhi
+
+        return to_uhi(self)
+
     @classmethod
     def from_columns(
         cls,
