@@ -21,6 +21,7 @@ def test_bh_conversion():
     assert h2.axes[0].name == "y"
     assert h3.axes[0].metadata == {"name": "x"}
 
+
 def test_bh_conversion_add_metadata():
     h = bh.Histogram(bh.axis.Regular(3, 2, 1))
 
@@ -28,4 +29,3 @@ def test_bh_conversion_add_metadata():
 
     assert h2.label == "abc"
     assert h2.name == "def"
-
