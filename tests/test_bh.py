@@ -20,3 +20,12 @@ def test_bh_conversion():
     assert not isinstance(h3.axes[0], hist.axis.Regular)
     assert h2.axes[0].name == "y"
     assert h3.axes[0].metadata == {"name": "x"}
+
+def test_bh_conversion_add_metadata():
+    h = bh.Histogram(bh.axis.Regular(3, 2, 1))
+
+    h2 = hist.Hist(h, label="abc", name="def")
+
+    assert h2.label == "abc"
+    assert h2.name == "def"
+

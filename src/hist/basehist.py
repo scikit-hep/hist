@@ -127,8 +127,6 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         """
         self._hist: Any = None
         self.axes: NamedAxesTuple
-        self.name = name
-        self.label = label
 
         args: tuple[AxisTypes, ...]
 
@@ -178,6 +176,9 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
         if data is not None:
             self[...] = data
+
+        self.name = name
+        self.label = label
 
     # Backport of storage_type from boost-histogram 1.3.2:
     if not hasattr(bh.Histogram, "storage_type"):
