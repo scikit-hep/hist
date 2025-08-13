@@ -12,7 +12,7 @@ import importlib.metadata
 
 project = "Hist"
 copyright = "2020, Henry Schreiner"
-author = "Henry Schreiner and Nino Lau"
+author = "Henry Schreiner and Aman Goel and Shuo Liu"
 version = importlib.metadata.version("hist")
 
 
