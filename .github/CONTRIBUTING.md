@@ -23,7 +23,7 @@ specific jobs:
 ```console
 $ nox -l # List all the defined sessions
 $ nox -s lint  # Lint only
-$ nox -s tests-3.9  # Python 3.9 tests only
+$ nox -s tests-3.14  # Python 3.14 tests only
 $ nox -s docs -- serve  # Build and serve the docs
 $ nox -s build  # Make an SDist and wheel
 ```
@@ -33,9 +33,9 @@ environment for each run. On Linux, it will run the `--mpl` tests. You can
 run the linux tests from anywhere with Docker:
 
 ```bash
-docker run --rm -v $PWD:/nox -w /nox -t quay.io/pypa/manylinux2014_x86_64:latest pipx run nox -s tests-3.9
+docker run --rm -v $PWD:/nox -w /nox -t quay.io/pypa/manylinux_2_28_x86_64:latest pipx run nox -s tests-3.9
 # Regenerate the MPL comparison images:
-docker run --rm -v $PWD:/nox -w /nox -t quay.io/pypa/manylinux2014_x86_64:latest pipx run nox -s regenerate
+docker run --rm -v $PWD:/nox -w /nox -t quay.io/pypa/manylinux_2_28_x86_64:latest pipx run nox -s regenerate
 ```
 
 ### PyPI
@@ -43,23 +43,13 @@ docker run --rm -v $PWD:/nox -w /nox -t quay.io/pypa/manylinux2014_x86_64:latest
 For extended development, you can set up a development environment using PyPI.
 
 ```bash
-$ python3 -m venv venv
-$ source venv/bin/activate
-(venv)$ pip install -e .[dev]
+$ python3 -m venv .venv
+$ source .venv/bin/activate
+(venv)$ pip install -e . --group dev
 (venv)$ python -m ipykernel install --user --name hist
 ```
 
 You should have pip 10 or later.
-
-### Conda
-
-You can also set up a development environment using Conda. With conda, you can search some channels for development.
-
-```bash
-$ conda env create -f dev-environment.yml -n hist
-$ conda activate hist
-(hist)$ python -m ipykernel install --name hist
-```
 
 ## Post setup
 
