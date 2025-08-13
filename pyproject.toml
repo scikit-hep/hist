@@ -92,6 +92,7 @@ dask = [
 test = [
     { include-group = "test-core" },
     { include-group = "fit" },
+    "awkward>=2.0.7",
 ]
 test-core = [
     "pytest >=8",
