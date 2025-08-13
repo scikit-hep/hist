@@ -180,13 +180,6 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         self.name = name
         self.label = label
 
-    # Backport of storage_type from boost-histogram 1.3.2:
-    if not hasattr(bh.Histogram, "storage_type"):
-
-        @property
-        def storage_type(self) -> type[bh.storage.Storage]:
-            return self._storage_type
-
     def _generate_axes_(self) -> NamedAxesTuple:
         """
         This is called to fill in the axes. Subclasses can override it if they need

@@ -12,7 +12,7 @@ from hist.serialization import from_uhi, to_uhi
 bhs = pytest.importorskip("boost_histogram.serialization")
 
 BHV = packaging.version.Version(importlib.metadata.version("boost_histogram"))
-BHMETADATA = packaging.version.Version("1.6.1dev0") < BHV
+BHMETADATA = packaging.version.Version("1.6.1") <= BHV
 
 
 @pytest.mark.parametrize(

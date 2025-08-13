@@ -4,7 +4,6 @@ import typing
 from collections.abc import Iterable
 from typing import Any, Protocol
 
-import boost_histogram as bh
 import boost_histogram.axis as bha
 
 import hist
@@ -227,18 +226,11 @@ class IntCategory(AxesMixin, bha.IntCategory, family=hist):
         __dict__: dict[str, Any] | None = None,
     ) -> None:
         has_flow = flow if overflow is None else overflow
-        if tuple(int(x) for x in bh.__version__.split(".")[:2]) < (1, 4):
-            if not has_flow:
-                msg = "Boost-histogram 1.4+ required for flowless Category axes"
-                raise TypeError(msg)
-            kwargs = {}
-        else:
-            kwargs = {"overflow": has_flow}
         super().__init__(
             categories,
             metadata=metadata,
             growth=growth,
-            **kwargs,
+            overflow=has_flow,
             __dict__=__dict__,
         )
         self._raw_metadata["name"] = name
@@ -261,18 +253,11 @@ class StrCategory(AxesMixin, bha.StrCategory, family=hist):
         __dict__: dict[str, Any] | None = None,
     ) -> None:
         has_flow = flow if overflow is None else overflow
-        if tuple(int(x) for x in bh.__version__.split(".")[:2]) < (1, 4):
-            if not has_flow:
-                msg = "Boost-histogram 1.4+ required for flowless Category axes"
-                raise TypeError(msg)
-            kwargs = {}
-        else:
-            kwargs = {"overflow": has_flow}
         super().__init__(
             categories,
             metadata=metadata,
             growth=growth,
-            **kwargs,
+            overflow=has_flow,
             __dict__=__dict__,
         )
         self._raw_metadata["name"] = name
