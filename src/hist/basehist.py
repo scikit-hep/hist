@@ -586,7 +586,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
             The legend title is set from the axis label if available.
         **kwargs : Any
             Additional keyword arguments passed to the underlying plot functions.
-        
+
         Returns
         -------
         Hist1DArtists

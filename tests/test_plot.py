@@ -780,21 +780,23 @@ def test_plot1d_legend_functionality():
 
     # Test with default legend (should be True)
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
-    
+
     # Test with legend=True (default)
     artists1 = h.plot1d(ax=ax1)
     legend1 = ax1.get_legend()
     assert legend1 is not None, "Legend should be created by default"
-    assert legend1.get_title().get_text() == "Dataset Type", "Legend title should be axis label"
-    
+    assert legend1.get_title().get_text() == "Dataset Type", (
+        "Legend title should be axis label"
+    )
+
     # Test with legend=False
     artists2 = h.plot1d(ax=ax2, legend=False)
     legend2 = ax2.get_legend()
     assert legend2 is None, "Legend should not be created when legend=False"
-    
+
     # Test return type is consistent
-    assert type(artists1) == type(artists2), "Return type should be consistent"
-    
+    assert type(artists1) is type(artists2), "Return type should be consistent"
+
     plt.close(fig)
 
 
@@ -814,15 +816,15 @@ def test_plot1d_legend_without_axis_label():
     h.fill(dataset="B", variable=np.random.normal(3, 2, 100))
 
     fig, ax = plt.subplots()
-    
+
     # Test with legend=True but no explicit axis label
-    artists = h.plot1d(ax=ax)
+    h.plot1d(ax=ax)
     legend = ax.get_legend()
     assert legend is not None, "Legend should still be created"
     # Title should be the axis name when no explicit label is provided
     title = legend.get_title().get_text()
     assert title == "dataset", "Legend title should be axis name when no explicit label"
-    
+
     plt.close(fig)
 
 
@@ -837,11 +839,11 @@ def test_plot1d_legend_1d_histogram():
     h.fill(np.random.normal(5, 1, 100))
 
     fig, ax = plt.subplots()
-    
+
     # Test 1D histogram (should not create legend since no categories)
     artists = h.plot1d(ax=ax)
     # For 1D histograms, the legend parameter doesn't apply since there are no categories
     # The function should still work and return artists
     assert artists is not None
-    
+
     plt.close(fig)
