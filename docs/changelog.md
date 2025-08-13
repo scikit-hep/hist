@@ -10,6 +10,7 @@ Features:
 * Support serialization with boost-histogram 1.6
   [#627](https://github.com/scikit-hep/hist/pull/627)
 * Add `legend=True` for plot1d stacked
+  [#622](https://github.com/scikit-hep/hist/pull/622)
 * Specify license with SPDX, add some authors
   [#625](https://github.com/scikit-hep/hist/pull/625), [#628](https://github.com/scikit-hep/hist/pull/628)
 
@@ -20,6 +21,7 @@ Fixes:
 * Handle string args for fill-flattened
   [#629](https://github.com/scikit-hep/hist/pull/629)
 * Label/name propagation fixed for casting histograms
+  [#630](https://github.com/scikit-hep/hist/pull/630)
 
 Tests:
 
