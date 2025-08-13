@@ -383,3 +383,17 @@ def test_named_keyword(unnamed_hist):
         axis.Regular(2, 0, 1, name="z"),
     ).fill_flattened(x=x, y=y, z=z)
     assert np.allclose(h.values(), expected)
+
+
+def test_string_fill_flattened():
+    ark = np.array([1, 2, 3, 4, 5])
+    h = hist.new.Reg(10, 0, 10, name="x").StrCat([], growth=True, name="cat").Weight()
+    h.fill_flattened(x=ark, cat="A")
+
+
+def test_ak_fill_flattened():
+    ak = pytest.importorskip("awkward")
+
+    ark = ak.Array([[1, 2, 3], [4, 5, 6], [9]])
+    h = hist.new.Reg(10, 0, 10, name="x").StrCat([], growth=True, name="cat").Weight()
+    h.fill_flattened(x=ark, cat="A")
