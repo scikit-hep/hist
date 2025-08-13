@@ -1,6 +1,48 @@
 # Changelog
 
-## WIP
+## Version 2.9.0
+
+Features:
+
+* Support for boost-histogram 1.6, drop support for Python 3.8, boost-histogram
+  < 1.5, add support for Python 3.14/3.14t
+  [#597](https://github.com/scikit-hep/hist/pull/597) [#618](https://github.com/scikit-hep/hist/pull/618), [#631](https://github.com/scikit-hep/hist/pull/631)
+* Support serialization with boost-histogram 1.6
+  [#627](https://github.com/scikit-hep/hist/pull/627)
+* Add `legend=True` for plot1d stacked
+* Specify license with SPDX, add some authors
+  [#625](https://github.com/scikit-hep/hist/pull/625), [#628](https://github.com/scikit-hep/hist/pull/628)
+
+Fixes:
+
+* Handle fill-flattened for non-user args
+  [#612](https://github.com/scikit-hep/hist/pull/612)
+* Handle string args for fill-flattened
+  [#629](https://github.com/scikit-hep/hist/pull/629)
+* Label/name propagation fixed for casting histograms
+
+Tests:
+
+* Handle tests that need mplhep
+  [#604](https://github.com/scikit-hep/hist/pull/604)
+* Modernize noxfile
+  [#623](https://github.com/scikit-hep/hist/pull/623)
+* Use dependency-groups
+  [#624](https://github.com/scikit-hep/hist/pull/624)
+
+CI:
+
+* Upload nightly wheels to Anaconda
+  [#611](https://github.com/scikit-hep/hist/pull/611)
+* Add pass job to tests
+  [#619](https://github.com/scikit-hep/hist/pull/619)
+* Modernize pylint and uv
+  [#629](https://github.com/scikit-hep/hist/pull/629)
+* Update and check the minimum versions in CI
+  [#621](https://github.com/scikit-hep/hist/pull/621)
+* Speed up read-the-docs
+  [#576](https://github.com/scikit-hep/hist/pull/576)
+
 
 ## Version 2.8.1
 
