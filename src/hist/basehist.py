@@ -568,10 +568,29 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         *,
         ax: matplotlib.axes.Axes | None = None,
         overlay: str | int | None = None,
+        legend: bool = True,
         **kwargs: Any,
     ) -> Hist1DArtists:
         """
         Plot1d method for BaseHist object.
+
+        Parameters
+        ----------
+        ax : matplotlib.axes.Axes, optional
+            Axes to plot on. If None, uses current axes or creates new ones.
+        overlay : str or int, optional
+            Name or index of the axis to overlay. If None, automatically selects
+            the first discrete axis for multi-dimensional histograms.
+        legend : bool, default True
+            Whether to automatically add a legend when plotting stacked categories.
+            The legend title is set from the axis label if available.
+        **kwargs : Any
+            Additional keyword arguments passed to the underlying plot functions.
+
+        Returns
+        -------
+        Hist1DArtists
+            The matplotlib artists created by the plot.
         """
 
         from hist import plot
@@ -598,7 +617,19 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
                 raise ValueError(
                     f"label ``{kwargs['label']}`` not understood for {len(cats)} categories"
                 )
-        return plot.histplot(d1hists, ax=ax, label=cats, **_proc_kw_for_lw(kwargs))
+        artists = plot.histplot(d1hists, ax=ax, label=cats, **_proc_kw_for_lw(kwargs))
+        if legend:
+            # Try to set legend title from axis label if available
+            if ax is None:
+                # Get axis from the first artist (mplhep returns Hist1DArtists tuple)
+                # This will raise an error if artists is empty or doesn't have the expected structure,
+                # which is intended behavior as specified in the requirements
+                ax = artists[0].stairs.axes
+            handles, _ = ax.get_legend_handles_labels()
+            if handles:
+                title = getattr(cat_ax, "label", None)
+                ax.legend(title=title if title else None)
+        return artists
 
     def plot2d(
         self,
