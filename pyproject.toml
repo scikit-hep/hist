@@ -216,7 +216,7 @@ extend-select = [
   "UP",          # pyupgrade
   "YTT",         # flake8-2020
 ]
-ignore = ["PLR", "E501", "PT011", "PT013", "B017", "ISC001", "PLC0415"]
+ignore = ["PLR", "E501", "PT011", "PT013", "B017", "PLC0415"]
 typing-modules = ["hist._compat.typing"]
 isort.required-imports = ["from __future__ import annotations"]
 flake8-unused-arguments.ignore-variadic-names = true
