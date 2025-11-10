@@ -132,7 +132,7 @@ addopts = ["-ra", "--strict-markers", "--strict-config"]
 xfail_strict = true
 testpaths = ["tests"]
 required_plugins = ["pytest-mpl"]
-log_cli_level = "DEBUG"
+log_level = "DEBUG"
 filterwarnings = [
     "error",
     "ignore::matplotlib._api.deprecation.MatplotlibDeprecationWarning",
