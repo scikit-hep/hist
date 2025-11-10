@@ -31,6 +31,6 @@ def test_axestuple():
     # Our backport has a simpler error message
     with pytest.raises(
         Exception,
-        match="argument 2 is longer than argument 1|arguments are not the same length",
+        match=r"argument 2 is longer than argument 1|arguments are not the same length",
     ):
         h.axes.name = ("A", "B", "C")
