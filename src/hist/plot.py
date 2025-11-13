@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import inspect
 import sys
-from collections.abc import Iterable
-from typing import Any, Callable, Literal, NamedTuple, Union
+from collections.abc import Callable, Iterable
+from typing import Any, Literal, NamedTuple, TypeAlias
 
 import numpy as np
 
@@ -56,10 +56,10 @@ class PullArtists(NamedTuple):
     patch_artist: list[matplotlib.patches.Rectangle]
 
 
-MainAxisArtists = Union[FitResultArtists, Hist1DArtists]
+MainAxisArtists: TypeAlias = FitResultArtists | Hist1DArtists
 
-RatioArtists = Union[RatioErrorbarArtists, RatioBarArtists]
-RatiolikeArtists = Union[RatioArtists, PullArtists]
+RatioArtists = RatioErrorbarArtists | RatioBarArtists
+RatiolikeArtists = RatioArtists | PullArtists
 
 
 def __dir__() -> tuple[str, ...]:
@@ -694,7 +694,7 @@ def _plot_ratiolike(
             perr = np.sqrt(np.diagonal(pcov))
 
             fp_label = "Fit"
-            for name, value, error in zip(parnames, popt, perr):
+            for name, value, error in zip(parnames, popt, perr, strict=True):
                 fp_label += "\n  "
                 fp_label += fit_fmt.format(name=name, value=value, error=error)
             fp_kwargs["label"] = fp_label

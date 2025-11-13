@@ -6,10 +6,9 @@ import itertools
 import operator
 import typing
 import warnings
-from collections.abc import Generator, Iterator, Mapping, Sequence
+from collections.abc import Callable, Generator, Iterator, Mapping, Sequence
 from typing import (
     Any,
-    Callable,
     Protocol,
     SupportsIndex,
     Union,
@@ -45,9 +44,9 @@ class SupportsLessThan(Protocol):
 InnerIndexing = Union[
     SupportsIndex, str, Callable[[bh.axis.Axis], int], slice, "ellipsis"
 ]
-IndexingWithMapping = Union[InnerIndexing, Mapping[Union[int, str], InnerIndexing]]
-IndexingExpr = Union[IndexingWithMapping, tuple[IndexingWithMapping, ...]]
-AxisTypes = Union[AxisProtocol, tuple[int, float, float]]
+IndexingWithMapping = InnerIndexing | Mapping[int | str, InnerIndexing]
+IndexingExpr = IndexingWithMapping | tuple[IndexingWithMapping, ...]
+AxisTypes = AxisProtocol | tuple[int, float, float]
 
 
 # Workaround for bug in mplhep
@@ -234,11 +233,11 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         for ax in axes:
             if isinstance(ax, str):
                 assert ax in data, f"{ax} must be present in data={list(data)}"
-                cats = set(data[ax])
+                cats = set(data[ax])  # type: ignore[arg-type]
                 if all(isinstance(a, str) for a in cats):
-                    axes_list.append(hist.axis.StrCategory(sorted(cats), name=ax))
+                    axes_list.append(hist.axis.StrCategory(sorted(cats), name=ax))  # type: ignore[arg-type]
                 elif all(isinstance(a, int) for a in cats):
-                    axes_list.append(hist.axis.IntCategory(sorted(cats), name=ax))
+                    axes_list.append(hist.axis.IntCategory(sorted(cats), name=ax))  # type: ignore[arg-type]
                 else:
                     raise TypeError(
                         f"{ax} must be all int or strings if axis not given"
@@ -252,7 +251,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
         self = cls(*axes_list, storage=storage)
         data_list = {x.name: data[x.name] for x in axes_list}
-        self.fill(**data_list, weight=weight_arr)
+        self.fill(**data_list, weight=weight_arr)  # type: ignore[arg-type]
         return self
 
     def project(self, *args: int | str) -> Self | float | bh.accumulators.Accumulator:
@@ -350,7 +349,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
                 user_args_broadcast = broadcast[:1]
                 user_kwargs_broadcast = {}
                 non_user_kwargs_broadcast = dict(
-                    zip(non_user_kwargs.keys(), broadcast[1:])
+                    zip(non_user_kwargs.keys(), broadcast[1:], strict=True)
                 )
             else:
                 # Result must be broadcast, so unpack and rebuild
@@ -361,11 +360,13 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
                 user_args_broadcast = ()
                 user_kwargs_broadcast = {
                     k: v
-                    for k, v in zip(destructured, broadcast[: len(destructured)])
+                    for k, v in zip(
+                        destructured, broadcast[: len(destructured)], strict=True
+                    )
                     if k in axis_names
                 }
                 non_user_kwargs_broadcast = dict(
-                    zip(non_user_kwargs, broadcast[len(destructured) :])
+                    zip(non_user_kwargs, broadcast[len(destructured) :], strict=True)
                 )
         # Multiple args: broadcast and flatten!
         else:
@@ -373,10 +374,10 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
             broadcast = interop.broadcast_and_flatten(inputs)
             user_args_broadcast = broadcast[: len(args)]
             user_kwargs_broadcast = dict(
-                zip(kwargs, broadcast[len(args) : len(args) + len(kwargs)])
+                zip(kwargs, broadcast[len(args) : len(args) + len(kwargs)], strict=True)
             )
             non_user_kwargs_broadcast = dict(
-                zip(non_user_kwargs, broadcast[len(args) + len(kwargs) :])
+                zip(non_user_kwargs, broadcast[len(args) + len(kwargs) :], strict=True)
             )
         return self.fill(
             *user_args_broadcast,
@@ -734,7 +735,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         stack_histograms: Iterator[BaseHist] = [  # type: ignore[assignment]
             self[{axis: i}] for i in range(len(self.axes[axis]))
         ]
-        for name, h in zip(self.axes[axis], stack_histograms):
+        for name, h in zip(self.axes[axis], stack_histograms, strict=True):
             h.name = name
 
         return hist.stack.Stack(*stack_histograms)
