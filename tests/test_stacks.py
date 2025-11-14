@@ -58,7 +58,7 @@ fills = (int, bool, int, int, int, str)
 ids = ("reg", "boo", "var", "int", "icat", "scat")
 
 
-@pytest.fixture(params=zip(axs, fills), ids=ids)
+@pytest.fixture(params=zip(axs, fills, strict=True), ids=ids)
 def hist_1d(request):
     def make_hist():
         ax, fill = request.param
