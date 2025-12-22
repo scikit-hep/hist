@@ -292,14 +292,13 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         }
 
         if set(data_dict) != set(range(len(args), self.ndim)):
-
             expected = set(range(len(args), self.ndim))
             provided = set(data_dict)
 
-            missing = expected - provided 
+            missing = expected - provided
             missing_values = [self.axes[i].name for i in missing]
 
-            raise TypeError ( 
+            raise TypeError(
                 f"Missing values for single/multiple axis : {missing_values}."
                 f"Expected axes : {[ax.name for ax in self.axes]}"
             )
