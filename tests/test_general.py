@@ -1029,5 +1029,6 @@ def test_fill_missing_axis_reports_axis_name():
         axis.Regular(5, 0, 1, name="y"),
     )
 
-    with pytest.raises(TypeError) as exc:
-        h.fill(x=[0.1, 0.2])
+    with pytest.raises(TypeError) : 
+        h.fill(x = [0.1, 0.2])
+        
