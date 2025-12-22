@@ -1021,3 +1021,14 @@ def test_T_3D():
     assert h_3D.T.axes[0] == h_3D.axes[2]
     assert h_3D.T.axes[1] == h_3D.axes[1]
     assert h_3D.T.axes[2] == h_3D.axes[0]
+
+
+def test_fill_missing_axis_reports_axis_name() : 
+    h = Hist ( 
+        axis.Regular(5,0,1, name = "x"),
+        axis.Regular(5,0,1, name = "y"),
+    )
+
+    with pytest.raises(TypeError) as exc : 
+        h.fill(x = [0.1, 0.2])
+        
