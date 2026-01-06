@@ -305,6 +305,18 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
         data = (data_dict[i] for i in range(len(args), self.ndim))
 
+        # Quick check for a common mistake with a weighted fill
+        if (
+            weight is not None
+            and args
+            and hasattr(weight, "__len__")
+            and hasattr(args[0], "__len__")
+            and len(weight) != len(args[0])
+        ):
+            raise ValueError(
+                "Weight array must match the length of the input data for a given data"
+            )
+
         return super().fill(*args, *data, weight=weight, sample=sample, threads=threads)
 
     def fill_flattened(
