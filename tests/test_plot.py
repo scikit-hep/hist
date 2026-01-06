@@ -867,6 +867,8 @@ def test_plot_ratio_misalignment():
     def record_x(x, *a, **k):
         captured["x"] = np.asarray(x)
         return []
+    
+    _, ax = plt.subplots() 
 
     fig, ax = plt.subplots()
 
