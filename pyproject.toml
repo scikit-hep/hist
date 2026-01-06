@@ -62,10 +62,12 @@ Changelog = "https://hist.readthedocs.io/en/latest/changelog.html"
 mpl = [
     "matplotlib >=3.3.3",
     "mplhep >=0.3.17",
+    "pyparsing >=3.0",  # Needed for oldest version job until we bump matplotlib to 3.8+
 ]
 plot = [
     "matplotlib >=3.3.3",
     "mplhep >=0.3.17",
+    "pyparsing >=3.0",  # Needed for oldest version job until we bump matplotlib to 3.8+
 ]
 fit = [
     "scipy >=1.5.4",
@@ -80,6 +82,7 @@ dask = [
 plot = [
     "matplotlib >=3.3.3",
     "mplhep >=0.3.17",
+    "pyparsing >=3.0",  # Needed for oldest version job until we bump matplotlib to 3.8+
 ]
 fit = [
     "scipy >=1.5.4",
