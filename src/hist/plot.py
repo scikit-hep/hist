@@ -207,6 +207,21 @@ def plot2d_full(
     Plot2d_full method for BaseHist object.
 
     Pass a dict of axes to ``ax_dict``, otherwise, the current figure will be used.
+
+    Other Parameters
+    ----------------
+
+    main_* : optional
+        Keywords arguments prefixed with ''main_'' are forwarded to the main 2D histogram
+        plot and controls its appearance.
+
+    top_* : optional
+        Keywords arguments prefixed with ''top_'' are forwarded to the top histogram plot and controls
+        its appearance.
+
+    side_* : optional
+        Keywords arguments prefixed with ''side_'' are forwarded to the side histogram plot
+        and controls its appearance.
     """
     # Type judgement
     if self.ndim != 2:
@@ -394,6 +409,25 @@ def plot_ratio_array(
 ) -> RatioArtists:
     """
     Plot a ratio plot on the given axes
+
+    Other Parameters
+    ----------------
+    central_value : float, optional
+        Value of Y-axis at which to draw the horizontal reference line
+        on the ration plot.
+        Default is 1.0.
+
+    uncert_draw_type : {"line", "bar"}, optional
+        Defines how uncertainty is drawn on the ration plot.
+        If "line", uncertainty is shown as error bars.
+        If "bar", uncertainty is shown as bars.
+        Default is "line".
+
+    ylim : tuple of float, optional
+        Y-axis limits for the ratio plot given as (ymin, ymax)
+        If not provided, limits are automatically determined based on
+        the ratio values and their uncertainties.
+
     """
     x_values = __hist.axes[0].centers
     left_edge = __hist.axes.edges[0][0]
@@ -543,6 +577,35 @@ def _plot_ratiolike(
     Plot ratio-like plots (ratio plots and pull plots) for BaseHist
 
     ``fit_fmt`` can be a string such as ``r"{name} = {value:.3g} $\pm$ {error:.3g}"``
+
+    Other Parameters
+    ----------------
+    rp_* : optional
+        Keyword arguments prefixed with ``rp_`` are forwarded to
+        function :`plot_ratio_array` and control the appearance and behavior
+        of the ratio plot (y-axis limits and the drawing style of uncertainty).
+
+    eb_* : optional
+        Keyword arguments prefixed with ``eb_`` are forwarded to
+        Matplotlib error bar plotting functions and controls the
+        appearance of histogram error bars.
+
+    fp_* : optional
+        Keyword arguments prefixed with ``fp_`` controls the appearance
+        of model curve drawn on the main plot.
+
+    ub_* : optional
+        Keyword arguments prefixed with ``ub_`` controls the appearance
+        of uncertainty bands drawn around model curve.
+
+    bar_* : optional
+        Keyword arguments prefixed with ``bar_`` are forwarded to
+        Matplotlib bar plotting functions used in pull plots.
+
+    pp_* : optional
+        Keyword arguments prefixed with ``pp_`` control the appearance
+        of patch-based elements used in pull plots.
+
     """
     from .intervals import ratio_uncertainty
 

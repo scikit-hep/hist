@@ -60,12 +60,12 @@ Changelog = "https://hist.readthedocs.io/en/latest/changelog.html"
 [project.optional-dependencies]
 # Keep in sync with dependency-groups below
 mpl = [
-    "matplotlib >=3.3.3",
-    "mplhep >=0.3.17",
+    "matplotlib >=3.8",
+    "mplhep >=0.3.33",
 ]
 plot = [
-    "matplotlib >=3.3.3",
-    "mplhep >=0.3.17",
+    "matplotlib >=3.8",
+    "mplhep >=0.3.33",
 ]
 fit = [
     "scipy >=1.5.4",
@@ -78,8 +78,9 @@ dask = [
 
 [dependency-groups]
 plot = [
-    "matplotlib >=3.3.3",
-    "mplhep >=0.3.17",
+    "matplotlib >=3.8",
+    "mplhep >=0.3.33",
+    "pyparsing>=3.0,<3.3; python_version<'3.10'"
 ]
 fit = [
     "scipy >=1.5.4",
@@ -135,7 +136,6 @@ required_plugins = ["pytest-mpl"]
 log_level = "DEBUG"
 filterwarnings = [
     "error",
-    "ignore::matplotlib._api.deprecation.MatplotlibDeprecationWarning",
 ]
 
 [tool.mypy]
