@@ -37,7 +37,7 @@ repos:
   - id: mypy
     files: ^src
     args: []
-    additional_dependencies: ["numpy~=2.3.0", "matplotlib>=3.4", "boost-histogram~=1.6.1", "uhi~=1.0", "pandas-stubs>=2.0.1.230501"]
+    additional_dependencies: ["numpy~=2.3.0", "matplotlib>=3.8", "boost-histogram~=1.6.1", "uhi~=1.0", "pandas-stubs>=2.0.1.230501"]
 
 - repo: https://github.com/codespell-project/codespell
   rev: v2.4.1
