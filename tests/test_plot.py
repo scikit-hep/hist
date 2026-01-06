@@ -854,27 +854,34 @@ def test_plot_ratio_misalignment():
 
     import hist
     from hist.plot import plot_ratio_array
+    import matplotlib.pyplot as plt 
+
 
     h = hist.new.Int(0, 3, name="x").Double()
     h.fill([0, 1, 2])
 
     ratio = np.ones(3)
-    ratio_uncert = np.zeros((2, 3))
+    ratio_uncert = np.full((2,3), 1e-6)
 
     captured = {}
 
-    def record_x(self, x, *a, **k):
-        captured["x"] = x
+    def record_x(x , *a, **k) : 
+        captured["x"] = np.asarray(x) 
+        return []
+    
+    fig, ax = plt.subplots() 
 
-    class Ax:
-        errorbar = record_x
-        bar = record_x
-        axhline = lambda *a, **k: None
-        set_xlim = lambda *a, **k: None
-        set_ylim = lambda *a, **k: None
-        set_xlabel = lambda *a, **k: None
-        set_ylabel = lambda *a, **k: None
+    ax.errorbar = record_x 
+    ax.bar = record_x
+    ax.axhline = lambda *a, **k : None 
 
-    plot_ratio_array(h, ratio, ratio_uncert, ax=Ax(), uncert_draw_type="line")
+    plot_ratio_array( 
+        h,
+        ratio, 
+        ratio_uncert,
+        ax = ax, 
+        uncert_draw_type = "line"
+    )
 
     assert np.all(captured["x"] == h.axes[0].edges[:-1])
+
