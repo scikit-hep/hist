@@ -850,38 +850,30 @@ def test_plot1d_legend_1d_histogram():
 
 
 def test_plot_ratio_misalignment():
+    import matplotlib.pyplot as plt
     import numpy as np
 
     import hist
     from hist.plot import plot_ratio_array
-    import matplotlib.pyplot as plt 
-
 
     h = hist.new.Int(0, 3, name="x").Double()
     h.fill([0, 1, 2])
 
     ratio = np.ones(3)
-    ratio_uncert = np.full((2,3), 1e-6)
+    ratio_uncert = np.full((2, 3), 1e-6)
 
     captured = {}
 
-    def record_x(x , *a, **k) : 
-        captured["x"] = np.asarray(x) 
+    def record_x(x, *a, **k):
+        captured["x"] = np.asarray(x)
         return []
-    
-    fig, ax = plt.subplots() 
 
-    ax.errorbar = record_x 
+    fig, ax = plt.subplots()
+
+    ax.errorbar = record_x
     ax.bar = record_x
-    ax.axhline = lambda *a, **k : None 
+    ax.axhline = lambda *a, **k: None
 
-    plot_ratio_array( 
-        h,
-        ratio, 
-        ratio_uncert,
-        ax = ax, 
-        uncert_draw_type = "line"
-    )
+    plot_ratio_array(h, ratio, ratio_uncert, ax=ax, uncert_draw_type="line")
 
     assert np.all(captured["x"] == h.axes[0].edges[:-1])
-
