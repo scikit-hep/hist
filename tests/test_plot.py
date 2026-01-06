@@ -870,8 +870,6 @@ def test_plot_ratio_misalignment():
 
     _, ax = plt.subplots()
 
-    fig, ax = plt.subplots()
-
     ax.errorbar = record_x
     ax.bar = record_x
     ax.axhline = lambda *a, **k: None
