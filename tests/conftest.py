@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import pytest
+import matplotlib
+matplotlib.use("Agg")
 
 from hist import Hist, NamedHist
 from hist.hist import BaseHist
