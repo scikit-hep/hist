@@ -138,6 +138,7 @@ required_plugins = ["pytest-mpl"]
 log_level = "DEBUG"
 filterwarnings = [
     "error",
+    "ignore:deprecated - use:DeprecationWarning",
     "ignore::matplotlib._api.deprecation.MatplotlibDeprecationWarning",
 ]
 
