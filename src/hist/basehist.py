@@ -292,8 +292,15 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         }
 
         if set(data_dict) != set(range(len(args), self.ndim)):
+            expected = set(range(len(args), self.ndim))
+            provided = set(data_dict)
+
+            missing = expected - provided
+            missing_values = [self.axes[i].name for i in missing]
+
             raise TypeError(
-                "All axes must be accounted for in fill, you may have used a disallowed name in the axes"
+                f"Missing values for single/multiple axis : {missing_values}."
+                f"Expected axes : {[ax.name for ax in self.axes]}"
             )
 
         data = (data_dict[i] for i in range(len(args), self.ndim))
