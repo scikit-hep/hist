@@ -863,14 +863,14 @@ def test_plot_ratio_misalignment():
 
     captured = {}
 
-    def record_x(x, *a, **k):
-        captured["x"] = x
+    def record_x(_self, x, *a, **k):
+        captured["x"] = np.asarray(x)
 
     class Ax:
         errorbar = record_x
         bar = record_x
 
-        def aaxhline(self, *a, **k):
+        def axhline(self, *a, **k):
             return None
 
         def set_xlim(self, *a, **k):
@@ -882,9 +882,9 @@ def test_plot_ratio_misalignment():
         def set_xlabel(self, *a, **k):
             return None
 
-        def setI_ylabel(self, *a, **K):
+        def set_ylabel(self, *a, **K):
             return None
 
     plot_ratio_array(h, ratio, ratio_uncert, ax=Ax(), uncert_draw_type="line")
 
-    assert np.all(captured["x"] == h.axes[0].edges[:-1])
+    assert np.allclose(captured["x"], h.axes[0].edges[:-1])
