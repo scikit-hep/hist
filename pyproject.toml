@@ -79,7 +79,6 @@ dask = [
 plot = [
     "matplotlib >=3.10",
     "mplhep >=0.3.33",
-    "pyparsing>=3.0,<3.3; python_version<'3.10'"
 ]
 fit = [
     "scipy >=1.7.0",
