@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import matplotlib as mpl
 import pytest
-import matplotlib
-matplotlib.use("Agg")
+
+mpl.use("Agg")
 
 mpl.use("Agg")
 

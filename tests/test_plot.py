@@ -849,33 +849,42 @@ def test_plot1d_legend_1d_histogram():
     plt.close(fig)
 
 
-def test_plot_ratio_misalignment() : 
-    import hist 
-    import numpy as np 
+def test_plot_ratio_misalignment():
+    import numpy as np
+
+    import hist
     from hist.plot import plot_ratio_array
 
-    h = hist.new.Int(0,3,name = "x").Double() 
-    h.fill([0,1,2])
+    h = hist.new.Int(0, 3, name="x").Double()
+    h.fill([0, 1, 2])
 
     ratio = np.ones(3)
-    ratio_uncert = np.zeros((2,3))
+    ratio_uncert = np.zeros((2, 3))
 
     captured = {}
 
-    def record_x(self, x , *a, **k) : 
-        captured["x"] = x 
+    def record_x(x, *a, **k):
+        captured["x"] = x
 
-    class Ax : 
-        errorbar = record_x 
-        bar = record_x 
-        axhline = lambda *a, **k : None 
-        set_xlim = lambda *a, **k: None
-        set_ylim = lambda *a, **k: None
-        set_xlabel = lambda *a, **k: None
-        set_ylabel = lambda *a, **k: None
+    class Ax:
+        errorbar = record_x
+        bar = record_x
 
-    plot_ratio_array ( 
-        h, ratio, ratio_uncert, ax = Ax(), uncert_draw_type = "line"
-    )
+        def aaxhline(self, *a, **k):
+            return None
+
+        def set_xlim(self, *a, **k):
+            return None
+
+        def set_ylim(self, *a, **K):
+            return None
+
+        def set_xlabel(self, *a, **k):
+            return None
+
+        def setI_ylabel(self, *a, **K):
+            return None
+
+    plot_ratio_array(h, ratio, ratio_uncert, ax=Ax(), uncert_draw_type="line")
 
     assert np.all(captured["x"] == h.axes[0].edges[:-1])
