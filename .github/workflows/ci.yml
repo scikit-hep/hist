@@ -94,7 +94,7 @@ jobs:
   pass:
     if: always()
     needs: [pylint, checks, minimums]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     timeout-minutes: 2
     steps:
       - name: Decide whether the needed jobs succeeded or failed
