@@ -847,3 +847,44 @@ def test_plot1d_legend_1d_histogram():
     assert artists is not None
 
     plt.close(fig)
+
+
+def test_plot_ratio_misalignment():
+    import numpy as np
+
+    import hist
+    from hist.plot import plot_ratio_array
+
+    h = hist.new.Int(0, 3, name="x").Double()
+    h.fill([0, 1, 2])
+
+    ratio = np.ones(3)
+    ratio_uncert = np.zeros((2, 3))
+
+    captured = {}
+
+    def record_x(_self, x, *a, **k):
+        captured["x"] = np.asarray(x)
+
+    class Ax:
+        errorbar = record_x
+        bar = record_x
+
+        def axhline(self, *a, **k):
+            return None
+
+        def set_xlim(self, *a, **k):
+            return None
+
+        def set_ylim(self, *a, **K):
+            return None
+
+        def set_xlabel(self, *a, **k):
+            return None
+
+        def set_ylabel(self, *a, **K):
+            return None
+
+    plot_ratio_array(h, ratio, ratio_uncert, ax=Ax(), uncert_draw_type="line")
+
+    assert np.allclose(captured["x"], h.axes[0].edges[:-1])
