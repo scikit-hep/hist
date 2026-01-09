@@ -253,6 +253,11 @@ class StrCategory(AxesMixin, bha.StrCategory, family=hist):
         __dict__: dict[str, Any] | None = None,
     ) -> None:
         has_flow = flow if overflow is None else overflow
+
+        categories = list(categories)
+        if len(categories)!=len(set(categories)) :
+            raise ValueError("Categorical axis entries must be unique") 
+        
         super().__init__(
             categories,
             metadata=metadata,
