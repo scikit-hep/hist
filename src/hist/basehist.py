@@ -310,7 +310,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
             and args
             and hasattr(weight, "__len__")
             and hasattr(args[0], "__len__")
-            and len(weight) != len(args[0])
+            and len(weight) != len(args[0])  # type: ignore[arg-type]
         ):
             raise ValueError(
                 "Weight array must match the length of the input data for a given data"
