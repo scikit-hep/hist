@@ -59,11 +59,11 @@ Changelog = "https://hist.readthedocs.io/en/latest/changelog.html"
 [project.optional-dependencies]
 # Keep in sync with dependency-groups below
 mpl = [
-    "matplotlib >=3.10",
+    "matplotlib >=3.10.7",
     "mplhep >=0.3.33",
 ]
 plot = [
-    "matplotlib >=3.10",
+    "matplotlib >=3.10.7",
     "mplhep >=0.3.33",
 ]
 fit = [
@@ -77,7 +77,7 @@ dask = [
 
 [dependency-groups]
 plot = [
-    "matplotlib >=3.10",
+    "matplotlib >=3.10.7",
     "mplhep >=0.3.33",
 ]
 fit = [
