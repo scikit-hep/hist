@@ -65,13 +65,13 @@ def test_axis_disallowed_names():
     with pytest.warns(UserWarning, match="threads is a protected keyword"):
         hist.Hist(axis.Regular(10, 0, 10, name="threads"))
 
-def test_duplicate_strcategory() : 
-    import hist 
-   
-    try : 
-        hist.axis.StrCategory(["a","a"])
-        assert False, "Axis creation should have failed due to duplicate categories"
-   
-    except ValueError : 
-        assert True 
-        
+
+def test_duplicate_strcategory():
+    import hist
+
+    try:
+        hist.axis.StrCategory(["a", "a"])
+        raise  RuntimeError("Axis creation should have failed due to duplicate categories")
+
+    except ValueError:
+        pass 
