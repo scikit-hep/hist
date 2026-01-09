@@ -98,19 +98,23 @@ class NamedHist(BaseHist, family=hist):
             # Partition into user and non-user args
             user_kwargs_broadcast = {
                 k: v
-                for k, v in zip(destructured, broadcast[: len(destructured)])
+                for k, v in zip(
+                    destructured, broadcast[: len(destructured)], strict=True
+                )
                 if k in axis_names
             }
             non_user_kwargs_broadcast = dict(
-                zip(non_user_kwargs, broadcast[len(destructured) :])
+                zip(non_user_kwargs, broadcast[len(destructured) :], strict=True)
             )
         # Multiple args: broadcast and flatten!
         else:
             inputs = (*kwargs.values(), *non_user_kwargs.values())
             broadcast = interop.broadcast_and_flatten(inputs)
-            user_kwargs_broadcast = dict(zip(kwargs, broadcast[: len(kwargs)]))
+            user_kwargs_broadcast = dict(
+                zip(kwargs, broadcast[: len(kwargs)], strict=True)
+            )
             non_user_kwargs_broadcast = dict(
-                zip(non_user_kwargs, broadcast[len(kwargs) :])
+                zip(non_user_kwargs, broadcast[len(kwargs) :], strict=True)
             )
         return self.fill(
             **user_kwargs_broadcast,
