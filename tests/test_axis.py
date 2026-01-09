@@ -71,7 +71,9 @@ def test_duplicate_strcategory():
 
     try:
         hist.axis.StrCategory(["a", "a"])
-        raise  RuntimeError("Axis creation should have failed due to duplicate categories")
+        raise RuntimeError(
+            "Axis creation should have failed due to duplicate categories"
+        )
 
     except ValueError:
-        pass 
+        pass
