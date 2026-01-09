@@ -55,6 +55,7 @@ def minimums(session):
     """
 
     session.install("-e.", "--group=test", "--resolution=lowest-direct")
+    session.run("uv", "pip", "list")
     session.run("pytest", *session.posargs)
 
 
