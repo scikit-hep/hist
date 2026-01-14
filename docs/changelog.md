@@ -1,5 +1,60 @@
 # Changelog
 
+
+## Version 2.9.2
+
+Fixes:
+
+* Revert [#654](https://github.com/scikit-hep/hist/pull/654), caused issues with some fills.
+  [#662](https://github.com/scikit-hep/hist/pull/662)
+
+Tests:
+
+* Add testing for dask-awkward.
+  [#663](https://github.com/scikit-hep/hist/pull/663)
+
+
+CI:
+
+* Bump the image used for docs.
+  [#664](https://github.com/scikit-hep/hist/pull/664)
+
+## Version 2.9.1
+
+Fixes:
+
+* Improve error message for invalid weighted fill
+  [#654](https://github.com/scikit-hep/hist/pull/654)
+* Improved error message for missing axes in `Hist.fill`
+  [#651](https://github.com/scikit-hep/hist/pull/651)
+* Misaligned ratio plots for `Int` axes
+  [#655](https://github.com/scikit-hep/hist/pull/655)
+
+Tests:
+
+* Modernize config slightly
+  [#642](https://github.com/scikit-hep/hist/pull/642)
+* pytest `log_level` is better than `log_cli_level`
+  [#645](https://github.com/scikit-hep/hist/pull/645)
+
+CI:
+
+* GHA release notes now require bot suffix
+  [#658](https://github.com/scikit-hep/hist/pull/658)
+* Avoid deprecation warning from pyparsing in some jobs
+  [#657](https://github.com/scikit-hep/hist/pull/657)
+
+Documentation:
+
+* Add agoose77 as a contributor for code, and doc
+  [#656](https://github.com/scikit-hep/hist/pull/656)
+* Add missing links to changelog
+  [#633](https://github.com/scikit-hep/hist/pull/633)
+* Improved plotting kwargs documentation
+  [#652](https://github.com/scikit-hep/hist/pull/652)
+* One more missing author
+  [#634](https://github.com/scikit-hep/hist/pull/634)
+
 ## Version 2.9.0
 
 Features:
