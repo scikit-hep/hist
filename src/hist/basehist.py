@@ -305,25 +305,6 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
         data = (data_dict[i] for i in range(len(args), self.ndim))
 
-        def can_check_length(x: Any) -> bool:
-            is_dak_like = all(
-                hasattr(x, attr)
-                for attr in ["__dask_graph__", "layout", "fields", "known_divisions"]
-            )
-            return x.known_divisions if is_dak_like else hasattr(x, "__len__")
-
-        # Quick check for a common mistake with a weighted fill
-        if (
-            weight is not None
-            and args
-            and can_check_length(weight)
-            and can_check_length(args[0])
-            and len(weight) != len(args[0])
-        ):
-            raise ValueError(
-                "Weight array must match the length of the input data for a given data"
-            )
-
         return super().fill(*args, *data, weight=weight, sample=sample, threads=threads)
 
     def fill_flattened(
