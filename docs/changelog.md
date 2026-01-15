@@ -8,14 +8,12 @@ Fixes:
 * Revert [#654](https://github.com/scikit-hep/hist/pull/654), caused issues with some fills.
   [#662](https://github.com/scikit-hep/hist/pull/662)
 
-Tests:
+Tests/CI:
 
 * Add testing for dask-awkward.
   [#663](https://github.com/scikit-hep/hist/pull/663)
-
-
-CI:
-
+* Enable dask tests in python 3.14
+  [#666](https://github.com/scikit-hep/hist/pull/666)
 * Bump the image used for docs.
   [#664](https://github.com/scikit-hep/hist/pull/664)
 
