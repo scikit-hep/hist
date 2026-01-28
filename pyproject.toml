@@ -39,7 +39,7 @@ keywords = [
 ]
 requires-python = ">=3.10"
 dependencies = [
-    "boost-histogram>=1.5,<1.7",
+    "boost-histogram>=1.6,<1.8",
     "histoprint>=2.2.0",
     'numpy>=1.21.3',
     'typing-extensions>=4;python_version<"3.11"',

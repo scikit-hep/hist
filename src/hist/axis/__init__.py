@@ -31,7 +31,6 @@ def __dir__() -> tuple[str, ...]:
 
 
 class CoreAxisProtocol(Protocol):
-    metadata: dict[str, Any]  # boost-histogram < 1.6
     raw_metadata: dict[str, Any]
 
 
@@ -55,9 +54,6 @@ class AxesMixin:
 
     @property
     def _raw_metadata(self: AxisProtocol) -> dict[str, Any]:
-        # boost-histogram < 1.6
-        if hasattr(self._ax, "metadata"):
-            return self._ax.metadata
         return self._ax.raw_metadata
 
     @property
