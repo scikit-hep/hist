@@ -23,6 +23,7 @@ __all__ = [
 ]
 
 try:
+    # pylint: disable-next=unused-import
     from boost_histogram.storage import MultiCell
 
     __all__ += ["MultiCell"]

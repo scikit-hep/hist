@@ -718,6 +718,13 @@ def _plot_ratiolike(
 
         main_ax_artists = self_artists, other_artists
 
+        # Compute histogram uncertainties for pull plots
+        variances = self.variances()
+        if variances is None:
+            msg = "Cannot compute from a variance-less histogram, try a Weight storage"
+            raise RuntimeError(msg)
+        hist_values_uncert = np.sqrt(variances)
+
     subplot_ax_artists: RatiolikeArtists  # Type now due to control flow
     # Compute ratios: containing no INF values
     with np.errstate(divide="ignore", invalid="ignore"):
