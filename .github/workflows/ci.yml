@@ -53,18 +53,13 @@ jobs:
       run: uv venv
 
     - name: Install package
-      if: matrix.python-version == '3.14'
-      run: uv pip install -e. --group test
-
-    - name: Install package (dask)
-      if: matrix.python-version != '3.14'
-      run: uv pip install -e ".[dask]" --group test
+      run: uv pip install -e . --group test --group dask
 
     - name: Test package
       run: .venv/bin/python -m pytest
 
     - name: Install plotting requirements too
-      run: uv pip install -e ".[plot]"
+      run: uv pip install -e . --group plot
 
     - name: Test plotting too
       run: .venv/bin/python -m pytest --mpl
