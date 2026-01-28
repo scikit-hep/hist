@@ -21,7 +21,6 @@ classifiers = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -38,11 +37,11 @@ keywords = [
     "boost-histogram",
     "dask-histogram",
 ]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
     "boost-histogram>=1.5,<1.7",
     "histoprint>=2.2.0",
-    'numpy>=1.19.3',
+    'numpy>=1.21.3',
     'typing-extensions>=4;python_version<"3.11"',
 ]
 dynamic = ["version"]
@@ -60,16 +59,16 @@ Changelog = "https://hist.readthedocs.io/en/latest/changelog.html"
 [project.optional-dependencies]
 # Keep in sync with dependency-groups below
 mpl = [
-    "matplotlib >=3.8",
+    "matplotlib >=3.10.7",
     "mplhep >=0.3.33",
 ]
 plot = [
-    "matplotlib >=3.8",
+    "matplotlib >=3.10.7",
     "mplhep >=0.3.33",
 ]
 fit = [
-    "scipy >=1.5.4",
-    "iminuit >=2",
+    "scipy >=1.7.0",
+    "iminuit >=2.9.0",
 ]
 dask = [
     "dask[dataframe] >=2022,<2025",
@@ -79,13 +78,12 @@ dask = [
 
 [dependency-groups]
 plot = [
-    "matplotlib >=3.8",
+    "matplotlib >=3.10.7",
     "mplhep >=0.3.33",
-    "pyparsing>=3.0,<3.3; python_version<'3.10'"
 ]
 fit = [
-    "scipy >=1.5.4",
-    "iminuit >=2; python_version<'3.14'",
+    "scipy >=1.7.0",
+    "iminuit >=2.9.0",
 ]
 dask = [
     "dask[dataframe] >=2022,<2025",
@@ -143,7 +141,7 @@ filterwarnings = [
 [tool.mypy]
 warn_unused_configs = true
 files = "src"
-python_version = "3.9"
+python_version = "3.10"
 strict = true
 enable_error_code = ["ignore-without-code", "truthy-bool", "redundant-expr"]
 warn_unreachable = true
@@ -163,7 +161,7 @@ ignore_missing_imports = true
 
 
 [tool.pylint]
-py-version = "3.9"
+py-version = "3.10"
 extension-pkg-allow-list = ["boost_histogram._core"]
 reports.output-format = "colorized"
 similarities.ignore-imports = "yes"

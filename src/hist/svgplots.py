@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from typing import Any, Callable
+import itertools
+from collections.abc import Callable
+from typing import Any
 
 import numpy as np
 from boost_histogram.axis import Axis
@@ -70,7 +72,7 @@ def svg_hist_1d(h: hist.BaseHist) -> svg:
     (edges,) = h.axes.edges
     norm_edges = (edges - edges[0]) / (edges[-1] - edges[0])
     density = h.density()
-    max_dens: float = np.amax(density) or 1  # type: ignore[redundant-expr, unreachable]
+    max_dens: float = np.amax(density) or 1
     norm_vals: np.typing.NDArray[Any] = density / max_dens
 
     arr: np.typing.NDArray[np.float64] = np.empty(
@@ -121,7 +123,7 @@ def svg_hist_1d_c(h: hist.BaseHist) -> svg:
     (edges,) = h.axes.edges
     norm_edges = (edges - edges[0]) / (edges[-1] - edges[0]) * np.pi * 2
     density = h.density()
-    max_dens = np.amax(density) or 1  # type: ignore[redundant-expr, var-annotated, unreachable]
+    max_dens = np.amax(density) or 1
     norm_vals: np.typing.NDArray[Any] = density / max_dens
 
     arr: np.typing.NDArray[np.float64] = np.empty((2, len(norm_vals) * 2), dtype=float)
@@ -132,7 +134,7 @@ def svg_hist_1d_c(h: hist.BaseHist) -> svg:
     xs = arr[1] * np.cos(arr[0])
     ys = arr[1] * np.sin(arr[0])
 
-    points = " ".join(f"{x:3g},{y:.3g}" for x, y in zip(xs, ys))
+    points = " ".join(f"{x:3g},{y:.3g}" for x, y in zip(xs, ys, strict=True))
     bins = polygon(points=points, style="fill:none; stroke:currentColor;")
 
     center = circle(
@@ -155,13 +157,13 @@ def svg_hist_2d(h: hist.BaseHist) -> svg:
     ey = -(e1 - e1[0]) / (e1[-1] - e1[0]) * height
 
     density = h.density()
-    max_dens = np.amax(density) or 1  # type: ignore[redundant-expr, var-annotated, unreachable]
+    max_dens = np.amax(density) or 1
     norm_vals: np.typing.NDArray[Any] = density / max_dens
 
     boxes = []
-    for r, (up_edge, bottom_edge) in enumerate(zip(ey[:-1], ey[1:])):
+    for r, (up_edge, bottom_edge) in enumerate(itertools.pairwise(ey)):
         ht = up_edge - bottom_edge
-        for c, (left_edge, right_edge) in enumerate(zip(ex[:-1], ex[1:])):
+        for c, (left_edge, right_edge) in enumerate(itertools.pairwise(ex)):
             opacity = norm_vals[c, r]
             wt = left_edge - right_edge
             boxes.append(

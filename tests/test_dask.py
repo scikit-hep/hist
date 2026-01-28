@@ -146,11 +146,11 @@ def test_unnamed_5D_strcat_intcat_rectangular(
 
     assert len(h.axes[0]) == 2
     assert len(control.axes[0]) == 2
-    assert all(cx == hx for cx, hx in zip(control.axes[0], h.axes[0]))
+    assert all(cx == hx for cx, hx in zip(control.axes[0], h.axes[0], strict=True))
 
     assert len(h.axes[1]) == 2
     assert len(control.axes[1]) == 2
-    assert all(cx == hx for cx, hx in zip(control.axes[1], h.axes[1]))
+    assert all(cx == hx for cx, hx in zip(control.axes[1], h.axes[1], strict=True))
 
 
 @pytest.mark.parametrize("use_weights", [True, False])
@@ -205,8 +205,8 @@ def test_named_5D_strcat_intcat_rectangular(named_dask_hist, use_weights):
 
     assert len(h.axes[0]) == 2
     assert len(control.axes[0]) == 2
-    assert all(cx == hx for cx, hx in zip(control.axes[0], h.axes[0]))
+    assert all(cx == hx for cx, hx in zip(control.axes[0], h.axes[0], strict=True))
 
     assert len(h.axes[1]) == 2
     assert len(control.axes[1]) == 2
-    assert all(cx == hx for cx, hx in zip(control.axes[1], h.axes[1]))
+    assert all(cx == hx for cx, hx in zip(control.axes[1], h.axes[1], strict=True))
