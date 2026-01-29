@@ -440,6 +440,7 @@ class ConstructProxy(QuickConstruct):
         )
 
     if hasattr(storage, "MultiCell"):
+
         def MultiCell(
             self,
             /,
@@ -452,7 +453,7 @@ class ConstructProxy(QuickConstruct):
         ) -> BaseHist:
             return self.hist_class(
                 *self.axes,
-                storage=storage.MultiCell(nelem),
+                storage=storage.MultiCell(nelem),  # type: ignore[call-arg]
                 metadata=metadata,
                 data=data,
                 label=label,

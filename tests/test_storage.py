@@ -14,6 +14,7 @@ def test_has_multi_cell():
     if bh_version >= packaging.version.Version("1.7"):
         assert "MultiCell" in repr(hist.storage.MultiCell)
 
+
 def test_has_multi_cell_quick_construct():
     bh_version = packaging.version.Version(
         importlib.metadata.version("boost_histogram")
