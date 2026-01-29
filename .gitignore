@@ -145,3 +145,7 @@ dmypy.json
 /yarn.lock
 
 banner_slides.pdf
+
+# Lock files
+uv.lock
+*pylock

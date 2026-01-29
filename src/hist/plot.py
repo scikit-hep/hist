@@ -672,6 +672,7 @@ def _plot_ratiolike(
 
     # Computation and Fit
     hist_values = self.values()
+    hist_values_uncert: np.typing.NDArray[Any] | None = None
 
     main_ax_artists: MainAxisArtists  # Type now due to control flow
     if callable(other) or isinstance(other, str):
@@ -718,6 +719,11 @@ def _plot_ratiolike(
 
         main_ax_artists = self_artists, other_artists
 
+        # Compute histogram uncertainties for pull plots
+        variances = self.variances()
+        if variances is not None:
+            hist_values_uncert = np.sqrt(variances)
+
     subplot_ax_artists: RatiolikeArtists  # Type now due to control flow
     # Compute ratios: containing no INF values
     with np.errstate(divide="ignore", invalid="ignore"):
@@ -734,6 +740,9 @@ def _plot_ratiolike(
             )
 
         elif view == "pull":
+            if hist_values_uncert is None:
+                msg = "Cannot compute from a variance-less histogram, try a Weight storage"
+                raise RuntimeError(msg)
             pulls: np.typing.NDArray[Any] = (
                 hist_values - compare_values
             ) / hist_values_uncert

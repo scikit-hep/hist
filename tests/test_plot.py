@@ -318,6 +318,40 @@ def test_general_plot_pull():
     plt.close("all")
 
 
+def test_general_plot_pull_with_hist():
+    """
+    Test plot_pull with histogram comparison -- whether 1d-Hist can be plotted pull
+    with another histogram as reference properly.
+    """
+    np.random.seed(42)
+
+    h1 = Hist(
+        axis.Regular(
+            50, -4, 4, name="S", label="s [units]", underflow=False, overflow=False
+        )
+    ).fill(np.random.normal(size=10))
+
+    h2 = Hist(
+        axis.Regular(
+            50, -4, 4, name="S", label="s [units]", underflow=False, overflow=False
+        )
+    ).fill(np.random.normal(loc=0.1, size=12))
+
+    # Test pull plot with histogram comparison
+    assert h1.plot_pull(h2)
+
+    # Test with custom kwargs
+    assert h1.plot_pull(
+        h2,
+        bar_fc="orange",
+        pp_num=6,
+        pp_fc="orange",
+        pp_alpha=0.618,
+    )
+
+    plt.close("all")
+
+
 def test_named_plot1d():
     """
     Test named plot1d -- whether 1d-NamedHist can be plotted properly.
