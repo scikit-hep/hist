@@ -439,6 +439,26 @@ class ConstructProxy(QuickConstruct):
             name=name,
         )
 
+    if hasattr(storage, "MultiCell"):
+        def MultiCell(
+            self,
+            /,
+            nelem: int,
+            *,
+            metadata: Any = None,
+            data: np.typing.NDArray[Any] | None = None,
+            label: str | None = None,
+            name: str | None = None,
+        ) -> BaseHist:
+            return self.hist_class(
+                *self.axes,
+                storage=storage.MultiCell(nelem),
+                metadata=metadata,
+                data=data,
+                label=label,
+                name=name,
+            )
+
 
 class MetaConstructor(type):
     @property
