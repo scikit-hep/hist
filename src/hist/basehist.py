@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import fnmatch
 import functools
+import importlib.metadata
 import itertools
 import operator
 import typing
@@ -12,6 +13,7 @@ from typing import Any, Generic, Protocol, SupportsIndex, TypeVar, Union
 import boost_histogram as bh
 import histoprint
 import numpy as np
+import packaging.version
 
 import hist
 
@@ -69,9 +71,17 @@ def process_mistaken_quick_construct(
 NO_METADATA = object()
 
 S = TypeVar("S", bound=bh.storage.Storage)
+bh_version = packaging.version.Version(importlib.metadata.version("boost-histogram"))
+if typing.TYPE_CHECKING or bh_version >= packaging.version.Version("1.7.1"):
+    _Histogram = bh.Histogram
+else:
+
+    class _Histogram:
+        def __class_getitem__(cls, arg):
+            return bh.Histogram
 
 
-class BaseHist(bh.Histogram[S], Generic[S], metaclass=MetaConstructor, family=hist):
+class BaseHist(_Histogram[S], Generic[S], metaclass=MetaConstructor, family=hist):
     __slots__ = ()
 
     @typing.overload

@@ -42,6 +42,7 @@ dependencies = [
     "boost-histogram>=1.6,<1.8",
     "histoprint>=2.2.0",
     'numpy>=1.21.3',
+    'packaging>=23',
     'typing-extensions>=4;python_version<"3.11"',
 ]
 dynamic = ["version"]
