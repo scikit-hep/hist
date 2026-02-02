@@ -7,12 +7,7 @@ import operator
 import typing
 import warnings
 from collections.abc import Callable, Generator, Iterator, Mapping, Sequence
-from typing import (
-    Any,
-    Protocol,
-    SupportsIndex,
-    Union,
-)
+from typing import Any, Generic, Protocol, SupportsIndex, TypeVar, Union
 
 import boost_histogram as bh
 import histoprint
@@ -73,8 +68,10 @@ def process_mistaken_quick_construct(
 
 NO_METADATA = object()
 
+S = TypeVar("S", bound=bh.storage.Storage)
 
-class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
+
+class BaseHist(bh.Histogram[S], Generic[S], metaclass=MetaConstructor, family=hist):
     __slots__ = ()
 
     @typing.overload
@@ -92,7 +89,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
     @typing.overload
     def __init__(
         self,
-        arg: Self | bh.Histogram,
+        arg: Self | bh.Histogram[S],
         /,
         *,
         data: np.typing.NDArray[Any] | None = ...,
@@ -105,7 +102,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
     def __init__(
         self,
         *axes: AxisTypes | Storage | str,
-        storage: Storage = ...,
+        storage: S = ...,
         metadata: Any = ...,
         data: np.typing.NDArray[Any] | None = ...,
         label: str | None = ...,
@@ -114,7 +111,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
     def __init__(
         self,
-        *in_args: Self | bh.Histogram | dict[str, Any] | AxisTypes | Storage | str,
+        *in_args: Self | bh.Histogram[S] | dict[str, Any] | AxisTypes | Storage | str,
         storage: Storage | str | None = None,
         metadata: Any = NO_METADATA,
         data: np.typing.NDArray[Any] | None = None,
@@ -124,8 +121,9 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         """
         Initialize BaseHist object. Axis params can contain the names.
         """
-        self._hist: Any = None
-        self.axes: NamedAxesTuple
+        # Making the histogram generic seems to confuse PyLint's slots check
+        self._hist: Any = None  # pylint: disable=assigning-non-slot
+        self.axes: NamedAxesTuple  # pylint: disable=assigning-non-slot
 
         args: tuple[AxisTypes, ...]
 
@@ -176,8 +174,8 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         if data is not None:
             self[...] = data
 
-        self.name = name
-        self.label = label
+        self.name = name  # pylint: disable=assigning-non-slot
+        self.label = label  # pylint: disable=assigning-non-slot
 
     def _generate_axes_(self) -> NamedAxesTuple:
         """
@@ -254,7 +252,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         self.fill(**data_list, weight=weight_arr)  # type: ignore[arg-type]
         return self
 
-    def project(self, *args: int | str) -> Self | float | bh.accumulators.Accumulator:
+    def project(self, *args: int | str) -> Self:
         """
         Projection of axis idx.
         """
@@ -263,7 +261,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
     @property
     def T(self) -> Self:
-        return self.project(*reversed(range(self.ndim)))  # type: ignore[return-value]
+        return self.project(*reversed(range(self.ndim)))
 
     def fill(
         self,
@@ -478,9 +476,54 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
         return tuple(self._loc_shortcut(v, i) for i, (v) in enumerate(index))  # type: ignore[arg-type]
 
-    def __getitem__(  # type: ignore[override]
+    @typing.overload  # type: ignore[override]
+    def __getitem__(
+        self: BaseHist[bh.storage.Double], index: IndexingExpr
+    ) -> BaseHist[bh.storage.Double] | float: ...
+
+    @typing.overload
+    def __getitem__(
+        self: BaseHist[bh.storage.Int64], index: IndexingExpr
+    ) -> BaseHist[bh.storage.Int64] | int: ...
+
+    @typing.overload
+    def __getitem__(
+        self: BaseHist[bh.storage.AtomicInt64], index: IndexingExpr
+    ) -> BaseHist[bh.storage.AtomicInt64] | int: ...
+
+    @typing.overload
+    def __getitem__(
+        self: BaseHist[bh.storage.Unlimited], index: IndexingExpr
+    ) -> BaseHist[bh.storage.Unlimited] | int | float: ...
+
+    @typing.overload
+    def __getitem__(
+        self: BaseHist[bh.storage.MultiCell], index: IndexingExpr
+    ) -> BaseHist[bh.storage.MultiCell] | list[float]: ...
+
+    @typing.overload
+    def __getitem__(
+        self: BaseHist[bh.storage.Weight], index: IndexingExpr
+    ) -> BaseHist[bh.storage.Weight] | bh.accumulators.WeightedSum: ...
+
+    @typing.overload
+    def __getitem__(
+        self: BaseHist[bh.storage.Mean], index: IndexingExpr
+    ) -> BaseHist[bh.storage.Mean] | bh.accumulators.Mean: ...
+
+    @typing.overload
+    def __getitem__(
+        self: BaseHist[bh.storage.WeightedMean], index: IndexingExpr
+    ) -> BaseHist[bh.storage.WeightedMean] | bh.accumulators.WeightedMean: ...
+
+    @typing.overload
+    def __getitem__(
         self, index: IndexingExpr
-    ) -> Self | float | bh.accumulators.Accumulator:
+    ) -> Self | float | list[float] | int | bh.accumulators.Accumulator: ...
+
+    def __getitem__(
+        self, index: IndexingExpr
+    ) -> Self | float | int | list[float] | bh.accumulators.Accumulator:
         """
         Get histogram item.
         """
@@ -666,7 +709,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
     def plot_ratio(
         self,
-        other: hist.BaseHist
+        other: hist.BaseHist[Any]
         | Callable[[np.typing.NDArray[Any]], np.typing.NDArray[Any]]
         | str,
         *,
@@ -714,13 +757,13 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
         return plot.plot_pie(self, ax=ax, **kwargs)
 
-    def stack(self, axis: int | str) -> hist.stack.Stack:
+    def stack(self, axis: int | str) -> hist.stack.Stack[S]:
         """
         Returns a stack from a normal histogram axes.
         """
         if self.ndim < 2:
             raise RuntimeError("Cannot stack with less than two axis")
-        stack_histograms: Iterator[BaseHist] = [  # type: ignore[assignment]
+        stack_histograms: Iterator[BaseHist[S]] = [  # type: ignore[assignment]
             self[{axis: i}] for i in range(len(self.axes[axis]))
         ]
         for name, h in zip(self.axes[axis], stack_histograms, strict=True):
@@ -733,7 +776,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         name: int | str,
         i_or_list: InnerIndexing | list[str | int] | None = None,
         j: InnerIndexing | None = None,
-    ) -> Self | float | bh.accumulators.Accumulator:
+    ) -> Self | int | float | list[float] | bh.accumulators.Accumulator:
         if isinstance(i_or_list, list):
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
@@ -743,24 +786,3 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
                 return selection[{name: slice(0, len(i_or_list), sum)}]
 
         return self[{name: slice(i_or_list, j, sum)}]
-
-    def sum(self, flow: bool = False) -> float | bh.accumulators.Accumulator:
-        """
-        Compute the sum over the histogram bins (optionally including the flow bins).
-        """
-        # TODO: This method will go away once we can guarantee a modern boost-histogram (1.3.2 or better)
-        if any(x == 0 for x in (self.axes.extent if flow else self.axes.size)):
-            storage = self.storage_type
-            if issubclass(storage, (bh.storage.AtomicInt64, bh.storage.Int64)):
-                return 0
-            if issubclass(storage, (bh.storage.Double, bh.storage.Unlimited)):
-                return 0.0
-            if issubclass(storage, bh.storage.Weight):
-                return bh.accumulators.WeightedSum(0, 0)
-            if issubclass(storage, bh.storage.Mean):
-                return bh.accumulators.Mean(0, 0, 0)
-            if issubclass(storage, bh.storage.WeightedMean):
-                return bh.accumulators.WeightedMean(0, 0, 0, 0)
-            raise AssertionError(f"Unsupported storage type {storage}")
-
-        return super().sum(flow=flow)

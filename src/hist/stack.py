@@ -3,8 +3,9 @@ from __future__ import annotations
 import copy
 import typing
 from collections.abc import Iterator
-from typing import Any
+from typing import Any, Generic, TypeVar
 
+import boost_histogram as bh
 import histoprint
 import numpy as np
 
@@ -19,10 +20,13 @@ if typing.TYPE_CHECKING:
 __all__ = ("Stack",)
 
 
-class Stack:
+S = TypeVar("S", bound=bh.storage.Storage)
+
+
+class Stack(Generic[S]):
     def __init__(
         self,
-        *args: BaseHist,
+        *args: BaseHist[S],
     ) -> None:
         """
         Initialize Stack of histograms.
@@ -44,14 +48,14 @@ class Stack:
     __hash__ = None  # type: ignore[assignment]
 
     @classmethod
-    def from_iter(cls, iterable: typing.Iterable[BaseHist]) -> Self:
+    def from_iter(cls, iterable: typing.Iterable[BaseHist[S]]) -> Self:
         """
         Create a Stack from an iterable of histograms.
         """
         return cls(*iterable)
 
     @classmethod
-    def from_dict(cls, d: typing.Mapping[str, BaseHist]) -> Self:
+    def from_dict(cls, d: typing.Mapping[str, BaseHist[S]]) -> Self:
         """
         Create a Stack from a dictionary of histograms. The keys of the
         dictionary are used as names.
@@ -75,12 +79,12 @@ class Stack:
         raise IndexError(f"Name not found: {name}")
 
     @typing.overload
-    def __getitem__(self, val: int | str) -> BaseHist: ...
+    def __getitem__(self, val: int | str) -> BaseHist[S]: ...
 
     @typing.overload
     def __getitem__(self, val: slice) -> Self: ...
 
-    def __getitem__(self, val: int | slice | str) -> BaseHist | Self:
+    def __getitem__(self, val: int | slice | str) -> BaseHist[S] | Self:
         if isinstance(val, str):
             val = self._get_index(val)
         if isinstance(val, slice):
@@ -91,7 +95,7 @@ class Stack:
 
         return self._stack.__getitem__(val)
 
-    def __setitem__(self, key: int | str, value: BaseHist) -> None:
+    def __setitem__(self, key: int | str, value: BaseHist[S]) -> None:
         """
         Set a histogram in the Stack. Checks the axes of the histogram, they must match.
         """
@@ -104,7 +108,7 @@ class Stack:
 
         self._stack[key] = value
 
-    def __iter__(self) -> Iterator[BaseHist]:
+    def __iter__(self) -> Iterator[BaseHist[S]]:
         return iter(self._stack)
 
     def __len__(self) -> int:
@@ -200,7 +204,7 @@ class Stack:
         """
         Project the Stack onto a new axes.
         """
-        return self.__class__(*(h.project(*args) for h in self))  # type: ignore[arg-type]
+        return self.__class__(*(h.project(*args) for h in self))
 
 
 def __dir__() -> tuple[str, ...]:

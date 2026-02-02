@@ -160,9 +160,12 @@ def boost(session):
         session.chdir("boost-histogram")
         session.install(".")
     session.chdir(DIR)
-    session.install("-e.[test,plot]", "pip")
+    session.install(
+        "-e.", "--group=test", "--group=plot", "pip", "mypy", "pandas-stubs"
+    )
     session.run("pip", "list")
     session.run("pytest", *session.posargs)
+    session.run("mypy")
 
 
 if __name__ == "__main__":

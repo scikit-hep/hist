@@ -23,7 +23,7 @@ from .svgutils import (
 )
 
 
-def _desc_hist(h: hist.BaseHist) -> str:
+def _desc_hist(h: hist.BaseHist[Any]) -> str:
     main_sum = h.sum()
     flow_too_sum = h.sum(flow=True)
 
@@ -37,7 +37,9 @@ def _desc_hist(h: hist.BaseHist) -> str:
     return output
 
 
-def html_hist(h: hist.BaseHist, function: Callable[[hist.BaseHist], svg]) -> html:
+def html_hist(
+    h: hist.BaseHist[Any], function: Callable[[hist.BaseHist[Any]], svg]
+) -> html:
     left_column = div(function(h), style="width:290px;")
     right_column = div(_desc_hist(h), style="flex=grow:1;")
 
@@ -62,7 +64,7 @@ def make_ax_text(ax: Axis, **kwargs: SupportsStr) -> text:
     return make_text(ax.label or ax.name, **kwargs)
 
 
-def svg_hist_1d(h: hist.BaseHist) -> svg:
+def svg_hist_1d(h: hist.BaseHist[Any]) -> svg:
     width = 250
     height = 100
 
@@ -111,7 +113,7 @@ def svg_hist_1d(h: hist.BaseHist) -> svg:
     )
 
 
-def svg_hist_1d_c(h: hist.BaseHist) -> svg:
+def svg_hist_1d_c(h: hist.BaseHist[Any]) -> svg:
     width = 250
     height = 250
     radius = 100
@@ -147,7 +149,7 @@ def svg_hist_1d_c(h: hist.BaseHist) -> svg:
     return svg(bins, center, viewBox=f"{-width / 2} {-height / 2} {width} {height}")
 
 
-def svg_hist_2d(h: hist.BaseHist) -> svg:
+def svg_hist_2d(h: hist.BaseHist[Any]) -> svg:
     width = 250
     height = 250
     assert h.ndim == 2, "Must be 2D"
