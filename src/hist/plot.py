@@ -198,7 +198,7 @@ def _plot_keywords_wrapper(ax: matplotlib.axes.Axes, legend: bool | None) -> Non
 
 
 def plot2d_full(
-    self: hist.BaseHist,
+    self: hist.BaseHist[Any],
     *,
     ax_dict: dict[str, matplotlib.axes.Axes] | None = None,
     **kwargs: Any,
@@ -296,7 +296,7 @@ def plot2d_full(
 
 
 def _construct_gaussian_callable(
-    __hist: hist.BaseHist,
+    __hist: hist.BaseHist[Any],
 ) -> Callable[[np.typing.NDArray[Any]], np.typing.NDArray[Any]]:
     x_values = __hist.axes[0].centers
     hist_values = __hist.values()
@@ -324,7 +324,7 @@ def _construct_gaussian_callable(
 
 def _fit_callable_to_hist(
     model: Callable[[np.typing.NDArray[Any]], np.typing.NDArray[Any]],
-    histogram: hist.BaseHist,
+    histogram: hist.BaseHist[Any],
     likelihood: bool = False,
 ) -> tuple[
     np.typing.NDArray[Any],
@@ -361,7 +361,7 @@ def _fit_callable_to_hist(
 
 
 def _plot_fit_result(
-    __hist: hist.BaseHist,
+    __hist: hist.BaseHist[Any],
     model_values: np.typing.NDArray[Any],
     model_uncert: np.typing.NDArray[Any],
     ax: matplotlib.axes.Axes,
@@ -401,7 +401,7 @@ def _plot_fit_result(
 
 
 def plot_ratio_array(
-    __hist: hist.BaseHist,
+    __hist: hist.BaseHist[Any],
     ratio: np.typing.NDArray[Any],
     ratio_uncert: np.typing.NDArray[Any],
     ax: matplotlib.axes.Axes,
@@ -512,7 +512,7 @@ def plot_ratio_array(
 
 
 def plot_pull_array(
-    __hist: hist.BaseHist,
+    __hist: hist.BaseHist[Any],
     pulls: np.typing.NDArray[Any],
     ax: matplotlib.axes.Axes,
     bar_kwargs: dict[str, Any],
@@ -562,8 +562,8 @@ def plot_pull_array(
 
 
 def _plot_ratiolike(
-    self: hist.BaseHist,
-    other: hist.BaseHist
+    self: hist.BaseHist[Any],
+    other: hist.BaseHist[Any]
     | Callable[[np.typing.NDArray[Any]], np.typing.NDArray[Any]]
     | str,
     likelihood: bool = False,
@@ -765,7 +765,7 @@ def get_center(x: str | int | tuple[float, float]) -> str | float:
 
 
 def plot_pie(
-    self: hist.BaseHist,
+    self: hist.BaseHist[Any],
     *,
     ax: matplotlib.axes.Axes | None = None,
     **kwargs: Any,
@@ -782,7 +782,7 @@ def plot_pie(
 
 
 def plot_stack(
-    self: hist.stack.Stack,
+    self: hist.stack.Stack[Any],
     *,
     ax: matplotlib.axes.Axes | None = None,
     legend: bool | None = False,

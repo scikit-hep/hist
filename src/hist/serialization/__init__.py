@@ -11,11 +11,11 @@ from .. import Hist, __version__
 __all__ = ["from_uhi", "remove_writer_info", "to_uhi"]
 
 
-def from_uhi(data: dict[str, Any], /) -> Hist:
+def from_uhi(data: dict[str, Any], /) -> Hist[Any]:
     return Hist(bhs.from_uhi(data))
 
 
-def to_uhi(h: Histogram, /) -> dict[str, Any]:
+def to_uhi(h: Histogram[Any], /) -> dict[str, Any]:
     d = bhs.to_uhi(h)
     d["writer_info"]["hist"] = {"version": __version__}
     return d
