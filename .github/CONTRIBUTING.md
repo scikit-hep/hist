@@ -33,7 +33,7 @@ environment for each run. On Linux, it will run the `--mpl` tests. You can
 run the linux tests from anywhere with Docker:
 
 ```bash
-docker run --rm -v $PWD:/nox -w /nox -t quay.io/pypa/manylinux_2_28_x86_64:latest pipx run nox -s tests-3.9
+docker run --rm -v $PWD:/nox -w /nox -t quay.io/pypa/manylinux_2_28_x86_64:latest pipx run nox -s tests-3.10
 # Regenerate the MPL comparison images:
 docker run --rm -v $PWD:/nox -w /nox -t quay.io/pypa/manylinux_2_28_x86_64:latest pipx run nox -s regenerate
 ```
