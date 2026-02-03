@@ -1,6 +1,22 @@
 # Changelog
 
 
+## Version 2.10.0
+
+Features:
+
+* Remove Python 3.9 support.
+  [#646](https://github.com/scikit-hep/hist/pull/646)
+* Support boost-histogram 1.7 (including `MultiCell`) and drop boost-histogram 1.5
+  [#667](https://github.com/scikit-hep/hist/pull/667)
+
+Typing:
+
+* Adapt boost-histogram 1.7.1's new generic typing
+  [#668](https://github.com/scikit-hep/hist/pull/668)
+* Improve integrate type
+  [#670](https://github.com/scikit-hep/hist/pull/670)
+
 ## Version 2.9.2
 
 Fixes:

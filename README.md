@@ -20,7 +20,7 @@
 
 Hist is an analyst-friendly front-end for
 [boost-histogram](https://github.com/scikit-hep/boost-histogram), designed for
-Python 3.9+ (3.6-3.8 users get older versions). See [what's new](https://hist.readthedocs.io/en/latest/changelog.html).
+Python 3.10+ (3.6-3.9 users get older versions). See [what's new](https://hist.readthedocs.io/en/latest/changelog.html).
 
 ![Slideshow of features. See docs/banner_slides.md for text if the image is not readable.](https://github.com/scikit-hep/hist/raw/main/docs/_images/banner.gif)
 
@@ -48,7 +48,6 @@ Hist currently provides everything boost-histogram provides, and the following e
 
 - The `Hist` class augments `bh.Histogram` with simpler construction:
   - `flow=False` is a fast way to turn off flow for the axes on construction.
-  - Storages can be given by string.
   - `storage=` can be omitted, strings and storages can be positional.
   - `data=` can initialize a histogram with existing data.
   - `Hist.from_columns` can be used to initialize with a DataFrame or dict.
