@@ -71,6 +71,20 @@ def process_mistaken_quick_construct(
 NO_METADATA = object()
 
 S = TypeVar("S", bound=bh.storage.Storage)
+
+IntHists = TypeVar(
+    "IntHists", bound="BaseHist[bh.storage.AtomicInt64] | BaseHist[bh.storage.Int64]"
+)
+FloatHists = TypeVar(
+    "FloatHists", bound="BaseHist[bh.storage.Double] | BaseHist[bh.storage.Unlimited]"
+)
+ListHists = TypeVar("ListHists", bound="BaseHist[bh.storage.MultiCell]")
+WeightHists = TypeVar("WeightHists", bound="BaseHist[bh.storage.Weight]")
+MeanHists = TypeVar("MeanHists", bound="BaseHist[bh.storage.Mean]")
+WeightedMeanHists = TypeVar(
+    "WeightedMeanHists", bound="BaseHist[bh.storage.WeightedMean]"
+)
+
 bh_version = packaging.version.Version(importlib.metadata.version("boost-histogram"))
 if typing.TYPE_CHECKING or bh_version >= packaging.version.Version("1.7.1"):
     _Histogram = bh.Histogram
@@ -487,44 +501,30 @@ class BaseHist(_Histogram[S], Generic[S], metaclass=MetaConstructor, family=hist
         return tuple(self._loc_shortcut(v, i) for i, (v) in enumerate(index))  # type: ignore[arg-type]
 
     @typing.overload  # type: ignore[override]
-    def __getitem__(
-        self: BaseHist[bh.storage.Double], index: IndexingExpr
-    ) -> BaseHist[bh.storage.Double] | float: ...
+    def __getitem__(self: FloatHists, index: IndexingExpr) -> FloatHists | float: ...
+
+    @typing.overload
+    def __getitem__(self: IntHists, index: IndexingExpr) -> IntHists | int: ...
 
     @typing.overload
     def __getitem__(
-        self: BaseHist[bh.storage.Int64], index: IndexingExpr
-    ) -> BaseHist[bh.storage.Int64] | int: ...
+        self: ListHists, index: IndexingExpr
+    ) -> ListHists | list[float]: ...
 
     @typing.overload
     def __getitem__(
-        self: BaseHist[bh.storage.AtomicInt64], index: IndexingExpr
-    ) -> BaseHist[bh.storage.AtomicInt64] | int: ...
+        self: WeightHists, index: IndexingExpr
+    ) -> WeightHists | bh.accumulators.WeightedSum: ...
 
     @typing.overload
     def __getitem__(
-        self: BaseHist[bh.storage.Unlimited], index: IndexingExpr
-    ) -> BaseHist[bh.storage.Unlimited] | int | float: ...
+        self: MeanHists, index: IndexingExpr
+    ) -> MeanHists | bh.accumulators.Mean: ...
 
     @typing.overload
     def __getitem__(
-        self: BaseHist[bh.storage.MultiCell], index: IndexingExpr
-    ) -> BaseHist[bh.storage.MultiCell] | list[float]: ...
-
-    @typing.overload
-    def __getitem__(
-        self: BaseHist[bh.storage.Weight], index: IndexingExpr
-    ) -> BaseHist[bh.storage.Weight] | bh.accumulators.WeightedSum: ...
-
-    @typing.overload
-    def __getitem__(
-        self: BaseHist[bh.storage.Mean], index: IndexingExpr
-    ) -> BaseHist[bh.storage.Mean] | bh.accumulators.Mean: ...
-
-    @typing.overload
-    def __getitem__(
-        self: BaseHist[bh.storage.WeightedMean], index: IndexingExpr
-    ) -> BaseHist[bh.storage.WeightedMean] | bh.accumulators.WeightedMean: ...
+        self: WeightedMeanHists, index: IndexingExpr
+    ) -> WeightedMeanHists | bh.accumulators.WeightedMean: ...
 
     @typing.overload
     def __getitem__(
@@ -781,6 +781,70 @@ class BaseHist(_Histogram[S], Generic[S], metaclass=MetaConstructor, family=hist
 
         return hist.stack.Stack(*stack_histograms)
 
+    @typing.overload
+    def integrate(
+        self,
+        name: int | str,
+        i_or_list: list[str | int],
+        j: InnerIndexing | None = None,
+    ) -> Self: ...
+
+    @typing.overload
+    def integrate(
+        self: IntHists,
+        name: int | str,
+        i_or_list: InnerIndexing | None = None,
+        j: InnerIndexing | None = None,
+    ) -> IntHists | int: ...
+
+    @typing.overload
+    def integrate(
+        self: FloatHists,
+        name: int | str,
+        i_or_list: InnerIndexing | None = None,
+        j: InnerIndexing | None = None,
+    ) -> FloatHists | float: ...
+
+    @typing.overload
+    def integrate(
+        self: ListHists,
+        name: int | str,
+        i_or_list: InnerIndexing | None = None,
+        j: InnerIndexing | None = None,
+    ) -> ListHists | list[float]: ...
+
+    @typing.overload
+    def integrate(
+        self: WeightHists,
+        name: int | str,
+        i_or_list: InnerIndexing | None = None,
+        j: InnerIndexing | None = None,
+    ) -> WeightHists | bh.accumulators.WeightedSum: ...
+
+    @typing.overload
+    def integrate(
+        self: MeanHists,
+        name: int | str,
+        i_or_list: InnerIndexing | None = None,
+        j: InnerIndexing | None = None,
+    ) -> MeanHists | bh.accumulators.Mean: ...
+
+    @typing.overload
+    def integrate(
+        self: WeightedMeanHists,
+        name: int | str,
+        i_or_list: InnerIndexing | None = None,
+        j: InnerIndexing | None = None,
+    ) -> WeightedMeanHists | bh.accumulators.WeightedMean: ...
+
+    @typing.overload
+    def integrate(
+        self,
+        name: int | str,
+        i_or_list: InnerIndexing | None = None,
+        j: InnerIndexing | None = None,
+    ) -> Self | int | float | list[float] | bh.accumulators.Accumulator: ...
+
     def integrate(
         self,
         name: int | str,
@@ -791,7 +855,6 @@ class BaseHist(_Histogram[S], Generic[S], metaclass=MetaConstructor, family=hist
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
 
-                # TODO: We could teach the typing system that list always returns Self type
                 selection: Self = self[{name: i_or_list}]  # type: ignore[assignment, dict-item]
                 return selection[{name: slice(0, len(i_or_list), sum)}]
 
