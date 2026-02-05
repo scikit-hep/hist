@@ -1,5 +1,14 @@
 # Changelog
 
+## Version 2.10.1
+
+Fixes:
+
+* Patch repr of `MultiCell` for boost-histogram 1.7.0 and 1.7.1.
+  [#673](https://github.com/scikit-hep/hist/pull/673)
+* Relax optional dependency cap on dask.
+  [#672](https://github.com/scikit-hep/hist/pull/672)
+
 
 ## Version 2.10.0
 
