@@ -226,6 +226,14 @@ class BaseHist(_Histogram[S], Generic[S], metaclass=MetaConstructor, family=hist
 
         return None
 
+    def __repr__(self) -> str:
+        # Workaround for boost-histogram 1.7.0 and 1.7.1 having a 0
+        old_repr = super().__repr__()
+        if "MultiCell(0)" in old_repr:
+            nelem = self._hist.nelem()
+            return old_repr.replace("MultiCell(0)", f"MultiCell({nelem})")
+        return old_repr
+
     def _name_to_index(self, name: str) -> int:
         """
             Transform axis name to axis index, given axis name, return axis \
