@@ -72,7 +72,7 @@ fit = [
     "iminuit >=2.9.0",
 ]
 dask = [
-    "dask[dataframe] >=2022,<2025",
+    "dask[dataframe] >=2022,<2025.4.0",
     "dask_awkward >=2025.9.0",
     "dask_histogram >=2023.1",
 ]
@@ -87,7 +87,7 @@ fit = [
     "iminuit >=2.9.0",
 ]
 dask = [
-    "dask[dataframe] >=2022,<2025",
+    "dask[dataframe] >=2022,<2025.4.0",
     "dask_awkward >=2025.9.0",
     "dask_histogram >=2023.1",
 ]
