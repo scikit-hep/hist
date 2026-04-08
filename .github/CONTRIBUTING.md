@@ -43,6 +43,12 @@ The generation of documentation requires `pandoc` and `dot` (a Graphviz applicat
 
 For example, on Debian/ubuntu:
 
+```console
+$ sudo apt install pandoc graphviz
+$ nox -s docs
+$ xdg-open _build/html/index.html
+```
+
 ### PyPI
 
 For extended development, you can set up a development environment using PyPI.
