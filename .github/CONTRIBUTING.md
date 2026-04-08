@@ -40,11 +40,9 @@ docker run --rm -v $PWD:/nox -w /nox -t quay.io/pypa/manylinux_2_28_x86_64:lates
 
 ### Documentation
 The generation of documentation requires `pandoc` and `dot` (a Graphviz application) in addition.
-```console
-$ sudo apt install pandoc graphviz
-$ nox -s docs
-$ firefox _build/html/index.html
-```
+
+For example, on Debian/ubuntu:
+
 
 ### PyPI
 
