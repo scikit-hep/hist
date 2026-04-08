@@ -3,8 +3,8 @@ hist.dask package
 
 .. automodule:: hist.dask
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 Submodules
 ----------

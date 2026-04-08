@@ -16,10 +16,11 @@
 [![Gitter][gitter-badge]][gitter-link]
 [![Binder][binder-badge]][binder-link]
 [![Scikit-HEP][sk-badge]][sk-link]
+[![SPEC 4 — Using and Creating Nightly Wheels][spec4-badge]][spec4-link]
 
 Hist is an analyst-friendly front-end for
 [boost-histogram](https://github.com/scikit-hep/boost-histogram), designed for
-Python 3.7+ (3.6 users get version 2.4). See [what's new](https://hist.readthedocs.io/en/latest/changelog.html).
+Python 3.10+ (3.6-3.9 users get older versions). See [what's new](https://hist.readthedocs.io/en/latest/changelog.html).
 
 ![Slideshow of features. See docs/banner_slides.md for text if the image is not readable.](https://github.com/scikit-hep/hist/raw/main/docs/_images/banner.gif)
 
@@ -47,7 +48,6 @@ Hist currently provides everything boost-histogram provides, and the following e
 
 - The `Hist` class augments `bh.Histogram` with simpler construction:
   - `flow=False` is a fast way to turn off flow for the axes on construction.
-  - Storages can be given by string.
   - `storage=` can be omitted, strings and storages can be positional.
   - `data=` can initialize a histogram with existing data.
   - `Hist.from_columns` can be used to initialize with a DataFrame or dict.
@@ -105,7 +105,7 @@ h = (
 )
 
 # Filling by names is allowed:
-h.fill(y=[1, 4, 6], x=[3, 5, 2])
+h.fill(y=[1, 4, 6], x=[0.3, 0.5, 0.2])
 
 # Names can be used to manipulate the histogram:
 h.project("x")
@@ -137,22 +137,25 @@ We would like to acknowledge the contributors that made this project possible ([
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
 <table>
-  <tr>
-    <td align="center"><a href="https://github.com/henryiii"><img src="https://avatars1.githubusercontent.com/u/4616906?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Henry Schreiner</b></sub></a><br /><a href="#maintenance-henryiii" title="Maintenance">🚧</a> <a href="https://github.com/scikit-hep/hist/commits?author=henryiii" title="Code">💻</a> <a href="https://github.com/scikit-hep/hist/commits?author=henryiii" title="Documentation">📖</a></td>
-    <td align="center"><a href="http://lovelybuggies.com.cn/"><img src="https://avatars3.githubusercontent.com/u/29083689?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Nino Lau</b></sub></a><br /><a href="#maintenance-LovelyBuggies" title="Maintenance">🚧</a> <a href="https://github.com/scikit-hep/hist/commits?author=LovelyBuggies" title="Code">💻</a> <a href="https://github.com/scikit-hep/hist/commits?author=LovelyBuggies" title="Documentation">📖</a></td>
-    <td align="center"><a href="https://github.com/chrisburr"><img src="https://avatars3.githubusercontent.com/u/5220533?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Chris Burr</b></sub></a><br /><a href="https://github.com/scikit-hep/hist/commits?author=chrisburr" title="Code">💻</a></td>
-    <td align="center"><a href="https://github.com/aminnj"><img src="https://avatars.githubusercontent.com/u/5760027?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Nick Amin</b></sub></a><br /><a href="https://github.com/scikit-hep/hist/commits?author=aminnj" title="Code">💻</a></td>
-    <td align="center"><a href="http://cern.ch/eduardo.rodrigues"><img src="https://avatars.githubusercontent.com/u/5013581?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Eduardo Rodrigues</b></sub></a><br /><a href="https://github.com/scikit-hep/hist/commits?author=eduardo-rodrigues" title="Code">💻</a></td>
-    <td align="center"><a href="http://andrzejnovak.github.io/"><img src="https://avatars.githubusercontent.com/u/13226500?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Andrzej Novak</b></sub></a><br /><a href="https://github.com/scikit-hep/hist/commits?author=andrzejnovak" title="Code">💻</a></td>
-    <td align="center"><a href="http://www.matthewfeickert.com/"><img src="https://avatars.githubusercontent.com/u/5142394?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Matthew Feickert</b></sub></a><br /><a href="https://github.com/scikit-hep/hist/commits?author=matthewfeickert" title="Code">💻</a></td>
-  </tr>
-  <tr>
-    <td align="center"><a href="http://theoryandpractice.org"><img src="https://avatars.githubusercontent.com/u/4458890?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Kyle Cranmer</b></sub></a><br /><a href="https://github.com/scikit-hep/hist/commits?author=cranmer" title="Documentation">📖</a></td>
-    <td align="center"><a href="http://dantrim.github.io"><img src="https://avatars.githubusercontent.com/u/7841565?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Daniel Antrim</b></sub></a><br /><a href="https://github.com/scikit-hep/hist/commits?author=dantrim" title="Code">💻</a></td>
-    <td align="center"><a href="https://github.com/nsmith-"><img src="https://avatars.githubusercontent.com/u/6587412?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Nicholas Smith</b></sub></a><br /><a href="https://github.com/scikit-hep/hist/commits?author=nsmith-" title="Code">💻</a></td>
-    <td align="center"><a href="http://meliache.srht.site"><img src="https://avatars.githubusercontent.com/u/5121824?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Michael Eliachevitch</b></sub></a><br /><a href="https://github.com/scikit-hep/hist/commits?author=meliache" title="Code">💻</a></td>
-    <td align="center"><a href="https://github.com/jonas-eschle"><img src="https://avatars.githubusercontent.com/u/17454848?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Jonas Eschle</b></sub></a><br /><a href="https://github.com/scikit-hep/hist/commits?author=jonas-eschle" title="Documentation">📖</a></td>
-  </tr>
+  <tbody>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/henryiii"><img src="https://avatars1.githubusercontent.com/u/4616906?v=4?s=100" width="100px;" alt="Henry Schreiner"/><br /><sub><b>Henry Schreiner</b></sub></a><br /><a href="#maintenance-henryiii" title="Maintenance">🚧</a> <a href="https://github.com/scikit-hep/hist/commits?author=henryiii" title="Code">💻</a> <a href="https://github.com/scikit-hep/hist/commits?author=henryiii" title="Documentation">📖</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://lovelybuggies.com.cn/"><img src="https://avatars3.githubusercontent.com/u/29083689?v=4?s=100" width="100px;" alt="Nino Lau"/><br /><sub><b>Nino Lau</b></sub></a><br /><a href="#maintenance-LovelyBuggies" title="Maintenance">🚧</a> <a href="https://github.com/scikit-hep/hist/commits?author=LovelyBuggies" title="Code">💻</a> <a href="https://github.com/scikit-hep/hist/commits?author=LovelyBuggies" title="Documentation">📖</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/chrisburr"><img src="https://avatars3.githubusercontent.com/u/5220533?v=4?s=100" width="100px;" alt="Chris Burr"/><br /><sub><b>Chris Burr</b></sub></a><br /><a href="https://github.com/scikit-hep/hist/commits?author=chrisburr" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/aminnj"><img src="https://avatars.githubusercontent.com/u/5760027?v=4?s=100" width="100px;" alt="Nick Amin"/><br /><sub><b>Nick Amin</b></sub></a><br /><a href="https://github.com/scikit-hep/hist/commits?author=aminnj" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://cern.ch/eduardo.rodrigues"><img src="https://avatars.githubusercontent.com/u/5013581?v=4?s=100" width="100px;" alt="Eduardo Rodrigues"/><br /><sub><b>Eduardo Rodrigues</b></sub></a><br /><a href="https://github.com/scikit-hep/hist/commits?author=eduardo-rodrigues" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://andrzejnovak.github.io/"><img src="https://avatars.githubusercontent.com/u/13226500?v=4?s=100" width="100px;" alt="Andrzej Novak"/><br /><sub><b>Andrzej Novak</b></sub></a><br /><a href="https://github.com/scikit-hep/hist/commits?author=andrzejnovak" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://www.matthewfeickert.com/"><img src="https://avatars.githubusercontent.com/u/5142394?v=4?s=100" width="100px;" alt="Matthew Feickert"/><br /><sub><b>Matthew Feickert</b></sub></a><br /><a href="https://github.com/scikit-hep/hist/commits?author=matthewfeickert" title="Code">💻</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="http://theoryandpractice.org"><img src="https://avatars.githubusercontent.com/u/4458890?v=4?s=100" width="100px;" alt="Kyle Cranmer"/><br /><sub><b>Kyle Cranmer</b></sub></a><br /><a href="https://github.com/scikit-hep/hist/commits?author=cranmer" title="Documentation">📖</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://dantrim.github.io"><img src="https://avatars.githubusercontent.com/u/7841565?v=4?s=100" width="100px;" alt="Daniel Antrim"/><br /><sub><b>Daniel Antrim</b></sub></a><br /><a href="https://github.com/scikit-hep/hist/commits?author=dantrim" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/nsmith-"><img src="https://avatars.githubusercontent.com/u/6587412?v=4?s=100" width="100px;" alt="Nicholas Smith"/><br /><sub><b>Nicholas Smith</b></sub></a><br /><a href="https://github.com/scikit-hep/hist/commits?author=nsmith-" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://meliache.srht.site"><img src="https://avatars.githubusercontent.com/u/5121824?v=4?s=100" width="100px;" alt="Michael Eliachevitch"/><br /><sub><b>Michael Eliachevitch</b></sub></a><br /><a href="https://github.com/scikit-hep/hist/commits?author=meliache" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/jonas-eschle"><img src="https://avatars.githubusercontent.com/u/17454848?v=4?s=100" width="100px;" alt="Jonas Eschle"/><br /><sub><b>Jonas Eschle</b></sub></a><br /><a href="https://github.com/scikit-hep/hist/commits?author=jonas-eschle" title="Documentation">📖</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://oieltd.com"><img src="https://avatars.githubusercontent.com/u/1248413?v=4?s=100" width="100px;" alt="Angus Hollands"/><br /><sub><b>Angus Hollands</b></sub></a><br /><a href="https://github.com/scikit-hep/hist/commits?author=agoose77" title="Code">💻</a> <a href="https://github.com/scikit-hep/hist/commits?author=agoose77" title="Documentation">📖</a></td>
+    </tr>
+  </tbody>
 </table>
 
 <!-- markdownlint-restore -->
@@ -200,3 +203,5 @@ Support for this work was provided by the National Science Foundation cooperativ
 [rtd-link]:                 https://hist.readthedocs.io/en/latest/?badge=latest
 [sk-badge]:                 https://scikit-hep.org/assets/images/Scikit--HEP-Project-blue.svg
 [sk-link]:                  https://scikit-hep.org/
+[spec4-badge]:              https://img.shields.io/badge/SPEC-4-green?labelColor=%23004811&color=%235CA038
+[spec4-link]:               https://scientific-python.org/specs/spec-0004/

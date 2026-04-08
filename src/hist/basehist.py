@@ -1,19 +1,24 @@
 from __future__ import annotations
 
+import fnmatch
 import functools
+import importlib.metadata
+import itertools
 import operator
 import typing
 import warnings
-from typing import Any, Callable, Generator, Iterator, Mapping, Sequence, Tuple, Union
+from collections.abc import Callable, Generator, Iterator, Mapping, Sequence
+from typing import Any, Generic, Protocol, SupportsIndex, TypeVar, Union
 
 import boost_histogram as bh
 import histoprint
 import numpy as np
+import packaging.version
 
 import hist
 
 from . import interop
-from ._compat.typing import ArrayLike, Protocol, Self, SupportsIndex
+from ._compat.typing import ArrayLike, Self
 from .axestuple import NamedAxesTuple
 from .axis import AxisProtocol
 from .quick_construct import MetaConstructor
@@ -30,16 +35,15 @@ if typing.TYPE_CHECKING:
 
 
 class SupportsLessThan(Protocol):
-    def __lt__(self, __other: Any) -> bool:
-        ...
+    def __lt__(self, __other: Any) -> bool: ...
 
 
 InnerIndexing = Union[
     SupportsIndex, str, Callable[[bh.axis.Axis], int], slice, "ellipsis"
 ]
-IndexingWithMapping = Union[InnerIndexing, Mapping[Union[int, str], InnerIndexing]]
-IndexingExpr = Union[IndexingWithMapping, Tuple[IndexingWithMapping, ...]]
-AxisTypes = Union[AxisProtocol, Tuple[int, float, float]]
+IndexingWithMapping = InnerIndexing | Mapping[int | str, InnerIndexing]
+IndexingExpr = IndexingWithMapping | tuple[IndexingWithMapping, ...]
+AxisTypes = AxisProtocol | tuple[int, float, float]
 
 
 # Workaround for bug in mplhep
@@ -64,14 +68,76 @@ def process_mistaken_quick_construct(
             yield ax
 
 
-class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
+NO_METADATA = object()
+
+S = TypeVar("S", bound=bh.storage.Storage)
+
+IntHists = TypeVar(
+    "IntHists", bound="BaseHist[bh.storage.AtomicInt64] | BaseHist[bh.storage.Int64]"
+)
+FloatHists = TypeVar(
+    "FloatHists", bound="BaseHist[bh.storage.Double] | BaseHist[bh.storage.Unlimited]"
+)
+ListHists = TypeVar("ListHists", bound="BaseHist[bh.storage.MultiCell]")
+WeightHists = TypeVar("WeightHists", bound="BaseHist[bh.storage.Weight]")
+MeanHists = TypeVar("MeanHists", bound="BaseHist[bh.storage.Mean]")
+WeightedMeanHists = TypeVar(
+    "WeightedMeanHists", bound="BaseHist[bh.storage.WeightedMean]"
+)
+
+bh_version = packaging.version.Version(importlib.metadata.version("boost-histogram"))
+if typing.TYPE_CHECKING or bh_version >= packaging.version.Version("1.7.1"):
+    _Histogram = bh.Histogram
+else:
+
+    class _Histogram:
+        def __class_getitem__(cls, arg):
+            return bh.Histogram
+
+
+class BaseHist(_Histogram[S], Generic[S], metaclass=MetaConstructor, family=hist):
     __slots__ = ()
+
+    @typing.overload
+    def __init__(
+        self,
+        arg: dict[str, Any],
+        /,
+        *,
+        data: np.typing.NDArray[Any] | None = ...,
+        metadata: Any = ...,
+        label: str | None = ...,
+        name: str | None = ...,
+    ) -> None: ...
+
+    @typing.overload
+    def __init__(
+        self,
+        arg: Self | bh.Histogram[S],
+        /,
+        *,
+        data: np.typing.NDArray[Any] | None = ...,
+        metadata: Any = ...,
+        label: str | None = ...,
+        name: str | None = ...,
+    ) -> None: ...
+
+    @typing.overload
+    def __init__(
+        self,
+        *axes: AxisTypes | Storage | str,
+        storage: S = ...,
+        metadata: Any = ...,
+        data: np.typing.NDArray[Any] | None = ...,
+        label: str | None = ...,
+        name: str | None = ...,
+    ) -> None: ...
 
     def __init__(
         self,
-        *in_args: AxisTypes | Storage | str,
+        *in_args: Self | bh.Histogram[S] | dict[str, Any] | AxisTypes | Storage | str,
         storage: Storage | str | None = None,
-        metadata: Any = None,
+        metadata: Any = NO_METADATA,
         data: np.typing.NDArray[Any] | None = None,
         label: str | None = None,
         name: str | None = None,
@@ -79,10 +145,9 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         """
         Initialize BaseHist object. Axis params can contain the names.
         """
-        self._hist: Any = None
-        self.axes: NamedAxesTuple
-        self.name = name
-        self.label = label
+        # Making the histogram generic seems to confuse PyLint's slots check
+        self._hist: Any = None  # pylint: disable=assigning-non-slot
+        self.axes: NamedAxesTuple  # pylint: disable=assigning-non-slot
 
         args: tuple[AxisTypes, ...]
 
@@ -107,7 +172,10 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
             warnings.warn(msg, stacklevel=2)
             storage = storage()
 
-        super().__init__(*args, storage=storage, metadata=metadata)  # type: ignore[call-overload]
+        if metadata is NO_METADATA:
+            super().__init__(*args, storage=storage)  # type: ignore[call-overload]
+        else:
+            super().__init__(*args, storage=storage, metadata=metadata)  # type: ignore[call-overload]
 
         disallowed_names = {"weight", "sample", "threads"}
         for ax in self.axes:
@@ -130,12 +198,8 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         if data is not None:
             self[...] = data
 
-    # Backport of storage_type from boost-histogram 1.3.2:
-    if not hasattr(bh.Histogram, "storage_type"):
-
-        @property
-        def storage_type(self) -> type[bh.storage.Storage]:
-            return self._storage_type
+        self.name = name  # pylint: disable=assigning-non-slot
+        self.label = label  # pylint: disable=assigning-non-slot
 
     def _generate_axes_(self) -> NamedAxesTuple:
         """
@@ -162,6 +226,14 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
         return None
 
+    def __repr__(self) -> str:
+        # Workaround for boost-histogram 1.7.0 and 1.7.1 having a 0
+        old_repr = super().__repr__()
+        if "MultiCell(0)" in old_repr:
+            nelem = self._hist.nelem()
+            return old_repr.replace("MultiCell(0)", f"MultiCell({nelem})")
+        return old_repr
+
     def _name_to_index(self, name: str) -> int:
         """
             Transform axis name to axis index, given axis name, return axis \
@@ -172,6 +244,11 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
                 return index
 
         raise ValueError(f"The axis name {name} could not be found")
+
+    def _to_uhi_(self) -> dict[str, Any]:
+        from .serialization import to_uhi
+
+        return to_uhi(self)
 
     @classmethod
     def from_columns(
@@ -207,7 +284,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         self.fill(**data_list, weight=weight_arr)  # type: ignore[arg-type]
         return self
 
-    def project(self, *args: int | str) -> Self | float | bh.accumulators.Accumulator:
+    def project(self, *args: int | str) -> Self:
         """
         Projection of axis idx.
         """
@@ -216,7 +293,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
     @property
     def T(self) -> Self:
-        return self.project(*reversed(range(self.ndim)))  # type: ignore[return-value]
+        return self.project(*reversed(range(self.ndim)))
 
     def fill(
         self,
@@ -244,8 +321,15 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         }
 
         if set(data_dict) != set(range(len(args), self.ndim)):
+            expected = set(range(len(args), self.ndim))
+            provided = set(data_dict)
+
+            missing = expected - provided
+            missing_values = [self.axes[i].name for i in missing]
+
             raise TypeError(
-                "All axes must be accounted for in fill, you may have used a disallowed name in the axes"
+                f"Missing values for single/multiple axis : {missing_values}."
+                f"Expected axes : {[ax.name for ax in self.axes]}"
             )
 
         data = (data_dict[i] for i in range(len(args), self.ndim))
@@ -283,7 +367,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
                 user_args_broadcast = broadcast[:1]
                 user_kwargs_broadcast = {}
                 non_user_kwargs_broadcast = dict(
-                    zip(non_user_kwargs.keys(), broadcast[1:])
+                    zip(non_user_kwargs.keys(), broadcast[1:], strict=True)
                 )
             else:
                 # Result must be broadcast, so unpack and rebuild
@@ -294,22 +378,24 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
                 user_args_broadcast = ()
                 user_kwargs_broadcast = {
                     k: v
-                    for k, v in zip(destructured, broadcast[: len(destructured)])
+                    for k, v in zip(
+                        destructured, broadcast[: len(destructured)], strict=True
+                    )
                     if k in axis_names
                 }
                 non_user_kwargs_broadcast = dict(
-                    zip(non_user_kwargs, broadcast[len(destructured) :])
+                    zip(non_user_kwargs, broadcast[len(destructured) :], strict=True)
                 )
         # Multiple args: broadcast and flatten!
         else:
-            inputs = (*args, *kwargs.values(), *non_user_kwargs)
+            inputs = (*args, *kwargs.values(), *non_user_kwargs.values())
             broadcast = interop.broadcast_and_flatten(inputs)
             user_args_broadcast = broadcast[: len(args)]
             user_kwargs_broadcast = dict(
-                zip(kwargs, broadcast[len(args) : len(args) + len(kwargs)])
+                zip(kwargs, broadcast[len(args) : len(args) + len(kwargs)], strict=True)
             )
             non_user_kwargs_broadcast = dict(
-                zip(non_user_kwargs, broadcast[len(args) + len(kwargs) :])
+                zip(non_user_kwargs, broadcast[len(args) + len(kwargs) :], strict=True)
             )
         return self.fill(
             *user_args_broadcast,
@@ -336,11 +422,38 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
             # This can only return Self, not float, etc., so we ignore the extra types here
             return self[{axis: [bh.loc(x) for x in sorted_cats]}]  # type: ignore[dict-item, return-value]
 
-    def _loc_shortcut(self, x: Any) -> Any:
+    def _convert_index_wildcards(self, x: Any, ax_id: str | int | None = None) -> Any:
+        """
+        Convert wildcards to available indices before passing to bh.loc
+        """
+
+        if not any(
+            isinstance(x, t) for t in [str, list]
+        ):  # Process only lists and strings
+            return x
+        _x = x if isinstance(x, list) else [x]  # Convert to list if not already
+        if not all(isinstance(n, str) for n in _x):
+            return x
+        if any(any(special in pattern for special in ["*", "?"]) for pattern in _x):
+            available = [n for n in self.axes[ax_id] if isinstance(n, str)]
+            all_matches = []
+            for pattern in _x:
+                all_matches.append(
+                    [k for k in available if fnmatch.fnmatch(k, pattern)]
+                )
+            matches = list(
+                dict.fromkeys(list(itertools.chain.from_iterable(all_matches)))
+            )
+            if len(matches) == 0:
+                raise ValueError(f"No matches found for {x}")
+            return matches
+        return x
+
+    def _loc_shortcut(self, x: Any, ax_id: str | int | None = None) -> Any:
         """
         Convert some specific indices to location.
         """
-
+        x = self._convert_index_wildcards(x, ax_id)
         if isinstance(x, list):
             return [self._loc_shortcut(each) for each in x]
         if isinstance(x, slice):
@@ -372,9 +485,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
             raise ValueError("The imaginary part should be an integer")
         return bh.rebin(int(x.imag))
 
-    def _index_transform(
-        self, index: list[IndexingExpr] | IndexingExpr
-    ) -> bh.IndexingExpr:
+    def _index_transform(self, index: list[IndexingExpr] | IndexingExpr) -> Any:
         """
         Auxiliary function for __getitem__ and __setitem__.
         """
@@ -383,7 +494,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
             new_indices = {
                 (
                     self._name_to_index(k) if isinstance(k, str) else k
-                ): self._loc_shortcut(v)
+                ): self._loc_shortcut(v, k)
                 for k, v in index.items()
             }
             if len(new_indices) != len(index):
@@ -395,11 +506,42 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         if not isinstance(index, tuple):
             index = (index,)  # type: ignore[assignment]
 
-        return tuple(self._loc_shortcut(v) for v in index)  # type: ignore[union-attr, union-attr, union-attr, union-attr]
+        return tuple(self._loc_shortcut(v, i) for i, (v) in enumerate(index))  # type: ignore[arg-type]
 
-    def __getitem__(  # type: ignore[override]
+    @typing.overload  # type: ignore[override]
+    def __getitem__(self: FloatHists, index: IndexingExpr) -> FloatHists | float: ...
+
+    @typing.overload
+    def __getitem__(self: IntHists, index: IndexingExpr) -> IntHists | int: ...
+
+    @typing.overload
+    def __getitem__(
+        self: ListHists, index: IndexingExpr
+    ) -> ListHists | list[float]: ...
+
+    @typing.overload
+    def __getitem__(
+        self: WeightHists, index: IndexingExpr
+    ) -> WeightHists | bh.accumulators.WeightedSum: ...
+
+    @typing.overload
+    def __getitem__(
+        self: MeanHists, index: IndexingExpr
+    ) -> MeanHists | bh.accumulators.Mean: ...
+
+    @typing.overload
+    def __getitem__(
+        self: WeightedMeanHists, index: IndexingExpr
+    ) -> WeightedMeanHists | bh.accumulators.WeightedMean: ...
+
+    @typing.overload
+    def __getitem__(
         self, index: IndexingExpr
-    ) -> Self | float | bh.accumulators.Accumulator:
+    ) -> Self | float | list[float] | int | bh.accumulators.Accumulator: ...
+
+    def __getitem__(
+        self, index: IndexingExpr
+    ) -> Self | float | int | list[float] | bh.accumulators.Accumulator:
         """
         Get histogram item.
         """
@@ -489,10 +631,29 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
         *,
         ax: matplotlib.axes.Axes | None = None,
         overlay: str | int | None = None,
+        legend: bool = True,
         **kwargs: Any,
     ) -> Hist1DArtists:
         """
         Plot1d method for BaseHist object.
+
+        Parameters
+        ----------
+        ax : matplotlib.axes.Axes, optional
+            Axes to plot on. If None, uses current axes or creates new ones.
+        overlay : str or int, optional
+            Name or index of the axis to overlay. If None, automatically selects
+            the first discrete axis for multi-dimensional histograms.
+        legend : bool, default True
+            Whether to automatically add a legend when plotting stacked categories.
+            The legend title is set from the axis label if available.
+        **kwargs : Any
+            Additional keyword arguments passed to the underlying plot functions.
+
+        Returns
+        -------
+        Hist1DArtists
+            The matplotlib artists created by the plot.
         """
 
         from hist import plot
@@ -503,8 +664,9 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
             (overlay,) = (i for i, ax in enumerate(self.axes) if ax.traits.discrete)
         assert overlay is not None
         cat_ax = self.axes[overlay]
-        cats = cat_ax if cat_ax.traits.discrete else np.arange(len(cat_ax.centers))
-        d1hists = [self[{overlay: cat}] for cat in cats]
+        icats = np.arange(len(cat_ax))
+        cats = cat_ax if cat_ax.traits.discrete else icats
+        d1hists = [self[{overlay: cat}] for cat in icats]
         if "label" in kwargs:
             if not isinstance(kwargs["label"], str) and len(kwargs["label"]) == len(
                 cats
@@ -518,7 +680,19 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
                 raise ValueError(
                     f"label ``{kwargs['label']}`` not understood for {len(cats)} categories"
                 )
-        return plot.histplot(d1hists, ax=ax, label=cats, **_proc_kw_for_lw(kwargs))
+        artists = plot.histplot(d1hists, ax=ax, label=cats, **_proc_kw_for_lw(kwargs))
+        if legend:
+            # Try to set legend title from axis label if available
+            if ax is None:
+                # Get axis from the first artist (mplhep returns Hist1DArtists tuple)
+                # This will raise an error if artists is empty or doesn't have the expected structure,
+                # which is intended behavior as specified in the requirements
+                ax = artists[0].stairs.axes
+            handles, _ = ax.get_legend_handles_labels()
+            if handles:
+                title = getattr(cat_ax, "label", None)
+                ax.legend(title=title if title else None)
+        return artists
 
     def plot2d(
         self,
@@ -553,7 +727,7 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
     def plot_ratio(
         self,
-        other: hist.BaseHist
+        other: hist.BaseHist[Any]
         | Callable[[np.typing.NDArray[Any]], np.typing.NDArray[Any]]
         | str,
         *,
@@ -601,53 +775,95 @@ class BaseHist(bh.Histogram, metaclass=MetaConstructor, family=hist):
 
         return plot.plot_pie(self, ax=ax, **kwargs)
 
-    def stack(self, axis: int | str) -> hist.stack.Stack:
+    def stack(self, axis: int | str) -> hist.stack.Stack[S]:
         """
         Returns a stack from a normal histogram axes.
         """
         if self.ndim < 2:
             raise RuntimeError("Cannot stack with less than two axis")
-        stack_histograms: Iterator[BaseHist] = [  # type: ignore[assignment]
+        stack_histograms: Iterator[BaseHist[S]] = [  # type: ignore[assignment]
             self[{axis: i}] for i in range(len(self.axes[axis]))
         ]
-        for name, h in zip(self.axes[axis], stack_histograms):
+        for name, h in zip(self.axes[axis], stack_histograms, strict=True):
             h.name = name
 
         return hist.stack.Stack(*stack_histograms)
+
+    @typing.overload
+    def integrate(
+        self,
+        name: int | str,
+        i_or_list: list[str | int],
+        j: InnerIndexing | None = None,
+    ) -> Self: ...
+
+    @typing.overload
+    def integrate(
+        self: IntHists,
+        name: int | str,
+        i_or_list: InnerIndexing | None = None,
+        j: InnerIndexing | None = None,
+    ) -> IntHists | int: ...
+
+    @typing.overload
+    def integrate(
+        self: FloatHists,
+        name: int | str,
+        i_or_list: InnerIndexing | None = None,
+        j: InnerIndexing | None = None,
+    ) -> FloatHists | float: ...
+
+    @typing.overload
+    def integrate(
+        self: ListHists,
+        name: int | str,
+        i_or_list: InnerIndexing | None = None,
+        j: InnerIndexing | None = None,
+    ) -> ListHists | list[float]: ...
+
+    @typing.overload
+    def integrate(
+        self: WeightHists,
+        name: int | str,
+        i_or_list: InnerIndexing | None = None,
+        j: InnerIndexing | None = None,
+    ) -> WeightHists | bh.accumulators.WeightedSum: ...
+
+    @typing.overload
+    def integrate(
+        self: MeanHists,
+        name: int | str,
+        i_or_list: InnerIndexing | None = None,
+        j: InnerIndexing | None = None,
+    ) -> MeanHists | bh.accumulators.Mean: ...
+
+    @typing.overload
+    def integrate(
+        self: WeightedMeanHists,
+        name: int | str,
+        i_or_list: InnerIndexing | None = None,
+        j: InnerIndexing | None = None,
+    ) -> WeightedMeanHists | bh.accumulators.WeightedMean: ...
+
+    @typing.overload
+    def integrate(
+        self,
+        name: int | str,
+        i_or_list: InnerIndexing | None = None,
+        j: InnerIndexing | None = None,
+    ) -> Self | int | float | list[float] | bh.accumulators.Accumulator: ...
 
     def integrate(
         self,
         name: int | str,
         i_or_list: InnerIndexing | list[str | int] | None = None,
         j: InnerIndexing | None = None,
-    ) -> Self | float | bh.accumulators.Accumulator:
+    ) -> Self | int | float | list[float] | bh.accumulators.Accumulator:
         if isinstance(i_or_list, list):
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
 
-                # TODO: We could teach the typing system that list always returns Self type
                 selection: Self = self[{name: i_or_list}]  # type: ignore[assignment, dict-item]
                 return selection[{name: slice(0, len(i_or_list), sum)}]
 
         return self[{name: slice(i_or_list, j, sum)}]
-
-    def sum(self, flow: bool = False) -> float | bh.accumulators.Accumulator:
-        """
-        Compute the sum over the histogram bins (optionally including the flow bins).
-        """
-        # TODO: This method will go away once we can guarantee a modern boost-histogram (1.3.2 or better)
-        if any(x == 0 for x in (self.axes.extent if flow else self.axes.size)):
-            storage = self.storage_type
-            if issubclass(storage, (bh.storage.AtomicInt64, bh.storage.Int64)):
-                return 0
-            if issubclass(storage, (bh.storage.Double, bh.storage.Unlimited)):
-                return 0.0
-            if issubclass(storage, bh.storage.Weight):
-                return bh.accumulators.WeightedSum(0, 0)
-            if issubclass(storage, bh.storage.Mean):
-                return bh.accumulators.Mean(0, 0, 0)
-            if issubclass(storage, bh.storage.WeightedMean):
-                return bh.accumulators.WeightedMean(0, 0, 0, 0)
-            raise AssertionError(f"Unsupported storage type {storage}")
-
-        return super().sum(flow=flow)

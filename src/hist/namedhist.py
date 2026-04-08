@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Any
+import typing
+from typing import Any, Generic, TypeVar
 
 import boost_histogram as bh
 
@@ -10,8 +11,10 @@ from . import interop
 from ._compat.typing import ArrayLike, Self
 from .basehist import BaseHist, IndexingExpr
 
+S = TypeVar("S", bound=bh.storage.Storage)
 
-class NamedHist(BaseHist, family=hist):
+
+class NamedHist(BaseHist[S], Generic[S], family=hist):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         """
         Initialize NamedHist object. Axis params must contain the names.
@@ -23,8 +26,7 @@ class NamedHist(BaseHist, family=hist):
                 f"Each axes in the {self.__class__.__name__} instance should have a name"
             )
 
-    # TODO: This can return a single value
-    def project(self, *args: int | str) -> Self | float | bh.accumulators.Accumulator:
+    def project(self, *args: int | str) -> Self:
         """
         Projection of axis idx.
         """
@@ -98,19 +100,23 @@ class NamedHist(BaseHist, family=hist):
             # Partition into user and non-user args
             user_kwargs_broadcast = {
                 k: v
-                for k, v in zip(destructured, broadcast[: len(destructured)])
+                for k, v in zip(
+                    destructured, broadcast[: len(destructured)], strict=True
+                )
                 if k in axis_names
             }
             non_user_kwargs_broadcast = dict(
-                zip(non_user_kwargs, broadcast[len(destructured) :])
+                zip(non_user_kwargs, broadcast[len(destructured) :], strict=True)
             )
         # Multiple args: broadcast and flatten!
         else:
-            inputs = (*kwargs.values(), *non_user_kwargs)
+            inputs = (*kwargs.values(), *non_user_kwargs.values())
             broadcast = interop.broadcast_and_flatten(inputs)
-            user_kwargs_broadcast = dict(zip(kwargs, broadcast[: len(kwargs)]))
+            user_kwargs_broadcast = dict(
+                zip(kwargs, broadcast[: len(kwargs)], strict=True)
+            )
             non_user_kwargs_broadcast = dict(
-                zip(non_user_kwargs, broadcast[len(kwargs) :])
+                zip(non_user_kwargs, broadcast[len(kwargs) :], strict=True)
             )
         return self.fill(
             **user_kwargs_broadcast,
@@ -118,20 +124,19 @@ class NamedHist(BaseHist, family=hist):
             **non_user_kwargs_broadcast,
         )
 
-    def __getitem__(  # type: ignore[override]
-        self,
-        index: IndexingExpr,
-    ) -> Self | float | bh.accumulators.Accumulator:
-        """
-        Get histogram item.
-        """
+    if not typing.TYPE_CHECKING:
 
-        if isinstance(index, dict) and any(isinstance(k, int) for k in index):
-            raise TypeError(
-                f"Only access by names are supported for {self.__class__.__name__} in dictionary"
-            )
+        def __getitem__(self, index):
+            """
+            Get histogram item.
+            """
 
-        return super().__getitem__(index)
+            if isinstance(index, dict) and any(isinstance(k, int) for k in index):
+                raise TypeError(
+                    f"Only access by names are supported for {self.__class__.__name__} in dictionary"
+                )
+
+            return super().__getitem__(index)
 
     def __setitem__(  # type: ignore[override]
         self,

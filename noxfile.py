@@ -1,3 +1,8 @@
+#!/usr/bin/env -S uv run -q
+# /// script
+# dependencies = ["nox>=2025.2.9"]
+# ///
+
 from __future__ import annotations
 
 import argparse
@@ -7,10 +12,8 @@ from pathlib import Path
 
 import nox
 
-ALL_PYTHONS = ["3.7", "3.8", "3.9", "3.10", "3.11"]
-
-nox.options.sessions = ["lint", "tests"]
-
+nox.needs_version = ">=2025.2.9"
+nox.options.default_venv_backend = "uv|virtualenv"
 
 DIR = Path(__file__).parent.resolve()
 
@@ -30,27 +33,38 @@ def pylint(session: nox.Session) -> None:
     Run pylint.
     """
 
-    session.install("pylint~=2.17.0")
+    session.install("pylint~=4.0.4")
     session.install("-e.")
     session.run("pylint", "hist", *session.posargs)
 
 
-@nox.session(python=ALL_PYTHONS, reuse_venv=True)
+@nox.session
 def tests(session):
     """
     Run the unit and regular tests.
     """
-    session.install("-e", ".[test,plot]")
+    session.install("-e.[plot]", "--group=test")
     args = ["--mpl"] if sys.platform.startswith("linux") else []
     session.run("pytest", *args, *session.posargs)
 
 
-@nox.session
+@nox.session(venv_backend="uv", default=False)
+def minimums(session):
+    """
+    Run with the minimum dependencies.
+    """
+
+    session.install("-e.", "--group=test", "--resolution=lowest-direct")
+    session.run("uv", "pip", "list")
+    session.run("pytest", *session.posargs)
+
+
+@nox.session(default=False)
 def regenerate(session):
     """
     Regenerate MPL images.
     """
-    session.install("-e", ".[test,plot]")
+    session.install("-e.[plot]", "--group=test")
     if not sys.platform.startswith("linux"):
         session.error(
             "Must be run from Linux, images will be slightly different on macOS"
@@ -58,29 +72,48 @@ def regenerate(session):
     session.run("pytest", "--mpl-generate-path=tests/baseline", *session.posargs)
 
 
-@nox.session(reuse_venv=True)
+@nox.session(reuse_venv=True, default=False)
 def docs(session: nox.Session) -> None:
     """
-    Build the docs. Pass "--serve" to serve.
+    Build the docs. Use "--non-interactive" to avoid serving. Pass "-b linkcheck" to check links.
     """
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--serve", action="store_true", help="Serve after building")
-    args = parser.parse_args(session.posargs)
+    parser.add_argument(
+        "-b", dest="builder", default="html", help="Build target (default: html)"
+    )
+    args, posargs = parser.parse_known_args(session.posargs)
 
-    session.install("-e", ".[docs]")
+    serve = args.builder == "html" and session.interactive
+    extra_installs = ["sphinx-autobuild"] if serve else []
+    session.install("-e.", "--group=docs", *extra_installs)
+
     session.chdir("docs")
-    session.run("sphinx-build", "-M", "html", ".", "_build")
 
-    if args.serve:
-        print("Launching docs at http://localhost:8000/ - use Ctrl-C to quit")
-        session.run("python", "-m", "http.server", "8000", "-d", "_build/html")
+    shared_args = (
+        "-n",  # nitpicky mode
+        "-T",  # full tracebacks
+        f"-b={args.builder}",
+        ".",
+        f"_build/{args.builder}",
+        *posargs,
+    )
+
+    if serve:
+        session.run("sphinx-autobuild", "--open-browser", *shared_args)
+    else:
+        session.run("sphinx-build", "--keep-going", *shared_args)
 
 
-@nox.session(reuse_venv=True)
+@nox.session(reuse_venv=True, default=False)
 def build_api_docs(session: nox.Session) -> None:
     """
-    Build (regenerate) API docs.
+    Build (regenerate) API docs. Requires Linux.
+
+    For example:
+
+        docker run -v $PWD:/histogram -w /histogram -it quay.io/pypa/manylinux_2_28_x86_64
+        uvx nox -s regenerate
     """
 
     session.install("sphinx")
@@ -96,21 +129,18 @@ def build_api_docs(session: nox.Session) -> None:
     )
 
 
-@nox.session(reuse_venv=True)
+@nox.session(reuse_venv=True, default=False)
 def build(session):
     """
     Build an SDist and wheel.
     """
 
-    build_p = DIR.joinpath("build")
-    if build_p.exists():
-        shutil.rmtree(build_p)
-
-    session.install("build")
-    session.run("python", "-m", "build")
+    args = [] if shutil.which("uv") else ["uv"]
+    session.install("build", *args)
+    session.run("python", "-m", "build", "--installer=uv")
 
 
-@nox.session()
+@nox.session(default=False)
 def boost(session):
     """
     Build against latest boost-histogram.
@@ -130,6 +160,13 @@ def boost(session):
         session.chdir("boost-histogram")
         session.install(".")
     session.chdir(DIR)
-    session.install("-e.[test,plot]")
+    session.install(
+        "-e.", "--group=test", "--group=plot", "pip", "mypy", "pandas-stubs"
+    )
     session.run("pip", "list")
     session.run("pytest", *session.posargs)
+    session.run("mypy")
+
+
+if __name__ == "__main__":
+    nox.main()

@@ -215,6 +215,7 @@ def test_general_plot_pull():
     """
     Test general plot_pull -- whether 1d-Hist can be plotted pull properly.
     """
+    pytest.importorskip("iminuit")
 
     np.random.seed(42)
 
@@ -313,6 +314,40 @@ def test_general_plot_pull():
     # wrong kwargs types
     with pytest.raises(Exception):
         h.plot_pull(pdf, eb_ecolor=1.0, eb_mfc=1.0)  # kwargs should be str
+
+    plt.close("all")
+
+
+def test_general_plot_pull_with_hist():
+    """
+    Test plot_pull with histogram comparison -- whether 1d-Hist can be plotted pull
+    with another histogram as reference properly.
+    """
+    np.random.seed(42)
+
+    h1 = Hist(
+        axis.Regular(
+            50, -4, 4, name="S", label="s [units]", underflow=False, overflow=False
+        )
+    ).fill(np.random.normal(size=10))
+
+    h2 = Hist(
+        axis.Regular(
+            50, -4, 4, name="S", label="s [units]", underflow=False, overflow=False
+        )
+    ).fill(np.random.normal(loc=0.1, size=12))
+
+    # Test pull plot with histogram comparison
+    assert h1.plot_pull(h2)
+
+    # Test with custom kwargs
+    assert h1.plot_pull(
+        h2,
+        bar_fc="orange",
+        pp_num=6,
+        pp_fc="orange",
+        pp_alpha=0.618,
+    )
 
     plt.close("all")
 
@@ -619,6 +654,7 @@ def test_ratiolike_str_alias(str_alias, use_likelihood):
     """
     Test str alias for callable in plot_ratio and plot_pull
     """
+    pytest.importorskip("iminuit")
 
     np.random.seed(42)
 
@@ -756,3 +792,133 @@ def test_plot1d_auto_handling():
     # assert h.plot(ax=ax2[1], overlay=1)
 
     return fig
+
+
+def test_plot1d_legend_functionality():
+    """
+    Test plot1d legend functionality including:
+    - Default legend behavior
+    - Legend with axis label as title
+    - Legend opt-out
+    """
+    np.random.seed(42)
+
+    # Create histogram with labeled axis for stacked plots
+    h = Hist(
+        axis.Regular(10, 0, 10, name="variable", label="Variable [units]"),
+        axis.StrCategory("", name="dataset", label="Dataset Type", growth=True),
+    )
+
+    h.fill(dataset="Signal", variable=np.random.normal(5, 1, 100))
+    h.fill(dataset="Background", variable=np.random.normal(3, 2, 100))
+
+    # Test with default legend (should be True)
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
+
+    # Test with legend=True (default)
+    artists1 = h.plot1d(ax=ax1)
+    legend1 = ax1.get_legend()
+    assert legend1 is not None, "Legend should be created by default"
+    assert legend1.get_title().get_text() == "Dataset Type", (
+        "Legend title should be axis label"
+    )
+
+    # Test with legend=False
+    artists2 = h.plot1d(ax=ax2, legend=False)
+    legend2 = ax2.get_legend()
+    assert legend2 is None, "Legend should not be created when legend=False"
+
+    # Test return type is consistent
+    assert type(artists1) is type(artists2), "Return type should be consistent"
+
+    plt.close(fig)
+
+
+def test_plot1d_legend_without_axis_label():
+    """
+    Test plot1d legend functionality when axis has no explicit label.
+    """
+    np.random.seed(42)
+
+    # Create histogram without explicit axis label (will default to name)
+    h = Hist(
+        axis.Regular(10, 0, 10, name="variable"),
+        axis.StrCategory("", name="dataset", growth=True),
+    )
+
+    h.fill(dataset="A", variable=np.random.normal(5, 1, 100))
+    h.fill(dataset="B", variable=np.random.normal(3, 2, 100))
+
+    fig, ax = plt.subplots()
+
+    # Test with legend=True but no explicit axis label
+    h.plot1d(ax=ax)
+    legend = ax.get_legend()
+    assert legend is not None, "Legend should still be created"
+    # Title should be the axis name when no explicit label is provided
+    title = legend.get_title().get_text()
+    assert title == "dataset", "Legend title should be axis name when no explicit label"
+
+    plt.close(fig)
+
+
+def test_plot1d_legend_1d_histogram():
+    """
+    Test that 1D histograms don't get legends (since they don't have categories to legend).
+    """
+    np.random.seed(42)
+
+    # Create simple 1D histogram
+    h = Hist(axis.Regular(10, 0, 10, name="variable", label="Variable [units]"))
+    h.fill(np.random.normal(5, 1, 100))
+
+    fig, ax = plt.subplots()
+
+    # Test 1D histogram (should not create legend since no categories)
+    artists = h.plot1d(ax=ax)
+    # For 1D histograms, the legend parameter doesn't apply since there are no categories
+    # The function should still work and return artists
+    assert artists is not None
+
+    plt.close(fig)
+
+
+def test_plot_ratio_misalignment():
+    import numpy as np
+
+    import hist
+    from hist.plot import plot_ratio_array
+
+    h = hist.new.Int(0, 3, name="x").Double()
+    h.fill([0, 1, 2])
+
+    ratio = np.ones(3)
+    ratio_uncert = np.zeros((2, 3))
+
+    captured = {}
+
+    def record_x(_self, x, *a, **k):
+        captured["x"] = np.asarray(x)
+
+    class Ax:
+        errorbar = record_x
+        bar = record_x
+
+        def axhline(self, *a, **k):
+            return None
+
+        def set_xlim(self, *a, **k):
+            return None
+
+        def set_ylim(self, *a, **K):
+            return None
+
+        def set_xlabel(self, *a, **k):
+            return None
+
+        def set_ylabel(self, *a, **K):
+            return None
+
+    plot_ratio_array(h, ratio, ratio_uncert, ax=Ax(), uncert_draw_type="line")
+
+    assert np.allclose(captured["x"], h.axes[0].edges[:-1])

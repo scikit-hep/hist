@@ -6,9 +6,7 @@ from typing import Any
 
 from boost_histogram.axis import ArrayTuple, AxesTuple
 
-from ._compat.builtins import zip
-
-__all__ = ("NamedAxesTuple", "AxesTuple", "ArrayTuple")
+__all__ = ("ArrayTuple", "AxesTuple", "NamedAxesTuple")
 
 
 def __dir__() -> tuple[str, ...]:
@@ -48,9 +46,8 @@ class NamedAxesTuple(AxesTuple):
 
     @name.setter
     def name(self, values: Iterable[str]) -> None:
-        # strict = True from Python 3.10
         for ax, val in zip(self, values, strict=True):
-            ax._ax.metadata["name"] = val
+            ax._raw_metadata["name"] = val
 
         disallowed_names = {"weight", "sample", "threads"}
         for ax in self:

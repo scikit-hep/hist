@@ -8,16 +8,26 @@ on:
   release:
     types:
     - published
+  schedule:
+    - cron: "34 5 * * *"
+
+permissions:
+  actions: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 
 jobs:
   dist:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
       with:
         fetch-depth: 0
 
-    - uses: hynek/build-and-inspect-python-package@v1
+    - uses: hynek/build-and-inspect-python-package@v2
 
 
   publish:
@@ -29,11 +39,41 @@ jobs:
       url: https://pypi.org/p/hist
     permissions:
       id-token: write
+      attestations: write
+      contents: read
 
     steps:
-    - uses: actions/download-artifact@v3
+    - uses: actions/download-artifact@v8
       with:
         name: Packages
         path: dist
 
+    - name: Generate artifact attestation for sdist and wheel
+      uses: actions/attest@v4
+      with:
+        subject-path: "dist/hist-*"
+
     - uses: pypa/gh-action-pypi-publish@release/v1
+
+  upload_nightly_wheels:
+    name: Upload nightly wheels to Anaconda Cloud
+    if: |
+      (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') &&
+      !github.event.repository.fork &&
+      github.ref == 'refs/heads/main'
+    needs: [dist]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/download-artifact@v8
+      with:
+        name: Packages
+        path: dist
+
+    - name: List all files
+      run: ls -lh dist
+
+    - name: Upload wheel to Anaconda Cloud as nightly
+      uses: scientific-python/upload-nightly-action@5748273c71e2d8d3a61f3a11a16421c8954f9ecf # 0.6.3
+      with:
+        artifacts_path: dist
+        anaconda_nightly_upload_token: ${{ secrets.ANACONDA_ORG_UPLOAD_TOKEN }}

@@ -1,10 +1,8 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Literal
 
 import numpy as np
-
-from ._compat.typing import Literal
 
 try:
     from scipy import stats
@@ -17,7 +15,7 @@ except ModuleNotFoundError:
     )
     raise
 
-__all__ = ("poisson_interval", "clopper_pearson_interval", "ratio_uncertainty")
+__all__ = ("clopper_pearson_interval", "poisson_interval", "ratio_uncertainty")
 
 
 def __dir__() -> tuple[str, ...]:
@@ -109,7 +107,7 @@ def clopper_pearson_interval(
     interval = np.stack((interval_min, interval_max))
     interval[0, num == 0.0] = 0.0
     interval[1, num == denom] = 1.0
-    return interval  # type: ignore[no-any-return]
+    return interval
 
 
 def ratio_uncertainty(

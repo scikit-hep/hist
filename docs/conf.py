@@ -6,16 +6,14 @@
 
 from __future__ import annotations
 
-# Warning: do not change the path here. To use autodoc, you need to install the
-# package first.
-from pkg_resources import get_distribution
+import importlib.metadata
 
 # -- Project information -----------------------------------------------------
 
 project = "Hist"
 copyright = "2020, Henry Schreiner"
-author = "Henry Schreiner and Nino Lau"
-version = get_distribution("hist").version
+author = "Henry Schreiner and Aman Goel and Shuo Liu"
+version = importlib.metadata.version("hist")
 
 
 # -- General configuration ---------------------------------------------------
@@ -24,9 +22,11 @@ version = get_distribution("hist").version
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    "matplotlib.sphinxext.plot_directive",
     "myst_parser",
     "nbsphinx",
     "sphinx.ext.autodoc",
+    "sphinx.ext.intersphinx",
     "sphinx.ext.mathjax",
     "sphinx.ext.napoleon",
     "sphinx_copybutton",
@@ -50,6 +50,11 @@ exclude_patterns = [
     "build",
 ]
 
+
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3", None),
+    "boost_histogram": ("https://boost-histogram.readthedocs.io/en/latest", None),
+}
 
 # -- Options for HTML output -------------------------------------------------
 

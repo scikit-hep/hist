@@ -13,4 +13,6 @@ if not importlib.util.find_spec("dask_histogram"):
 from .hist import Hist
 from .namedhist import NamedHist
 
-__all__ = ["Hist", "NamedHist"]
+new = Hist.new
+
+__all__ = ["Hist", "NamedHist", "new"]

@@ -2,13 +2,12 @@ from __future__ import annotations
 
 import inspect
 import sys
-from typing import Any, Callable, Iterable, NamedTuple, Union
+from collections.abc import Callable, Iterable
+from typing import Any, Literal, NamedTuple, TypeAlias
 
 import numpy as np
 
 import hist
-
-from ._compat.typing import Literal
 
 try:
     import matplotlib.axes
@@ -57,10 +56,10 @@ class PullArtists(NamedTuple):
     patch_artist: list[matplotlib.patches.Rectangle]
 
 
-MainAxisArtists = Union[FitResultArtists, Hist1DArtists]
+MainAxisArtists: TypeAlias = FitResultArtists | Hist1DArtists
 
-RatioArtists = Union[RatioErrorbarArtists, RatioBarArtists]
-RatiolikeArtists = Union[RatioArtists, PullArtists]
+RatioArtists = RatioErrorbarArtists | RatioBarArtists
+RatiolikeArtists = RatioArtists | PullArtists
 
 
 def __dir__() -> tuple[str, ...]:
@@ -122,7 +121,7 @@ def _expr_to_lambda(expr: str) -> Callable[..., Any]:
     varnames = list(OrderedDict.fromkeys([name for name in varnames if name != "x"]))
     lambdastr = f"lambda x,{','.join(varnames)}: {expr}"
     # pylint: disable-next=eval-used
-    return eval(lambdastr)  # type: ignore[no-any-return]  # noqa: PGH001
+    return eval(lambdastr)  # type: ignore[no-any-return]
 
 
 def _curve_fit_wrapper(
@@ -199,7 +198,7 @@ def _plot_keywords_wrapper(ax: matplotlib.axes.Axes, legend: bool | None) -> Non
 
 
 def plot2d_full(
-    self: hist.BaseHist,
+    self: hist.BaseHist[Any],
     *,
     ax_dict: dict[str, matplotlib.axes.Axes] | None = None,
     **kwargs: Any,
@@ -208,6 +207,21 @@ def plot2d_full(
     Plot2d_full method for BaseHist object.
 
     Pass a dict of axes to ``ax_dict``, otherwise, the current figure will be used.
+
+    Other Parameters
+    ----------------
+
+    main_* : optional
+        Keywords arguments prefixed with ''main_'' are forwarded to the main 2D histogram
+        plot and controls its appearance.
+
+    top_* : optional
+        Keywords arguments prefixed with ''top_'' are forwarded to the top histogram plot and controls
+        its appearance.
+
+    side_* : optional
+        Keywords arguments prefixed with ''side_'' are forwarded to the side histogram plot
+        and controls its appearance.
     """
     # Type judgement
     if self.ndim != 2:
@@ -241,7 +255,7 @@ def plot2d_full(
     side_kwargs = _filter_dict(kwargs, "side_")
 
     # judge whether some arguments left
-    if len(kwargs):
+    if kwargs:
         raise ValueError(f"{set(kwargs)} not needed")
 
     # Plot: plot the 2d-histogram
@@ -282,7 +296,7 @@ def plot2d_full(
 
 
 def _construct_gaussian_callable(
-    __hist: hist.BaseHist,
+    __hist: hist.BaseHist[Any],
 ) -> Callable[[np.typing.NDArray[Any]], np.typing.NDArray[Any]]:
     x_values = __hist.axes[0].centers
     hist_values = __hist.values()
@@ -310,7 +324,7 @@ def _construct_gaussian_callable(
 
 def _fit_callable_to_hist(
     model: Callable[[np.typing.NDArray[Any]], np.typing.NDArray[Any]],
-    histogram: hist.BaseHist,
+    histogram: hist.BaseHist[Any],
     likelihood: bool = False,
 ) -> tuple[
     np.typing.NDArray[Any],
@@ -347,7 +361,7 @@ def _fit_callable_to_hist(
 
 
 def _plot_fit_result(
-    __hist: hist.BaseHist,
+    __hist: hist.BaseHist[Any],
     model_values: np.typing.NDArray[Any],
     model_uncert: np.typing.NDArray[Any],
     ax: matplotlib.axes.Axes,
@@ -387,7 +401,7 @@ def _plot_fit_result(
 
 
 def plot_ratio_array(
-    __hist: hist.BaseHist,
+    __hist: hist.BaseHist[Any],
     ratio: np.typing.NDArray[Any],
     ratio_uncert: np.typing.NDArray[Any],
     ax: matplotlib.axes.Axes,
@@ -395,8 +409,27 @@ def plot_ratio_array(
 ) -> RatioArtists:
     """
     Plot a ratio plot on the given axes
+
+    Other Parameters
+    ----------------
+    central_value : float, optional
+        Value of Y-axis at which to draw the horizontal reference line
+        on the ration plot.
+        Default is 1.0.
+
+    uncert_draw_type : {"line", "bar"}, optional
+        Defines how uncertainty is drawn on the ration plot.
+        If "line", uncertainty is shown as error bars.
+        If "bar", uncertainty is shown as bars.
+        Default is "line".
+
+    ylim : tuple of float, optional
+        Y-axis limits for the ratio plot given as (ymin, ymax)
+        If not provided, limits are automatically determined based on
+        the ratio values and their uncertainties.
+
     """
-    x_values = __hist.axes[0].centers
+    x_values = __hist.axes[0].edges[:-1]
     left_edge = __hist.axes.edges[0][0]
     right_edge = __hist.axes.edges[-1][-1]
 
@@ -462,7 +495,7 @@ def plot_ratio_array(
                 valid_ratios + ratio_uncert[1][valid_ratios_idx],
             ]
         )
-        max_delta = np.amax(np.abs(extrema - central_value))
+        max_delta: float = np.amax(np.abs(extrema - central_value))
         ratio_extrema = np.abs(max_delta + central_value)
 
         _alpha = 2.0
@@ -479,7 +512,7 @@ def plot_ratio_array(
 
 
 def plot_pull_array(
-    __hist: hist.BaseHist,
+    __hist: hist.BaseHist[Any],
     pulls: np.typing.NDArray[Any],
     ax: matplotlib.axes.Axes,
     bar_kwargs: dict[str, Any],
@@ -529,8 +562,8 @@ def plot_pull_array(
 
 
 def _plot_ratiolike(
-    self: hist.BaseHist,
-    other: hist.BaseHist
+    self: hist.BaseHist[Any],
+    other: hist.BaseHist[Any]
     | Callable[[np.typing.NDArray[Any]], np.typing.NDArray[Any]]
     | str,
     likelihood: bool = False,
@@ -544,6 +577,35 @@ def _plot_ratiolike(
     Plot ratio-like plots (ratio plots and pull plots) for BaseHist
 
     ``fit_fmt`` can be a string such as ``r"{name} = {value:.3g} $\pm$ {error:.3g}"``
+
+    Other Parameters
+    ----------------
+    rp_* : optional
+        Keyword arguments prefixed with ``rp_`` are forwarded to
+        function :`plot_ratio_array` and control the appearance and behavior
+        of the ratio plot (y-axis limits and the drawing style of uncertainty).
+
+    eb_* : optional
+        Keyword arguments prefixed with ``eb_`` are forwarded to
+        Matplotlib error bar plotting functions and controls the
+        appearance of histogram error bars.
+
+    fp_* : optional
+        Keyword arguments prefixed with ``fp_`` controls the appearance
+        of model curve drawn on the main plot.
+
+    ub_* : optional
+        Keyword arguments prefixed with ``ub_`` controls the appearance
+        of uncertainty bands drawn around model curve.
+
+    bar_* : optional
+        Keyword arguments prefixed with ``bar_`` are forwarded to
+        Matplotlib bar plotting functions used in pull plots.
+
+    pp_* : optional
+        Keyword arguments prefixed with ``pp_`` control the appearance
+        of patch-based elements used in pull plots.
+
     """
     from .intervals import ratio_uncertainty
 
@@ -610,6 +672,7 @@ def _plot_ratiolike(
 
     # Computation and Fit
     hist_values = self.values()
+    hist_values_uncert: np.typing.NDArray[Any] | None = None
 
     main_ax_artists: MainAxisArtists  # Type now due to control flow
     if callable(other) or isinstance(other, str):
@@ -632,7 +695,7 @@ def _plot_ratiolike(
             perr = np.sqrt(np.diagonal(pcov))
 
             fp_label = "Fit"
-            for name, value, error in zip(parnames, popt, perr):
+            for name, value, error in zip(parnames, popt, perr, strict=True):
                 fp_label += "\n  "
                 fp_label += fit_fmt.format(name=name, value=value, error=error)
             fp_kwargs["label"] = fp_label
@@ -656,6 +719,11 @@ def _plot_ratiolike(
 
         main_ax_artists = self_artists, other_artists
 
+        # Compute histogram uncertainties for pull plots
+        variances = self.variances()
+        if variances is not None:
+            hist_values_uncert = np.sqrt(variances)
+
     subplot_ax_artists: RatiolikeArtists  # Type now due to control flow
     # Compute ratios: containing no INF values
     with np.errstate(divide="ignore", invalid="ignore"):
@@ -672,6 +740,9 @@ def _plot_ratiolike(
             )
 
         elif view == "pull":
+            if hist_values_uncert is None:
+                msg = "Cannot compute from a variance-less histogram, try a Weight storage"
+                raise RuntimeError(msg)
             pulls: np.typing.NDArray[Any] = (
                 hist_values - compare_values
             ) / hist_values_uncert
@@ -694,7 +765,7 @@ def get_center(x: str | int | tuple[float, float]) -> str | float:
 
 
 def plot_pie(
-    self: hist.BaseHist,
+    self: hist.BaseHist[Any],
     *,
     ax: matplotlib.axes.Axes | None = None,
     **kwargs: Any,
@@ -711,7 +782,7 @@ def plot_pie(
 
 
 def plot_stack(
-    self: hist.stack.Stack,
+    self: hist.stack.Stack[Any],
     *,
     ax: matplotlib.axes.Axes | None = None,
     legend: bool | None = False,

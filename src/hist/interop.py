@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
-from typing import Any, Callable, Iterator, TypeVar, cast
+from collections.abc import Callable, Iterator, Sequence
+from typing import Any, Protocol, TypeVar, cast
 
 import numpy as np
 
-from ._compat.typing import ArrayLike, Protocol
+from ._compat.typing import ArrayLike
 
 T_contra = TypeVar("T_contra", contravariant=True)
 U = TypeVar("U")
@@ -13,13 +13,11 @@ V = TypeVar("V")
 
 
 class HistogramModuleProtocol(Protocol[T_contra, U]):
-    def unpack(self, obj: T_contra) -> dict[str, U] | None:
-        ...
+    def unpack(self, obj: T_contra) -> dict[str, U] | None: ...
 
     def broadcast_and_flatten(
         self, objects: Sequence[U | ArrayLike]
-    ) -> tuple[np.typing.NDArray[Any], ...]:
-        ...
+    ) -> tuple[np.typing.NDArray[Any], ...]: ...
 
 
 _histogram_modules: dict[type, HistogramModuleProtocol[Any, Any]] = {}
@@ -69,15 +67,22 @@ def destructure(obj: Any) -> dict[str, Any] | None:
     raise TypeError(f"No histogram module found for {obj!r}")
 
 
-def broadcast_and_flatten(args: Sequence[Any]) -> tuple[np.typing.NDArray[Any], ...]:
+def broadcast_and_flatten(
+    args: Sequence[Any],
+) -> tuple[str | np.typing.NDArray[Any], ...]:
     """
     Convert the given histogram-module arrays into a set of consistent 1D NumPy arrays
     for histogram filling. For NumPy this entails broadcasting and flattening.
+
+    This skips passing strings to the backend, they are left inplace.
     """
-    for module in find_histogram_modules(*args):
-        result = module.broadcast_and_flatten(args)
+
+    non_strings = [x for x in args if not isinstance(x, str)]
+    for module in find_histogram_modules(*non_strings):
+        result = module.broadcast_and_flatten(non_strings)
         if result is not NotImplemented:
-            return result
+            it = iter(result)
+            return tuple(next(it) if not isinstance(x, str) else x for x in args)
 
     raise TypeError(f"No histogram module found for {args!r}")
 
@@ -101,7 +106,7 @@ class NumpyHistogramModule:
             try:
                 arrays.append(np.asarray(arg))
             except (TypeError, ValueError):
-                return NotImplemented
+                return NotImplemented  # type: ignore[no-any-return]
 
         return tuple(np.ravel(x) for x in np.broadcast_arrays(*arrays))
 
@@ -128,6 +133,6 @@ else:
                 try:
                     arrays.append(np.asarray(arg))
                 except (TypeError, ValueError):
-                    return NotImplemented
+                    return NotImplemented  # type: ignore[no-any-return]
 
             return tuple(np.ravel(x) for x in np.broadcast_arrays(*arrays))

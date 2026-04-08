@@ -11,8 +11,6 @@ from pytest import approx
 import hist
 from hist import Hist, axis, storage
 
-BHV = tuple(int(x) for x in bh.__version__.split(".")[:2])
-
 # TODO: specify what error is raised
 
 
@@ -132,7 +130,7 @@ def test_general_fill_regular():
     z_one_only = h[{2: bh.loc(1)}]
     for idx_x in range(10):
         for idx_y in range(10):
-            if idx_x == 3 and idx_y == 4 or idx_x == 4 and idx_y == 4:
+            if (idx_x == 3 and idx_y == 4) or (idx_x == 4 and idx_y == 4):
                 assert z_one_only[idx_x, idx_y] == 1
             elif idx_x == 5 and idx_y == 4:
                 assert z_one_only[idx_x, idx_y] == 3
@@ -173,7 +171,7 @@ def test_general_fill_variable():
     z_one_only = h[{2: bh.loc(1)}]
     for idx_x in range(10):
         for idx_y in range(10):
-            if idx_x == 3 and idx_y == 4 or idx_x == 4 and idx_y == 4:
+            if (idx_x == 3 and idx_y == 4) or (idx_x == 4 and idx_y == 4):
                 assert z_one_only[idx_x, idx_y] == 1
             elif idx_x == 5 and idx_y == 4:
                 assert z_one_only[idx_x, idx_y] == 3
@@ -195,7 +193,7 @@ def test_general_fill_integer():
     z_one_only = h[{2: bh.loc(1)}]
     for idx_x in range(10):
         for idx_y in range(10):
-            if idx_x == 3 and idx_y == 4 or idx_x == 4 and idx_y == 4:
+            if (idx_x == 3 and idx_y == 4) or (idx_x == 4 and idx_y == 4):
                 assert z_one_only[idx_x, idx_y] == 1
             elif idx_x == 5 and idx_y == 4:
                 assert z_one_only[idx_x, idx_y] == 3
@@ -205,8 +203,8 @@ def test_general_fill_integer():
 
 def test_general_fill_int_cat():
     h = Hist(
-        axis.IntCategory(range(10), name="x", flow=BHV < (1, 4)),
-        axis.IntCategory(range(10), name="y", overflow=BHV < (1, 4)),
+        axis.IntCategory(range(10), name="x", flow=False),
+        axis.IntCategory(range(10), name="y", overflow=False),
         axis.IntCategory(range(2), name="z"),
     ).fill(
         x=[3, 3, 3, 4, 5, 5, 5],
@@ -214,18 +212,14 @@ def test_general_fill_int_cat():
         z=[0, 0, 1, 1, 1, 1, 1],
     )
 
-    if BHV < (1, 4):
-        assert h.axes[0].traits.overflow
-        assert h.axes[1].traits.overflow
-    else:
-        assert not h.axes[0].traits.overflow
-        assert not h.axes[1].traits.overflow
+    assert not h.axes[0].traits.overflow
+    assert not h.axes[1].traits.overflow
     assert h.axes[2].traits.overflow
 
     z_one_only = h[{2: bh.loc(1)}]
     for idx_x in range(10):
         for idx_y in range(10):
-            if idx_x == 3 and idx_y == 4 or idx_x == 4 and idx_y == 4:
+            if (idx_x == 3 and idx_y == 4) or (idx_x == 4 and idx_y == 4):
                 assert z_one_only[idx_x, idx_y] == 1
             elif idx_x == 5 and idx_y == 4:
                 assert z_one_only[idx_x, idx_y] == 3
@@ -235,8 +229,8 @@ def test_general_fill_int_cat():
 
 def test_general_fill_str_cat():
     h = Hist(
-        axis.StrCategory("FT", name="x", flow=BHV < (1, 4)),
-        axis.StrCategory(list("FT"), name="y", overflow=BHV < (1, 4)),
+        axis.StrCategory("FT", name="x", flow=False),
+        axis.StrCategory(list("FT"), name="y", overflow=False),
         axis.StrCategory(["F", "T"], name="z"),
     ).fill(
         ["T", "T", "T", "T", "T", "F", "T"],
@@ -244,12 +238,8 @@ def test_general_fill_str_cat():
         ["F", "F", "T", "T", "T", "T", "T"],
     )
 
-    if BHV < (1, 4):
-        assert h.axes[0].traits.overflow
-        assert h.axes[1].traits.overflow
-    else:
-        assert not h.axes[0].traits.overflow
-        assert not h.axes[1].traits.overflow
+    assert not h.axes[0].traits.overflow
+    assert not h.axes[1].traits.overflow
     assert h.axes[2].traits.overflow
 
     z_one_only = h[{2: bh.loc("T")}]
@@ -307,7 +297,7 @@ def test_general_access():
     h = Hist(
         axis.Regular(50, -5, 5, name="Norm", label="normal distribution"),
         axis.Regular(50, -5, 5, name="Unif", label="uniform distribution"),
-        axis.StrCategory(["hi", "hello"], name="Greet", flow=BHV < (1, 4)),
+        axis.StrCategory(["hi", "hello"], name="Greet", flow=False),
         axis.Boolean(name="Yes"),
         axis.Integer(0, 1000, name="Int"),
     ).fill(
@@ -699,7 +689,7 @@ def test_general_transform_proxy():
 
 def test_hist_proxy_matches(named_hist):
     h = named_hist.new.Reg(10, 0, 1, name="x").Double()
-    assert type(h) == named_hist
+    assert type(h) is named_hist
 
 
 def test_hist_proxy():
@@ -710,7 +700,7 @@ def test_hist_proxy():
     h = Hist.new.Reg(10, 0, 1, name="x").Double().fill([0.5, 0.5])
     assert h[0.5j] == 2
 
-    assert type(h) == Hist
+    assert type(h) is Hist
 
     assert not hasattr(Hist(), "new")
 
@@ -932,6 +922,14 @@ def test_select_by_index_imag():
     assert tuple(h[[8j, 7j]].axes[0]) == (8, 7)
 
 
+@pytest.mark.filterwarnings("ignore:List indexing selection is experimental")
+def test_select_by_index_wildcards():
+    h = hist.new.Reg(10, 0, 10).StrCat(["ABC", "BCD", "CDE", "DEF"]).Weight()
+    assert tuple(h[:, "*E*"].axes[1]) == ("CDE", "DEF")
+    assert tuple(h[:, ["*B*", "CDE"]].axes[1]) == ("ABC", "BCD", "CDE")
+    assert tuple(h[:, ["*B*", "?D?"]].axes[1]) == ("ABC", "BCD", "CDE")
+
+
 def test_sorted_simple():
     h = Hist.new.IntCat([4, 1, 2]).StrCat(["AB", "BCC", "BC"]).Double()
     assert tuple(h.sort(0).axes[0]) == (1, 2, 4)
@@ -1023,3 +1021,13 @@ def test_T_3D():
     assert h_3D.T.axes[0] == h_3D.axes[2]
     assert h_3D.T.axes[1] == h_3D.axes[1]
     assert h_3D.T.axes[2] == h_3D.axes[0]
+
+
+def test_fill_missing_axis_reports_axis_name():
+    h = Hist(
+        axis.Regular(5, 0, 1, name="x"),
+        axis.Regular(5, 0, 1, name="y"),
+    )
+
+    with pytest.raises(TypeError):
+        h.fill(x=[0.1, 0.2])

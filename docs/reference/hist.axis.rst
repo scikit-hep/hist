@@ -3,8 +3,8 @@ hist.axis package
 
 .. automodule:: hist.axis
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 Submodules
 ----------

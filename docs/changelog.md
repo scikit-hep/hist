@@ -1,5 +1,186 @@
 # Changelog
 
+## Version 2.10.1
+
+Fixes:
+
+* Patch repr of `MultiCell` for boost-histogram 1.7.0 and 1.7.1.
+  [#673](https://github.com/scikit-hep/hist/pull/673)
+* Relax optional dependency cap on dask.
+  [#672](https://github.com/scikit-hep/hist/pull/672)
+
+
+## Version 2.10.0
+
+Features:
+
+* Remove Python 3.9 support.
+  [#646](https://github.com/scikit-hep/hist/pull/646)
+* Support boost-histogram 1.7 (including `MultiCell`) and drop boost-histogram 1.5
+  [#667](https://github.com/scikit-hep/hist/pull/667)
+
+Typing:
+
+* Adapt boost-histogram 1.7.1's new generic typing
+  [#668](https://github.com/scikit-hep/hist/pull/668)
+* Improve integrate type
+  [#670](https://github.com/scikit-hep/hist/pull/670)
+
+## Version 2.9.2
+
+Fixes:
+
+* Revert [#654](https://github.com/scikit-hep/hist/pull/654), caused issues with some fills.
+  [#662](https://github.com/scikit-hep/hist/pull/662)
+
+Tests/CI:
+
+* Add testing for dask-awkward.
+  [#663](https://github.com/scikit-hep/hist/pull/663)
+* Enable dask tests in python 3.14
+  [#666](https://github.com/scikit-hep/hist/pull/666)
+* Bump the image used for docs.
+  [#664](https://github.com/scikit-hep/hist/pull/664)
+
+## Version 2.9.1
+
+Fixes:
+
+* Improve error message for invalid weighted fill
+  [#654](https://github.com/scikit-hep/hist/pull/654)
+* Improved error message for missing axes in `Hist.fill`
+  [#651](https://github.com/scikit-hep/hist/pull/651)
+* Misaligned ratio plots for `Int` axes
+  [#655](https://github.com/scikit-hep/hist/pull/655)
+
+Tests:
+
+* Modernize config slightly
+  [#642](https://github.com/scikit-hep/hist/pull/642)
+* pytest `log_level` is better than `log_cli_level`
+  [#645](https://github.com/scikit-hep/hist/pull/645)
+
+CI:
+
+* GHA release notes now require bot suffix
+  [#658](https://github.com/scikit-hep/hist/pull/658)
+* Avoid deprecation warning from pyparsing in some jobs
+  [#657](https://github.com/scikit-hep/hist/pull/657)
+
+Documentation:
+
+* Add agoose77 as a contributor for code, and doc
+  [#656](https://github.com/scikit-hep/hist/pull/656)
+* Add missing links to changelog
+  [#633](https://github.com/scikit-hep/hist/pull/633)
+* Improved plotting kwargs documentation
+  [#652](https://github.com/scikit-hep/hist/pull/652)
+* One more missing author
+  [#634](https://github.com/scikit-hep/hist/pull/634)
+
+## Version 2.9.0
+
+Features:
+
+* Support for boost-histogram 1.6, drop support for Python 3.8, boost-histogram
+  < 1.5, add support for Python 3.14/3.14t
+  [#597](https://github.com/scikit-hep/hist/pull/597) [#618](https://github.com/scikit-hep/hist/pull/618), [#631](https://github.com/scikit-hep/hist/pull/631)
+* Support serialization with boost-histogram 1.6
+  [#627](https://github.com/scikit-hep/hist/pull/627)
+* Add `legend=True` for plot1d stacked
+  [#622](https://github.com/scikit-hep/hist/pull/622)
+* Specify license with SPDX, add some authors
+  [#625](https://github.com/scikit-hep/hist/pull/625), [#628](https://github.com/scikit-hep/hist/pull/628)
+
+Fixes:
+
+* Handle fill-flattened for non-user args
+  [#612](https://github.com/scikit-hep/hist/pull/612)
+* Handle string args for fill-flattened
+  [#629](https://github.com/scikit-hep/hist/pull/629)
+* Label/name propagation fixed for casting histograms
+  [#630](https://github.com/scikit-hep/hist/pull/630)
+
+Tests:
+
+* Handle tests that need mplhep
+  [#604](https://github.com/scikit-hep/hist/pull/604)
+* Modernize noxfile
+  [#623](https://github.com/scikit-hep/hist/pull/623)
+* Use dependency-groups
+  [#624](https://github.com/scikit-hep/hist/pull/624)
+
+CI:
+
+* Upload nightly wheels to Anaconda
+  [#611](https://github.com/scikit-hep/hist/pull/611)
+* Add pass job to tests
+  [#619](https://github.com/scikit-hep/hist/pull/619)
+* Modernize pylint and uv
+  [#629](https://github.com/scikit-hep/hist/pull/629)
+* Update and check the minimum versions in CI
+  [#621](https://github.com/scikit-hep/hist/pull/621)
+* Speed up read-the-docs
+  [#576](https://github.com/scikit-hep/hist/pull/576)
+
+
+## Version 2.8.1
+
+Features:
+
+* Allow wildcards in StrCat list indexing by @andrzejnovak
+  [#601](https://github.com/scikit-hep/hist/pull/601)
+
+Tests:
+
+* Limit dask version
+  [#596](https://github.com/scikit-hep/hist/pull/596)
+
+## Version 2.8.0
+
+Features:
+
+* Support boost-histogram 1.5; drop support for Python 3.7, add support for
+  Python 3.13 / 3.13t
+  [#582](https://github.com/scikit-hep/hist/pull/582)
+
+Fixes:
+
+* Support IntCat for plot1d overlay
+  [#419](https://github.com/scikit-hep/hist/pull/419)
+
+
+## Version 2.7.3
+
+This release fixes an issue with Python 3.12 pulling in NumPy 2 pre-releases.
+
+Fixes:
+
+* Sample required error message
+  [#538](https://github.com/scikit-hep/hist/pull/538)
+* `hist.dask.new` to match top-level package
+  [#563](https://github.com/scikit-hep/hist/pull/563)
+
+Docs:
+
+* Clarify sample term required for Mean storage
+  [#536](https://github.com/scikit-hep/hist/pull/536)
+
+CI:
+
+* Move to using Ruff Jupyter support
+  [#543](https://github.com/scikit-hep/hist/pull/543)
+* Move to using Ruff formatter
+  [#544](https://github.com/scikit-hep/hist/pull/544)
+* Group dependabot updates
+  [#554](https://github.com/scikit-hep/hist/pull/554)
+* Use uv
+  [#564](https://github.com/scikit-hep/hist/pull/564)
+* Add GitHub artifact attestations to package distribution
+  [#568](https://github.com/scikit-hep/hist/pull/568)
+* Reduce update frequency
+  [#571](https://github.com/scikit-hep/hist/pull/571)
+
 ## Version 2.7.2
 
 * Support boost-histogram 1.4.0 in addition to 1.3.x, including Python 3.12,

@@ -1,7 +1,9 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Callable, Iterable
+from collections.abc import Callable, Iterable
+from typing import TYPE_CHECKING, Any
 
+import boost_histogram as bh
 import numpy as np
 
 from . import axis, storage
@@ -19,15 +21,15 @@ class QuickConstruct:
     """
 
     __slots__ = (
-        "hist_class",
         "axes",
+        "hist_class",
     )
 
     def __repr__(self) -> str:
         inside = ", ".join(repr(ax) for ax in self.axes)
         return f"{self.__class__.__name__}({self.hist_class.__name__}, {inside})"
 
-    def __init__(self, hist_class: type[BaseHist], *axes: AxisProtocol) -> None:
+    def __init__(self, hist_class: type[BaseHist[Any]], *axes: AxisProtocol) -> None:
         self.hist_class = hist_class
         self.axes = axes
 
@@ -326,7 +328,7 @@ class ConstructProxy(QuickConstruct):
         data: np.typing.NDArray[Any] | None = None,
         label: str | None = None,
         name: str | None = None,
-    ) -> BaseHist:
+    ) -> BaseHist[bh.storage.Double]:
         return self.hist_class(
             *self.axes,
             storage=storage.Double(),
@@ -343,7 +345,7 @@ class ConstructProxy(QuickConstruct):
         data: np.typing.NDArray[Any] | None = None,
         label: str | None = None,
         name: str | None = None,
-    ) -> BaseHist:
+    ) -> BaseHist[bh.storage.Int64]:
         return self.hist_class(
             *self.axes,
             storage=storage.Int64(),
@@ -360,7 +362,7 @@ class ConstructProxy(QuickConstruct):
         data: np.typing.NDArray[Any] | None = None,
         label: str | None = None,
         name: str | None = None,
-    ) -> BaseHist:
+    ) -> BaseHist[bh.storage.AtomicInt64]:
         return self.hist_class(
             *self.axes,
             storage=storage.AtomicInt64(),
@@ -377,7 +379,7 @@ class ConstructProxy(QuickConstruct):
         data: np.typing.NDArray[Any] | None = None,
         label: str | None = None,
         name: str | None = None,
-    ) -> BaseHist:
+    ) -> BaseHist[bh.storage.Weight]:
         return self.hist_class(
             *self.axes,
             storage=storage.Weight(),
@@ -394,7 +396,7 @@ class ConstructProxy(QuickConstruct):
         data: np.typing.NDArray[Any] | None = None,
         label: str | None = None,
         name: str | None = None,
-    ) -> BaseHist:
+    ) -> BaseHist[bh.storage.Mean]:
         return self.hist_class(
             *self.axes,
             storage=storage.Mean(),
@@ -411,7 +413,7 @@ class ConstructProxy(QuickConstruct):
         data: np.typing.NDArray[Any] | None = None,
         label: str | None = None,
         name: str | None = None,
-    ) -> BaseHist:
+    ) -> BaseHist[bh.storage.WeightedMean]:
         return self.hist_class(
             *self.axes,
             storage=storage.WeightedMean(),
@@ -428,7 +430,7 @@ class ConstructProxy(QuickConstruct):
         data: np.typing.NDArray[Any] | None = None,
         label: str | None = None,
         name: str | None = None,
-    ) -> BaseHist:
+    ) -> BaseHist[bh.storage.Unlimited]:
         return self.hist_class(
             *self.axes,
             storage=storage.Unlimited(),
@@ -438,8 +440,29 @@ class ConstructProxy(QuickConstruct):
             name=name,
         )
 
+    if hasattr(storage, "MultiCell"):
+
+        def MultiCell(
+            self,
+            /,
+            nelem: int,
+            *,
+            metadata: Any = None,
+            data: np.typing.NDArray[Any] | None = None,
+            label: str | None = None,
+            name: str | None = None,
+        ) -> BaseHist[bh.storage.MultiCell]:
+            return self.hist_class(
+                *self.axes,
+                storage=storage.MultiCell(nelem),
+                metadata=metadata,
+                data=data,
+                label=label,
+                name=name,
+            )
+
 
 class MetaConstructor(type):
     @property
-    def new(cls: type[BaseHist]) -> QuickConstruct:  # type: ignore[misc]
+    def new(cls: type[BaseHist[Any]]) -> QuickConstruct:  # type: ignore[misc]
         return QuickConstruct(cls)
