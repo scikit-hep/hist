@@ -38,6 +38,17 @@ docker run --rm -v $PWD:/nox -w /nox -t quay.io/pypa/manylinux_2_28_x86_64:lates
 docker run --rm -v $PWD:/nox -w /nox -t quay.io/pypa/manylinux_2_28_x86_64:latest pipx run nox -s regenerate
 ```
 
+### Documentation
+The generation of documentation requires `pandoc` and `dot` (a Graphviz application) in addition.
+
+For example, on Debian/ubuntu:
+
+```console
+$ sudo apt install pandoc graphviz
+$ nox -s docs
+$ xdg-open _build/html/index.html
+```
+
 ### PyPI
 
 For extended development, you can set up a development environment using PyPI.
