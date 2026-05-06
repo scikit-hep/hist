@@ -23,8 +23,8 @@ def lint(session):
     """
     Run the linter.
     """
-    session.install("pre-commit")
-    session.run("pre-commit", "run", "--all-files", *session.posargs)
+    session.install("prek")
+    session.run("prek", "run", "--all-files", *session.posargs)
 
 
 @nox.session

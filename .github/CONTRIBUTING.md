@@ -10,11 +10,11 @@ detailed description of best practices for developing Scikit-HEP packages.
 ### Nox
 
 The fastest way to start with development is to use nox. If you don't have nox,
-you can use `pipx run nox` to run it without installing, or `pipx install nox`.
-If you don't have pipx (pip for applications), then you can install with with
-`pip install pipx` (the only case were installing an application with regular
-pip is reasonable). If you use macOS, then pipx and nox are both in brew, use
-`brew install pipx nox`.
+you can use `uvx nox` to run it without installing, or `uv tool install nox`.
+If you don't have uv (or pipx, which is similar), then you can install with with
+`pip install uv` (the only case were installing an application with regular
+pip is reasonable). If you use macOS, then uv, prek, and nox are both in brew, use
+`brew install uv prek nox`.
 
 To use, run `nox`. This will lint and test using every installed version of
 Python on your system, skipping ones that are not installed. You can also run
@@ -64,21 +64,20 @@ You should have pip 10 or later.
 
 ## Post setup
 
-You should prepare pre-commit, which will help you by checking that commits
+You should prepare prek, which will help you by checking that commits
 pass required checks:
 
 ```bash
-pipx install pre-commit # or brew install pre-commit on macOS
-pre-commit install # Will install a pre-commit hook into the git repo
+uv tool install prek # or brew install prek on macOS
+prek install # Will install a pre-commit hook into the git repo
 ```
 
-You can also/alternatively run `pre-commit run` (changes only) or `pre-commit
-run --all-files` to check even without installing the hook.
+You can also/alternatively run `prek` (changes only) or `prek -a` to check even without installing the hook.
 
 ## Testing
 
 Use PyTest to run the unit checks:
 
 ```bash
-pytest
+uv run pytest
 ```
