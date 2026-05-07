@@ -1,11 +1,13 @@
 from __future__ import annotations
 
-from collections.abc import Callable, Iterator, Sequence
-from typing import Any, Protocol, TypeVar, cast
+from typing import TYPE_CHECKING, Any, Protocol, TypeVar, cast
 
 import numpy as np
 
-from ._compat.typing import ArrayLike
+if TYPE_CHECKING:
+    from collections.abc import Callable, Iterator, Sequence
+
+    from ._compat.typing import ArrayLike
 
 T_contra = TypeVar("T_contra", contravariant=True)
 U = TypeVar("U")
@@ -64,7 +66,8 @@ def destructure(obj: Any) -> dict[str, Any] | None:
     """
     for module in find_histogram_modules(obj):
         return module.unpack(obj)
-    raise TypeError(f"No histogram module found for {obj!r}")
+    msg = f"No histogram module found for {obj!r}"
+    raise TypeError(msg)
 
 
 def broadcast_and_flatten(
@@ -84,7 +87,8 @@ def broadcast_and_flatten(
             it = iter(result)
             return tuple(next(it) if not isinstance(x, str) else x for x in args)
 
-    raise TypeError(f"No histogram module found for {args!r}")
+    msg = f"No histogram module found for {args!r}"
+    raise TypeError(msg)
 
 
 @histogram_module_for(np.ndarray)
@@ -121,7 +125,7 @@ else:
     class PandasHistogramModule:
         @staticmethod
         def unpack(obj: pd.DataFrame) -> dict[str, pd.Series[Any]]:
-            return cast(dict[str, pd.Series[Any]], obj.to_dict("series"))
+            return cast("dict[str, pd.Series[Any]]", obj.to_dict("series"))
 
         @staticmethod
         def broadcast_and_flatten(

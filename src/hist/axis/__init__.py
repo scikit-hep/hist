@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import typing
-from collections.abc import Iterable
 from typing import Any, Protocol
 
 import boost_histogram.axis as bha
@@ -10,6 +9,9 @@ import hist
 
 from ..axestuple import ArrayTuple, NamedAxesTuple
 from . import transform
+
+if typing.TYPE_CHECKING:
+    from collections.abc import Iterable
 
 __all__ = (
     "ArrayTuple",
@@ -61,7 +63,7 @@ class AxesMixin:
         """
         Get the name for the Regular axis
         """
-        return typing.cast(str, self._raw_metadata.get("name", ""))
+        return typing.cast("str", self._raw_metadata.get("name", ""))
 
     @property
     def label(self: AxisProtocol) -> str:

@@ -99,9 +99,8 @@ def clopper_pearson_interval(
         coverage = stats.norm.cdf(1) - stats.norm.cdf(-1)
     # Numerator is subset of denominator
     if np.any(num > denom):
-        raise ValueError(
-            "Found numerator larger than denominator while calculating binomial uncertainty"
-        )
+        msg = "Found numerator larger than denominator while calculating binomial uncertainty"
+        raise ValueError(msg)
     interval_min = stats.beta.ppf((1 - coverage) / 2, num, denom - num + 1)
     interval_max = stats.beta.ppf((1 + coverage) / 2, num + 1, denom - num)
     interval = np.stack((interval_min, interval_max))
@@ -159,7 +158,6 @@ def ratio_uncertainty(
     elif uncertainty_type == "efficiency":
         ratio_uncert = np.abs(clopper_pearson_interval(num, denom) - ratio)
     else:
-        raise TypeError(
-            f"'{uncertainty_type}' is an invalid option for uncertainty_type."
-        )
+        msg = f"'{uncertainty_type}' is an invalid option for uncertainty_type."  # type: ignore[unreachable]
+        raise TypeError(msg)
     return ratio_uncert

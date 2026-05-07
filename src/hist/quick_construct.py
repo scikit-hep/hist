@@ -1,16 +1,17 @@
 from __future__ import annotations
 
-from collections.abc import Callable, Iterable
 from typing import TYPE_CHECKING, Any
 
-import boost_histogram as bh
-import numpy as np
-
 from . import axis, storage
-from .axis import AxisProtocol
-from .axis.transform import AxisTransform
 
 if TYPE_CHECKING:
+    from collections.abc import Callable, Iterable
+
+    import boost_histogram as bh
+    import numpy as np
+
+    from .axis import AxisProtocol
+    from .axis.transform import AxisTransform
     from .basehist import BaseHist
 
 

@@ -2,12 +2,14 @@ from __future__ import annotations
 
 import inspect
 import sys
-from collections.abc import Callable, Iterable
-from typing import Any, Literal, NamedTuple, TypeAlias
+from typing import TYPE_CHECKING, Any, Literal, NamedTuple, TypeAlias
 
 import numpy as np
 
 import hist
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Iterable
 
 try:
     import matplotlib.axes
@@ -73,7 +75,7 @@ def _expand_shortcuts(key: str) -> str:
 
 
 def _filter_dict(
-    __dict: dict[str, Any], prefix: str, *, ignore: set[str] | None = None
+    dict_: dict[str, Any], prefix: str, *, ignore: set[str] | None = None
 ) -> dict[str, Any]:
     """
     Keyword argument conversion: convert the kwargs to several independent args, pulling
@@ -81,14 +83,14 @@ def _filter_dict(
     """
 
     # If passed explicitly, use that
-    if f"{prefix}kw" in __dict:
-        res: dict[str, Any] = __dict.pop(f"{prefix}kw")
+    if f"{prefix}kw" in dict_:
+        res: dict[str, Any] = dict_.pop(f"{prefix}kw")
         return {_expand_shortcuts(k): v for k, v in res.items()}
 
     ignore_set: set[str] = ignore or set()
     return {
-        _expand_shortcuts(key[len(prefix) :]): __dict.pop(key)
-        for key in list(__dict)
+        _expand_shortcuts(key[len(prefix) :]): dict_.pop(key)
+        for key in list(dict_)
         if key.startswith(prefix) and key not in ignore_set
     }
 
@@ -113,7 +115,7 @@ def _expr_to_lambda(expr: str) -> Callable[..., Any]:
         tokval = x[1]
         if toknum != NAME:
             continue
-        if ix > 0 and g[ix - 1][1] in {"."}:
+        if ix > 0 and g[ix - 1][1] == ".":
             continue
         if ix < len(g) - 1 and g[ix + 1][1] in {".", "("}:
             continue
@@ -194,7 +196,8 @@ def _plot_keywords_wrapper(ax: matplotlib.axes.Axes, legend: bool | None) -> Non
         if ax.get_legend_handles_labels()[0]:
             ax.legend()
         else:
-            raise ValueError("No labels to legend")
+            msg = "No labels to legend"
+            raise ValueError(msg)
 
 
 def plot2d_full(
@@ -225,7 +228,8 @@ def plot2d_full(
     """
     # Type judgement
     if self.ndim != 2:
-        raise TypeError("Only 2D-histogram has plot2d_full")
+        msg = "Only 2D-histogram has plot2d_full"
+        raise TypeError(msg)
 
     if ax_dict is None:
         ax_dict = {}
@@ -237,7 +241,8 @@ def plot2d_full(
             top_ax = ax_dict["top_ax"]
             side_ax = ax_dict["side_ax"]
         except KeyError as err:
-            raise ValueError("All axes should be all given or none at all") from err
+            msg = "All axes should be all given or none at all"
+            raise ValueError(msg) from err
 
     else:
         fig = plt.gcf()
@@ -256,7 +261,8 @@ def plot2d_full(
 
     # judge whether some arguments left
     if kwargs:
-        raise ValueError(f"{set(kwargs)} not needed")
+        msg = f"{set(kwargs)} not needed"
+        raise ValueError(msg)
 
     # Plot: plot the 2d-histogram
 
@@ -296,10 +302,10 @@ def plot2d_full(
 
 
 def _construct_gaussian_callable(
-    __hist: hist.BaseHist[Any],
+    hist_: hist.BaseHist[Any],
 ) -> Callable[[np.typing.NDArray[Any]], np.typing.NDArray[Any]]:
-    x_values = __hist.axes[0].centers
-    hist_values = __hist.values()
+    x_values = hist_.axes[0].centers
+    hist_values = hist_.values()
 
     # gaussian with reasonable initial guesses for parameters
     constant = float(hist_values.max())
@@ -337,9 +343,8 @@ def _fit_callable_to_hist(
     """
     variances = histogram.variances()
     if variances is None:
-        raise RuntimeError(
-            "Cannot compute from a variance-less histogram, try a Weight storage"
-        )
+        msg = "Cannot compute from a variance-less histogram, try a Weight storage"
+        raise RuntimeError(msg)
     hist_uncert = np.sqrt(variances)
 
     # Infer best fit model parameters and covariance matrix
@@ -361,7 +366,7 @@ def _fit_callable_to_hist(
 
 
 def _plot_fit_result(
-    __hist: hist.BaseHist[Any],
+    hist_: hist.BaseHist[Any],
     model_values: np.typing.NDArray[Any],
     model_uncert: np.typing.NDArray[Any],
     ax: matplotlib.axes.Axes,
@@ -372,15 +377,14 @@ def _plot_fit_result(
     """
     Plot fit of model to histogram data
     """
-    x_values = __hist.axes[0].centers
-    variances = __hist.variances()
+    x_values = hist_.axes[0].centers
+    variances = hist_.variances()
     if variances is None:
-        raise RuntimeError(
-            "Cannot compute from a variance-less histogram, try a Weight storage"
-        )
+        msg = "Cannot compute from a variance-less histogram, try a Weight storage"
+        raise RuntimeError(msg)
     hist_uncert = np.sqrt(variances)
 
-    errorbars = ax.errorbar(x_values, __hist.values(), hist_uncert, **eb_kwargs)
+    errorbars = ax.errorbar(x_values, hist_.values(), hist_uncert, **eb_kwargs)
 
     # Ensure zorder draws data points above model
     line_zorder = errorbars[0].get_zorder() - 1
@@ -401,7 +405,7 @@ def _plot_fit_result(
 
 
 def plot_ratio_array(
-    __hist: hist.BaseHist[Any],
+    hist_: hist.BaseHist[Any],
     ratio: np.typing.NDArray[Any],
     ratio_uncert: np.typing.NDArray[Any],
     ax: matplotlib.axes.Axes,
@@ -429,9 +433,9 @@ def plot_ratio_array(
         the ratio values and their uncertainties.
 
     """
-    x_values = __hist.axes[0].edges[:-1]
-    left_edge = __hist.axes.edges[0][0]
-    right_edge = __hist.axes.edges[-1][-1]
+    x_values = hist_.axes[0].edges[:-1]
+    left_edge = hist_.axes.edges[0][0]
+    right_edge = hist_.axes.edges[-1][-1]
 
     # Set 0 and inf to nan to hide during plotting
     ratio[ratio == 0] = np.nan
@@ -505,14 +509,14 @@ def plot_ratio_array(
     ax.set_xlim(left_edge, right_edge)
     ax.set_ylim(bottom=ratio_ylim[0], top=ratio_ylim[1])
 
-    ax.set_xlabel(__hist.axes[0].label)
+    ax.set_xlabel(hist_.axes[0].label)
     ax.set_ylabel(kwargs.pop("ylabel", "Ratio"))
 
     return axis_artists
 
 
 def plot_pull_array(
-    __hist: hist.BaseHist[Any],
+    hist_: hist.BaseHist[Any],
     pulls: np.typing.NDArray[Any],
     ax: matplotlib.axes.Axes,
     bar_kwargs: dict[str, Any],
@@ -521,9 +525,9 @@ def plot_pull_array(
     """
     Plot a pull plot on the given axes
     """
-    x_values = __hist.axes[0].centers
-    left_edge = __hist.axes.edges[0][0]
-    right_edge = __hist.axes.edges[-1][-1]
+    x_values = hist_.axes[0].centers
+    left_edge = hist_.axes.edges[0][0]
+    right_edge = hist_.axes.edges[-1][-1]
 
     # Pull: plot the pulls using Matplotlib bar method
     width = (right_edge - left_edge) / len(pulls)
@@ -555,7 +559,7 @@ def plot_pull_array(
 
     ax.set_xlim(left_edge, right_edge)
 
-    ax.set_xlabel(__hist.axes[0].label)
+    ax.set_xlabel(hist_.axes[0].label)
     ax.set_ylabel("Pull")
 
     return PullArtists(bar_artists, patch_artists)
@@ -610,20 +614,19 @@ def _plot_ratiolike(
     from .intervals import ratio_uncertainty
 
     if self.ndim != 1:
-        raise TypeError(
-            f"Only 1D-histogram supports ratio plot, try projecting {self.__class__.__name__} to 1D"
-        )
+        msg = f"Only 1D-histogram supports ratio plot, try projecting {self.__class__.__name__} to 1D"
+        raise TypeError(msg)
     if isinstance(other, hist.hist.Hist) and other.ndim != 1:
-        raise TypeError(
-            f"Only 1D-histogram supports ratio plot, try projecting other={other.__class__.__name__} to 1D"
-        )
+        msg = f"Only 1D-histogram supports ratio plot, try projecting other={other.__class__.__name__} to 1D"
+        raise TypeError(msg)
 
     if ax_dict:
         try:
             main_ax = ax_dict["main_ax"]
             subplot_ax = ax_dict[f"{view}_ax"]
         except KeyError as err:
-            raise ValueError("All axes should be all given or none at all") from err
+            msg = "All axes should be all given or none at all"
+            raise ValueError(msg) from err
     else:
         fig = plt.gcf()
         grid = fig.add_gridspec(2, 1, hspace=0, height_ratios=[3, 1])
@@ -666,7 +669,8 @@ def _plot_ratiolike(
 
     # Judge whether some arguments are left
     if kwargs:
-        raise ValueError(f"{set(kwargs)}' not needed")
+        msg = f"{set(kwargs)}' not needed"
+        raise ValueError(msg)
 
     main_ax.set_ylabel(fp_kwargs["label"])
 
@@ -789,7 +793,8 @@ def plot_stack(
     **kwargs: Any,
 ) -> Any:
     if self[0].ndim != 1:
-        raise NotImplementedError("Please project to 1D before calling plot")
+        msg = "Please project to 1D before calling plot"
+        raise NotImplementedError(msg)
 
     if "label" not in kwargs and all(h.name is not None for h in self):
         kwargs["label"] = [h.name for h in self]

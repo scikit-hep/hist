@@ -1,13 +1,9 @@
 from __future__ import annotations
 
 import itertools
-from collections.abc import Callable
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from boost_histogram.axis import Axis
-
-import hist
 
 from .svgutils import (
     SupportsStr,
@@ -21,6 +17,13 @@ from .svgutils import (
     svg,
     text,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from boost_histogram.axis import Axis
+
+    import hist
 
 
 def _desc_hist(h: hist.BaseHist[Any]) -> str:

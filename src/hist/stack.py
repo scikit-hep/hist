@@ -2,19 +2,21 @@ from __future__ import annotations
 
 import copy
 import typing
-from collections.abc import Iterator
 from typing import Any, Generic, TypeVar
 
 import boost_histogram as bh
 import histoprint
-import numpy as np
 
-from ._compat.typing import Self
-from .axestuple import NamedAxesTuple
 from .basehist import BaseHist
 
 if typing.TYPE_CHECKING:
+    from collections.abc import Iterator
+
     import matplotlib as mpl
+    import numpy as np
+
+    from ._compat.typing import Self
+    from .axestuple import NamedAxesTuple
 
 
 __all__ = ("Stack",)
@@ -35,15 +37,18 @@ class Stack(Generic[S]):
         self._stack = list(args)
 
         if not args:
-            raise ValueError("There should be histograms in the Stack")
+            msg = "There should be histograms in the Stack"
+            raise ValueError(msg)
 
         if not all(isinstance(a, BaseHist) for a in args):
-            raise ValueError("There should be only histograms in Stack")
+            msg = "There should be only histograms in Stack"
+            raise ValueError(msg)
 
         first_axes = args[0].axes
         for a in args[1:]:
             if first_axes != a.axes:
-                raise ValueError("The Histogram axes don't match")
+                msg = "The Histogram axes don't match"
+                raise ValueError(msg)
 
     __hash__ = None  # type: ignore[assignment]
 
@@ -76,7 +81,8 @@ class Stack(Generic[S]):
             if h.name == name:
                 return n
 
-        raise IndexError(f"Name not found: {name}")
+        msg = f"Name not found: {name}"
+        raise IndexError(msg)
 
     @typing.overload
     def __getitem__(self, val: int | str) -> BaseHist[S]: ...
@@ -100,11 +106,13 @@ class Stack(Generic[S]):
         Set a histogram in the Stack. Checks the axes of the histogram, they must match.
         """
         if not isinstance(value, BaseHist):
-            raise ValueError("The value should be a histogram")
+            msg = "The value should be a histogram"  # type: ignore[unreachable]
+            raise TypeError(msg)
         if isinstance(key, str):
             key = self._get_index(key)
-        if not value.axes == self._stack[key].axes:
-            raise ValueError("The histogram axes don't match")
+        if value.axes != self._stack[key].axes:
+            msg = "The histogram axes don't match"
+            raise ValueError(msg)
 
         self._stack[key] = value
 
@@ -119,7 +127,7 @@ class Stack(Generic[S]):
         h = repr(self[0]) if len(self) else "Empty stack"
         return f"{self.__class__.__name__}<({names}) of {h}>"
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, Stack):
             return False
         return self._stack == other._stack
