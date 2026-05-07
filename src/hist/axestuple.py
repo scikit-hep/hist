@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import warnings
-from collections.abc import Iterable
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from boost_histogram.axis import ArrayTuple, AxesTuple
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 __all__ = ("ArrayTuple", "AxesTuple", "NamedAxesTuple")
 
@@ -23,7 +25,8 @@ class NamedAxesTuple(AxesTuple):
         for i, ax in enumerate(self):
             if ax.name == name:
                 return i
-        raise KeyError(f"{name} not found in axes")
+        msg = f"{name} not found in axes"
+        raise KeyError(msg)
 
     def __getitem__(self, item: Any) -> Any:
         if isinstance(item, slice):
@@ -59,9 +62,8 @@ class NamedAxesTuple(AxesTuple):
 
         valid_names = [ax.name for ax in self if ax.name]
         if len(valid_names) != len(set(valid_names)):
-            raise KeyError(
-                f"{self.__class__.__name__} instance cannot contain axes with duplicated names"
-            )
+            msg = f"{self.__class__.__name__} instance cannot contain axes with duplicated names"
+            raise KeyError(msg)
 
     @property
     def label(self) -> tuple[str]:

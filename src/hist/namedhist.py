@@ -8,8 +8,10 @@ import boost_histogram as bh
 import hist
 
 from . import interop
-from ._compat.typing import ArrayLike, Self
 from .basehist import BaseHist, IndexingExpr
+
+if typing.TYPE_CHECKING:
+    from ._compat.typing import ArrayLike, Self
 
 S = TypeVar("S", bound=bh.storage.Storage)
 
@@ -22,9 +24,8 @@ class NamedHist(BaseHist[S], Generic[S], family=hist):
 
         super().__init__(*args, **kwargs)
         if args and "" in self.axes.name:
-            raise RuntimeError(
-                f"Each axes in the {self.__class__.__name__} instance should have a name"
-            )
+            msg = f"Each axes in the {self.__class__.__name__} instance should have a name"
+            raise RuntimeError(msg)
 
     def project(self, *args: int | str) -> Self:
         """
@@ -34,9 +35,8 @@ class NamedHist(BaseHist[S], Generic[S], family=hist):
         if not args or all(isinstance(x, str) for x in args):
             return super().project(*args)
 
-        raise TypeError(
-            f"Only projections by names are supported for {self.__class__.__name__}"
-        )
+        msg = f"Only projections by names are supported for {self.__class__.__name__}"
+        raise TypeError(msg)
 
     # pylint: disable-next=arguments-differ
     def fill(  # type: ignore[override]
@@ -54,9 +54,8 @@ class NamedHist(BaseHist[S], Generic[S], family=hist):
         if kwargs and all(isinstance(k, str) for k in kwargs):
             return super().fill(weight=weight, sample=sample, threads=threads, **kwargs)
 
-        raise TypeError(
-            f"Only fill by names are supported for {self.__class__.__name__}"
-        )
+        msg = f"Only fill by names are supported for {self.__class__.__name__}"
+        raise TypeError(msg)
 
     # pylint: disable-next=arguments-differ
     def fill_flattened(  # type: ignore[override]
@@ -80,18 +79,20 @@ class NamedHist(BaseHist[S], Generic[S], family=hist):
         # structures for multi-dimensional hists that must first be unpacked
         if obj is not None:
             if kwargs:
-                raise TypeError(
+                msg = (
                     "Only explicit keyword arguments, or a single structured object is supported by "
                     "`fill_flattened`, but not both."
                 )
+                raise TypeError(msg)
 
             destructured = interop.destructure(obj)
             # Try to unpack the array, if it's valid to do so, i.e. is the Awkward Array a record array?
             if destructured is None:
-                raise TypeError(
+                msg = (
                     f"Only fill by names are supported for {self.__class__.__name__}. A single object was given to "
                     "`fill_flattened`, but it could not be destructed into name-array pairs."
                 )
+                raise TypeError(msg)
 
             # Result must be broadcast, so unpack and rebuild
             broadcast = interop.broadcast_and_flatten(
@@ -132,9 +133,8 @@ class NamedHist(BaseHist[S], Generic[S], family=hist):
             """
 
             if isinstance(index, dict) and any(isinstance(k, int) for k in index):
-                raise TypeError(
-                    f"Only access by names are supported for {self.__class__.__name__} in dictionary"
-                )
+                msg = f"Only access by names are supported for {self.__class__.__name__} in dictionary"
+                raise TypeError(msg)
 
             return super().__getitem__(index)
 
@@ -148,8 +148,7 @@ class NamedHist(BaseHist[S], Generic[S], family=hist):
         """
 
         if isinstance(index, dict) and any(isinstance(k, int) for k in index):
-            raise TypeError(
-                f"Only access by names are supported for {self.__class__.__name__} in dictionary"
-            )
+            msg = f"Only access by names are supported for {self.__class__.__name__} in dictionary"
+            raise TypeError(msg)
 
         return super().__setitem__(index, value)
