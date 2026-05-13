@@ -187,6 +187,16 @@ def test_to_hist_empty():
     assert len(dense.axes[1]) == 0
 
 
+def test_to_hist_preserves_declared_categories_without_chunks():
+    h = ChunkedHist(
+        axis.Regular(10, 0, 1, name="x"),
+        axis.StrCategory(["a", "b"], growth=False, name="cat"),
+    )
+    dense = h.to_hist()
+    assert list(dense.axes[1]) == ["a", "b"]
+    assert not dense.axes[1].traits.growth
+
+
 def test_from_hist_basic():
     source = hist.Hist(
         axis.Regular(10, 0, 1, name="x"),
@@ -263,6 +273,23 @@ def test_iadd_chunked():
     assert dense[{"x": bh.loc(0.2), "cat": "a"}] == 1
     assert dense[{"x": bh.loc(0.4), "cat": "a"}] == 1
     assert dense[{"x": bh.loc(0.5), "cat": "b"}] == 1
+
+
+def test_iadd_chunked_does_not_alias_source_chunk_arrays():
+    left = ChunkedHist(
+        axis.Regular(10, 0, 1, name="x"),
+        axis.StrCategory([], growth=True, name="cat"),
+    )
+    right = ChunkedHist(
+        axis.Regular(10, 0, 1, name="x"),
+        axis.StrCategory([], growth=True, name="cat"),
+    )
+    right.fill(x=[0.5], cat="b")
+
+    left += right
+    right.chunk_view({"cat": "b"})[...] = 0
+
+    assert left.to_hist()[{"x": bh.loc(0.5), "cat": "b"}] == 1
 
 
 def test_add_chunked():
@@ -375,6 +402,16 @@ def test_getitem_wildcard_question():
     assert len(selected) == 2
 
 
+def test_getitem_wildcard_no_match_returns_empty():
+    h = ChunkedHist(
+        axis.Regular(10, 0, 1, name="x"),
+        axis.StrCategory([], growth=True, name="cat"),
+    )
+    h.fill(x=[0.2], cat="apple")
+    selected = h[{"cat": "z*"}]
+    assert len(selected) == 0
+
+
 def test_getitem_non_chunk_axis_raises():
     h = ChunkedHist(
         axis.Regular(10, 0, 1, name="x"),
@@ -418,6 +455,17 @@ def test_getitem_multiple_chunk_axes():
     dense = selected.to_hist()
     assert dense[{"s": "a", "i": bh.loc(1), "x": bh.loc(0.2)}] == 1
     assert dense[{"s": "a", "i": bh.loc(2), "x": bh.loc(0.6)}] == 1
+
+
+def test_getitem_numpy_scalar_selection():
+    h = ChunkedHist(
+        axis.Regular(10, 0, 1, name="x"),
+        axis.IntCategory([], growth=True, name="icat"),
+    )
+    h.fill(x=[0.2], icat=42)
+    selected = h[{"icat": np.int64(42)}]
+    assert len(selected) == 1
+    assert (42,) in selected
 
 
 # ---------------------------------------------------------------------------
@@ -521,6 +569,14 @@ def test_repr():
     assert "cat" in r
     assert "Regular" in r
     assert "Chunks" in r
+
+
+def test_repr_respects_axis_growth():
+    h = ChunkedHist(
+        axis.Regular(10, 0, 1, name="x"),
+        axis.StrCategory(["a"], growth=False, name="cat"),
+    )
+    assert "growth=True, name='cat'" not in repr(h)
 
 
 # ---------------------------------------------------------------------------

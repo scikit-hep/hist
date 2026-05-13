@@ -109,12 +109,17 @@ def normalize_chunk_selection(
             raise ValueError(
                 f"slicing only supports chunk axes; {axis_name!r} is dense"
             )
-        values = (raw_value,) if isinstance(raw_value, str | int) else tuple(raw_value)
+        values: tuple[ChunkScalar, ...]
+        if _is_scalar_like(raw_value):
+            values = (_normalize_chunk_scalar(raw_value),)
+        else:
+            values = tuple(
+                _normalize_chunk_scalar(value)
+                for value in tp.cast(Iterable[ChunkScalar], raw_value)
+            )
         if not values:
             raise ValueError(f"slice for axis {axis_name!r} must be non-empty")
-        normalized[axis_name] = tuple(
-            _normalize_chunk_scalar(value) for value in values
-        )
+        normalized[axis_name] = values
 
     return normalized
 
@@ -283,13 +288,11 @@ class ChunkedHist:
 
     def _save_chunk_view(self, key: ChunkKey, chunk_view: np.ndarray) -> None:
         array = _validate_dense_view(
-            np.ascontiguousarray(chunk_view),
+            chunk_view,
             shape=self.dense_view_shape,
             dtype=self.dense_view_dtype,
         )
-        if not array.flags.writeable:
-            array = array.copy()
-        self._chunks[key] = array
+        self._chunks[key] = np.array(array, copy=True, order="C")
 
     def _remember_chunk_key(self, key: ChunkKey) -> None:
         for spec, key_part in zip(self.chunk_axes, key, strict=True):
@@ -379,7 +382,13 @@ class ChunkedHist:
         # TODO: implement native chunked UHI serialization that avoids
         # expensive materialization to a dense Hist.
         axes = list(self.axes)
-        keys_by_axis = self._keys_by_axis(self._chunks)
+        keys_from_chunks = self._keys_by_axis(self._chunks)
+        keys_by_axis = {
+            spec.name: list(
+                dict.fromkeys((*spec.known_keys, *keys_from_chunks[spec.name]))
+            )
+            for spec in self.chunk_axes
+        }
         for spec in self.chunk_axes:
             keys = keys_by_axis[spec.name]
             if issubclass(spec.axis_type, bh.axis.IntCategory):
@@ -545,8 +554,6 @@ class ChunkedHist:
                             for k in spec.known_keys
                             if isinstance(k, str) and fnmatch.fnmatch(k, pattern)
                         ]
-                        if not matches:
-                            raise ValueError(f"No matches found for {pattern!r}")
                         expanded.extend(matches)
                     else:
                         expanded.append(pattern)
@@ -591,13 +598,7 @@ class ChunkedHist:
         return key in self._chunks
 
     def __repr__(self) -> str:
-        axes_repr = ",\n  ".join(
-            # ChunkedHist categorical axes are always growable in practice
-            f"{type(axis).__name__}(..., growth=True, name={axis.name!r})"
-            if isinstance(axis, bh.axis.IntCategory | bh.axis.StrCategory)
-            else repr(axis)
-            for axis in self.axes
-        )
+        axes_repr = ",\n  ".join(repr(axis) for axis in self.axes)
         total_bytes = self.histogram_bytes()
         byte_str = (
             f"{total_bytes} B" if total_bytes < 1024 else f"{total_bytes / 1024:.1f} KB"
