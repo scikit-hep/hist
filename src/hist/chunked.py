@@ -115,7 +115,7 @@ def normalize_chunk_selection(
         else:
             values = tuple(
                 _normalize_chunk_scalar(value)
-                for value in tp.cast(Iterable[ChunkScalar], raw_value)
+                for value in tp.cast("Iterable[ChunkScalar]", raw_value)
             )
         if not values:
             raise ValueError(f"slice for axis {axis_name!r} must be non-empty")
@@ -393,7 +393,7 @@ class ChunkedHist:
             keys = keys_by_axis[spec.name]
             if issubclass(spec.axis_type, bh.axis.IntCategory):
                 axes[spec.index] = hist.axis.IntCategory(
-                    [tp.cast(int, key) for key in keys],
+                    [tp.cast("int", key) for key in keys],
                     name=spec.name,
                     label=spec.label,
                     metadata=spec.metadata,
@@ -402,7 +402,7 @@ class ChunkedHist:
                 )
             else:
                 axes[spec.index] = hist.axis.StrCategory(
-                    [tp.cast(str, key) for key in keys],
+                    [tp.cast("str", key) for key in keys],
                     name=spec.name,
                     label=spec.label,
                     metadata=spec.metadata,
