@@ -3,7 +3,6 @@ from __future__ import annotations
 import fnmatch
 import itertools
 import typing as tp
-from collections.abc import Iterable, Iterator, Mapping
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -11,6 +10,11 @@ import boost_histogram as bh
 import numpy as np
 
 import hist
+
+if tp.TYPE_CHECKING:
+    from collections.abc import Iterable, Iterator, Mapping
+
+    from ._compat.typing import Self
 
 __all__ = (
     "ChunkKey",
@@ -29,15 +33,23 @@ def _validate_supported_axis(axis: tp.Any) -> None:
         isinstance(axis, bh.axis.Regular)
         and getattr(axis, "transform", None) is not None
     ):
-        raise ValueError("ChunkedHist does not support transformed Regular axes yet")
+        msg = "ChunkedHist does not support transformed Regular axes yet"
+        raise ValueError(msg)
+    if (
+        not isinstance(axis, bh.axis.IntCategory | bh.axis.StrCategory)
+        and axis.traits.growth
+    ):
+        # Growth would reallocate the scratch histogram's buffer mid-fill,
+        # invalidating every stored chunk's shape.
+        msg = "ChunkedHist does not support growing dense axes"
+        raise ValueError(msg)
 
 
 def _validate_supported_storage(storage: tp.Any) -> None:
     storage_type = type(storage)
     if storage_type in {bh.storage.Mean, bh.storage.WeightedMean}:
-        raise ValueError(
-            f"ChunkedHist does not support {storage_type.__name__} storage yet"
-        )
+        msg = f"ChunkedHist does not support {storage_type.__name__} storage yet"
+        raise ValueError(msg)
 
 
 def _validate_dense_view(
@@ -48,13 +60,11 @@ def _validate_dense_view(
 ) -> np.ndarray:
     array = np.asarray(view)
     if array.shape != shape:
-        raise ValueError(
-            f"dense view shape mismatch: expected {shape}, got {array.shape}"
-        )
+        msg = f"dense view shape mismatch: expected {shape}, got {array.shape}"
+        raise ValueError(msg)
     if array.dtype != dtype:
-        raise ValueError(
-            f"dense view dtype mismatch: expected {dtype}, got {array.dtype}"
-        )
+        msg = f"dense view dtype mismatch: expected {dtype}, got {array.dtype}"
+        raise ValueError(msg)
     return array
 
 
@@ -74,13 +84,20 @@ def _zero_dense_view(view: np.ndarray) -> None:
         _zero_dense_view(view[field_name])
 
 
+def _view_any_nonzero(view: np.ndarray) -> bool:
+    if view.dtype.fields is None:
+        return bool(np.any(view))
+    return any(
+        _view_any_nonzero(view[field_name]) for field_name in view.dtype.names or ()
+    )
+
+
 def _normalize_chunk_scalar(value: tp.Any) -> ChunkScalar:
     if isinstance(value, np.generic):
         value = value.item()
     if not isinstance(value, str | int):
-        raise TypeError(
-            f"chunk axis values must normalize to str or int, got {type(value)=}"
-        )
+        msg = f"chunk axis values must normalize to str or int, got {type(value)=}"
+        raise TypeError(msg)
     return value
 
 
@@ -104,11 +121,11 @@ def normalize_chunk_selection(
 
     for axis_name, raw_value in selection.items():
         if axis_name not in known_axes:
-            raise KeyError(f"unknown axis in slice: {axis_name!r}")
+            msg = f"unknown axis in slice: {axis_name!r}"
+            raise KeyError(msg)
         if axis_name not in known_chunk_axes:
-            raise ValueError(
-                f"slicing only supports chunk axes; {axis_name!r} is dense"
-            )
+            msg = f"slicing only supports chunk axes; {axis_name!r} is dense"
+            raise ValueError(msg)
         values: tuple[ChunkScalar, ...]
         if _is_scalar_like(raw_value):
             values = (_normalize_chunk_scalar(raw_value),)
@@ -118,7 +135,8 @@ def normalize_chunk_selection(
                 for value in tp.cast("Iterable[ChunkScalar]", raw_value)
             )
         if not values:
-            raise ValueError(f"slice for axis {axis_name!r} must be non-empty")
+            msg = f"slice for axis {axis_name!r} must be non-empty"
+            raise ValueError(msg)
         normalized[axis_name] = values
 
     return normalized
@@ -173,9 +191,11 @@ class ChunkedHist:
             >>> h.fill(x=[0.2, 0.4], cat="a")
         """
         if not axes:
-            raise ValueError("ChunkedHist requires at least one axis")
+            msg = "ChunkedHist requires at least one axis"
+            raise ValueError(msg)
         if not all(getattr(axis, "name", None) for axis in axes):
-            raise ValueError("all axes must have names")
+            msg = "all axes must have names"
+            raise ValueError(msg)
         if storage is None:
             storage = bh.storage.Double()
         for axis in axes:
@@ -252,13 +272,29 @@ class ChunkedHist:
             chunked._save_chunk_view((), np.ascontiguousarray(source_view))
             return chunked
 
+        # ChunkedHist has no storage for chunk-axis flow bins; refuse to
+        # silently drop their contents.
+        for spec in chunked.chunk_axes:
+            source_axis = source.axes[spec.index]
+            if source_axis.extent == source_axis.size:
+                continue
+            selector: list[tp.Any] = [slice(None)] * source_view.ndim
+            selector[spec.index] = source_axis.size
+            if _view_any_nonzero(np.asarray(source_view[tuple(selector)])):
+                msg = (
+                    f"source histogram has content in the flow bin of "
+                    f"categorical axis {spec.name!r}; ChunkedHist does not "
+                    "store flow content for chunk axes"
+                )
+                raise ValueError(msg)
+
         if not any(spec.known_keys for spec in chunked.chunk_axes):
             return chunked
 
         for key_indices in itertools.product(
             *(range(len(spec.known_keys)) for spec in chunked.chunk_axes)
         ):
-            selector: list[tp.Any] = [slice(None)] * source_view.ndim
+            selector = [slice(None)] * source_view.ndim
             key_values: list[ChunkScalar] = []
             for spec, key_index in zip(chunked.chunk_axes, key_indices, strict=True):
                 selector[spec.index] = key_index
@@ -294,7 +330,18 @@ class ChunkedHist:
         )
         self._chunks[key] = np.array(array, copy=True, order="C")
 
+    def _check_chunk_key(self, key: ChunkKey) -> None:
+        for spec, key_part in zip(self.chunk_axes, key, strict=True):
+            if not spec.growth and key_part not in spec.known_keys:
+                msg = (
+                    f"unknown key {key_part!r} for non-growing chunk axis "
+                    f"{spec.name!r}; ChunkedHist does not store flow content "
+                    "for chunk axes"
+                )
+                raise ValueError(msg)
+
     def _remember_chunk_key(self, key: ChunkKey) -> None:
+        self._check_chunk_key(key)
         for spec, key_part in zip(self.chunk_axes, key, strict=True):
             if key_part not in spec.known_keys:
                 spec.known_keys.append(key_part)
@@ -304,15 +351,15 @@ class ChunkedHist:
     ) -> tuple[ChunkKey, dict[str, tp.Any]]:
         missing = [name for name in self.chunk_axis_names if name not in kwargs]
         if missing:
-            raise ValueError(f"missing chunk axes in fill kwargs: {missing!r}")
+            msg = f"missing chunk axes in fill kwargs: {missing!r}"
+            raise ValueError(msg)
 
         chunk_key: list[ChunkScalar] = []
         for name in self.chunk_axis_names:
             value = kwargs[name]
             if not _is_scalar_like(value):
-                raise ValueError(
-                    f"categorical chunk axis {name!r} only accepts scalar int/str values"
-                )
+                msg = f"categorical chunk axis {name!r} only accepts scalar int/str values"
+                raise ValueError(msg)
             chunk_key.append(_normalize_chunk_scalar(value))
 
         return tuple(chunk_key), {
@@ -322,6 +369,7 @@ class ChunkedHist:
         }
 
     def add_dense_view(self, key: ChunkKey, dense_view: np.ndarray) -> None:
+        self._check_chunk_key(key)
         dense_view = _validate_dense_view(
             dense_view,
             shape=self.dense_view_shape,
@@ -349,6 +397,7 @@ class ChunkedHist:
             >>> h.fill(x=[0.2, 0.4], cat="a")
         """
         chunk_key, dense_kwargs = self.split_fill_kwargs(kwargs)
+        self._check_chunk_key(chunk_key)
         dense_hist = self._scratch_dense_hist
         dense_view = dense_hist.view(flow=True)
         try:
@@ -486,16 +535,14 @@ class ChunkedHist:
         normalized = self._normalize_selection(selection)
         exact_key = self._exact_chunk_key(normalized)
         if exact_key is None:
-            raise ValueError(
-                "selection must provide exactly one value for each chunk axis"
-            )
+            msg = "selection must provide exactly one value for each chunk axis"
+            raise ValueError(msg)
         return exact_key
 
     def selection_dict(self, key: ChunkKey) -> dict[str, ChunkScalar]:
         if len(key) != len(self.chunk_axis_names):
-            raise ValueError(
-                f"chunk key must have {len(self.chunk_axis_names)} values, got {len(key)}"
-            )
+            msg = f"chunk key must have {len(self.chunk_axis_names)} values, got {len(key)}"
+            raise ValueError(msg)
         return {
             axis_name: key[index]
             for index, axis_name in enumerate(self.chunk_axis_names)
@@ -510,7 +557,8 @@ class ChunkedHist:
         try:
             return self._chunks[chunk_key]
         except KeyError as exc:
-            raise KeyError(f"chunk selection {exact_selection!r} not found") from exc
+            msg = f"chunk selection {exact_selection!r} not found"
+            raise KeyError(msg) from exc
 
     def __getitem__(
         self,
@@ -610,7 +658,7 @@ class ChunkedHist:
             f" # Chunks: {len(self)}, Bytes: {byte_str}"
         )
 
-    def __iadd__(self, other: ChunkedHist | hist.Hist[Any]) -> ChunkedHist:
+    def __iadd__(self, other: ChunkedHist | hist.Hist[Any]) -> Self:
         """Merge another compatible histogram into this one in place.
 
         Args:
@@ -638,18 +686,24 @@ class ChunkedHist:
             or self.name != other.name
             or self.label != other.label
         ):
-            raise ValueError("cannot add incompatible histograms")
+            msg = "cannot add incompatible histograms"
+            raise ValueError(msg)
 
         if not all(
             a == b for a, b in zip(self.dense_axes, other.dense_axes, strict=True)
         ):
-            raise ValueError("cannot add histograms with incompatible dense axes")
+            msg = "cannot add histograms with incompatible dense axes"
+            raise ValueError(msg)
 
         if not all(
             a.name == b.name and a.axis_type is b.axis_type
             for a, b in zip(self.chunk_axes, other.chunk_axes, strict=True)
         ):
-            raise ValueError("cannot add histograms with incompatible chunk axes")
+            msg = "cannot add histograms with incompatible chunk axes"
+            raise ValueError(msg)
+        # Validate every key first so a failure cannot leave a partial merge.
+        for key in other._chunks:
+            self._check_chunk_key(key)
         for key, dense_view in other._chunks.items():
             self.add_dense_view(key, dense_view)
         return self

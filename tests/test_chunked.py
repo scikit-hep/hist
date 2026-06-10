@@ -76,6 +76,20 @@ def test_constructor_unsupported_storage_raises():
         )
 
 
+def test_constructor_growing_dense_axis_raises():
+    # Growth would reallocate the scratch buffer mid-fill, invalidating chunks
+    with pytest.raises(ValueError, match="growing dense axes"):
+        ChunkedHist(
+            axis.Regular(10, 0, 1, name="x", growth=True),
+            axis.StrCategory([], growth=True, name="cat"),
+        )
+    with pytest.raises(ValueError, match="growing dense axes"):
+        ChunkedHist(
+            axis.Integer(0, 5, name="i", growth=True),
+            axis.StrCategory([], growth=True, name="cat"),
+        )
+
+
 def test_constructor_no_chunk_axes():
     h = ChunkedHist(
         axis.Regular(10, 0, 1, name="x"),
@@ -162,6 +176,24 @@ def test_fill_int_category():
     assert dense[{"icat": bh.loc(7), "x": bh.loc(0.2)}] == 1
 
 
+def test_fill_unknown_key_non_growing_raises():
+    h = ChunkedHist(
+        axis.Regular(10, 0, 1, name="x"),
+        axis.StrCategory(["a"], name="cat"),  # growth=False
+    )
+    h.fill(x=[0.2], cat="a")
+    with pytest.raises(ValueError, match="non-growing chunk axis"):
+        h.fill(x=[0.4], cat="z")
+    # The failed fill must not leave any trace
+    assert list(h.keys()) == [("a",)]
+    h.fill(x=[0.6], cat="a")
+    dense = h.to_hist()
+    assert list(dense.axes[1]) == ["a"]
+    assert dense[{"cat": "a", "x": bh.loc(0.2)}] == 1
+    assert dense[{"cat": "a", "x": bh.loc(0.4)}] == 0
+    assert dense[{"cat": "a", "x": bh.loc(0.6)}] == 1
+
+
 def test_fill_no_chunk_axes():
     h = ChunkedHist(
         axis.Regular(10, 0, 1, name="x"),
@@ -240,6 +272,46 @@ def test_round_trip():
             recovered.chunk_view({"cat": key[0]}),
             chunked.chunk_view({"cat": key[0]}),
         )
+
+
+def test_from_hist_categorical_flow_content_raises():
+    source = hist.Hist(
+        axis.Regular(10, 0, 1, name="x"),
+        axis.StrCategory(["a"], name="cat"),  # growth=False, has overflow
+    )
+    source.fill(x=[0.2, 0.4], cat=["a", "z"])  # "z" lands in the flow bin
+    with pytest.raises(ValueError, match="flow bin of categorical axis 'cat'"):
+        ChunkedHist.from_hist(source)
+
+
+def test_from_hist_empty_flow_ok():
+    source = hist.Hist(
+        axis.Regular(10, 0, 1, name="x"),
+        axis.StrCategory(["a"], name="cat"),
+    )
+    source.fill(x=[0.2], cat=["a"])
+    chunked = ChunkedHist.from_hist(source)
+    assert chunked.to_hist()[{"cat": "a", "x": bh.loc(0.2)}] == 1
+
+
+def test_iadd_unknown_key_non_growing_is_atomic():
+    left = ChunkedHist(
+        axis.Regular(10, 0, 1, name="x"),
+        axis.StrCategory(["a"], name="cat"),
+    )
+    right = ChunkedHist(
+        axis.Regular(10, 0, 1, name="x"),
+        axis.StrCategory(["a", "z"], name="cat"),
+    )
+    left.fill(x=[0.2], cat="a")
+    right.fill(x=[0.4], cat="a")
+    right.fill(x=[0.5], cat="z")
+
+    with pytest.raises(ValueError, match="non-growing chunk axis"):
+        left += right
+    # No partial merge: left is untouched
+    assert list(left.keys()) == [("a",)]
+    assert left.to_hist()[{"cat": "a", "x": bh.loc(0.4)}] == 0
 
 
 def test_from_hist_no_chunk_axes():
