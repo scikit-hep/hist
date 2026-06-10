@@ -593,6 +593,8 @@ def test_items():
     key, view = items_list[0]
     assert key == ("a",)
     assert isinstance(view, np.ndarray)
+    # items() yields live views, same as chunk_view()
+    assert view is h.chunk_view({"cat": "a"})
 
 
 # ---------------------------------------------------------------------------
@@ -607,6 +609,19 @@ def test_empty_like():
     empty = h.empty_like()
     assert len(empty) == 0
     assert empty.axes == h.axes
+
+
+def test_empty_like_preserves_subclass():
+    class SubHist(ChunkedHist):
+        pass
+
+    h = SubHist(
+        axis.Regular(10, 0, 1, name="x"),
+        axis.StrCategory([], growth=True, name="cat"),
+    )
+    h.fill(x=[0.2], cat="a")
+    assert type(h.empty_like()) is SubHist
+    assert type(h[{"cat": "a"}]) is SubHist
 
 
 def test_reset():
@@ -641,6 +656,15 @@ def test_repr():
     assert "cat" in r
     assert "Regular" in r
     assert "Chunks" in r
+
+
+def test_repr_large_sizes():
+    h = ChunkedHist(
+        axis.Regular(300_000, 0, 1, name="x"),
+        axis.StrCategory([], growth=True, name="cat"),
+    )
+    h.fill(x=[0.2], cat="a")  # ~2.4 MB chunk
+    assert "MB" in repr(h)
 
 
 def test_repr_respects_axis_growth():
@@ -743,3 +767,15 @@ def test_int_category_with_numpy_scalar():
     h.fill(x=[0.1], icat=np.int64(42))
     assert len(h) == 1
     assert (42,) in h
+
+
+def test_bool_chunk_key_normalizes_to_int():
+    h = ChunkedHist(
+        axis.Regular(5, 0, 1, name="x"),
+        axis.IntCategory([], growth=True, name="icat"),
+    )
+    h.fill(x=[0.1], icat=True)
+    h.fill(x=[0.2], icat=np.True_)
+    assert list(h.keys()) == [(1,)]
+    key = next(iter(h.keys()))[0]
+    assert type(key) is int

@@ -95,6 +95,8 @@ def _view_any_nonzero(view: np.ndarray) -> bool:
 def _normalize_chunk_scalar(value: tp.Any) -> ChunkScalar:
     if isinstance(value, np.generic):
         value = value.item()
+    if isinstance(value, bool):
+        return int(value)
     if not isinstance(value, str | int):
         msg = f"chunk axis values must normalize to str or int, got {type(value)=}"
         raise TypeError(msg)
@@ -481,8 +483,8 @@ class ChunkedHist:
 
         return merged
 
-    def empty_like(self) -> ChunkedHist:
-        return ChunkedHist(
+    def empty_like(self) -> Self:
+        return type(self)(
             *self.axes,
             storage=self.storage_type(),
             name=self.name,
@@ -490,8 +492,12 @@ class ChunkedHist:
         )
 
     def items(self) -> Iterable[tuple[ChunkKey, np.ndarray]]:
-        for key, chunk_view in self._chunks.items():
-            yield key, np.ascontiguousarray(chunk_view)
+        """Iterate over ``(chunk key, chunk array)`` pairs.
+
+        Like :meth:`chunk_view`, the yielded arrays are live views of the
+        internal storage; copy them if you need independent data.
+        """
+        yield from self._chunks.items()
 
     def _keys_by_axis(
         self,
@@ -552,6 +558,11 @@ class ChunkedHist:
         self,
         selection: Mapping[str, ChunkScalar | tp.Iterable[ChunkScalar]],
     ) -> np.ndarray:
+        """Return the live array for one chunk.
+
+        The returned array is a view of the internal storage; mutating it
+        mutates the histogram. Copy it if you need independent data.
+        """
         chunk_key = self.exact_chunk_key(selection)
         exact_selection = self.selection_dict(chunk_key)
         try:
@@ -627,7 +638,7 @@ class ChunkedHist:
         for result_spec in result.chunk_axes:
             result_spec.known_keys = keys_by_axis[result_spec.name]
         for key in matching_keys:
-            result._save_chunk_view(key, self._chunks[key].copy(order="C"))
+            result._save_chunk_view(key, self._chunks[key])
         return result
 
     def histogram_bytes(self) -> int:
@@ -648,9 +659,12 @@ class ChunkedHist:
     def __repr__(self) -> str:
         axes_repr = ",\n  ".join(repr(axis) for axis in self.axes)
         total_bytes = self.histogram_bytes()
-        byte_str = (
-            f"{total_bytes} B" if total_bytes < 1024 else f"{total_bytes / 1024:.1f} KB"
-        )
+        size = float(total_bytes)
+        for unit in ("B", "KB", "MB", "GB", "TB"):
+            if size < 1024 or unit == "TB":
+                break
+            size /= 1024
+        byte_str = f"{total_bytes} B" if unit == "B" else f"{size:.1f} {unit}"
         return (
             "ChunkedHist(\n"
             f"  {axes_repr},\n"
