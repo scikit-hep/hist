@@ -149,3 +149,7 @@ banner_slides.pdf
 # Lock files
 uv.lock
 *pylock
+
+# Symlink to AGENTS.md
+CLAUDE.md
+.claude/
