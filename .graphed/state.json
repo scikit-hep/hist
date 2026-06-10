@@ -1,0 +1,27 @@
+{
+  "milestones": {
+    "HIST-1": {
+      "dispute_count": 0,
+      "escalated": false,
+      "freeze_tag": "freeze-HIST-1",
+      "gates": {
+        "benchmark": null,
+        "coverage": true,
+        "determinism": true,
+        "frozen_tests": true,
+        "integrity_scan": true,
+        "lint": true,
+        "types": true
+      },
+      "incident": null,
+      "l0_count": 0,
+      "metrics_history": [
+        {
+          "benchmark_ok": null,
+          "pass_count": 205
+        }
+      ]
+    }
+  },
+  "updated_at": "2026-06-10T00:00:00Z"
+}

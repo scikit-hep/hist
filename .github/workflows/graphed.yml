@@ -1,0 +1,48 @@
+name: graphed
+
+# The graphed-mvp integration (HIST-1): runs the FULL hist test suite together with the
+# hist.graphed tests, so regressions from the graphed additions are caught — not just the graphed
+# tests in isolation. Runs only on the graphed-mvp branch (hist's own CI runs on main / PRs).
+on:
+  push:
+    branches: [graphed-mvp]
+  workflow_dispatch:
+
+concurrency:
+  group: graphed-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CORE: "graphed-core @ git+https://github.com/graphed-org/graphed-core-mvp@main"
+  DEBUG: "graphed-debug @ git+https://github.com/graphed-org/graphed-debug-mvp@main"
+  FRONTEND: "graphed @ git+https://github.com/graphed-org/graphed-mvp@main"
+  NUMPY: "graphed-numpy @ git+https://github.com/graphed-org/graphed-numpy-mvp@main"
+  AWKWARD: "graphed-awkward @ git+https://github.com/graphed-org/graphed-awkward-mvp@main"
+  EXEC: "graphed-exec-local @ git+https://github.com/graphed-org/graphed-exec-local-mvp@main"
+  HISTO: "graphed-histogram @ git+https://github.com/graphed-org/graphed-histogram@main"
+  UPROOT: "uproot @ git+https://github.com/graphed-org/uproot5-graphed-mvp@graphed-mvp"
+
+jobs:
+  tests:
+    name: hist + graphed tests ${{ matrix.python }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Install graphed (mvp) siblings + hist (test extras)
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "${{ env.CORE }}" "${{ env.DEBUG }}" "${{ env.FRONTEND }}" \
+            "${{ env.NUMPY }}" "${{ env.AWKWARD }}" "${{ env.EXEC }}" "${{ env.HISTO }}" \
+            "${{ env.UPROOT }}"
+          python -m pip install -e ".[test,plot]" scikit-hep-testdata
+      - name: Full hist suite + the graphed integration tests
+        run: python -m pytest tests -q
