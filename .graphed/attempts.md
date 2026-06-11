@@ -16,3 +16,11 @@ a REAL hist.Hist (named indexing works on results).
   hook, and hist's name/label living in the axis `__dict__` (boost's metadata mechanism) — now
   captured/restored by the canonical spec.
 - Full hist suite green alongside: 200 passed, 8 skipped (mplhep + pytest-mpl are test deps).
+
+## freeze-HIST-2 — USER-DIRECTED respin: no compute() (graphed evaluation idiom) — 2026-06-11
+
+- graphed-histogram removed compute() (freeze-M23-1): evaluation is plan() + an R7 executor, or
+  the reference session.materialize. hist.graphed classes drop the now-unused _in_memory_type
+  property (pure MRO sandwiches); results wrap back in-memory via hist.Hist(value) /
+  hist.NamedHist(value) — names/labels survive (the spec carries the axis __dict__).
+- tests/test_graphed.py respun to the executor idiom; same pins. Full hist suite green.

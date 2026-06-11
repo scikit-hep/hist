@@ -13,10 +13,8 @@ S = TypeVar("S", bound=bh.storage.Storage)
 
 
 class Hist(HistInMemory[S], ghb.Histogram, Generic[S], family=hist):  # type: ignore[misc]
-    """A `hist.Hist` whose fills are DEFERRED graphed computations (the `hist.dask` analogue):
-    QuickConstruct (`Hist.new.Reg(...).Double()`) and named-axis fills record into the graphed
-    IR; `.compute()` returns a concrete in-memory `hist.Hist`."""
-
-    @property
-    def _in_memory_type(self) -> type[HistInMemory[S]]:
-        return HistInMemory
+    """A `hist.Hist` whose fills are DEFERRED graphed computations: QuickConstruct
+    (`Hist.new.Reg(...).Double()`) and named-axis fills record into the graphed IR. Evaluation
+    is graphed's own idiom — `plan()` + an R7 executor (whose result wraps back into an
+    in-memory `hist.Hist` via `hist.Hist(value)`), or the reference `session.materialize` on a
+    fill node."""

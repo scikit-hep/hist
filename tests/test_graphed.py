@@ -2,7 +2,8 @@
 # ADL-benchmarks port). QuickConstruct-built deferred histograms must equal their eager hist.Hist
 # twins BIT FOR BIT over graphed-numpy AND graphed-awkward sources and over a real uproot TTree,
 # with named-axis fills, weights, NamedHist, and the partition-wise efficiency witness (the
-# source's whole-dataset loader never runs).
+# source's whole-dataset loader never runs). Evaluation is graphed's idiom [freeze-HIST-2,
+# user-directed]: plan() + an R7 executor; hist.Hist(value) wraps results back in-memory.
 from __future__ import annotations
 
 import numpy as np
@@ -17,6 +18,7 @@ hist_graphed = pytest.importorskip("hist.graphed")
 from dataclasses import dataclass, field  # noqa: E402
 
 from graphed import Session  # noqa: E402
+from graphed.write import SequentialRunner  # noqa: E402
 from graphed_core import Partition  # noqa: E402
 
 RNG = np.random.default_rng(7)
@@ -54,7 +56,8 @@ def test_quickconstruct_matches_the_eager_twin_bit_for_bit():
     pytest.importorskip("graphed_numpy")
     x, src = _numpy_source()
     h = hist_graphed.Hist.new.Reg(40, 0, 10, name="met", label="$E_T$").Int64().fill(met=x)
-    out = h.compute(steps_per_file=4)
+    # graphed idiom: the executor aggregates; hist.Hist(value) wraps back into the in-memory type
+    out = hist.Hist(SequentialRunner().run(h.plan(steps_per_file=4)).value)
     assert isinstance(out, hist.Hist) and not isinstance(out, hist_graphed.Hist)
     eager = hist.Hist.new.Reg(40, 0, 10, name="met", label="$E_T$").Int64()
     eager.fill(met=DATA)
@@ -71,7 +74,7 @@ def test_weighted_2d_and_namedhist():
         hist_graphed.NamedHist.new.Reg(10, 0, 10, name="a").Reg(8, 0, 5, name="b").Weight()
         .fill(a=x, b=x * 0.5, weight=np.sqrt(abs(x)))
     )
-    out = h.compute(steps_per_file=3)
+    out = hist.NamedHist(SequentialRunner().run(h.plan(steps_per_file=3)).value)
     eager = hist.NamedHist.new.Reg(10, 0, 10, name="a").Reg(8, 0, 5, name="b").Weight()
     eager.fill(a=DATA, b=DATA * 0.5, weight=np.sqrt(np.abs(DATA)))
     assert np.allclose(out.values(flow=True), eager.values(flow=True))
@@ -107,7 +110,7 @@ def test_awkward_ragged_fills_flatten():
     g = s.source("events", form=AwkwardForm(tt), data=src)
 
     h = hist_graphed.Hist.new.Reg(20, 0, 100, name="pt").Int64().fill(pt=g.Jet_pt)
-    out = h.compute(steps_per_file=5)
+    out = hist.Hist(SequentialRunner().run(h.plan(steps_per_file=5)).value)
     eager = hist.Hist.new.Reg(20, 0, 100, name="pt").Int64()
     eager.fill(pt=ak.flatten(events.Jet_pt, axis=None))  # ragged fills flatten completely
     assert np.array_equal(out.values(flow=True), eager.values(flow=True))
@@ -124,7 +127,7 @@ def test_uproot_ttree_fill_end_to_end():
     h = hist_graphed.Hist.new.Reg(50, 0, 100, name="pt1").Double().fill(
         pt1=np.hypot(g.px1, g.py1)
     )
-    out = h.compute(steps_per_file=3)
+    out = hist.Hist(SequentialRunner().run(h.plan(steps_per_file=3)).value)
     raw = uproot.open(where).arrays(["px1", "py1"])
     eager = hist.Hist.new.Reg(50, 0, 100, name="pt1").Double()
     eager.fill(pt1=np.hypot(np.asarray(raw.px1), np.asarray(raw.py1)))
@@ -138,7 +141,7 @@ def test_multiple_fills_and_process_executor():
     x, _ = _numpy_source()
     h = hist_graphed.Hist.new.Reg(16, 0, 10, name="v").Int64()
     h.fill(v=x).fill(v=abs(x) * 0.5)
-    direct = h.compute(steps_per_file=3)
+    direct = SequentialRunner().run(h.plan(steps_per_file=3)).value
     later = pexec.ProcessExecutor(max_workers=2).run(h.plan(steps_per_file=3)).value
     eager = hist.Hist.new.Reg(16, 0, 10, name="v").Int64()
     eager.fill(v=DATA)

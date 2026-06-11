@@ -13,6 +13,4 @@ S = TypeVar("S", bound=bh.storage.Storage)
 
 
 class NamedHist(NamedHistInMemory[S], ghb.Histogram, Generic[S], family=hist):  # type: ignore[misc]
-    @property
-    def _in_memory_type(self) -> type[NamedHistInMemory[S]]:
-        return NamedHistInMemory
+    pass
