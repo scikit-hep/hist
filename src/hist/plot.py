@@ -537,11 +537,11 @@ def plot_pull_array(
     patch_height = max(np.abs(pulls)) / pp_num
     patch_width = width * len(pulls)
     patch_artists = []
-    # gradient color patches: fade each successive band by a constant factor
-    # from the base alpha (read once, so it does not compound across the loop)
     base_alpha = pp_kwargs.get("alpha", 0.5)
     for i in range(pp_num):
-        pp_kwargs["alpha"] = base_alpha * np.power(0.618, i)
+        # Each band applies 0.618^i more decay than the previous, giving
+        # base_alpha * 0.618^(0+1+...+i) = base_alpha * 0.618^(i*(i+1)/2)
+        pp_kwargs["alpha"] = base_alpha * np.power(0.618, i * (i + 1) // 2)
 
         upRect_startpoint = (left_edge, i * patch_height)
         upRect = patches.Rectangle(
