@@ -301,10 +301,13 @@ class ChunkedHist:
             for spec, key_index in zip(chunked.chunk_axes, key_indices, strict=True):
                 selector[spec.index] = key_index
                 key_values.append(spec.known_keys[key_index])
-            chunked._save_chunk_view(
-                tuple(key_values),
-                np.ascontiguousarray(source_view[tuple(selector)]),
-            )
+            chunk_view = np.ascontiguousarray(source_view[tuple(selector)])
+            # Skip all-zero chunks: the category is still recorded in the chunk
+            # axis ``known_keys`` (and thus reappears in ``to_hist``), so storing
+            # empty chunks only wastes memory and breaks the sparse invariant.
+            if not _view_any_nonzero(chunk_view):
+                continue
+            chunked._save_chunk_view(tuple(key_values), chunk_view)
 
         return chunked
 
@@ -407,12 +410,11 @@ class ChunkedHist:
             if chunk_view is not None:
                 dense_view[...] = chunk_view
             dense_hist.fill(**dense_kwargs)
-            existing = self._chunks.get(chunk_key)
-            if existing is None:
+            if chunk_view is None:
                 self._save_chunk_view(chunk_key, dense_view.copy(order="C"))
                 self._remember_chunk_key(chunk_key)
             else:
-                existing[...] = dense_view
+                chunk_view[...] = dense_view
         finally:
             _zero_dense_view(dense_view)
 
