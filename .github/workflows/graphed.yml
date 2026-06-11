@@ -19,7 +19,7 @@ env:
   NUMPY: "graphed-numpy @ git+https://github.com/graphed-org/graphed-numpy-mvp@main"
   AWKWARD: "graphed-awkward @ git+https://github.com/graphed-org/graphed-awkward-mvp@main"
   EXEC: "graphed-exec-local @ git+https://github.com/graphed-org/graphed-exec-local-mvp@main"
-  HISTO: "graphed-histogram @ git+https://github.com/graphed-org/graphed-histogram@main"
+  HISTO: "graphed-histogram @ git+https://github.com/graphed-org/graphed-histogram-mvp@main"
   UPROOT: "uproot @ git+https://github.com/graphed-org/uproot5-graphed-mvp@graphed-mvp"
 
 jobs:
