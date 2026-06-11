@@ -49,12 +49,12 @@ def find_histogram_modules(
         try:
             yield arg._histogram_module_
         except AttributeError:
-            # Find class exactly, or check subclasses
+            # Find class exactly, or check subclasses, stopping at the first
+            # registered base in the MRO.
             for cls in type(arg).__mro__:
-                try:
+                if cls in _histogram_modules:
                     yield _histogram_modules[cls]
-                except KeyError:
-                    continue
+                    break
 
 
 def destructure(obj: Any) -> dict[str, Any] | None:
@@ -91,6 +91,22 @@ def broadcast_and_flatten(
     raise TypeError(msg)
 
 
+def _numpy_broadcast_and_flatten(
+    args: Sequence[Any],
+) -> tuple[np.typing.NDArray[Any], ...]:
+    """Broadcast and ravel args via NumPy, or ``NotImplemented`` if any arg
+    cannot be interpreted as a NumPy array."""
+    arrays = []
+    for arg in args:
+        # If we can't interpret this argument, it's not NumPy-friendly!
+        try:
+            arrays.append(np.asarray(arg))
+        except (TypeError, ValueError):
+            return NotImplemented  # type: ignore[no-any-return]
+
+    return tuple(np.ravel(x) for x in np.broadcast_arrays(*arrays))
+
+
 @histogram_module_for(np.ndarray)
 class NumpyHistogramModule:
     @staticmethod
@@ -104,15 +120,7 @@ class NumpyHistogramModule:
     def broadcast_and_flatten(
         args: Sequence[np.typing.NDArray[Any] | ArrayLike],
     ) -> tuple[np.typing.NDArray[Any], ...]:
-        arrays = []
-        for arg in args:
-            # If we can't interpret this argument, it's not NumPy-friendly!
-            try:
-                arrays.append(np.asarray(arg))
-            except (TypeError, ValueError):
-                return NotImplemented  # type: ignore[no-any-return]
-
-        return tuple(np.ravel(x) for x in np.broadcast_arrays(*arrays))
+        return _numpy_broadcast_and_flatten(args)
 
 
 try:
@@ -131,12 +139,4 @@ else:
         def broadcast_and_flatten(
             args: Sequence[pd.Series[Any] | ArrayLike],
         ) -> tuple[np.typing.NDArray[Any], ...]:
-            arrays = []
-            for arg in args:
-                # If we can't interpret this argument, it's not NumPy-friendly!
-                try:
-                    arrays.append(np.asarray(arg))
-                except (TypeError, ValueError):
-                    return NotImplemented  # type: ignore[no-any-return]
-
-            return tuple(np.ravel(x) for x in np.broadcast_arrays(*arrays))
+            return _numpy_broadcast_and_flatten(args)
