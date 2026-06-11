@@ -91,6 +91,13 @@ class Stack(Generic[S]):
     def __getitem__(self, val: slice) -> Self: ...
 
     def __getitem__(self, val: int | slice | str) -> BaseHist[S] | Self:
+        """
+        Index the Stack by position or by histogram name.
+
+        Slices follow normal Python (half-open) semantics, so a slice stop
+        given as a name is *exclusive*: ``stack["a":"c"]`` yields the
+        histograms from ``"a"`` up to but not including ``"c"``.
+        """
         if isinstance(val, str):
             val = self._get_index(val)
         if isinstance(val, slice):
