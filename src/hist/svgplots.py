@@ -87,7 +87,7 @@ def svg_hist_1d(h: hist.BaseHist[Any]) -> svg:
     arr[1, 1:-2:2] = arr[1, 2:-1:2] = -height * norm_vals
     arr[1, 0] = arr[1, -1] = 0
 
-    points = " ".join(f"{x:3g},{y:.3g}" for x, y in arr.T)
+    points = " ".join(f"{x:.3g},{y:.3g}" for x, y in arr.T)
     bins = polyline(points=points, style="fill:none; stroke:currentColor;")
 
     ax_line = line(
@@ -139,7 +139,7 @@ def svg_hist_1d_c(h: hist.BaseHist[Any]) -> svg:
     xs = arr[1] * np.cos(arr[0])
     ys = arr[1] * np.sin(arr[0])
 
-    points = " ".join(f"{x:3g},{y:.3g}" for x, y in zip(xs, ys, strict=True))
+    points = " ".join(f"{x:.3g},{y:.3g}" for x, y in zip(xs, ys, strict=True))
     bins = polygon(points=points, style="fill:none; stroke:currentColor;")
 
     center = circle(
