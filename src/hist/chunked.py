@@ -57,7 +57,7 @@ def _validate_dense_view(
     *,
     shape: tuple[int, ...],
     dtype: np.dtype[tp.Any],
-) -> np.ndarray:
+) -> np.typing.NDArray[Any]:
     array = np.asarray(view)
     if array.shape != shape:
         msg = f"dense view shape mismatch: expected {shape}, got {array.shape}"
@@ -68,7 +68,9 @@ def _validate_dense_view(
     return array
 
 
-def _accumulate_dense_view(target: np.ndarray, source: np.ndarray) -> None:
+def _accumulate_dense_view(
+    target: np.typing.NDArray[Any], source: np.typing.NDArray[Any]
+) -> None:
     if target.dtype.fields is None:
         target[...] += source
         return
@@ -76,7 +78,7 @@ def _accumulate_dense_view(target: np.ndarray, source: np.ndarray) -> None:
         _accumulate_dense_view(target[field_name], source[field_name])
 
 
-def _zero_dense_view(view: np.ndarray) -> None:
+def _zero_dense_view(view: np.typing.NDArray[Any]) -> None:
     if view.dtype.fields is None:
         view.fill(0)
         return
@@ -84,7 +86,7 @@ def _zero_dense_view(view: np.ndarray) -> None:
         _zero_dense_view(view[field_name])
 
 
-def _view_any_nonzero(view: np.ndarray) -> bool:
+def _view_any_nonzero(view: np.typing.NDArray[Any]) -> bool:
     if view.dtype.fields is None:
         return bool(np.any(view))
     return any(
@@ -168,7 +170,7 @@ class ChunkedHist:
     _dense_view_nbytes: int = field(init=False)
     _chunk_axis_names: tuple[str, ...] = field(init=False)
     _scratch_dense_hist: hist.Hist[Any] = field(init=False)
-    _chunks: dict[ChunkKey, np.ndarray] = field(default_factory=dict)
+    _chunks: dict[ChunkKey, np.typing.NDArray[Any]] = field(default_factory=dict)
 
     def __init__(
         self,
@@ -327,7 +329,9 @@ class ChunkedHist:
     def dense_axes(self) -> tuple[tp.Any, ...]:
         return tuple(self._scratch_dense_hist.axes)
 
-    def _save_chunk_view(self, key: ChunkKey, chunk_view: np.ndarray) -> None:
+    def _save_chunk_view(
+        self, key: ChunkKey, chunk_view: np.typing.NDArray[Any]
+    ) -> None:
         array = _validate_dense_view(
             chunk_view,
             shape=self.dense_view_shape,
@@ -373,7 +377,7 @@ class ChunkedHist:
             if name not in self.chunk_axis_names
         }
 
-    def add_dense_view(self, key: ChunkKey, dense_view: np.ndarray) -> None:
+    def add_dense_view(self, key: ChunkKey, dense_view: np.typing.NDArray[Any]) -> None:
         self._check_chunk_key(key)
         dense_view = _validate_dense_view(
             dense_view,
@@ -493,7 +497,7 @@ class ChunkedHist:
             label=self.label,
         )
 
-    def items(self) -> Iterable[tuple[ChunkKey, np.ndarray]]:
+    def items(self) -> Iterable[tuple[ChunkKey, np.typing.NDArray[Any]]]:
         """Iterate over ``(chunk key, chunk array)`` pairs.
 
         Like :meth:`chunk_view`, the yielded arrays are live views of the
@@ -559,7 +563,7 @@ class ChunkedHist:
     def chunk_view(
         self,
         selection: Mapping[str, ChunkScalar | tp.Iterable[ChunkScalar]],
-    ) -> np.ndarray:
+    ) -> np.typing.NDArray[Any]:
         """Return the live array for one chunk.
 
         The returned array is a view of the internal storage; mutating it
