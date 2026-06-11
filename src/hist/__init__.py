@@ -14,6 +14,7 @@ from .hist import Hist
 from .namedhist import NamedHist
 from .stack import Stack
 from .tag import (
+    at,
     loc,
     overflow,
     rebin,
@@ -34,6 +35,7 @@ __all__ = (
     "Stack",
     "__version__",
     "accumulators",
+    "at",
     "axis",
     "loc",
     "new",
