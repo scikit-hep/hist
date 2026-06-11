@@ -43,6 +43,8 @@ jobs:
           python -m pip install "${{ env.CORE }}" "${{ env.DEBUG }}" "${{ env.FRONTEND }}" \
             "${{ env.NUMPY }}" "${{ env.AWKWARD }}" "${{ env.EXEC }}" "${{ env.HISTO }}" \
             "${{ env.UPROOT }}"
-          python -m pip install -e ".[test,plot]" scikit-hep-testdata
+          # hist's test deps are a PEP 735 dependency GROUP (not an extra)
+          python -m pip install -e . --group test
+          python -m pip install scikit-hep-testdata
       - name: Full hist suite + the graphed integration tests
         run: python -m pytest tests -q
