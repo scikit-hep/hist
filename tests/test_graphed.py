@@ -18,7 +18,7 @@ hist_graphed = pytest.importorskip("hist.graphed")
 from dataclasses import dataclass, field  # noqa: E402
 
 from graphed import Session  # noqa: E402
-from graphed.write import SequentialRunner  # noqa: E402
+from graphed_core.execution import SequentialRunner  # noqa: E402
 from graphed_core import Partition  # noqa: E402
 
 RNG = np.random.default_rng(7)
