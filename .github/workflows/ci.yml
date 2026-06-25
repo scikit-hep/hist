@@ -62,7 +62,11 @@ jobs:
       run: uv pip install -e . --group plot
 
     - name: Test plotting too
-      run: .venv/bin/python -m pytest --mpl
+      # mpl image baselines track matplotlib 3.11; Python 3.10 stays on 3.10.x
+      # (3.11 dropped 3.10), so only pixel-compare on 3.11+.
+      run: >
+        .venv/bin/python -m pytest
+        ${{ matrix.python-version != '3.10' && '--mpl' || '' }}
 
   mypy:
     name: Type check
