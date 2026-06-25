@@ -922,3 +922,62 @@ def test_plot_ratio_misalignment():
     plot_ratio_array(h, ratio, ratio_uncert, ax=Ax(), uncert_draw_type="line")
 
     assert np.allclose(captured["x"], h.axes[0].edges[:-1])
+
+
+@pytest.mark.parametrize("kind", ["int", "reg"])
+def test_plot_ratio_ax_dict_alignment(kind):
+    """
+    The main and subplot axes must line up identically whether the axes are
+    auto-created or supplied via ax_dict, for both Integer and Regular axes (#659).
+    """
+
+    value_ax = (
+        axis.Integer(0, 10, name="v")
+        if kind == "int"
+        else axis.Regular(10, 0, 10, name="v")
+    )
+    h = Hist(axis.StrCategory(["a", "b"], name="cat"), value_ax)
+    rng = np.random.default_rng(42)
+    h.fill(cat="a", v=rng.integers(0, 10, size=200))
+    h.fill(cat="b", v=rng.integers(0, 10, size=200))
+    num = h[{"cat": "a"}]
+    den = h[{"cat": "b"}]
+
+    def ratio_point_x(subplot_ax):
+        # The errorbar data line carries one x per bin; the central reference
+        # line (axhline) carries only the two axis endpoints.
+        per_bin = [
+            np.asarray(line.get_xdata())
+            for line in subplot_ax.get_lines()
+            if np.asarray(line.get_xdata()).size == num.axes[0].size
+        ]
+        assert per_bin, "ratio points not found"
+        return per_bin[0]
+
+    def make(own):
+        fig = plt.figure()
+        if own:
+            grid = fig.add_gridspec(2, 1, hspace=0, height_ratios=[3, 1])
+            main_ax = fig.add_subplot(grid[0])
+            sub_ax = fig.add_subplot(grid[1])
+            num.plot_ratio(den, ax_dict={"main_ax": main_ax, "ratio_ax": sub_ax})
+        else:
+            num.plot_ratio(den)
+            main_ax, sub_ax = fig.axes[0], fig.axes[1]
+        result = (
+            main_ax.get_xlim(),
+            sub_ax.get_xlim(),
+            ratio_point_x(sub_ax),
+        )
+        plt.close(fig)
+        return result
+
+    auto_main_xlim, auto_sub_xlim, auto_x = make(own=False)
+    own_main_xlim, own_sub_xlim, own_x = make(own=True)
+
+    # Within each branch, main and subplot share the same x-range.
+    assert auto_main_xlim == auto_sub_xlim
+    assert own_main_xlim == own_sub_xlim
+    # And the two branches agree with each other.
+    assert auto_main_xlim == own_main_xlim
+    assert np.allclose(auto_x, own_x)
