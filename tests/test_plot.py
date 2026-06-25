@@ -922,3 +922,26 @@ def test_plot_ratio_misalignment():
     plot_ratio_array(h, ratio, ratio_uncert, ax=Ax(), uncert_draw_type="line")
 
     assert np.allclose(captured["x"], h.axes[0].edges[:-1])
+
+
+def test_construct_gaussian_callable_sigma():
+    # Regression test for issue #483: the initial-guess sigma must be a
+    # standard deviation, not the variance (np.sqrt was missing).
+    from hist.plot import _construct_gaussian_callable
+
+    true_mean = 5.0
+    true_std = 2.0
+
+    h = Hist(axis.Regular(200, -10, 20))
+    centers = h.axes[0].centers
+    width = h.axes[0].edges[1] - h.axes[0].edges[0]
+    density = np.exp(-0.5 * ((centers - true_mean) / true_std) ** 2)
+    h[...] = density * width * 1e5
+
+    gauss = _construct_gaussian_callable(h)
+    # Defaults are (constant, mean, sigma)
+    _constant, mean, sigma = gauss.__defaults__
+
+    assert mean == pytest.approx(true_mean, abs=0.05)
+    # Before the fix this returned the variance (~true_std**2 == 4.0)
+    assert sigma == pytest.approx(true_std, rel=0.05)
