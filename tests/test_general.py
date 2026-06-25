@@ -421,6 +421,37 @@ def test_general_index_access():
         h[0:10:20j, 0:5:10j, "hello", False, 5]
 
 
+def test_negative_index_access():
+    """
+    Negative plain-int indices and slice bounds should be normalized relative
+    to the number of bins on the axis, like Python/NumPy semantics (#559).
+    """
+
+    h = Hist(axis.Regular(10, 0, 10, name="x")).fill(np.linspace(0, 9, 10, dtype=float))
+
+    # Bare integer index
+    assert h[-1] == h[9]
+    assert h[-2] == h[8]
+
+    # Slice bounds (positional)
+    assert h[1:-2] == h[1:8]
+    assert h[-3:-1] == h[7:9]
+    assert h[-3:] == h[7:]
+    assert h[:-2] == h[:8]
+
+    # Named / dict indexing goes through the same path
+    assert h[{"x": -2}] == h[{"x": 8}]
+    assert h[{"x": slice(1, -2)}] == h[{"x": slice(1, 8)}]
+
+    # Two-axis case to confirm per-axis normalization uses the right length
+    h2 = Hist(
+        axis.Regular(10, 0, 10, name="x"),
+        axis.Regular(4, 0, 4, name="y"),
+    )
+    assert h2[1:-2, :].axes[0].size == h2[1:8, :].axes[0].size
+    assert h2[:, -1] == h2[:, 3]
+
+
 class TestGeneralStorageProxy:
     """
         Test general storage proxy suite -- whether Hist storage proxy \
