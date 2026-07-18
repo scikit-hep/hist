@@ -142,7 +142,7 @@ def test_multiple_fills_and_process_executor():
     h = hist_graphed.Hist.new.Reg(16, 0, 10, name="v").Int64()
     h.fill(v=x).fill(v=abs(x) * 0.5)
     direct = SequentialRunner().run(h.plan(steps_per_file=3)).value
-    later = pexec.ProcessExecutor(max_workers=2).run(h.plan(steps_per_file=3)).value
+    later = pexec.ProcessPoolExecutor(max_workers=2).run(h.plan(steps_per_file=3)).value
     eager = hist.Hist.new.Reg(16, 0, 10, name="v").Int64()
     eager.fill(v=DATA)
     eager.fill(v=np.abs(DATA) * 0.5)
