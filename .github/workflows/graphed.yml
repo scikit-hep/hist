@@ -13,11 +13,9 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  CORE: "graphed-core @ git+https://github.com/graphed-org/graphed-core-mvp@main"
-  DEBUG: "graphed-debug @ git+https://github.com/graphed-org/graphed-debug-mvp@main"
-  FRONTEND: "graphed @ git+https://github.com/graphed-org/graphed-mvp@main"
-  NUMPY: "graphed-numpy @ git+https://github.com/graphed-org/graphed-numpy-mvp@main"
-  AWKWARD: "graphed-awkward @ git+https://github.com/graphed-org/graphed-awkward-mvp@main"
+  # graphed core/frontend/numpy/awkward/debug are now ONE consolidated package (graphed.core, ...);
+  # graphed-histogram + graphed-exec-local + the uproot fork stay separate packages.
+  GRAPHED: "graphed[awkward,numpy] @ git+https://github.com/graphed-org/graphed@main"
   EXEC: "graphed-exec-local @ git+https://github.com/graphed-org/graphed-exec-local-mvp@main"
   HISTO: "graphed-histogram @ git+https://github.com/graphed-org/graphed-histogram-mvp@main"
   UPROOT: "uproot @ git+https://github.com/graphed-org/uproot5-graphed-mvp@graphed-mvp"
@@ -40,8 +38,7 @@ jobs:
       - name: Install graphed (mvp) siblings + hist (test extras)
         run: |
           python -m pip install --upgrade pip
-          python -m pip install "${{ env.CORE }}" "${{ env.DEBUG }}" "${{ env.FRONTEND }}" \
-            "${{ env.NUMPY }}" "${{ env.AWKWARD }}" "${{ env.EXEC }}" "${{ env.HISTO }}" \
+          python -m pip install "${{ env.GRAPHED }}" "${{ env.EXEC }}" "${{ env.HISTO }}" \
             "${{ env.UPROOT }}"
           # hist's test deps are a PEP 735 dependency GROUP (not an extra)
           python -m pip install -e . --group test

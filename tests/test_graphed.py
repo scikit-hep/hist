@@ -18,8 +18,8 @@ hist_graphed = pytest.importorskip("hist.graphed")
 from dataclasses import dataclass, field  # noqa: E402
 
 from graphed import Session  # noqa: E402
-from graphed_core.execution import SequentialRunner  # noqa: E402
-from graphed_core import Partition  # noqa: E402
+from graphed.core.execution import SequentialRunner  # noqa: E402
+from graphed.core import Partition  # noqa: E402
 
 RNG = np.random.default_rng(7)
 DATA = RNG.normal(5.0, 2.0, 800)
@@ -44,8 +44,8 @@ class ChunkedNumpySource:
 
 
 def _numpy_source():
-    from graphed_numpy import NumpyBackend
-    from graphed_numpy.forms import NumpyForm
+    from graphed.numpy import NumpyBackend
+    from graphed.numpy.forms import NumpyForm
 
     s = Session(NumpyBackend())
     src = ChunkedNumpySource(DATA)
@@ -53,7 +53,7 @@ def _numpy_source():
 
 
 def test_quickconstruct_matches_the_eager_twin_bit_for_bit():
-    pytest.importorskip("graphed_numpy")
+    pytest.importorskip("graphed.numpy")
     x, src = _numpy_source()
     h = hist_graphed.Hist.new.Reg(40, 0, 10, name="met", label="$E_T$").Int64().fill(met=x)
     # graphed idiom: the executor aggregates; hist.Hist(value) wraps back into the in-memory type
@@ -68,7 +68,7 @@ def test_quickconstruct_matches_the_eager_twin_bit_for_bit():
 
 
 def test_weighted_2d_and_namedhist():
-    pytest.importorskip("graphed_numpy")
+    pytest.importorskip("graphed.numpy")
     x, _ = _numpy_source()
     h = (
         hist_graphed.NamedHist.new.Reg(10, 0, 10, name="a").Reg(8, 0, 5, name="b").Weight()
@@ -83,8 +83,8 @@ def test_weighted_2d_and_namedhist():
 
 def test_awkward_ragged_fills_flatten():
     ak = pytest.importorskip("awkward")
-    pytest.importorskip("graphed_awkward")
-    from graphed_awkward import AwkwardBackend, AwkwardForm
+    pytest.importorskip("graphed.awkward")
+    from graphed.awkward import AwkwardBackend, AwkwardForm
 
     events = ak.Array({"Jet_pt": [[50.0, 30.0], [], [70.0, 20.0, 10.0]] * 50})
 
@@ -119,7 +119,7 @@ def test_awkward_ragged_fills_flatten():
 
 def test_uproot_ttree_fill_end_to_end():
     uproot = pytest.importorskip("uproot")
-    pytest.importorskip("graphed_awkward")
+    pytest.importorskip("graphed.awkward")
     skhep_testdata = pytest.importorskip("skhep_testdata")
 
     where = skhep_testdata.data_path("uproot-Zmumu.root") + ":events"
@@ -135,7 +135,7 @@ def test_uproot_ttree_fill_end_to_end():
 
 
 def test_multiple_fills_and_process_executor():
-    pytest.importorskip("graphed_numpy")
+    pytest.importorskip("graphed.numpy")
     pexec = pytest.importorskip("graphed_exec_local")
 
     x, _ = _numpy_source()
