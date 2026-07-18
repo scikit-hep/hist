@@ -136,7 +136,7 @@ def test_uproot_ttree_fill_end_to_end():
 
 def test_multiple_fills_and_process_executor():
     pytest.importorskip("graphed.numpy")
-    pexec = pytest.importorskip("graphed_exec_local")
+    pexec = pytest.importorskip("graphed_executors.local")
 
     x, _ = _numpy_source()
     h = hist_graphed.Hist.new.Reg(16, 0, 10, name="v").Int64()
