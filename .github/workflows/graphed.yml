@@ -15,7 +15,7 @@ concurrency:
 env:
   # graphed core/frontend/numpy/awkward/debug are now ONE consolidated package (graphed.core, ...);
   # graphed-histogram + graphed-executors + the uproot fork stay separate packages.
-  GRAPHED: "graphed[awkward,numpy] @ git+https://github.com/graphed-org/graphed@main"
+  GRAPHED: "graphed[awkward,numpy]"
   EXEC: "graphed-executors"
   HISTO: "graphed-histogram"
   UPROOT: "uproot @ git+https://github.com/graphed-org/uproot5-graphed-mvp@graphed-mvp"
