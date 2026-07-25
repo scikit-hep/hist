@@ -757,6 +757,12 @@ def _plot_ratiolike(
                 self, pulls, ax=subplot_ax, bar_kwargs=bar_kwargs, pp_kwargs=pp_kwargs
             )
 
+    # Match the main axis x-range to the bin edges so it lines up with the
+    # subplot. The subplot pins its own xlim; without this the two only stayed
+    # aligned via sharex in the auto-created branch, leaving user-supplied
+    # ax_dict axes misaligned (see #659).
+    main_ax.set_xlim(self.axes.edges[0][0], self.axes.edges[-1][-1])
+
     if main_ax.get_legend_handles_labels()[0]:  # Don't plot an empty legend
         main_ax.legend(loc=rp_kwargs["legend_loc"])
 
