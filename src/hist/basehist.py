@@ -460,8 +460,8 @@ class BaseHist(_Histogram[S], Generic[S], metaclass=MetaConstructor, family=hist
             return [self._loc_shortcut(each) for each in x]
         if isinstance(x, slice):
             return slice(
-                self._loc_shortcut(x.start),
-                self._loc_shortcut(x.stop),
+                self._loc_shortcut(x.start, ax_id),
+                self._loc_shortcut(x.stop, ax_id),
                 self._step_shortcut(x.step),
             )
         if isinstance(x, complex):
@@ -471,6 +471,16 @@ class BaseHist(_Histogram[S], Generic[S], metaclass=MetaConstructor, family=hist
             return bh.loc(x.imag, int(x.real))
         if isinstance(x, str):
             return bh.loc(x)
+        # Normalize plain negative integers relative to the axis length, like
+        # Python/NumPy indexing. Complex (by-value) indices, bools, and UHI tags
+        # are intentionally left untouched (#559).
+        if (
+            ax_id is not None
+            and isinstance(x, (int, np.integer))
+            and not isinstance(x, bool)
+            and x < 0
+        ):
+            return int(x) + len(self.axes[ax_id])
         return x
 
     @staticmethod
