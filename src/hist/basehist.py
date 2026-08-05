@@ -59,7 +59,7 @@ def _proc_kw_for_lw(kwargs: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def process_mistaken_quick_construct(
-    axes: Sequence[AxisTypes | hist.quick_construct.ConstructProxy],
+    axes: Sequence[AxisTypes | hist.quick_construct.ConstructProxy[Any]],
 ) -> Generator[AxisTypes, None, None]:
     for ax in axes:
         if isinstance(ax, hist.quick_construct.ConstructProxy):

@@ -1,21 +1,24 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 from . import axis, storage
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable
 
-    import boost_histogram as bh
     import numpy as np
 
     from .axis import AxisProtocol
     from .axis.transform import AxisTransform
     from .basehist import BaseHist
 
+# Carries the originating histogram class (Hist, NamedHist, or a user subclass)
+# through the construction chain so storage finalizers return the real subclass.
+H = TypeVar("H", bound="BaseHist[Any]")
 
-class QuickConstruct:
+
+class QuickConstruct(Generic[H]):
     """
     Create a quick construct instance. This is the "base" quick constructor; it will
     always require at least one axes to be added before allowing a storage or fill to be performed.
@@ -30,7 +33,7 @@ class QuickConstruct:
         inside = ", ".join(repr(ax) for ax in self.axes)
         return f"{self.__class__.__name__}({self.hist_class.__name__}, {inside})"
 
-    def __init__(self, hist_class: type[BaseHist[Any]], *axes: AxisProtocol) -> None:
+    def __init__(self, hist_class: type[H], *axes: AxisProtocol) -> None:
         self.hist_class = hist_class
         self.axes = axes
 
@@ -50,7 +53,7 @@ class QuickConstruct:
         circular: bool = False,
         transform: AxisTransform | None = None,
         __dict__: dict[str, Any] | None = None,
-    ) -> ConstructProxy:
+    ) -> ConstructProxy[H]:
         return ConstructProxy(
             self.hist_class,
             *self.axes,
@@ -83,7 +86,7 @@ class QuickConstruct:
         label: str = "",
         metadata: Any = None,
         __dict__: dict[str, Any] | None = None,
-    ) -> ConstructProxy:
+    ) -> ConstructProxy[H]:
         return ConstructProxy(
             self.hist_class,
             *self.axes,
@@ -109,7 +112,7 @@ class QuickConstruct:
         label: str = "",
         metadata: Any = None,
         __dict__: dict[str, Any] | None = None,
-    ) -> ConstructProxy:
+    ) -> ConstructProxy[H]:
         return ConstructProxy(
             self.hist_class,
             *self.axes,
@@ -136,7 +139,7 @@ class QuickConstruct:
         power: float,
         metadata: Any = None,
         __dict__: dict[str, Any] | None = None,
-    ) -> ConstructProxy:
+    ) -> ConstructProxy[H]:
         return ConstructProxy(
             self.hist_class,
             *self.axes,
@@ -164,7 +167,7 @@ class QuickConstruct:
         inverse: Callable[[float], float],
         metadata: Any = None,
         __dict__: dict[str, Any] | None = None,
-    ) -> ConstructProxy:
+    ) -> ConstructProxy[H]:
         return ConstructProxy(
             self.hist_class,
             *self.axes,
@@ -186,7 +189,7 @@ class QuickConstruct:
         label: str = "",
         metadata: Any = None,
         __dict__: dict[str, Any] | None = None,
-    ) -> ConstructProxy:
+    ) -> ConstructProxy[H]:
         return ConstructProxy(
             self.hist_class,
             *self.axes,
@@ -213,7 +216,7 @@ class QuickConstruct:
         growth: bool = False,
         circular: bool = False,
         __dict__: dict[str, Any] | None = None,
-    ) -> ConstructProxy:
+    ) -> ConstructProxy[H]:
         return ConstructProxy(
             self.hist_class,
             *self.axes,
@@ -247,7 +250,7 @@ class QuickConstruct:
         growth: bool = False,
         circular: bool = False,
         __dict__: dict[str, Any] | None = None,
-    ) -> ConstructProxy:
+    ) -> ConstructProxy[H]:
         return ConstructProxy(
             self.hist_class,
             *self.axes,
@@ -277,7 +280,7 @@ class QuickConstruct:
         metadata: Any = None,
         growth: bool = False,
         __dict__: dict[str, Any] | None = None,
-    ) -> ConstructProxy:
+    ) -> ConstructProxy[H]:
         return ConstructProxy(
             self.hist_class,
             *self.axes,
@@ -302,7 +305,7 @@ class QuickConstruct:
         metadata: Any = None,
         growth: bool = False,
         __dict__: dict[str, Any] | None = None,
-    ) -> ConstructProxy:
+    ) -> ConstructProxy[H]:
         return ConstructProxy(
             self.hist_class,
             *self.axes,
@@ -319,7 +322,7 @@ class QuickConstruct:
     StrCategory = StrCat
 
 
-class ConstructProxy(QuickConstruct):
+class ConstructProxy(QuickConstruct[H]):
     __slots__ = ()
 
     def Double(
@@ -329,7 +332,7 @@ class ConstructProxy(QuickConstruct):
         data: np.typing.NDArray[Any] | None = None,
         label: str | None = None,
         name: str | None = None,
-    ) -> BaseHist[bh.storage.Double]:
+    ) -> H:
         return self.hist_class(
             *self.axes,
             storage=storage.Double(),
@@ -346,7 +349,7 @@ class ConstructProxy(QuickConstruct):
         data: np.typing.NDArray[Any] | None = None,
         label: str | None = None,
         name: str | None = None,
-    ) -> BaseHist[bh.storage.Int64]:
+    ) -> H:
         return self.hist_class(
             *self.axes,
             storage=storage.Int64(),
@@ -363,7 +366,7 @@ class ConstructProxy(QuickConstruct):
         data: np.typing.NDArray[Any] | None = None,
         label: str | None = None,
         name: str | None = None,
-    ) -> BaseHist[bh.storage.AtomicInt64]:
+    ) -> H:
         return self.hist_class(
             *self.axes,
             storage=storage.AtomicInt64(),
@@ -380,7 +383,7 @@ class ConstructProxy(QuickConstruct):
         data: np.typing.NDArray[Any] | None = None,
         label: str | None = None,
         name: str | None = None,
-    ) -> BaseHist[bh.storage.Weight]:
+    ) -> H:
         return self.hist_class(
             *self.axes,
             storage=storage.Weight(),
@@ -397,7 +400,7 @@ class ConstructProxy(QuickConstruct):
         data: np.typing.NDArray[Any] | None = None,
         label: str | None = None,
         name: str | None = None,
-    ) -> BaseHist[bh.storage.Mean]:
+    ) -> H:
         return self.hist_class(
             *self.axes,
             storage=storage.Mean(),
@@ -414,7 +417,7 @@ class ConstructProxy(QuickConstruct):
         data: np.typing.NDArray[Any] | None = None,
         label: str | None = None,
         name: str | None = None,
-    ) -> BaseHist[bh.storage.WeightedMean]:
+    ) -> H:
         return self.hist_class(
             *self.axes,
             storage=storage.WeightedMean(),
@@ -431,7 +434,7 @@ class ConstructProxy(QuickConstruct):
         data: np.typing.NDArray[Any] | None = None,
         label: str | None = None,
         name: str | None = None,
-    ) -> BaseHist[bh.storage.Unlimited]:
+    ) -> H:
         return self.hist_class(
             *self.axes,
             storage=storage.Unlimited(),
@@ -452,7 +455,7 @@ class ConstructProxy(QuickConstruct):
             data: np.typing.NDArray[Any] | None = None,
             label: str | None = None,
             name: str | None = None,
-        ) -> BaseHist[bh.storage.MultiCell]:
+        ) -> H:
             return self.hist_class(
                 *self.axes,
                 storage=storage.MultiCell(nelem),
@@ -465,5 +468,5 @@ class ConstructProxy(QuickConstruct):
 
 class MetaConstructor(type):
     @property
-    def new(cls: type[BaseHist[Any]]) -> QuickConstruct:  # type: ignore[misc]
+    def new(cls: type[H]) -> QuickConstruct[H]:  # type: ignore[misc]
         return QuickConstruct(cls)
