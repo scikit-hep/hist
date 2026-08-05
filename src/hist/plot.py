@@ -310,7 +310,8 @@ def _construct_gaussian_callable(
     # gaussian with reasonable initial guesses for parameters
     constant = float(hist_values.max())
     mean = (hist_values * x_values).sum() / hist_values.sum()
-    sigma = (hist_values * np.square(x_values - mean)).sum() / hist_values.sum()
+    variance = (hist_values * np.square(x_values - mean)).sum() / hist_values.sum()
+    sigma = np.sqrt(variance)
 
     # gauss is a closure that will get evaluated in _fit_callable_to_hist
     def gauss(
