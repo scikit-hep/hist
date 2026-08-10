@@ -1,18 +1,12 @@
 from __future__ import annotations
 
-import importlib.metadata
-
 import numpy as np
-import packaging.version
 import pytest
 
 import hist
 from hist.serialization import from_uhi, to_uhi
 
 bhs = pytest.importorskip("boost_histogram.serialization")
-
-BHV = packaging.version.Version(importlib.metadata.version("boost_histogram"))
-BHMETADATA = packaging.version.Version("1.6.1") <= BHV
 
 
 @pytest.mark.parametrize(
@@ -40,9 +34,8 @@ def test_simple_to_dict(storage_type: hist.storage.Storage, expected_type: str) 
     assert data["axes"][0]["underflow"]
     assert data["axes"][0]["overflow"]
     assert not data["axes"][0]["circular"]
-    if BHMETADATA:
-        assert data["axes"][0]["metadata"]["name"] == "x"
-        assert data["axes"][0]["metadata"]["label"] == "X"
+    assert data["axes"][0]["metadata"]["name"] == "x"
+    assert data["axes"][0]["metadata"]["label"] == "X"
     assert data["storage"]["type"] == expected_type
     assert data["storage"]["values"] == pytest.approx(np.zeros(12))
     assert data["uhi_schema"] == 1
@@ -77,8 +70,7 @@ def test_mean_to_dict() -> None:
     )
     data = to_uhi(h)
 
-    if BHMETADATA:
-        assert data["metadata"]["name"] == "hi"
+    assert data["metadata"]["name"] == "hi"
     assert data["axes"][0]["type"] == "category_str"
     assert data["axes"][0]["categories"] == ["one", "two", "three"]
     assert data["axes"][0]["flow"]
@@ -149,9 +141,7 @@ def test_round_trip_simple(storage_type: hist.storage.Storage) -> None:
     data = to_uhi(h)
     h2 = from_uhi(data)
 
-    if BHMETADATA and isinstance(
-        storage_type, (hist.storage.Int64, hist.storage.Double)
-    ):
+    if isinstance(storage_type, (hist.storage.Int64, hist.storage.Double)):
         assert h._hist == h2._hist
         assert h == h2
 
@@ -219,8 +209,7 @@ def test_uhi_direct_conversion():
     )
     uhi_dict = h._to_uhi_()
     h2 = hist.Hist(uhi_dict)
-    if BHMETADATA:
-        assert h == h2
+    assert h == h2
 
 
 def test_round_trip_native() -> None:
@@ -232,9 +221,7 @@ def test_round_trip_native() -> None:
     data = to_uhi(h)
     h2 = from_uhi(data)
 
-    if BHMETADATA:
-        assert h == h2
-
+    assert h == h2
     assert isinstance(h2.axes[0], hist.axis.Integer)
     assert h2.storage_type is hist.storage.AtomicInt64
 

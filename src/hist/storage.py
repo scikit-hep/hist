@@ -5,6 +5,7 @@ from boost_histogram.storage import (
     Double,
     Int64,
     Mean,
+    MultiCell,
     Storage,
     Unlimited,
     Weight,
@@ -16,16 +17,9 @@ __all__ = [
     "Double",
     "Int64",
     "Mean",
+    "MultiCell",
     "Storage",
     "Unlimited",
     "Weight",
     "WeightedMean",
 ]
-
-try:
-    # pylint: disable-next=unused-import
-    from boost_histogram.storage import MultiCell
-
-    __all__ += ["MultiCell"]
-except ImportError:
-    pass
