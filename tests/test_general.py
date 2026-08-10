@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import ctypes
+import importlib.metadata
 import math
 
 import boost_histogram as bh
 import numpy as np
+import packaging.version
 import pytest
 from pytest import approx
 
@@ -370,6 +372,22 @@ def test_general_project():
 
     with pytest.raises(Exception):
         h.project("G", "H")
+
+
+@pytest.mark.skipif(
+    packaging.version.Version(importlib.metadata.version("boost_histogram"))
+    < packaging.version.Version("1.8"),
+    reason="flow= requires boost-histogram 1.8+",
+)
+def test_general_project_flow():
+    h = Hist(
+        axis.Regular(4, 0, 4, name="x"),
+        axis.Regular(4, 0, 4, name="y"),
+    )
+    h.fill(x=[1, 2, -1], y=[1, 2, 9])
+
+    assert h.project("x").sum(flow=True) == 3
+    assert h.project("x", flow=False).sum(flow=True) == 2
 
 
 def test_general_index_access():

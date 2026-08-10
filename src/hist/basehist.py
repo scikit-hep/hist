@@ -286,12 +286,15 @@ class BaseHist(_Histogram[S], Generic[S], metaclass=MetaConstructor, family=hist
         self.fill(**data_list, weight=weight_arr)  # type: ignore[arg-type]
         return self
 
-    def project(self, *args: int | str) -> Self:
+    def project(self, *args: int | str, flow: bool = True) -> Self:
         """
         Projection of axis idx.
         """
         int_args = [self._name_to_index(a) if isinstance(a, str) else a for a in args]
-        return super().project(*int_args)
+        if flow:
+            return super().project(*int_args)
+        # flow=False requires boost-histogram 1.8+
+        return super().project(*int_args, flow=False)
 
     @property
     def T(self) -> Self:

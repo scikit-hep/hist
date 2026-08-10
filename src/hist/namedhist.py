@@ -27,13 +27,13 @@ class NamedHist(BaseHist[S], Generic[S], family=hist):
             msg = f"Each axes in the {self.__class__.__name__} instance should have a name"
             raise RuntimeError(msg)
 
-    def project(self, *args: int | str) -> Self:
+    def project(self, *args: int | str, flow: bool = True) -> Self:
         """
         Projection of axis idx.
         """
 
         if not args or all(isinstance(x, str) for x in args):
-            return super().project(*args)
+            return super().project(*args, flow=flow)
 
         msg = f"Only projections by names are supported for {self.__class__.__name__}"
         raise TypeError(msg)
