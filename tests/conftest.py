@@ -1,11 +1,13 @@
 from __future__ import annotations
 
-import matplotlib as mpl
 import pytest
 
-mpl.use("Agg")
+try:
+    import matplotlib as mpl
 
-mpl.use("Agg")
+    mpl.use("Agg")
+except ModuleNotFoundError:
+    pass
 
 from hist import Hist, NamedHist
 from hist.hist import BaseHist

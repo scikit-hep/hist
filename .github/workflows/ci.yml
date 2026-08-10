@@ -36,6 +36,7 @@ jobs:
         - "3.12"
         - "3.13"
         - "3.14"
+        - "3.15"
 
     name: Check Python ${{ matrix.python-version }}
     steps:
@@ -53,15 +54,26 @@ jobs:
       run: uv venv
 
     - name: Install package
+      if: matrix.python-version != '3.15'
       run: uv pip install -e . --group test --group dask
 
+    - name: Install package (core only)
+      # scipy, iminuit, awkward, dask, and matplotlib do not support 3.15 yet
+      if: matrix.python-version == '3.15'
+      run: uv pip install -e . pytest packaging
+
     - name: Test package
-      run: .venv/bin/python -m pytest
+      # pytest-mpl needs matplotlib, so it can't be required on 3.15
+      run: >
+        .venv/bin/python -m pytest
+        ${{ matrix.python-version == '3.15' && '-o required_plugins=' || '' }}
 
     - name: Install plotting requirements too
+      if: matrix.python-version != '3.15'
       run: uv pip install -e . --group plot
 
     - name: Test plotting too
+      if: matrix.python-version != '3.15'
       # mpl image baselines track matplotlib 3.11; Python 3.10 stays on 3.10.x
       # (3.11 dropped 3.10), so only pixel-compare on 3.11+.
       run: >
