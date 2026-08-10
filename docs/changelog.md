@@ -1,5 +1,46 @@
 # Changelog
 
+## Version 2.11.0
+
+Features:
+
+* Add chunked histograms (`hist.chunked.ChunkedHist`).
+  [#685](https://github.com/scikit-hep/hist/pull/685)
+* Support boost-histogram 1.8, require 1.7+.
+  [#707](https://github.com/scikit-hep/hist/pull/707)
+* Support Python 3.15.
+  [#708](https://github.com/scikit-hep/hist/pull/708)
+* Expose `hist.at` and document `Stack` name-slice semantics.
+  [#695](https://github.com/scikit-hep/hist/pull/695)
+
+Fixes:
+
+* Preserve histogram subclass type through quick construction.
+  [#701](https://github.com/scikit-hep/hist/pull/701)
+* Align the main axis x-range in ratio/pull plots with user-supplied axes.
+  [#700](https://github.com/scikit-hep/hist/pull/700)
+* Take the square root for the Gaussian fit sigma initial guess.
+  [#698](https://github.com/scikit-hep/hist/pull/698)
+* Simplify the pull gradient alpha and fix the SVG coordinate format.
+  [#694](https://github.com/scikit-hep/hist/pull/694)
+* Skip empty chunks and deduplicate fill bookkeeping in chunked histograms.
+  [#691](https://github.com/scikit-hep/hist/pull/691)
+
+Performance:
+
+* Reuse the weight sum in profile and avoid a mutable default storage.
+  [#693](https://github.com/scikit-hep/hist/pull/693)
+
+Typing:
+
+* Annotate ndarray with generic args in chunked histograms and add a Python 3.10 mypy gate.
+  [#697](https://github.com/scikit-hep/hist/pull/697)
+
+Tests/CI:
+
+* Regenerate matplotlib baselines for matplotlib 3.11.
+  [#702](https://github.com/scikit-hep/hist/pull/702)
+
 ## Version 2.10.1
 
 Fixes:
