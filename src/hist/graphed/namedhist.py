@@ -8,9 +8,16 @@ import graphed_histogram.boost as ghb
 import hist
 
 from ..namedhist import NamedHist as NamedHistInMemory
+from .hist import FillModeMixin
 
 S = TypeVar("S", bound=bh.storage.Storage)
 
 
-class NamedHist(NamedHistInMemory[S], ghb.Histogram, Generic[S], family=hist):  # type: ignore[misc]
+class NamedHist(  # type: ignore[misc]
+    FillModeMixin,
+    NamedHistInMemory[S],
+    ghb.Histogram,  # type: ignore[misc]
+    Generic[S],
+    family=hist,
+):
     pass
