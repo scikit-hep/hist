@@ -13,11 +13,15 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  # graphed core/frontend/numpy/awkward/debug are now ONE consolidated package (graphed.core, ...);
+  # This integration branch tracks the graphed stack's git main, NOT PyPI: the mvp packages are
+  # co-developed and the hist.graphed tests use features (m52 `graphed.vary`/`points`, the
+  # `variation_axis`/`unweighted` histogram fill modes) that land on main ahead of any PyPI release.
+  # Pinning PyPI here silently regresses to a pre-feature graphed. Repin to PyPI once a release ships.
+  # graphed core/frontend/numpy/awkward/debug are ONE consolidated package (graphed.core, ...);
   # graphed-histogram + graphed-executors + the uproot fork stay separate packages.
-  GRAPHED: "graphed[awkward,numpy]"
-  EXEC: "graphed-executors"
-  HISTO: "graphed-histogram"
+  GRAPHED: "graphed[awkward,numpy] @ git+https://github.com/graphed-org/graphed@main"
+  EXEC: "graphed-executors @ git+https://github.com/graphed-org/graphed-executors@main"
+  HISTO: "graphed-histogram @ git+https://github.com/graphed-org/graphed-histogram@main"
   UPROOT: "uproot @ git+https://github.com/graphed-org/uproot5-graphed-mvp@graphed-mvp"
 
 jobs:
