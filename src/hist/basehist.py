@@ -160,6 +160,14 @@ class BaseHist(_Histogram[S], Generic[S], metaclass=MetaConstructor, family=hist
         # Support raw Quick Construct being accidentally passed in
         args = tuple(ax for ax in process_mistaken_quick_construct(args))
 
+        # Remove when boost-histogram 1.8.2+ is required; it does this itself
+        if (
+            len(args) == 1
+            and not isinstance(args[0], bh.Histogram)
+            and hasattr(args[0], "_to_uhi_")
+        ):
+            args = (args[0]._to_uhi_(),)  # type: ignore[union-attr]
+
         if isinstance(storage, str):
             storage_str = storage.title()
             if storage_str == "Atomicint64":
