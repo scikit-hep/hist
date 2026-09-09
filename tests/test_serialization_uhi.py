@@ -239,3 +239,27 @@ def test_round_trip_clean() -> None:
 
     assert isinstance(h2.axes[0], hist.axis.Regular)
     assert h2.storage_type is hist.storage.Int64
+
+
+def test_uhi_protocol_object_conversion() -> None:
+    class Wrapper:
+        def __init__(self, h: hist.Hist) -> None:
+            self._hist = h
+
+        def _to_uhi_(self) -> dict:
+            return to_uhi(self._hist)
+
+    h = hist.Hist(
+        hist.axis.Regular(3, 0, 1, name="x"),
+        storage=hist.storage.Int64(),
+        name="n",
+        label="L",
+    )
+    h.fill([0.1, 0.2, 0.9])
+
+    h2 = hist.Hist(Wrapper(h))
+
+    assert h == h2
+    assert h2.axes[0].name == "x"
+    assert h2.name == "n"
+    assert h2.label == "L"
