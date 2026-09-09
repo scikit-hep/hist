@@ -6,6 +6,7 @@ Features:
 
 * Support arbitrary mutable mappings for `ChunkedHist` chunk storage via
   `chunks=`; existing entries are adopted, and the store is exposed as `.chunks`.
+  [#715](https://github.com/scikit-hep/hist/pull/715)
 
 ## Version 2.11.0
 
