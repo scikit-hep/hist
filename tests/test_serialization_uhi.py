@@ -239,3 +239,67 @@ def test_round_trip_clean() -> None:
 
     assert isinstance(h2.axes[0], hist.axis.Regular)
     assert h2.storage_type is hist.storage.Int64
+
+
+@pytest.mark.parametrize("ext", ["json", "zip", "h5"])
+def test_read_write_file(tmp_path, ext: str) -> None:
+    if ext == "h5":
+        pytest.importorskip("h5py")
+    h = hist.Hist(
+        hist.axis.Regular(10, 0, 10, name="x"),
+        hist.axis.StrCategory(["a", "b"], name="c"),
+        storage=hist.storage.Weight(),
+        name="myhist",
+    )
+    h.fill([1, 2, 3], ["a", "b", "a"], weight=[1, 2, 3])
+
+    path = tmp_path / f"h.{ext}"
+    h.write(path)
+    h2 = hist.Hist.read(path)
+
+    assert isinstance(h2, hist.Hist)
+    assert h2.name == "myhist"
+    assert h2.axes[0].name == "x"
+    assert h2.axes[1].name == "c"
+    assert h2.storage_type is hist.storage.Weight
+    assert np.asarray(h2) == pytest.approx(np.asarray(h))
+
+
+@pytest.mark.parametrize("ext", ["zip", "h5"])
+def test_read_write_multiple(tmp_path, ext: str) -> None:
+    if ext == "h5":
+        pytest.importorskip("h5py")
+    h1 = hist.Hist(hist.axis.Regular(4, 0, 1), name="one")
+    h2 = hist.Hist(hist.axis.Integer(0, 3))
+    h1.fill([0.1, 0.2])
+    h2.fill([1, 1, 2])
+
+    path = tmp_path / f"h.{ext}"
+    h1.write(path)
+    h2.write(path, name="two")
+
+    with pytest.raises(ValueError, match="Multiple histograms"):
+        hist.Hist.read(path)
+
+    r1 = hist.Hist.read(path, name="one")
+    r2 = hist.Hist.read(path, name="two")
+    assert r1 == h1
+    assert r2 == h2
+    assert isinstance(r2.axes[0], hist.axis.Integer)
+
+
+def test_read_write_subclass(tmp_path) -> None:
+    h = hist.NamedHist(hist.axis.Regular(4, 0, 1, name="x"))
+    path = tmp_path / "h.json"
+    h.write(path)
+    h2 = hist.NamedHist.read(path)
+    assert type(h2) is hist.NamedHist
+    assert h2 == h
+
+
+def test_write_bad_extension(tmp_path) -> None:
+    h = hist.Hist(hist.axis.Regular(4, 0, 1))
+    with pytest.raises(ValueError, match="Unsupported file extension"):
+        h.write(tmp_path / "h.txt")
+    with pytest.raises(TypeError, match="name="):
+        h.write(tmp_path / "h.json", name="x")

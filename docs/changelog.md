@@ -1,5 +1,11 @@
 # Changelog
 
+## In progress
+
+Features:
+
+* Add `Hist.read()` / `h.write()` and `hist.serialization.read()` / `write()` shortcuts for UHI files. The backend is chosen by extension (`.json`, `.zip`, `.h5`/`.hdf5`). `uhi` is now a required dependency.
+
 ## Version 2.11.0
 
 Features:
