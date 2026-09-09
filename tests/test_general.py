@@ -1049,3 +1049,17 @@ def test_fill_missing_axis_reports_axis_name():
 
     with pytest.raises(TypeError):
         h.fill(x=[0.1, 0.2])
+
+
+def test_copy_keeps_name_label() -> None:
+    h = Hist(axis.Regular(4, 0, 1), name="n", label="l")
+    h2 = Hist(h)
+    assert h2.name == "n"
+    assert h2.label == "l"
+    h3 = Hist(h, name="x")
+    assert h3.name == "x"
+    assert h3.label == "l"
+    h4 = Hist(h, label="y")
+    assert h4.name == "n"
+    assert h4.label == "y"
+    assert Hist._from_uhi_(h._to_uhi_()).name == "n"

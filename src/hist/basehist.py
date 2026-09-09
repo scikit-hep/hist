@@ -197,8 +197,11 @@ class BaseHist(_Histogram[S], Generic[S], metaclass=MetaConstructor, family=hist
         if data is not None:
             self[...] = data
 
-        self.name = name  # pylint: disable=assigning-non-slot
-        self.label = label  # pylint: disable=assigning-non-slot
+        # Keep name/label copied from an input histogram unless overridden
+        if name is not None or "name" not in self.__dict__:
+            self.name = name  # pylint: disable=assigning-non-slot
+        if label is not None or "label" not in self.__dict__:
+            self.label = label  # pylint: disable=assigning-non-slot
 
     def _generate_axes_(self) -> NamedAxesTuple:
         """
