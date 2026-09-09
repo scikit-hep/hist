@@ -42,6 +42,7 @@ requires-python = ">=3.10"
 dependencies = [
     "boost-histogram>=1.7,<1.9",
     "histoprint>=2.3.0",
+    "uhi>=1.1.1",
     'numpy>=1.21.3',
     'packaging>=23',
     'typing-extensions>=4;python_version<"3.11"',
@@ -96,6 +97,7 @@ test = [
     { include-group = "test-core" },
     { include-group = "fit" },
     "awkward>=2.0.7",
+    "h5py>=3.7",
 ]
 test-core = [
     "pytest >=8",
@@ -151,6 +153,7 @@ warn_unreachable = true
 [[tool.mypy.overrides]]
 module = [
     "histoprint.*",
+    "h5py.*",
     "scipy.optimize.*",
     "matplotlib.*",
     "scipy.*",

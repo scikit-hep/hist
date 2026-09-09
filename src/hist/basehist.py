@@ -25,6 +25,7 @@ from .storage import Storage
 from .svgplots import html_hist, svg_hist_1d, svg_hist_1d_c, svg_hist_2d
 
 if typing.TYPE_CHECKING:
+    import os
     from builtins import ellipsis
 
     import matplotlib.axes
@@ -252,6 +253,40 @@ class BaseHist(_Histogram[S], Generic[S], metaclass=MetaConstructor, family=hist
         from .serialization import to_uhi
 
         return to_uhi(self)
+
+    def write(
+        self,
+        filename: str | os.PathLike[str],
+        /,
+        *,
+        name: str | None = None,
+        **kwargs: Any,
+    ) -> None:
+        """
+        Write this histogram to a UHI file. The backend is chosen by
+        extension: ``.json``, ``.zip``, or ``.h5``/``.hdf5``. See
+        :func:`hist.serialization.write`.
+        """
+        from .serialization import write
+
+        write(filename, self, name=name, **kwargs)
+
+    @classmethod
+    def read(
+        cls,
+        filename: str | os.PathLike[str],
+        /,
+        *,
+        name: str | None = None,
+    ) -> Self:
+        """
+        Read a histogram from a UHI file. The backend is chosen by
+        extension: ``.json``, ``.zip``, or ``.h5``/``.hdf5``. See
+        :func:`hist.serialization.read`.
+        """
+        from .serialization import read
+
+        return cls._from_uhi_(read(filename, name=name))
 
     @classmethod
     def from_columns(
