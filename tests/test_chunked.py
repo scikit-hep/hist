@@ -779,3 +779,110 @@ def test_bool_chunk_key_normalizes_to_int():
     assert list(h.keys()) == [(1,)]
     key = next(iter(h.keys()))[0]
     assert type(key) is int
+
+
+# ---------------------------------------------------------------------------
+# Custom chunk mappings
+# ---------------------------------------------------------------------------
+class CopyingMapping(dict):
+    """Mapping that returns copies, like a disk-backed store."""
+
+    def __getitem__(self, key):
+        return super().__getitem__(key).copy()
+
+    def get(self, key, default=None):
+        if key in self:
+            return self[key]
+        return default
+
+    def items(self):
+        return ((k, self[k]) for k in self)
+
+    def values(self):
+        return (self[k] for k in self)
+
+
+def _make_chunked(chunks):
+    return ChunkedHist(
+        axis.Regular(4, 0, 1, name="x"),
+        axis.StrCategory([], growth=True, name="cat"),
+        chunks=chunks,
+    )
+
+
+def test_custom_mapping_fill_and_accumulate():
+    store = CopyingMapping()
+    h = _make_chunked(store)
+    assert h.chunks is store
+
+    h.fill(x=[0.1], cat="a")
+    h.fill(x=[0.1], cat="a")
+    h.fill(x=[0.6], cat="b")
+
+    assert set(store) == {("a",), ("b",)}
+    dense = h.to_hist()
+    assert dense[{"x": 0, "cat": "a"}] == approx(2)
+    assert dense[{"x": 2, "cat": "b"}] == approx(1)
+
+
+def test_custom_mapping_add_dense_view_and_iadd():
+    store = CopyingMapping()
+    h = _make_chunked(store)
+    other = _make_chunked(None)
+    other.fill(x=[0.1], cat="a")
+
+    h += other
+    h += other
+    assert h.to_hist()[{"x": 0, "cat": "a"}] == approx(2)
+
+    view = np.zeros(h.dense_view_shape, dtype=h.dense_view_dtype)
+    view[1] = 3
+    h.add_dense_view(("a",), view)
+    assert h.to_hist()[{"x": 0, "cat": "a"}] == approx(5)
+
+
+def test_custom_mapping_adopts_existing_keys():
+    seed = _make_chunked(None)
+    seed.fill(x=[0.1], cat="a")
+    seed.fill(x=[0.6], cat="b")
+    store = dict(seed.items())
+
+    h = _make_chunked(store)
+    assert set(h.keys()) == {("a",), ("b",)}
+    assert [spec.known_keys for spec in h.chunk_axes] == [["a", "b"]]
+    assert h.to_hist() == seed.to_hist()
+
+
+def test_custom_mapping_rejects_bad_existing_chunk():
+    with pytest.raises(ValueError, match="shape mismatch"):
+        _make_chunked({("a",): np.zeros(3)})
+    with pytest.raises(ValueError, match="unknown key"):
+        ChunkedHist(
+            axis.Regular(4, 0, 1, name="x"),
+            axis.StrCategory(["a"], name="cat"),
+            chunks={("zz",): np.zeros(6)},
+        )
+
+
+def test_custom_mapping_empty_like_and_getitem():
+    store = CopyingMapping()
+    h = _make_chunked(store)
+    h.fill(x=[0.1], cat="a")
+    h.fill(x=[0.6], cat="b")
+
+    assert isinstance(h.empty_like().chunks, dict)
+    new_store = CopyingMapping()
+    assert h.empty_like(chunks=new_store).chunks is new_store
+
+    sub = h[{"cat": "a"}]
+    assert set(sub.keys()) == {("a",)}
+    assert type(sub.chunks) is dict
+
+
+def test_custom_mapping_reset():
+    store = CopyingMapping()
+    h = _make_chunked(store)
+    h.fill(x=[0.1], cat="a")
+    h.reset()
+    assert len(store) == 0
+    assert len(h) == 0

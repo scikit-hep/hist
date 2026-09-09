@@ -12,7 +12,7 @@ import numpy as np
 import hist
 
 if tp.TYPE_CHECKING:
-    from collections.abc import Iterable, Iterator, Mapping
+    from collections.abc import Iterable, Iterator, Mapping, MutableMapping
 
     from ._compat.typing import Self
 
@@ -170,7 +170,9 @@ class ChunkedHist:
     _dense_view_nbytes: int = field(init=False)
     _chunk_axis_names: tuple[str, ...] = field(init=False)
     _scratch_dense_hist: hist.Hist[Any] = field(init=False)
-    _chunks: dict[ChunkKey, np.typing.NDArray[Any]] = field(default_factory=dict)
+    _chunks: MutableMapping[ChunkKey, np.typing.NDArray[Any]] = field(
+        default_factory=dict
+    )
 
     def __init__(
         self,
@@ -178,6 +180,7 @@ class ChunkedHist:
         storage: tp.Any | None = None,
         name: str = "",
         label: str = "",
+        chunks: MutableMapping[ChunkKey, np.typing.NDArray[Any]] | None = None,
     ) -> None:
         """Initialize a chunked histogram.
 
@@ -186,6 +189,9 @@ class ChunkedHist:
             storage: Boost-histogram storage instance. Defaults to ``Double()``.
             name: Histogram name.
             label: Histogram label.
+            chunks: Mutable mapping used to store chunk arrays, such as a
+                disk-backed store. Defaults to a new ``dict``. Existing
+                entries are validated and their keys are adopted.
 
         Example:
             >>> h = ChunkedHist(
@@ -210,7 +216,7 @@ class ChunkedHist:
         self.storage_type = type(storage)
         self.name = name
         self.label = label
-        self._chunks = {}
+        self._chunks = {} if chunks is None else chunks
 
         self.chunk_axes = []
         dense_axes: list[tp.Any] = []
@@ -244,15 +250,26 @@ class ChunkedHist:
         self._dense_view_dtype = dense_view.dtype
         self._dense_view_nbytes = dense_view.nbytes
 
+        for key in list(self._chunks):
+            _validate_dense_view(
+                self._chunks[key],
+                shape=self._dense_view_shape,
+                dtype=self._dense_view_dtype,
+            )
+            self._remember_chunk_key(key)
+
     @classmethod
     def from_hist(
         cls,
         source: hist.Hist[Any],
+        *,
+        chunks: MutableMapping[ChunkKey, np.typing.NDArray[Any]] | None = None,
     ) -> ChunkedHist:
         """Build a ``ChunkedHist`` from an existing ``hist.Hist``.
 
         Args:
             source: Source histogram to copy into chunked storage.
+            chunks: Mapping to store chunk arrays in. Defaults to a new ``dict``.
 
         Returns:
             A new ``ChunkedHist`` containing the same bin contents.
@@ -270,6 +287,7 @@ class ChunkedHist:
             storage=source.storage_type(),
             name=source.name or "",
             label=source.label or "",
+            chunks=chunks,
         )
         source_view = source.view(flow=True)
         if not chunked.chunk_axes:
@@ -312,6 +330,11 @@ class ChunkedHist:
             chunked._save_chunk_view(tuple(key_values), chunk_view)
 
         return chunked
+
+    @property
+    def chunks(self) -> MutableMapping[ChunkKey, np.typing.NDArray[Any]]:
+        """The mapping that stores chunk arrays."""
+        return self._chunks
 
     @property
     def chunk_axis_names(self) -> tuple[str, ...]:
@@ -390,6 +413,8 @@ class ChunkedHist:
             self._remember_chunk_key(key)
             return
         _accumulate_dense_view(chunk_view, dense_view)
+        # Write back: a mapping may return copies rather than live views.
+        self._chunks[key] = chunk_view
 
     def fill(self, **kwargs: tp.Any) -> None:
         """Fill one chunk of the histogram.
@@ -419,6 +444,7 @@ class ChunkedHist:
                 self._remember_chunk_key(chunk_key)
             else:
                 chunk_view[...] = dense_view
+                self._chunks[chunk_key] = chunk_view
         finally:
             _zero_dense_view(dense_view)
 
@@ -489,18 +515,29 @@ class ChunkedHist:
 
         return merged
 
-    def empty_like(self) -> Self:
+    def empty_like(
+        self,
+        *,
+        chunks: MutableMapping[ChunkKey, np.typing.NDArray[Any]] | None = None,
+    ) -> Self:
+        """Return an empty histogram with the same schema.
+
+        Args:
+            chunks: Mapping to store chunk arrays in. Defaults to a new ``dict``.
+        """
         return type(self)(
             *self.axes,
             storage=self.storage_type(),
             name=self.name,
             label=self.label,
+            chunks=chunks,
         )
 
     def items(self) -> Iterable[tuple[ChunkKey, np.typing.NDArray[Any]]]:
         """Iterate over ``(chunk key, chunk array)`` pairs.
 
-        Like :meth:`chunk_view`, the yielded arrays are live views of the
+        Like :meth:`chunk_view`, the yielded arrays come straight from the
+        chunk mapping. With the default ``dict`` they are live views of the
         internal storage; copy them if you need independent data.
         """
         yield from self._chunks.items()
@@ -564,10 +601,11 @@ class ChunkedHist:
         self,
         selection: Mapping[str, ChunkScalar | tp.Iterable[ChunkScalar]],
     ) -> np.typing.NDArray[Any]:
-        """Return the live array for one chunk.
+        """Return the array for one chunk.
 
-        The returned array is a view of the internal storage; mutating it
-        mutates the histogram. Copy it if you need independent data.
+        With the default ``dict`` mapping the returned array is a live view
+        of the internal storage; mutating it mutates the histogram. Other
+        mappings may return copies. Copy it if you need independent data.
         """
         chunk_key = self.exact_chunk_key(selection)
         exact_selection = self.selection_dict(chunk_key)

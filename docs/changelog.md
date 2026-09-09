@@ -1,5 +1,12 @@
 # Changelog
 
+## In progress
+
+Features:
+
+* Support arbitrary mutable mappings for `ChunkedHist` chunk storage via
+  `chunks=`; existing entries are adopted, and the store is exposed as `.chunks`.
+
 ## Version 2.11.0
 
 Features:
