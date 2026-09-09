@@ -205,6 +205,17 @@ You can sort the Categorty axes via ``.sort()`` method:
     h1 = h.sort("Number").sort("Profession", reverse=True)
 
 
+You can expand all category axes into a dict of histograms with ``.expand()``.
+Every combination of categories gives one histogram. The keys join the
+category values with ``_``; pass ``name=`` a callable that takes the values
+and returns a string to change this:
+
+.. code-block:: python3
+
+    d = h.expand()  # {"3_Teacher": Hist(...), "3_Police": Hist(...), ...}
+    d = h.expand(name=lambda n, p: f"{p}-{n}")
+
+
 .. py:function:: hist.axis.StrCategory([str1, ...], name, label, metadata="", growth=False)
    :noindex:
 
