@@ -820,7 +820,7 @@ class BaseHist(_Histogram[S], Generic[S], metaclass=MetaConstructor, family=hist
 
         if name is None:
 
-            def name(*cats: Any) -> str:
+            def name(*cats: int | str) -> str:
                 return "_".join(str(c) for c in cats)
 
         result: dict[str, Self] = {}
