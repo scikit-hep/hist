@@ -1063,3 +1063,33 @@ def test_copy_keeps_name_label() -> None:
     assert h4.name == "n"
     assert h4.label == "y"
     assert Hist._from_uhi_(h._to_uhi_()).name == "n"
+
+
+def test_expand():
+    h = (
+        Hist.new.IntCat([4, 1], name="n")
+        .StrCat(["a", "b"], name="s")
+        .Reg(2, 0, 1, name="x")
+        .Double()
+    )
+    h.fill(n=[4, 1, 1], s=["a", "b", "b"], x=[0.2, 0.7, 0.7])
+
+    d = h.expand()
+    assert list(d) == ["4_a", "4_b", "1_a", "1_b"]
+    for key, hh in d.items():
+        assert hh.axes.name == ("x",)
+        assert hh.name == key
+    assert d["4_a"].values().tolist() == [1, 0]
+    assert d["1_b"].values().tolist() == [0, 2]
+    assert d["4_b"].sum() == 0
+
+    d2 = h.expand(name=lambda n, s: f"{s}{n}")
+    assert list(d2) == ["a4", "b4", "a1", "b1"]
+
+    # A single categorical axis gives 1D histograms
+    d3 = h.project("s", "x").expand()
+    assert list(d3) == ["a", "b"]
+    assert d3["b"].values().tolist() == [0, 2]
+
+    with pytest.raises(ValueError, match="categorical"):
+        h.project("x").expand()

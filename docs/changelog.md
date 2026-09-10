@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 2.12.0
+
+Features:
+
+* Add `.expand()` to split all categorical axes into a dict of histograms.
+
 ## Version 2.11.0
 
 Features:
