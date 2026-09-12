@@ -1,3 +1,7 @@
+.. meta::
+   :description: Hist is an analysis-focused histogram library built on
+      boost-histogram, with named axes, quick construction, and plotting.
+
 .. image:: _images/histlogo.png
    :width: 60%
    :alt: Hist logo
