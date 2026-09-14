@@ -1,9 +1,9 @@
-# Tests for hist.graphed — deferred hist filling on graphed task graphs (HIST-1; P0.1 of the
-# ADL-benchmarks port). QuickConstruct-built deferred histograms must equal their eager hist.Hist
-# twins BIT FOR BIT over graphed-numpy AND graphed-awkward sources and over a real uproot TTree,
-# with named-axis fills, weights, NamedHist, and the partition-wise efficiency witness (the
-# source's whole-dataset loader never runs). Evaluation is graphed's idiom [freeze-HIST-2,
-# user-directed]: plan() + an R7 executor; hist.Hist(value) wraps results back in-memory.
+# Tests for hist.graphed — deferred hist filling on graphed task graphs. QuickConstruct-built
+# deferred histograms must equal their eager hist.Hist twins BIT FOR BIT over graphed-numpy AND
+# graphed.awkward sources and over a real uproot TTree, with named-axis fills, weights, NamedHist,
+# and the partition-wise efficiency witness (the source's whole-dataset loader never runs).
+# Evaluation is graphed's idiom: plan() + a graphed executor; hist.Hist(value) wraps results back
+# in-memory.
 from __future__ import annotations
 
 import numpy as np
