@@ -96,6 +96,10 @@ test = [
     { include-group = "test-core" },
     { include-group = "fit" },
     "awkward>=2.0.7",
+    # tests/test_graphed.py; graphed requires Python 3.11+
+    'graphed[awkward,numpy]>=0.0.2;python_version>="3.11"',
+    'graphed-histogram>=0.0.2;python_version>="3.11"',
+    'graphed-executors>=0.0.2;python_version>="3.11"',
 ]
 test-core = [
     "pytest >=8",
