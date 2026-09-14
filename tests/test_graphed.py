@@ -136,6 +136,8 @@ def test_awkward_ragged_fills_flatten():
 
 def test_uproot_ttree_fill_end_to_end():
     uproot = pytest.importorskip("uproot")
+    if not hasattr(uproot, "graphed"):
+        pytest.skip("uproot without uproot.graphed (scikit-hep/uproot5#1720)")
     pytest.importorskip("graphed.awkward")
     skhep_testdata = pytest.importorskip("skhep_testdata")
 
