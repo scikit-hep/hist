@@ -121,6 +121,7 @@ docs = [
     "pillow",
     "uncertainties>=3",
     "myst_parser>=0.14",
+    "sphinx-llm",
 ]
 
 

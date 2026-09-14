@@ -30,6 +30,7 @@ extensions = [
     "sphinx.ext.mathjax",
     "sphinx.ext.napoleon",
     "sphinx_copybutton",
+    "sphinx_llm.txt",
     "sphinxcontrib.programoutput",
 ]
 
@@ -49,6 +50,15 @@ exclude_patterns = [
     "banner_slides.md",
     "build",
 ]
+
+
+# -- Options for LLM-friendly output -----------------------------------------
+
+# The default is the full README, which is too long for the summary block
+llms_txt_description = (
+    "Documentation of Hist, an analysis-focused histogram library built on"
+    " boost-histogram, with named axes, quick construction, and plotting."
+)
 
 
 intersphinx_mapping = {
