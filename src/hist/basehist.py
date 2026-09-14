@@ -809,7 +809,7 @@ class BaseHist(_Histogram[S], Generic[S], metaclass=MetaConstructor, family=hist
 
         return hist.stack.Stack(*stack_histograms)
 
-    def expand(self, *, name: Callable[..., str] | None = None) -> dict[str, Self]:
+    def expand_cats(self, *, name: Callable[..., str] | None = None) -> dict[str, Self]:
         """
         Expand all categorical axes into a dict of histograms.
 

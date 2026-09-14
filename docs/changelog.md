@@ -7,7 +7,7 @@ Features:
 * Support arbitrary mutable mappings for `ChunkedHist` chunk storage via
   `chunks=`; existing entries are adopted, and the store is exposed as `.chunks`.
   [#715](https://github.com/scikit-hep/hist/pull/715)
-* Add `.expand()` to split all categorical axes into a dict of histograms.
+* Add `.expand_cats()` to split all categorical axes into a dict of histograms.
   [#717](https://github.com/scikit-hep/hist/pull/717)
 
 ## Version 2.11.0
