@@ -15,11 +15,11 @@ gh = pytest.importorskip("graphed_histogram")
 graphed = pytest.importorskip("graphed")
 hist_graphed = pytest.importorskip("hist.graphed")
 
-from dataclasses import dataclass, field  # noqa: E402
+from dataclasses import dataclass, field
 
-from graphed import Session  # noqa: E402
-from graphed.core.execution import SequentialRunner  # noqa: E402
-from graphed.core import Partition  # noqa: E402
+from graphed import Session
+from graphed.core import Partition
+from graphed.core.execution import SequentialRunner
 
 RNG = np.random.default_rng(7)
 DATA = RNG.normal(5.0, 2.0, 800)
@@ -37,9 +37,12 @@ class ChunkedNumpySource:
         return self.data
 
     def partitions(self, steps_per_file: int = 1) -> tuple[Partition, ...]:
-        return tuple(Partition.blind("toy://x", "", s, steps_per_file) for s in range(steps_per_file))
+        return tuple(
+            Partition.blind("toy://x", "", s, steps_per_file)
+            for s in range(steps_per_file)
+        )
 
-    def read_partition(self, partition, columns, resources):  # type: ignore[no-untyped-def]
+    def read_partition(self, partition, _columns, _resources):  # type: ignore[no-untyped-def]
         part = partition.resolve(len(self.data))
         return self.data[part.entry_start : part.entry_stop]
 
@@ -56,14 +59,20 @@ def _numpy_source():
 def test_quickconstruct_matches_the_eager_twin_bit_for_bit():
     pytest.importorskip("graphed.numpy")
     x, src = _numpy_source()
-    h = hist_graphed.Hist.new.Reg(40, 0, 10, name="met", label="$E_T$").Int64().fill(met=x)
+    h = (
+        hist_graphed.Hist.new.Reg(40, 0, 10, name="met", label="$E_T$")
+        .Int64()
+        .fill(met=x)
+    )
     # graphed idiom: the executor aggregates; hist.Hist(value) wraps back into the in-memory type
     out = hist.Hist(SequentialRunner().run(h.plan(steps_per_file=4)).value)
-    assert isinstance(out, hist.Hist) and not isinstance(out, hist_graphed.Hist)
+    assert isinstance(out, hist.Hist)
+    assert not isinstance(out, hist_graphed.Hist)
     eager = hist.Hist.new.Reg(40, 0, 10, name="met", label="$E_T$").Int64()
     eager.fill(met=DATA)
     assert np.array_equal(out.values(flow=True), eager.values(flow=True))
-    assert out.axes[0].name == "met" and out.axes[0].label == "$E_T$"
+    assert out.axes[0].name == "met"
+    assert out.axes[0].label == "$E_T$"
     assert out[{"met": sum}] == eager[{"met": sum}]
     assert src.whole_calls == []  # partition-wise: the whole-dataset loader never ran
 
@@ -72,7 +81,9 @@ def test_weighted_2d_and_namedhist():
     pytest.importorskip("graphed.numpy")
     x, _ = _numpy_source()
     h = (
-        hist_graphed.NamedHist.new.Reg(10, 0, 10, name="a").Reg(8, 0, 5, name="b").Weight()
+        hist_graphed.NamedHist.new.Reg(10, 0, 10, name="a")
+        .Reg(8, 0, 5, name="b")
+        .Weight()
         .fill(a=x, b=x * 0.5, weight=np.sqrt(abs(x)))
     )
     out = hist.NamedHist(SequentialRunner().run(h.plan(steps_per_file=3)).value)
@@ -99,9 +110,12 @@ def test_awkward_ragged_fills_flatten():
             return self.data
 
         def partitions(self, steps_per_file: int = 1):
-            return tuple(Partition.blind("toy://e", "", s, steps_per_file) for s in range(steps_per_file))
+            return tuple(
+                Partition.blind("toy://e", "", s, steps_per_file)
+                for s in range(steps_per_file)
+            )
 
-        def read_partition(self, partition, columns, resources):
+        def read_partition(self, partition, _columns, _resources):
             part = partition.resolve(len(self.data))
             return self.data[part.entry_start : part.entry_stop]
 
@@ -113,7 +127,9 @@ def test_awkward_ragged_fills_flatten():
     h = hist_graphed.Hist.new.Reg(20, 0, 100, name="pt").Int64().fill(pt=g.Jet_pt)
     out = hist.Hist(SequentialRunner().run(h.plan(steps_per_file=5)).value)
     eager = hist.Hist.new.Reg(20, 0, 100, name="pt").Int64()
-    eager.fill(pt=ak.flatten(events.Jet_pt, axis=None))  # ragged fills flatten completely
+    eager.fill(
+        pt=ak.flatten(events.Jet_pt, axis=None)
+    )  # ragged fills flatten completely
     assert np.array_equal(out.values(flow=True), eager.values(flow=True))
     assert src.whole_calls == []
 
@@ -125,8 +141,10 @@ def test_uproot_ttree_fill_end_to_end():
 
     where = skhep_testdata.data_path("uproot-Zmumu.root") + ":events"
     g = uproot.graphed(where, library="ak", filter_name=["px1", "py1"])
-    h = hist_graphed.Hist.new.Reg(50, 0, 100, name="pt1").Double().fill(
-        pt1=np.hypot(g.px1, g.py1)
+    h = (
+        hist_graphed.Hist.new.Reg(50, 0, 100, name="pt1")
+        .Double()
+        .fill(pt1=np.hypot(g.px1, g.py1))
     )
     out = hist.Hist(SequentialRunner().run(h.plan(steps_per_file=3)).value)
     raw = uproot.open(where).arrays(["px1", "py1"])
@@ -167,7 +185,9 @@ def test_variation_axis_flag_reaches_graphed_and_is_not_read_as_an_axis_name():
     x, w = varied()
     h = hist_graphed.Hist.new.Reg(10, 0, 10, name="met").Weight()
     h.fill(met=x, weight=[w], variation_axis=True)
-    (got,) = dict(SequentialRunner().run(ghist.plan({"h": h}, steps_per_file=4)).value).values()
+    (got,) = dict(
+        SequentialRunner().run(ghist.plan({"h": h}, steps_per_file=4)).value
+    ).values()
 
     # axis mode: graphed declares the extra "variation" StrCategory itself
     assert [ax.__class__.__name__ for ax in got.axes] == ["Regular", "StrCategory"]
@@ -177,22 +197,26 @@ def test_variation_axis_flag_reaches_graphed_and_is_not_read_as_an_axis_name():
     x2, w2 = varied()
     low = ghb.Histogram(bh.axis.Regular(10, 0, 10), storage=bh.storage.Weight())
     low.fill(x2, weight=[w2], variation_axis=True)
-    (want,) = dict(SequentialRunner().run(ghist.plan({"h": low}, steps_per_file=4)).value).values()
+    (want,) = dict(
+        SequentialRunner().run(ghist.plan({"h": low}, steps_per_file=4)).value
+    ).values()
     assert np.array_equal(got.view(flow=True), want.view(flow=True))
 
     # the other end of the class: NamedHist, and the sibling control kwarg `unweighted=`
     x3, w3 = varied()
     named = hist_graphed.NamedHist.new.Reg(10, 0, 10, name="met").Weight()
     named.fill(met=x3, weight=[w3], variation_axis=True)
-    (n,) = dict(SequentialRunner().run(ghist.plan({"h": named}, steps_per_file=4)).value).values()
+    (n,) = dict(
+        SequentialRunner().run(ghist.plan({"h": named}, steps_per_file=4)).value
+    ).values()
     assert np.array_equal(n.view(flow=True), want.view(flow=True))
 
     x4, _ = _numpy_source()
     bare = hist_graphed.Hist.new.Reg(10, 0, 10, name="met").Weight()
     bare.fill(met=x4, unweighted=True)  # read as an axis name before the passthrough
-    assert SequentialRunner().run(bare.plan(steps_per_file=4)).value.sum().value == np.count_nonzero(
-        (DATA >= 0) & (DATA < 10)
-    )
+    assert SequentialRunner().run(
+        bare.plan(steps_per_file=4)
+    ).value.sum().value == np.count_nonzero((DATA >= 0) & (DATA < 10))
 
 
 def _named_numpy_source(name, data):  # type: ignore[no-untyped-def]
@@ -200,7 +224,9 @@ def _named_numpy_source(name, data):  # type: ignore[no-untyped-def]
     from graphed.numpy.forms import NumpyForm
 
     s = Session(NumpyBackend())
-    return s.source(name, form=NumpyForm(data.dtype, shape=(None,)), data=ChunkedNumpySource(data))
+    return s.source(
+        name, form=NumpyForm(data.dtype, shape=(None,)), data=ChunkedNumpySource(data)
+    )
 
 
 def test_flag_path_reorders_axes_and_engages_only_for_flags():
@@ -216,23 +242,45 @@ def test_flag_path_reorders_axes_and_engages_only_for_flags():
     from graphed.errors import GraphedError
 
     def run(h):  # type: ignore[no-untyped-def]
-        return next(iter(dict(SequentialRunner().run(ghist.plan({"h": h}, steps_per_file=4)).value).values()))
+        return next(
+            iter(
+                dict(
+                    SequentialRunner().run(ghist.plan({"h": h}, steps_per_file=4)).value
+                ).values()
+            )
+        )
 
     # (reorder) axes are declared a, b; passing them as b=, a= must land on a, b — i.e. equal the
     # positional fill(a_data, b_data), and NOT the swapped fill(b_data, a_data).
     h = hist_graphed.Hist.new.Reg(10, 0, 10, name="a").Reg(10, 0, 10, name="b").Double()
-    h.fill(b=_named_numpy_source("b", DATA2), a=_named_numpy_source("a", DATA), variation_axis=True)
+    h.fill(
+        b=_named_numpy_source("b", DATA2),
+        a=_named_numpy_source("a", DATA),
+        variation_axis=True,
+    )
     got = run(h).view(flow=True)
     low = ghb.Histogram(bh.axis.Regular(10, 0, 10), bh.axis.Regular(10, 0, 10))
-    low.fill(_named_numpy_source("a", DATA), _named_numpy_source("b", DATA2), variation_axis=True)
+    low.fill(
+        _named_numpy_source("a", DATA),
+        _named_numpy_source("b", DATA2),
+        variation_axis=True,
+    )
     assert np.array_equal(got, run(low).view(flow=True))
     swapped = ghb.Histogram(bh.axis.Regular(10, 0, 10), bh.axis.Regular(10, 0, 10))
-    swapped.fill(_named_numpy_source("b", DATA2), _named_numpy_source("a", DATA), variation_axis=True)
-    assert not np.array_equal(got, run(swapped).view(flow=True))  # order genuinely matters
+    swapped.fill(
+        _named_numpy_source("b", DATA2),
+        _named_numpy_source("a", DATA),
+        variation_axis=True,
+    )
+    assert not np.array_equal(
+        got, run(swapped).view(flow=True)
+    )  # order genuinely matters
 
     # (routing) no flag -> hist's path, whose missing-axis TypeError names the axis ("Missing
     # values ... ['b']"); the flag path would instead raise graphed's arity message.
-    miss = hist_graphed.Hist.new.Reg(10, 0, 10, name="a").Reg(10, 0, 10, name="b").Double()
+    miss = (
+        hist_graphed.Hist.new.Reg(10, 0, 10, name="a").Reg(10, 0, 10, name="b").Double()
+    )
     with pytest.raises(TypeError, match="Missing values"):
         miss.fill(a=_named_numpy_source("a", DATA))
 
@@ -251,8 +299,12 @@ def test_sibling_mode_is_unchanged_by_the_flag_passthrough():
     x, _ = _numpy_source()
     w = x * 0.1
     h = hist_graphed.Hist.new.Reg(10, 0, 10, name="met").Weight()
-    h.fill(met=x, weight=[graphed.vary(w, "wgt", up=w * 1.2, down=w * 0.8)])  # default: siblings
+    h.fill(
+        met=x, weight=[graphed.vary(w, "wgt", up=w * 1.2, down=w * 0.8)]
+    )  # default: siblings
     slots = dict(SequentialRunner().run(ghist.plan({"h": h}, steps_per_file=4)).value)
     assert {k[1] for k in slots} == {"nominal", "wgt_up", "wgt_down"}
     for got in slots.values():
-        assert [ax.__class__.__name__ for ax in got.axes] == ["Regular"]  # no variation axis
+        assert [ax.__class__.__name__ for ax in got.axes] == [
+            "Regular"
+        ]  # no variation axis
