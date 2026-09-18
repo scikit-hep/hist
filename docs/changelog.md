@@ -9,6 +9,9 @@ Features:
   [#715](https://github.com/scikit-hep/hist/pull/715)
 * Add `.expand_cats()` to split all categorical axes into a dict of histograms.
   [#717](https://github.com/scikit-hep/hist/pull/717)
+* Add `Hist.read()` / `h.write()` and `hist.serialization.read()` / `write()` shortcuts for UHI files.
+  The backend is chosen by extension (`.json`, `.zip`, `.h5`/`.hdf5`). `uhi` is now a required dependency.
+  [#718](https://github.com/scikit-hep/hist/pull/718)
 
 ## Version 2.11.0
 
