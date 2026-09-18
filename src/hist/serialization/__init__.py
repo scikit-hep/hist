@@ -79,6 +79,14 @@ def _select_name(names: list[str], path: Path) -> str:
     raise ValueError(msg)
 
 
+def _read_json(path: Path) -> dict[str, Any]:
+    import uhi.io.json
+
+    with path.open(encoding="utf-8") as f:
+        contents: dict[str, Any] = json.load(f, object_hook=uhi.io.json.object_hook)
+    return contents
+
+
 def write(
     filename: str | os.PathLike[str],
     h: Histogram[Any],
@@ -91,10 +99,12 @@ def write(
     Write a histogram to a UHI file. The backend is chosen by extension:
     ``.json``, ``.zip``, or ``.h5``/``.hdf5`` (requires h5py).
 
-    JSON files hold a single histogram and are overwritten. Zip and HDF5
-    files are opened in append mode, and ``name`` selects the entry; it
-    defaults to the histogram's ``name`` or ``"histogram"``. Extra keyword
-    arguments are passed to the backend writer.
+    ``name`` selects the entry in the file. Zip and HDF5 files always hold
+    named entries, are opened in append mode, and default to the
+    histogram's ``name`` or ``"histogram"``. JSON files also accept a
+    ``name``, but are the only format that can hold a single unnamed
+    histogram, which is what ``name=None`` writes; such a file is
+    overwritten. Extra keyword arguments are passed to the backend writer.
     """
     path = Path(filename)
     backend = _backend(path)
@@ -103,11 +113,19 @@ def write(
     if backend == "json":
         import uhi.io.json
 
+        contents: Any = data
         if name is not None:
-            msg = "name= is not supported for JSON files"
-            raise TypeError(msg)
+            contents = {}
+            if path.is_file():
+                contents = _read_json(path)
+                if "uhi_schema" in contents:
+                    msg = (
+                        f"{path} holds a single unnamed histogram; cannot add {name!r}"
+                    )
+                    raise ValueError(msg)
+            contents[name] = data
         with path.open("w", encoding="utf-8") as f:
-            json.dump(data, f, default=uhi.io.json.default, **kwargs)
+            json.dump(contents, f, default=uhi.io.json.default, **kwargs)
         return
 
     if name is None:
@@ -137,22 +155,26 @@ def read(
     Read a UHI histogram dictionary from a file. The backend is chosen by
     extension: ``.json``, ``.zip``, or ``.h5``/``.hdf5`` (requires h5py).
 
-    For zip and HDF5 files, ``name`` selects the entry; if not given, the
-    file must contain exactly one histogram. Use :meth:`hist.Hist.read` to
-    get a histogram object directly.
+    ``name`` selects the entry; if not given, the file must contain exactly
+    one histogram, or, for JSON, a single unnamed histogram. Use
+    :meth:`hist.Hist.read` to get a histogram object directly.
     """
     path = Path(filename)
     backend = _backend(path)
 
     if backend == "json":
-        import uhi.io.json
-
-        if name is not None:
-            msg = "name= is not supported for JSON files"
-            raise TypeError(msg)
-        with path.open(encoding="utf-8") as f:
-            output: dict[str, Any] = json.load(f, object_hook=uhi.io.json.object_hook)
-        return output
+        contents = _read_json(path)
+        if "uhi_schema" in contents:
+            if name is not None:
+                msg = f"{path} holds a single unnamed histogram; {name!r} not found"
+                raise ValueError(msg)
+            return contents
+        if name is None:
+            name = _select_name(list(contents), path)
+        if name not in contents:
+            msg = f"{name!r} not found in {path}; contains {list(contents)}"
+            raise ValueError(msg)
+        return typing.cast("dict[str, Any]", contents[name])
 
     if backend == "zip":
         import uhi.io.zip

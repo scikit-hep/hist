@@ -289,7 +289,7 @@ def test_read_write_file(tmp_path, ext: str) -> None:
     assert np.asarray(h2) == pytest.approx(np.asarray(h))
 
 
-@pytest.mark.parametrize("ext", ["zip", "h5"])
+@pytest.mark.parametrize("ext", ["json", "zip", "h5"])
 def test_read_write_multiple(tmp_path, ext: str) -> None:
     if ext == "h5":
         pytest.importorskip("h5py")
@@ -299,7 +299,7 @@ def test_read_write_multiple(tmp_path, ext: str) -> None:
     h2.fill([1, 1, 2])
 
     path = tmp_path / f"h.{ext}"
-    h1.write(path)
+    h1.write(path, name="one")  # JSON is unnamed unless a name is given
     h2.write(path, name="two")
 
     with pytest.raises(ValueError, match="Multiple histograms"):
@@ -325,5 +325,30 @@ def test_write_bad_extension(tmp_path) -> None:
     h = hist.Hist(hist.axis.Regular(4, 0, 1))
     with pytest.raises(ValueError, match="Unsupported file extension"):
         h.write(tmp_path / "h.txt")
-    with pytest.raises(TypeError, match="name="):
-        h.write(tmp_path / "h.json", name="x")
+    with pytest.raises(ValueError, match="Unsupported file extension"):
+        hist.Hist.read(tmp_path / "h.txt")
+
+
+def test_json_named_and_unnamed(tmp_path) -> None:
+    h = hist.Hist(hist.axis.Regular(4, 0, 1))
+    path = tmp_path / "h.json"
+
+    h.write(path)
+    with pytest.raises(ValueError, match="'one' not found"):
+        hist.Hist.read(path, name="one")
+
+    path.unlink()
+    h.write(path, name="one")
+    assert hist.Hist.read(path) == h
+    assert hist.Hist.read(path, name="one") == h
+
+    with pytest.raises(ValueError, match="'two' not found"):
+        hist.Hist.read(path, name="two")
+
+
+def test_json_mixing_named_and_unnamed(tmp_path) -> None:
+    h = hist.Hist(hist.axis.Regular(4, 0, 1))
+    path = tmp_path / "h.json"
+    h.write(path)
+    with pytest.raises(ValueError, match="cannot add 'one'"):
+        h.write(path, name="one")
