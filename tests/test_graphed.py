@@ -221,14 +221,19 @@ def test_variation_axis_flag_reaches_graphed_and_is_not_read_as_an_axis_name():
     ).value.sum().value == np.count_nonzero((DATA >= 0) & (DATA < 10))
 
 
-def _named_numpy_source(name, data):  # type: ignore[no-untyped-def]
+def _named_numpy_columns(**columns):  # type: ignore[no-untyped-def]
+    """Arrays of one Session, the columns of one source: an `Array` means something only in the
+    Session that recorded it, and a plan takes exactly one partitioned source."""
     from graphed.numpy import NumpyBackend
     from graphed.numpy.forms import NumpyForm
 
-    s = Session(NumpyBackend())
-    return s.source(
-        name, form=NumpyForm(data.dtype, shape=(None,)), data=ChunkedNumpySource(data)
+    stacked = np.stack(list(columns.values()), axis=1)
+    source = Session(NumpyBackend()).source(
+        "columns",
+        form=NumpyForm(stacked.dtype, shape=(None, len(columns))),
+        data=ChunkedNumpySource(stacked),
     )
+    return {name: source[:, i] for i, name in enumerate(columns)}
 
 
 def test_flag_path_reorders_axes_and_engages_only_for_flags():
@@ -254,26 +259,15 @@ def test_flag_path_reorders_axes_and_engages_only_for_flags():
 
     # (reorder) axes are declared a, b; passing them as b=, a= must land on a, b — i.e. equal the
     # positional fill(a_data, b_data), and NOT the swapped fill(b_data, a_data).
+    c = _named_numpy_columns(a=DATA, b=DATA2)
     h = hist_graphed.Hist.new.Reg(10, 0, 10, name="a").Reg(10, 0, 10, name="b").Double()
-    h.fill(
-        b=_named_numpy_source("b", DATA2),
-        a=_named_numpy_source("a", DATA),
-        variation_axis=True,
-    )
+    h.fill(b=c["b"], a=c["a"], variation_axis=True)
     got = run(h).view(flow=True)
     low = ghb.Histogram(bh.axis.Regular(10, 0, 10), bh.axis.Regular(10, 0, 10))
-    low.fill(
-        _named_numpy_source("a", DATA),
-        _named_numpy_source("b", DATA2),
-        variation_axis=True,
-    )
+    low.fill(c["a"], c["b"], variation_axis=True)
     assert np.array_equal(got, run(low).view(flow=True))
     swapped = ghb.Histogram(bh.axis.Regular(10, 0, 10), bh.axis.Regular(10, 0, 10))
-    swapped.fill(
-        _named_numpy_source("b", DATA2),
-        _named_numpy_source("a", DATA),
-        variation_axis=True,
-    )
+    swapped.fill(c["b"], c["a"], variation_axis=True)
     assert not np.array_equal(
         got, run(swapped).view(flow=True)
     )  # order genuinely matters
@@ -284,11 +278,11 @@ def test_flag_path_reorders_axes_and_engages_only_for_flags():
         hist_graphed.Hist.new.Reg(10, 0, 10, name="a").Reg(10, 0, 10, name="b").Double()
     )
     with pytest.raises(TypeError, match="Missing values"):
-        miss.fill(a=_named_numpy_source("a", DATA))
+        miss.fill(a=c["a"])
 
     # (unweighted) forwarded, not silently set False: unweighted=True with a weight= factor is the
     # contradiction graphed refuses at fill time.
-    x = _named_numpy_source("met", DATA)
+    x = c["a"]
     hbad = hist_graphed.Hist.new.Reg(10, 0, 10, name="met").Weight()
     with pytest.raises(GraphedError, match="unweighted=True suppresses"):
         hbad.fill(met=x, weight=[x], unweighted=True)
