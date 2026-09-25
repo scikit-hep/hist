@@ -11,7 +11,7 @@ Welcome to Hist's documentation!
 ================================
 
 |Actions Status| |Documentation Status| |pre-commit.ci Status| |PyPI version|
-|Conda-Forge| |PyPI platforms| |DOI| |License| |GitHub Discussion| |Gitter| |Binder| |Scikit-HEP|
+|Conda-Forge| |PyPI platforms| |DOI| |License| |GitHub Discussion| |Binder| |Scikit-HEP|
 
 Introduction
 ------------
@@ -97,8 +97,6 @@ Indices and tables
    :target: https://opensource.org/licenses/BSD-3-Clause
 .. |GitHub Discussion| image:: https://img.shields.io/static/v1?label=Discussions&message=Ask&color=blue&logo=github
    :target: https://github.com/scikit-hep/hist/discussions
-.. |Gitter| image:: https://badges.gitter.im/HSF/PyHEP-histogramming.svg
-   :target: https://gitter.im/HSF/PyHEP-histogramming?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
 .. |Binder| image:: https://mybinder.org/badge_logo.svg
    :target: https://mybinder.org/v2/gh/scikit-hep/hist/HEAD
 .. |Scikit-HEP| image:: https://scikit-hep.org/assets/images/Scikit--HEP-Project-blue.svg
