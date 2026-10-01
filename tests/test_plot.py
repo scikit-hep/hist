@@ -152,6 +152,38 @@ def test_general_plot2d_full():
     plt.close("all")
 
 
+@pytest.mark.parametrize(
+    "side_axis",
+    [
+        axis.Integer(-2, 2, name="B", flow=False),
+        axis.StrCategory(["a", "b", "c", "d"], name="B"),
+        axis.Regular(4, -2, 2, name="B", flow=False),
+    ],
+)
+def test_plot2d_full_preserves_side_count_ticks(side_axis):
+    """Bin labels must not replace the tick settings of the rotated count axis."""
+    from matplotlib.ticker import FuncFormatter, MaxNLocator
+
+    h = Hist(axis.Integer(-2, 2, name="A", flow=False), side_axis)
+    h[...] = np.arange(1, 17).reshape(4, 4) * 1000
+    fig = plt.figure()
+    grid = fig.add_gridspec(2, 2)
+    main_ax = fig.add_subplot(grid[1, 0])
+    top_ax = fig.add_subplot(grid[0, 0], sharex=main_ax)
+    side_ax = fig.add_subplot(grid[1, 1], sharey=main_ax)
+    locator = MaxNLocator(nbins=4)
+    formatter = FuncFormatter(lambda value, _: f"{value / 1000:g}k")
+    side_ax.xaxis.set_major_locator(locator)
+    side_ax.xaxis.set_major_formatter(formatter)
+
+    h.plot2d_full(ax_dict={"main_ax": main_ax, "top_ax": top_ax, "side_ax": side_ax})
+
+    assert side_ax.xaxis.get_major_locator() is locator
+    assert side_ax.xaxis.get_major_formatter() is formatter
+    assert max(side_ax.get_xticks()) > 1000
+    plt.close(fig)
+
+
 def test_general_plot():
     """
     Test general plot -- whether Hist can be plotted properly.
