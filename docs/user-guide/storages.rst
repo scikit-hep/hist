@@ -116,11 +116,38 @@ Accumulator storages
 These storages hold more than one number internally. They return a smart view when queried
 with ``.view()``; see :ref:`usage-accumulators` for information on each accumulator and view.
 
+.. _usage-storage-weight:
+
 Weight
 ^^^^^^
 
-This storage keeps a sum of weights as well (in CERN ROOT, this is like calling
-``.Sumw2()`` before filling a histogram). It uses the ``WeightedSum`` accumulator.
+Use ``Weight()`` when filling with event weights and keeping track of their
+uncertainties. Each bin stores the sum of weights and the sum of squared weights,
+returned by ``.values()`` and ``.variances()`` respectively. It uses the
+``WeightedSum`` accumulator (in CERN ROOT, this is like calling ``.Sumw2()``
+before filling a histogram).
+
+For example, the first bin below contains weights 2 and 3, so its value is
+``2 + 3 = 5`` and its variance is ``2**2 + 3**2 = 13``. The plotting function
+can use the square root of the stored variances for error bars, without needing
+to calculate the squared weights yourself:
+
+.. plot::
+   :include-source: true
+
+   from hist import Hist
+
+   h = Hist.new.Reg(2, 0, 2, name="x").Weight()
+   h.fill([0.25, 0.75, 1.25], weight=[2.0, 3.0, 4.0])
+
+   print(h.values())     # [5. 4.]
+   print(h.variances())  # [13. 16.]
+   h.plot(histtype="errorbar", w2method="sqrt")
+
+``Double()`` also accepts weighted fills, but it stores only the sum of weights.
+After such a fill, ``.variances()`` returns ``None``. Choose ``Weight()`` before
+filling if you need weighted uncertainties; changing storage afterward cannot
+recover the sum of squared weights.
 
 
 MultiCell
