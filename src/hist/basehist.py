@@ -754,10 +754,26 @@ class BaseHist(_Histogram[S], Generic[S], metaclass=MetaConstructor, family=hist
         **kwargs: Any,
     ) -> tuple[MainAxisArtists, RatiolikeArtists]:
         """
-        ``plot_ratio`` method for ``BaseHist`` object.
+        Plot a 1D histogram and its ratio to another histogram or a fitted model.
 
         Return a tuple of artists following a structure of
         ``(main_ax_artists, subplot_ax_artists)``
+
+        Parameters
+        ----------
+        other : hist.BaseHist, collections.abc.Callable, or str
+            A histogram to compare with, or a model to fit to this histogram.
+            The strings ``"gauss"``, ``"gaus"``, and ``"normal"`` select a Gaussian
+            model with initial parameter estimates derived from the histogram.
+            Other strings are Python expressions in ``x``, such as
+            ``"a * x + b"``, where ``a`` and ``b`` are fit parameters. NumPy is
+            available as ``np``. Only use trusted expressions, since they are
+            evaluated as Python code.
+        ax_dict : dict[str, matplotlib.axes.Axes]
+            Axes for the histogram and ratio subplot, keyed by ``"main_ax"`` and
+            ``"ratio_ax"``, respectively. Both keys are required when passing a
+            nonempty dictionary. If omitted or empty, both axes are created in
+            the current figure.
         """
 
         from hist import plot
@@ -774,10 +790,25 @@ class BaseHist(_Histogram[S], Generic[S], metaclass=MetaConstructor, family=hist
         **kwargs: Any,
     ) -> tuple[FitResultArtists, RatiolikeArtists]:
         """
-        ``plot_pull`` method for ``BaseHist`` object.
+        Plot a 1D histogram with a fitted model and a pull subplot.
 
         Return a tuple of artists following a structure of
         ``(main_ax_artists, subplot_ax_artists)``
+
+        Parameters
+        ----------
+        func : collections.abc.Callable or str
+            A model to fit to this histogram. The strings ``"gauss"``, ``"gaus"``,
+            and ``"normal"`` select a Gaussian model with initial parameter
+            estimates derived from the histogram. Other strings are Python
+            expressions in ``x``, such as ``"a * x + b"``, where ``a`` and ``b``
+            are fit parameters. NumPy is available as ``np``. Only use trusted
+            expressions, since they are evaluated as Python code.
+        ax_dict : dict[str, matplotlib.axes.Axes]
+            Axes for the histogram and pull subplot, keyed by ``"main_ax"`` and
+            ``"pull_ax"``, respectively. Both keys are required when passing a
+            nonempty dictionary. If omitted or empty, both axes are created in
+            the current figure.
         """
 
         from hist import plot
