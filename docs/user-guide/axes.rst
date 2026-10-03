@@ -216,6 +216,17 @@ and returns a string to change this:
     d = h.expand_cats(name=lambda n, p: f"{p}-{n}")
 
 
+Keys must be unique across all category combinations, including empty histograms.
+If either the default names or a custom ``name`` callable produce a duplicate key,
+``.expand_cats()`` raises ``ValueError`` instead of overwriting a group. For example,
+``("a_b", "c")`` and ``("a", "b_c")`` both default to ``"a_b_c"``. To keep such
+combinations distinct, use the tuple representation as the key:
+
+.. code-block:: python3
+
+    d = h.expand_cats(name=lambda *cats: repr(cats))
+
+
 .. py:function:: hist.axis.StrCategory([str1, ...], name, label, metadata="", growth=False)
    :noindex:
 

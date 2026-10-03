@@ -16,6 +16,8 @@ Fixes:
   pandas is loaded. [#730](https://github.com/scikit-hep/hist/pull/730)
 * `fill_flattened` accepts pandas DataFrames and Series.
   [#730](https://github.com/scikit-hep/hist/pull/730)
+* Raise `ValueError` when `.expand_cats()` generates duplicate keys, including
+  from custom `name` callbacks or empty groups, instead of silently overwriting a group.
 
 ## Version 2.11.0
 
