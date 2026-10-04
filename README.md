@@ -13,7 +13,6 @@
 [![License][license-badge]][license-link]
 
 [![GitHub Discussion][github-discussions-badge]][github-discussions-link]
-[![Gitter][gitter-badge]][gitter-link]
 [![Binder][binder-badge]][binder-link]
 [![Scikit-HEP][sk-badge]][sk-link]
 [![SPEC 4 — Using and Creating Nightly Wheels][spec4-badge]][spec4-link]
@@ -190,8 +189,6 @@ Support for this work was provided by the National Science Foundation cooperativ
 [doi-link]:                 https://zenodo.org/badge/latestdoi/239605861
 [github-discussions-badge]: https://img.shields.io/static/v1?label=Discussions&message=Ask&color=blue&logo=github
 [github-discussions-link]:  https://github.com/scikit-hep/hist/discussions
-[gitter-badge]:             https://badges.gitter.im/HSF/PyHEP-histogramming.svg
-[gitter-link]:              https://gitter.im/HSF/PyHEP-histogramming?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
 [license-badge]:            https://img.shields.io/badge/License-BSD_3--Clause-blue.svg
 [license-link]:             https://opensource.org/licenses/BSD-3-Clause
 [pre-commit-badge]:         https://results.pre-commit.ci/badge/github/scikit-hep/hist/main.svg
