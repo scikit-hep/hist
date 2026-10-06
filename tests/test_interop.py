@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import subprocess
+import sys
+
 import numpy as np
 import pytest
 
@@ -397,3 +400,40 @@ def test_ak_fill_flattened():
     ark = ak.Array([[1, 2, 3], [4, 5, 6], [9]])
     h = hist.new.Reg(10, 0, 10, name="x").StrCat([], growth=True, name="cat").Weight()
     h.fill_flattened(x=ark, cat="A")
+
+
+def test_pandas_fill_flattened(named_hist):
+    pd = pytest.importorskip("pandas")
+
+    df = pd.DataFrame({"x": [0.1, 0.5, 0.5], "y": [0.2, 0.2, 0.8]})
+    h = named_hist(
+        axis.Regular(2, 0, 1, name="x"), axis.Regular(2, 0, 1, name="y")
+    ).fill_flattened(df, weight=pd.Series([1.0, 2.0, 3.0]))
+    assert h.values().tolist() == [[1.0, 0.0], [2.0, 3.0]]
+
+    h = hist.new.Reg(2, 0, 1).Double().fill_flattened(pd.Series([0.1, 0.6, 0.7]))
+    assert h.values().tolist() == [1.0, 2.0]
+
+
+def test_import_does_not_load_pandas():
+    pytest.importorskip("pandas")
+    code = "import hist, sys; assert 'pandas' not in sys.modules"
+    subprocess.run([sys.executable, "-c", code], check=True)
+
+
+def test_pandas_imported_after_hist():
+    pytest.importorskip("pandas")
+    code = """
+import sys
+import numpy as np
+import hist
+
+h = hist.new.Reg(2, 0, 1, name="x").Double().fill_flattened(np.array([0.1]))
+assert "pandas" not in sys.modules
+
+import pandas as pd
+
+h.fill_flattened(pd.DataFrame({"x": [0.6]}))
+assert h.values().tolist() == [1.0, 1.0], h.values()
+"""
+    subprocess.run([sys.executable, "-c", code], check=True)
