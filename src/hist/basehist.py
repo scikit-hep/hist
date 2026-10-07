@@ -816,6 +816,8 @@ class BaseHist(_Histogram[S], Generic[S], metaclass=MetaConstructor, family=hist
         One histogram is produced for every combination of categories. The
         ``name`` callable receives the category values, one per categorical
         axis, and returns the key; the default joins them with ``_``.
+        Keys must be unique across all combinations, including empty groups.
+        A duplicate key raises ``ValueError``; pass ``name`` to choose unique keys.
         """
         cat_axes = [
             i
@@ -834,6 +836,9 @@ class BaseHist(_Histogram[S], Generic[S], metaclass=MetaConstructor, family=hist
         result: dict[str, Self] = {}
         for cats in itertools.product(*(self.axes[i] for i in cat_axes)):
             key = name(*cats)
+            if key in result:
+                msg = f"Duplicate histogram name {key!r} from categorical expansion; use name= to generate unique names"
+                raise ValueError(msg)
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
                 index: dict[int | str, Any] = {
