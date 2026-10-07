@@ -1,5 +1,12 @@
 from __future__ import annotations
 
+__lazy_modules__ = {
+    "boost_histogram",
+    "boost_histogram.serialization",
+    "copy",
+    f"{(__spec__.parent or '').rsplit('.', 1)[0]}",
+}
+
 import copy
 from typing import Any, TypeVar
 

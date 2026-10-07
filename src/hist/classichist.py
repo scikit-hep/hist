@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+__lazy_modules__ = {"argparse", "boost_histogram", "histoprint", "pathlib", "shutil"}
+
 import argparse
 import shutil
 import sys

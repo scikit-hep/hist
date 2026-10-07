@@ -1,5 +1,19 @@
 from __future__ import annotations
 
+__lazy_modules__ = {
+    "fnmatch",
+    "functools",
+    "histoprint",
+    "itertools",
+    "numpy",
+    "operator",
+    "warnings",
+    f"{__spec__.parent}",
+    f"{__spec__.parent}.axestuple",
+    f"{__spec__.parent}.storage",
+    f"{__spec__.parent}.svgplots",
+}
+
 import fnmatch
 import functools
 import importlib.metadata

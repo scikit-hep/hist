@@ -58,3 +58,9 @@ repos:
   rev: v0.11.0.1-1
   hooks:
   - id: shellcheck
+
+- repo: https://github.com/henryiii/flake8-lazy
+  rev: v0.10.1
+  hooks:
+  - id: flake8-lazy
+    args: [--apply=set, --strict-typing]

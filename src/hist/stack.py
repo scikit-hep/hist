@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+__lazy_modules__ = {"copy", "histoprint", f"{__spec__.parent}.basehist"}
+
 import copy
 import typing
 from typing import Any, Generic, TypeVar

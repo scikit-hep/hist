@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+__lazy_modules__ = {"boost_histogram.storage"}
+
 from boost_histogram.storage import (
     AtomicInt64,
     Double,

@@ -6,6 +6,8 @@
 # in-memory.
 from __future__ import annotations
 
+__lazy_modules__ = {"graphed", "graphed.core", "graphed.core.execution", "hist"}
+
 import numpy as np
 import pytest
 
