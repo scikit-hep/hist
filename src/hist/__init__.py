@@ -5,6 +5,16 @@
 
 from __future__ import annotations
 
+__lazy_modules__ = {
+    "warnings",
+    f"{__spec__.parent}",
+    f"{__spec__.parent}.basehist",
+    f"{__spec__.parent}.namedhist",
+    f"{__spec__.parent}.stack",
+    f"{__spec__.parent}.tag",
+    f"{__spec__.parent}.version",
+}
+
 import warnings
 from typing import TYPE_CHECKING
 

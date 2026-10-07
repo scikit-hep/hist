@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+__lazy_modules__ = {"itertools", "numpy", f"{__spec__.parent}.svgutils"}
+
 import itertools
 from typing import TYPE_CHECKING, Any
 

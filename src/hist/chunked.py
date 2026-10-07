@@ -1,5 +1,14 @@
 from __future__ import annotations
 
+__lazy_modules__ = {
+    "boost_histogram",
+    "collections.abc",
+    "fnmatch",
+    "itertools",
+    "numpy",
+    f"{__spec__.parent}._compat.typing",
+}
+
 import fnmatch
 import itertools
 import typing as tp

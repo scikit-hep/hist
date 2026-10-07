@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+__lazy_modules__ = {"boost_histogram.tag"}
+
 from boost_histogram.tag import (
     Locator,
     Slicer,

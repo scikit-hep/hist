@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+__lazy_modules__ = {f"{__spec__.parent}"}
+
 from typing import TYPE_CHECKING, Any, Generic, TypeVar, overload
 
 from . import axis, storage

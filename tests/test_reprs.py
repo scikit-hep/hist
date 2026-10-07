@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+__lazy_modules__ = {"hist"}
+
 from hist import Stack, axis
 
 

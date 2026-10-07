@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+__lazy_modules__ = {"inspect", "numpy"}
+
 import inspect
 import sys
 from typing import TYPE_CHECKING, Any, Literal, NamedTuple, TypeAlias

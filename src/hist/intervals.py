@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+__lazy_modules__ = {"numpy", "typing"}
+
 from typing import Any, Literal
 
 import numpy as np

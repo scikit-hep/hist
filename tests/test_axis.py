@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+__lazy_modules__ = {"hist", "pytest"}
+
 import pytest
 
 from hist import axis, hist

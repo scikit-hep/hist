@@ -1,5 +1,10 @@
 from __future__ import annotations
 
+__lazy_modules__ = {
+    f"{(__spec__.parent or '').rsplit('.', 1)[0]}.axestuple",
+    f"{__spec__.parent}",
+}
+
 import typing
 from typing import Any, Protocol
 
