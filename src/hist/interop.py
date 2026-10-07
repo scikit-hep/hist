@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+import sys
 from typing import TYPE_CHECKING, Any, Protocol, TypeVar, cast
 
 import numpy as np
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator, Sequence
+
+    import pandas as pd
 
     from ._compat.typing import ArrayLike
 
@@ -45,6 +48,7 @@ def find_histogram_modules(
     """
     Yield histogram-module objects that are known to support any of the given objects.
     """
+    _register_pandas()
     for arg in objects:
         try:
             yield arg._histogram_module_
@@ -123,20 +127,31 @@ class NumpyHistogramModule:
         return _numpy_broadcast_and_flatten(args)
 
 
-try:
-    import pandas as pd
-except ImportError:
-    ...
-else:
+class PandasHistogramModule:
+    @staticmethod
+    def unpack(
+        obj: pd.DataFrame | pd.Series[Any],
+    ) -> dict[str, pd.Series[Any]] | None:
+        import pandas as pd  # already loaded, since obj is a pandas object
 
-    @histogram_module_for(pd.DataFrame)
-    class PandasHistogramModule:
-        @staticmethod
-        def unpack(obj: pd.DataFrame) -> dict[str, pd.Series[Any]]:
-            return cast("dict[str, pd.Series[Any]]", obj.to_dict("series"))
+        if isinstance(obj, pd.Series):
+            return None
 
-        @staticmethod
-        def broadcast_and_flatten(
-            args: Sequence[pd.Series[Any] | ArrayLike],
-        ) -> tuple[np.typing.NDArray[Any], ...]:
-            return _numpy_broadcast_and_flatten(args)
+        return cast("dict[str, pd.Series[Any]]", obj.to_dict("series"))
+
+    @staticmethod
+    def broadcast_and_flatten(
+        args: Sequence[pd.Series[Any] | ArrayLike],
+    ) -> tuple[np.typing.NDArray[Any], ...]:
+        return _numpy_broadcast_and_flatten(args)
+
+
+def _register_pandas() -> None:
+    """
+    Register the pandas module on first use instead of importing pandas with
+    hist; a pandas object can only exist once pandas is in ``sys.modules``.
+    """
+    pandas = sys.modules.get("pandas")
+    if pandas is not None and pandas.DataFrame not in _histogram_modules:
+        histogram_module_for(pandas.DataFrame)(PandasHistogramModule)
+        histogram_module_for(pandas.Series)(PandasHistogramModule)

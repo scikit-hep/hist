@@ -10,6 +10,13 @@ Features:
 * Add `.expand_cats()` to split all categorical axes into a dict of histograms.
   [#717](https://github.com/scikit-hep/hist/pull/717)
 
+Fixes:
+
+* `import hist` no longer imports pandas; pandas support is registered once
+  pandas is loaded. [#730](https://github.com/scikit-hep/hist/pull/730)
+* `fill_flattened` accepts pandas DataFrames and Series.
+  [#730](https://github.com/scikit-hep/hist/pull/730)
+
 ## Version 2.11.0
 
 Features:
