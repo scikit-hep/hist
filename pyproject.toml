@@ -42,6 +42,7 @@ requires-python = ">=3.10"
 dependencies = [
     "boost-histogram>=1.7,<1.9",
     "histoprint>=2.3.0",
+    "uhi>=1.1.1",
     'numpy>=1.21.3',
     'packaging>=23',
     'typing-extensions>=4;python_version<"3.11"',
@@ -100,6 +101,7 @@ test = [
     'graphed[awkward,numpy]>=0.0.2;python_version>="3.11"',
     'graphed-histogram>=0.0.2;python_version>="3.11"',
     'graphed-executors>=0.0.2;python_version>="3.11"',
+    "h5py>=3.7",
 ]
 test-core = [
     "pytest >=8",
@@ -156,6 +158,7 @@ warn_unreachable = true
 [[tool.mypy.overrides]]
 module = [
     "histoprint.*",
+    "h5py.*",
     "scipy.optimize.*",
     "matplotlib.*",
     "scipy.*",
@@ -184,15 +187,8 @@ messages_control.disable = [
   "missing-function-docstring",
   "missing-module-docstring",
   "protected-access",
-  "too-few-public-methods",
-  "too-many-arguments",
-  "too-many-branches",
-  "too-many-instance-attributes",
   "too-many-lines",
-  "too-many-locals",
-  "too-many-positional-arguments",
-  "too-many-return-statements",
-  "too-many-statements",
+  "design",  # too-many-* and too-few-*
   "wrong-import-position",
   "duplicate-code",
   "import-outside-toplevel",
