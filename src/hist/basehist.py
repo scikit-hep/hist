@@ -969,6 +969,6 @@ class BaseHist(_Histogram[S], Generic[S], metaclass=MetaConstructor, family=hist
                 warnings.simplefilter("ignore")
 
                 selection: Self = self[{name: i_or_list}]  # type: ignore[assignment, dict-item]
-                return selection[{name: slice(0, len(i_or_list), sum)}]
+                return selection[{name: slice(0, len(selection.axes[name]), sum)}]
 
         return self[{name: slice(i_or_list, j, sum)}]
