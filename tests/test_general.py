@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-__lazy_modules__ = {"boost_histogram", "ctypes", "hist", "math", "numpy"}
+__lazy_modules__ = {"boost_histogram", "ctypes", "math", "numpy"}
 
 import ctypes
 import importlib.metadata
@@ -1051,6 +1051,73 @@ def test_fill_missing_axis_reports_axis_name():
 
     with pytest.raises(TypeError):
         h.fill(x=[0.1, 0.2])
+
+
+@pytest.mark.parametrize("hist_class", [Hist, hist.NamedHist])
+@pytest.mark.parametrize(
+    ("values", "extra", "expected"),
+    [
+        ({"x": [0.1, 0.2, 0.3], "y": [0.1, 0.2]}, {}, "axis 'y': (2,)"),
+        ({"x": [0.1, 0.2], "y": 0.1}, {"weight": [1, 2, 3]}, "weight: (3,)"),
+        ({"x": [0.1, 0.2], "y": 0.2}, {"sample": [1, 2, 3]}, "sample: (3,)"),
+    ],
+)
+def test_fill_incompatible_lengths(hist_class, values, extra, expected):
+    h = hist_class(
+        axis.Regular(5, 0, 1, name="x"),
+        axis.Regular(5, 0, 1, name="y"),
+        storage=storage.Mean() if "sample" in extra else storage.Double(),
+    )
+    with pytest.raises(ValueError, match="All arrays passed to fill") as exc:
+        h.fill(**values, **extra)
+    assert "axis 'x':" in str(exc.value)
+    assert expected in str(exc.value)
+    assert str(exc.value.__cause__) == "spans must have compatible lengths"
+
+
+def test_fill_incompatible_lengths_positional():
+    h = Hist(axis.Regular(5, 0, 1), axis.Regular(5, 0, 1))
+    with pytest.raises(ValueError, match="All arrays passed to fill") as exc:
+        h.fill([0.1, 0.2], [0.1, 0.2, 0.3])
+    assert "axis 0: (2,), axis 1: (3,)" in str(exc.value)
+
+
+def test_fill_incompatible_lengths_categories():
+    h = (
+        Hist.new.StrCat([], growth=True, name="dataset")
+        .Reg(14, 0, 14, name="cut")
+        .Double()
+    )
+    with pytest.raises(ValueError, match="All arrays passed to fill") as exc:
+        h.fill(dataset=["a", "b", "a"], cut=[3, 5], weight=[1, 3, 2])
+    assert "axis 'dataset': (3,), axis 'cut': (2,), weight: (3,)" in str(exc.value)
+
+
+def test_fill_incompatible_lengths_mixed_arguments():
+    h = Hist.new.Reg(5, 0, 1, name="x").Reg(5, 0, 1, name="y").Double()
+    with pytest.raises(ValueError, match="All arrays passed to fill") as exc:
+        h.fill([0.1, 0.2], y=[0.1, 0.2, 0.3])
+    assert "axis 'x': (2,), axis 'y': (3,)" in str(exc.value)
+
+
+def test_fill_incompatible_lengths_scalar_axes():
+    h = Hist.new.Reg(5, 0, 1, name="x").Double()
+    with pytest.raises(ValueError, match="All arrays passed to fill") as exc:
+        h.fill(x=0.1, weight=[1, 2, 3])
+    assert "axis 'x': (), weight: (3,)" in str(exc.value)
+
+
+def test_fill_scalar_broadcasting_unchanged():
+    h = Hist.new.Reg(5, 0, 1, name="x").Reg(5, 0, 1, name="y").Double()
+    assert h.fill(x=[0.1, 0.2, 0.3], y=0.1, weight=2) is h
+    assert h.sum() == 6
+
+
+def test_fill_unrelated_value_error_unchanged():
+    h = Hist.new.Reg(5, 0, 1, name="x").Double()
+    with pytest.raises(ValueError, match="could not convert string to float") as exc:
+        h.fill(x=[0.1, 0.2], weight="bad")
+    assert exc.value.__cause__ is None
 
 
 def test_copy_keeps_name_label() -> None:
