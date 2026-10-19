@@ -12,6 +12,9 @@ Features:
 
 Fixes:
 
+* `.integrate()` with a list containing wildcards now sums every matching
+  category, not just the first `len(list)` bins.
+  [#737](https://github.com/scikit-hep/hist/pull/737)
 * `import hist` no longer imports pandas; pandas support is registered once
   pandas is loaded. [#730](https://github.com/scikit-hep/hist/pull/730)
 * `fill_flattened` accepts pandas DataFrames and Series.
