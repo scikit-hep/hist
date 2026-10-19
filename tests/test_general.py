@@ -998,6 +998,16 @@ def test_integrate():
     assert h2[{"x": 1j}] == 3
 
 
+def test_integrate_wildcard_list():
+    h = hist.new.StrCat(["ab", "ac", "b"], name="c").Reg(2, 0, 2, name="x").Double()
+    h.fill(c=["ab", "ac", "ac", "b"], x=[0.5, 0.5, 1.5, 0.5])
+
+    # "a*" expands to two categories, both of which must be summed
+    assert h.integrate("c", ["a*"]).values() == approx([2, 1])
+    assert h.integrate("c", ["a*", "b"]).values() == approx([3, 1])
+    assert h.integrate(0, ["a*"]).values() == approx([2, 1])
+
+
 def test_T_property():
     # Create a 2D histogram with some data
     hist_data = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])

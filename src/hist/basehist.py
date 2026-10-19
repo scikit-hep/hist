@@ -969,6 +969,8 @@ class BaseHist(_Histogram[S], Generic[S], metaclass=MetaConstructor, family=hist
                 warnings.simplefilter("ignore")
 
                 selection: Self = self[{name: i_or_list}]  # type: ignore[assignment, dict-item]
-                return selection[{name: slice(0, len(i_or_list), sum)}]
+                # Wildcards can select more bins than there are list entries
+                nbins = len(selection.axes[name])
+                return selection[{name: slice(0, nbins, sum)}]
 
         return self[{name: slice(i_or_list, j, sum)}]
