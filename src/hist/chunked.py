@@ -169,6 +169,42 @@ class ChunkAxisSpec:
 
 @dataclass(slots=True, init=False)
 class ChunkedHist:
+    """container for :class:`hist.Hist` to avoid memory allocation issues surrouding categorical axes
+
+    When categorical axes (with ``growth=True``) are used and new categories are filled,
+    the entire bin-content array needs to be re-allocated. These re-allocations can sometimes
+    cause run-ending issues (especailly in the case where the number of categories is large).
+
+    During construction and filling, ``ChunkedHist`` can be used in the same way as ``Hist``.
+
+    .. code-block:: python
+
+       import hist.chunked
+       h = (
+           hist.chunked.ChunkedHist.new
+           .StrCategory([], growth=True)
+           .Reg(100,-5,5)
+           .Double()
+       )
+       h.fill("one", np.random.normal(loc=+1.0, size=10_000))
+       h.fill("two", np.random.normal(loc=-1.0, size=10_000))
+       h.fill("red", np.random.normal(loc=+2.0, size=10_000))
+       h.fill("blue", np.random.normal(loc=-2.0, size=10_000))
+
+    However, the ``ChunkedHist`` does not support the same slicing and plotting mechanisms as
+    ``Hist``, but converting between them is pretty simple. After filling is complete, you
+    can do a single (potentially large) re-allocation in order to convert a ``ChunkedHist``
+    into its "dense" equivalent.
+        
+    .. code-block:: python
+
+       # after filling is done, translate for slicing and plotting
+       h = h.to_hist()
+       # e.g. sum over all categories and plot
+       h[sum,:].plot()
+    
+    """
+
     chunk_axes: list[ChunkAxisSpec]
     axes: tuple[tp.Any, ...]
     storage_type: type[tp.Any]

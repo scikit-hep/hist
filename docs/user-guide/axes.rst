@@ -233,6 +233,10 @@ combinations distinct, use the tuple representation as the key:
    You can put strings in a category axis as well. The fill method supports lists or arrays of strings
    to allow this to be filled.
 
+If you have a large number of categories (more than a few dozen) and are using ``growth=True``,
+then you should consider using :class:`hist.chunked.ChunkedHist` during the construction and
+filling stages in order to avoid memory issues due to re-allocation when new categories are added.
+
 Manipulating Axes
 -----------------
 
