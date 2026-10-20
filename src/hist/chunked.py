@@ -174,7 +174,9 @@ class ChunkedHist:
     When categorical axes (with ``growth=True``) are used and new categories are filled,
     the entire bin-content array needs to be re-allocated. These re-allocations can sometimes
     cause run-ending issues (especially in the case where the number of categories is large).
-
+    ``ChunkedHist`` avoids these re-allocations by keeping an internal dictionary of the categorical axes
+    and only creating ``boost_histogram`` axes when needed.
+    
     During construction and filling, ``ChunkedHist`` can be used in the same way as ``Hist``.
 
     .. code-block:: python
