@@ -1095,3 +1095,28 @@ def test_expand_cats():
 
     with pytest.raises(ValueError, match="categorical"):
         h.project("x").expand_cats()
+
+
+@pytest.mark.parametrize("axis_id", [0, "species"])
+@pytest.mark.parametrize(
+    ("patterns", "expected"),
+    [(["v*"], [1, 2]), (["*"], [0, 1, 2]), (["v*", "virginica"], [1, 2])],
+)
+@pytest.mark.parametrize("weighted", [False, True])
+def test_integrate_wildcard_categories(axis_id, patterns, expected, weighted):
+    h = Hist(
+        axis.StrCategory(["setosa", "versicolor", "virginica"], name="species"),
+        axis.Regular(3, 0, 3, name="feature"),
+        storage=storage.Weight() if weighted else storage.Int64(),
+    )
+    h.fill(["setosa", "versicolor", "virginica", "virginica"], [0.5, 1.5, 1.5, 2.5])
+    # The unknown category belongs to overflow and must stay excluded.
+    h.fill(["other"], [0.5])
+    original = h.copy()
+    result = h.integrate(axis_id, patterns)
+    np.testing.assert_array_equal(result.values(), h.values()[expected].sum(axis=0))
+    np.testing.assert_array_equal(
+        result.variances(), h.variances()[expected].sum(axis=0)
+    )
+    assert result.axes == h.project("feature").axes
+    assert h == original
