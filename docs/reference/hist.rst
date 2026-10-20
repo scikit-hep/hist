@@ -25,6 +25,7 @@ Submodules
    hist.axestuple
    hist.basehist
    hist.classichist
+   hist.chunked
    hist.hist
    hist.interop
    hist.intervals
