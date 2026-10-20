@@ -176,7 +176,7 @@ class ChunkedHist:
     cause run-ending issues (especially in the case where the number of categories is large).
     ``ChunkedHist`` avoids these re-allocations by keeping an internal dictionary of the categorical axes
     and only creating ``boost_histogram`` axes when needed.
-    
+
     During construction and filling, ``ChunkedHist`` can be used in the same way as ``Hist``.
 
     .. code-block:: python
