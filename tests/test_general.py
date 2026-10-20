@@ -950,6 +950,14 @@ def test_select_by_index_wildcards():
     assert tuple(h[:, ["*B*", "?D?"]].axes[1]) == ("ABC", "BCD", "CDE")
 
 
+def test_select_by_index_wildcards_missing_exact_name():
+    h = hist.new.Reg(10, 0, 10).StrCat(["ABC", "BCD", "CDE", "DEF"]).Weight()
+    with pytest.raises(KeyError):
+        h[:, ["*B*", "XYZ"]]
+    with pytest.raises(KeyError):
+        h.integrate(1, ["*B*", "XYZ"])
+
+
 def test_sorted_simple():
     h = Hist.new.IntCat([4, 1, 2]).StrCat(["AB", "BCC", "BC"]).Double()
     assert tuple(h.sort(0).axes[0]) == (1, 2, 4)

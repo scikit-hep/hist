@@ -18,6 +18,8 @@ Fixes:
   [#730](https://github.com/scikit-hep/hist/pull/730)
 * Raise `ValueError` when `.expand_cats()` generates duplicate keys, including
   from custom `name` callbacks or empty groups, instead of silently overwriting a group.
+* Raise `KeyError` for a missing exact category name in a list that also
+  contains wildcards, instead of silently dropping it.
 
 ## Version 2.11.0
 
