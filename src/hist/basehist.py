@@ -467,8 +467,13 @@ class BaseHist(_Histogram[S], Generic[S], metaclass=MetaConstructor, family=hist
             return x
         if any(any(special in pattern for special in ["*", "?"]) for pattern in _x):
             available = [n for n in self.axes[ax_id] if isinstance(n, str)]
+            # Exact names are kept as-is, so a missing one still raises a
+            # KeyError in bh.loc instead of being silently dropped.
             all_matches = [
-                [k for k in available if fnmatch.fnmatch(k, pattern)] for pattern in _x
+                [k for k in available if fnmatch.fnmatch(k, pattern)]
+                if any(special in pattern for special in ["*", "?"])
+                else [pattern]
+                for pattern in _x
             ]
             matches = list(
                 dict.fromkeys(list(itertools.chain.from_iterable(all_matches)))

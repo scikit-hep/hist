@@ -20,6 +20,8 @@ Fixes:
   from custom `name` callbacks or empty groups, instead of silently overwriting a group.
 * `ChunkedHist.reset()` and selection keep the declared categories of
   non-growing chunk axes, so those categories can still be filled afterwards.
+* Raise `KeyError` for a missing exact category name in a list that also
+  contains wildcards, instead of silently dropping it.
 
 ## Version 2.11.0
 
