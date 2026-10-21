@@ -12,6 +12,7 @@ Features:
 
 Fixes:
 
+* Include axis names and input shapes in incompatible-length errors from `.fill()`.
 * `import hist` no longer imports pandas; pandas support is registered once
   pandas is loaded. [#730](https://github.com/scikit-hep/hist/pull/730)
 * `fill_flattened` accepts pandas DataFrames and Series.
