@@ -48,6 +48,7 @@ Documentation:
 
 Features:
 
+* Remove Python 3.10 support.
 * Support arbitrary mutable mappings for `ChunkedHist` chunk storage via
   `chunks=`; existing entries are adopted, and the store is exposed as `.chunks`.
   [#715](https://github.com/scikit-hep/hist/pull/715)

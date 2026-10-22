@@ -31,7 +31,6 @@ jobs:
       fail-fast: false
       matrix:
         python-version:
-        - "3.10"
         - "3.11"
         - "3.12"
         - "3.13"
@@ -74,11 +73,7 @@ jobs:
 
     - name: Test plotting too
       if: matrix.python-version != '3.15'
-      # mpl image baselines track matplotlib 3.11; Python 3.10 stays on 3.10.x
-      # (3.11 dropped 3.10), so only pixel-compare on 3.11+.
-      run: >
-        .venv/bin/python -m pytest
-        ${{ matrix.python-version != '3.10' && '--mpl' || '' }}
+      run: .venv/bin/python -m pytest --mpl
 
   mypy:
     name: Type check
@@ -103,7 +98,7 @@ jobs:
 
     - uses: actions/setup-python@v7
       with:
-        python-version: '3.10'
+        python-version: '3.11'
 
     - name: Setup uv
       uses: astral-sh/setup-uv@v10.2.0

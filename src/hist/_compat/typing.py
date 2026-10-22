@@ -1,12 +1,6 @@
 from __future__ import annotations
 
-import sys
-from typing import TYPE_CHECKING, Any
-
-if sys.version_info < (3, 11):
-    from typing_extensions import Self
-else:
-    from typing import Self
+from typing import TYPE_CHECKING, Any, Self
 
 if TYPE_CHECKING:
     from numpy import ufunc as Ufunc
