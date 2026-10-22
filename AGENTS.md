@@ -57,6 +57,6 @@ CI installs `test` + `dask`, then separately `plot` for the `--mpl` test job.
 
 ## CI / Workflow
 
-- `ci.yml` runs: pylint, Python 3.10–3.14 checks, minimum-dependency checks.
+- `ci.yml` runs: pylint, Python 3.11–3.15 checks, minimum-dependency checks.
 - `cd.yml` runs on push to `main` and releases; builds via `hynek/build-and-inspect-python-package` and publishes on release.
 - Do not run `git commit` or `git push` unless explicitly asked.
