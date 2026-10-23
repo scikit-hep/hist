@@ -73,6 +73,23 @@ def test_poisson_interval(hist_fixture):
     )
 
 
+@pytest.mark.parametrize(
+    "dtype",
+    [np.int8, np.uint8, np.int16, np.uint16, np.int32, np.uint32, np.int64, np.uint64],
+)
+def test_poisson_interval_unweighted_integer_overflow(dtype):
+    maximum = np.iinfo(dtype).max
+    values = np.array([0, 1, maximum // 2, maximum // 2 + 1, maximum], dtype=dtype)
+    original_values = values.copy()
+    expected = intervals.poisson_interval(values.astype(float))
+    result = intervals.poisson_interval(values)
+    np.testing.assert_allclose(result, expected)
+    np.testing.assert_array_equal(values, original_values)
+    assert np.isfinite(result).all()
+    assert np.all(result[0] <= values)
+    assert np.all(result[1] >= values)
+
+
 def test_clopper_pearson_interval(hist_fixture):
     hist_1, _ = hist_fixture
 
