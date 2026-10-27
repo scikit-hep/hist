@@ -18,6 +18,8 @@ Fixes:
   [#730](https://github.com/scikit-hep/hist/pull/730)
 * Raise `ValueError` when `.expand_cats()` generates duplicate keys, including
   from custom `name` callbacks or empty groups, instead of silently overwriting a group.
+* `ChunkedHist.reset()` and selection keep the declared categories of
+  non-growing chunk axes, so those categories can still be filled afterwards.
 
 ## Version 2.11.0
 
