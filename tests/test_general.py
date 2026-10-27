@@ -950,6 +950,18 @@ def test_select_by_index_wildcards():
     assert tuple(h[:, ["*B*", "?D?"]].axes[1]) == ("ABC", "BCD", "CDE")
 
 
+@pytest.mark.filterwarnings("ignore:List indexing selection is experimental")
+def test_select_by_index_wildcards_after_ellipsis():
+    h = hist.new.Reg(10, 0, 10).StrCat(["ABC", "XYZ"]).StrCat(["ABC", "BCD", "CDE"])
+    h = h.Weight()
+    assert tuple(h[..., "*C*"].axes[2]) == ("ABC", "BCD", "CDE")
+    assert tuple(h[0, ..., ["*B*"]].axes[1]) == ("ABC", "BCD")
+    assert tuple(h[..., "?BC", :].axes[1]) == ("ABC",)
+
+    h1 = hist.new.StrCat(["ABC", "BCD", "CDE"]).Weight()
+    assert tuple(h1[..., "*D*"].axes[0]) == ("BCD", "CDE")
+
+
 def test_sorted_simple():
     h = Hist.new.IntCat([4, 1, 2]).StrCat(["AB", "BCC", "BC"]).Double()
     assert tuple(h.sort(0).axes[0]) == (1, 2, 4)
