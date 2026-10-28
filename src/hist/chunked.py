@@ -722,8 +722,17 @@ class ChunkedHist:
 
         result = self.empty_like()
         keys_by_axis = self._keys_by_axis(matching_keys)
-        for result_spec in result.chunk_axes:
-            result_spec.known_keys = keys_by_axis[result_spec.name]
+        for spec, result_spec in zip(self.chunk_axes, result.chunk_axes, strict=True):
+            if spec.growth:
+                result_spec.known_keys = keys_by_axis[spec.name]
+            else:
+                # The categories of a non-growing axis are the keys it accepts,
+                # so narrow them to the selection instead of rebuilding them
+                # from the chunks that happen to be filled.
+                allowed = selected.get(spec.name)
+                result_spec.known_keys = [
+                    key for key in spec.known_keys if allowed is None or key in allowed
+                ]
         for key in matching_keys:
             result._save_chunk_view(key, self._chunks[key])
         return result
@@ -834,6 +843,12 @@ class ChunkedHist:
         return result
 
     def reset(self) -> None:
+        """Remove all chunks.
+
+        Growing chunk axes forget their categories. Non-growing chunk axes
+        keep theirs, so the histogram can still be filled afterwards.
+        """
         self._chunks.clear()
         for spec in self.chunk_axes:
-            spec.known_keys.clear()
+            if spec.growth:
+                spec.known_keys.clear()
