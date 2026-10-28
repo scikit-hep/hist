@@ -14,7 +14,6 @@ Fixes:
 * `ChunkedHist.reset()` and selection keep the declared categories of
   non-growing chunk axes, so those categories can still be filled afterwards.
   [#742](https://github.com/scikit-hep/hist/pull/742)
-
 * Correct weighted Poisson intervals for integer input arrays.
   [#732](https://github.com/scikit-hep/hist/pull/732)
 * Avoid integer overflow in unweighted Poisson intervals.
@@ -53,7 +52,6 @@ Features:
   [#715](https://github.com/scikit-hep/hist/pull/715)
 * Add `.expand_cats()` to split all categorical axes into a dict of histograms.
   [#717](https://github.com/scikit-hep/hist/pull/717)
-
 * Accept objects with `_to_uhi_` in the histogram constructor.
   [#719](https://github.com/scikit-hep/hist/pull/719)
 * Add hooks for working with graphed.
