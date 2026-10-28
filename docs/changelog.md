@@ -2,6 +2,50 @@
 
 ## In progress
 
+Fixes:
+
+* Raise `KeyError` for a missing exact category name in a list that also
+  contains wildcards, instead of silently dropping it.
+* `fill_flattened()` accepts pandas DataFrames and Series.
+  [#730](https://github.com/scikit-hep/hist/pull/730)
+* Raise `ValueError` when `.expand_cats()` generates duplicate keys, including
+  from custom `name` callbacks or empty groups, instead of silently overwriting a group.
+  [#728](https://github.com/scikit-hep/hist/pull/728)
+* `ChunkedHist.reset()` and selection keep the declared categories of
+  non-growing chunk axes, so those categories can still be filled afterwards.
+  [#742](https://github.com/scikit-hep/hist/pull/742)
+
+* Correct weighted Poisson intervals for integer input arrays.
+  [#732](https://github.com/scikit-hep/hist/pull/732)
+* Avoid integer overflow in unweighted Poisson intervals.
+  [#741](https://github.com/scikit-hep/hist/pull/741)
+* Integrate all categories matched by wildcard patterns.
+  [#733](https://github.com/scikit-hep/hist/pull/733)
+* Resolve wildcard category selections correctly after an ellipsis.
+  [#744](https://github.com/scikit-hep/hist/pull/744)
+* Preserve rotated side-panel count ticks.
+  [#725](https://github.com/scikit-hep/hist/pull/725)
+
+Performance:
+
+* `import hist` no longer imports pandas; pandas support is registered once
+  pandas is loaded. [#730](https://github.com/scikit-hep/hist/pull/730)
+
+Documentation:
+
+* Add initial documentation for `hist.chunked`.
+  [#736](https://github.com/scikit-hep/hist/pull/736)
+* Explain weighted fills and uncertainty error bars.
+  [#726](https://github.com/scikit-hep/hist/pull/726)
+* Explain ratio and pull model strings and axes.
+  [#727](https://github.com/scikit-hep/hist/pull/727)
+* Document `plot()` dispatch and common mplhep keyword arguments.
+  [#740](https://github.com/scikit-hep/hist/pull/740)
+* Remove references to the archived Gitter channel.
+  [#723](https://github.com/scikit-hep/hist/pull/723)
+
+## Version 2.12.0
+
 Features:
 
 * Support arbitrary mutable mappings for `ChunkedHist` chunk storage via
@@ -10,18 +54,22 @@ Features:
 * Add `.expand_cats()` to split all categorical axes into a dict of histograms.
   [#717](https://github.com/scikit-hep/hist/pull/717)
 
+* Accept objects with `_to_uhi_` in the histogram constructor.
+  [#719](https://github.com/scikit-hep/hist/pull/719)
+* Add hooks for working with graphed.
+  [#721](https://github.com/scikit-hep/hist/pull/721)
+
 Fixes:
 
-* `import hist` no longer imports pandas; pandas support is registered once
-  pandas is loaded. [#730](https://github.com/scikit-hep/hist/pull/730)
-* `fill_flattened` accepts pandas DataFrames and Series.
-  [#730](https://github.com/scikit-hep/hist/pull/730)
-* Raise `ValueError` when `.expand_cats()` generates duplicate keys, including
-  from custom `name` callbacks or empty groups, instead of silently overwriting a group.
-* `ChunkedHist.reset()` and selection keep the declared categories of
-  non-growing chunk axes, so those categories can still be filled afterwards.
-* Raise `KeyError` for a missing exact category name in a list that also
-  contains wildcards, instead of silently dropping it.
+* Keep name and label when copying a histogram.
+  [#716](https://github.com/scikit-hep/hist/pull/716)
+* Require histoprint 2.3.0 or newer.
+  [#712](https://github.com/scikit-hep/hist/pull/712)
+
+Documentation:
+
+* Add `llms.txt` and Markdown versions of documentation pages.
+  [#720](https://github.com/scikit-hep/hist/pull/720)
 
 ## Version 2.11.0
 
