@@ -652,7 +652,59 @@ class BaseHist(_Histogram[S], Generic[S], metaclass=MetaConstructor, family=hist
         self, *args: Any, overlay: str | None = None, **kwargs: Any
     ) -> Hist1DArtists | Hist2DArtists:
         """
-        Plot method for BaseHist object.
+        Plot the histogram with mplhep, picking a 1D or 2D plot automatically.
+
+        * 1D histograms, and 2D histograms with one continuous and one
+          categorical axis (or with ``overlay`` given), are drawn with
+          :meth:`plot1d`, which wraps ``mplhep.histplot``. For 2D histograms,
+          one line is drawn per bin of the overlay axis.
+        * Other 2D histograms are drawn with :meth:`plot2d`, which wraps
+          ``mplhep.hist2dplot``.
+        * Histograms with more than two dimensions must be projected first.
+
+        Parameters
+        ----------
+        *args : Any
+            Forwarded to :meth:`plot1d` or :meth:`plot2d`; both only take
+            keyword arguments, so pass options by name.
+        overlay : str, optional
+            Name of the axis to overlay for a 2D histogram. Giving it
+            forces a 1D overlay plot. If None, a 2D histogram with one
+            continuous and one categorical axis overlays the categorical axis.
+        **kwargs : Any
+            Forwarded to :meth:`plot1d` (``ax``, ``legend``, then
+            ``mplhep.histplot``) or :meth:`plot2d` (``ax``, then
+            ``mplhep.hist2dplot``). Any remaining keywords go to matplotlib,
+            and ``ls``/``*_ls`` are accepted as aliases for
+            ``linestyle``/``*_linestyle``. Commonly used ``mplhep.histplot``
+            options include:
+
+            - ``histtype``: ``"step"`` (default), ``"fill"``, ``"errorbar"``,
+              or another type supported by the installed mplhep.
+            - ``yerr``: ``True`` for Poisson/sqrt(N) errors, or an array.
+            - ``w2method``: ``"poisson"``, ``"sqrt"``, or a callable.
+            - ``stack``: stack the overlaid histograms.
+            - ``density``/``binwnorm``: normalize to unit area/to bin width.
+            - ``flow``: how to show under/overflow bins, e.g. ``"hint"``,
+              ``"show"``, ``"sum"`` or ``"none"``.
+            - ``label``: legend label; for an overlay, a single string or one
+              label per category (defaults to the category names).
+            - ``sort``: order overlaid histograms by ``"label"`` or ``"yield"``.
+
+            Commonly used ``mplhep.hist2dplot`` options include ``cbar``,
+            ``cmin``/``cmax``, ``labels`` (``True`` prints bin values) and
+            ``flow``. See the mplhep documentation for the full list.
+
+        Returns
+        -------
+        Hist1DArtists or Hist2DArtists
+            The matplotlib artists returned by mplhep (a list of
+            ``Hist1DArtists`` for 1D plots).
+
+        Raises
+        ------
+        NotImplementedError
+            If the histogram has more than two dimensions.
         """
         ordered_traits = sum(t.ordered for t in self.axes.traits)
         discrete_traits = sum(t.discrete for t in self.axes.traits)
@@ -690,7 +742,9 @@ class BaseHist(_Histogram[S], Generic[S], metaclass=MetaConstructor, family=hist
             Whether to automatically add a legend when plotting stacked categories.
             The legend title is set from the axis label if available.
         **kwargs : Any
-            Additional keyword arguments passed to the underlying plot functions.
+            Additional keyword arguments passed to ``mplhep.histplot`` (for
+            example ``histtype``, ``yerr``, ``stack``, ``density``, ``flow``
+            or ``label``; see :meth:`plot`), and from there to matplotlib.
 
         Returns
         -------
@@ -743,6 +797,20 @@ class BaseHist(_Histogram[S], Generic[S], metaclass=MetaConstructor, family=hist
     ) -> Hist2DArtists:
         """
         Plot2d method for BaseHist object.
+
+        Parameters
+        ----------
+        ax : matplotlib.axes.Axes, optional
+            Axes to plot on. If None, uses current axes or creates new ones.
+        **kwargs : Any
+            Additional keyword arguments passed to ``mplhep.hist2dplot``, such
+            as ``cbar``, ``cmin``/``cmax``, ``labels`` or ``flow``, and from
+            there to matplotlib's ``pcolormesh``.
+
+        Returns
+        -------
+        Hist2DArtists
+            The matplotlib artists created by the plot.
         """
 
         from hist import plot
