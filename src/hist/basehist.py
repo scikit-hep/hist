@@ -538,7 +538,15 @@ class BaseHist(_Histogram[S], Generic[S], metaclass=MetaConstructor, family=hist
         if not isinstance(index, tuple):
             index = (index,)  # type: ignore[assignment]
 
-        return tuple(self._loc_shortcut(v, i) for i, (v) in enumerate(index))  # type: ignore[arg-type]
+        # An Ellipsis stands in for the missing axes, so entries after it
+        # refer to axes counted from the end.
+        offset = 0
+        new_index = []
+        for i, v in enumerate(index):  # type: ignore[arg-type]
+            if v is Ellipsis:
+                offset = self.ndim - len(index)  # type: ignore[arg-type]
+            new_index.append(self._loc_shortcut(v, i + offset))
+        return tuple(new_index)
 
     @typing.overload  # type: ignore[override]
     def __getitem__(self: FloatHists, index: IndexingExpr) -> FloatHists | float: ...
