@@ -1,6 +1,6 @@
 # Changelog
 
-## In progress
+## Version 2.12.1
 
 Fixes:
 
