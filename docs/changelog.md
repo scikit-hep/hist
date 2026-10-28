@@ -6,6 +6,7 @@ Fixes:
 
 * Raise `KeyError` for a missing exact category name in a list that also
   contains wildcards, instead of silently dropping it.
+  [#738](https://github.com/scikit-hep/hist/pull/738)
 * `fill_flattened()` accepts pandas DataFrames and Series.
   [#730](https://github.com/scikit-hep/hist/pull/730)
 * Raise `ValueError` when `.expand_cats()` generates duplicate keys, including
