@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-__lazy_modules__ = {"hist", "numpy"}
+__lazy_modules__ = {"hist"}
 
 import numpy as np
 import pytest
@@ -71,6 +71,23 @@ def test_poisson_interval(hist_fixture):
     assert approx(interval_max) == np.array(
         [1.84102165, 3.29952656, 4.63785962, 5.91818583]
     )
+
+
+@pytest.mark.parametrize(
+    "dtype",
+    [np.int8, np.uint8, np.int16, np.uint16, np.int32, np.uint32, np.int64, np.uint64],
+)
+def test_poisson_interval_unweighted_integer_overflow(dtype):
+    maximum = np.iinfo(dtype).max
+    values = np.array([0, 1, maximum // 2, maximum // 2 + 1, maximum], dtype=dtype)
+    original_values = values.copy()
+    expected = intervals.poisson_interval(values.astype(float))
+    result = intervals.poisson_interval(values)
+    np.testing.assert_allclose(result, expected)
+    np.testing.assert_array_equal(values, original_values)
+    assert np.isfinite(result).all()
+    assert np.all(result[0] <= values)
+    assert np.all(result[1] >= values)
 
 
 def test_clopper_pearson_interval(hist_fixture):
@@ -203,3 +220,29 @@ def test_valid_efficiency_ratio_uncertainty(hist_fixture):
     efficiency_err_up = efficiency_ratio + uncertainty_max
 
     assert len(efficiency_err_up[efficiency_err_up > 1.0]) == 0
+
+
+@pytest.mark.parametrize("dtype", [np.int32, np.int64, np.uint64])
+@pytest.mark.parametrize("weight", [1, 2, 3])
+def test_poisson_interval_integer_weighted_arrays(dtype, weight):
+    values = np.array([0, 1, 4, 10], dtype=dtype) * weight
+    variances = values * weight
+    original_values = values.copy()
+    original_variances = variances.copy()
+    expected = intervals.poisson_interval(values.astype(float), variances.astype(float))
+    result = intervals.poisson_interval(values, variances)
+    np.testing.assert_array_equal(result, expected)
+    np.testing.assert_array_equal(values, original_values)
+    np.testing.assert_array_equal(variances, original_variances)
+
+
+def test_poisson_interval_native_integer_histogram():
+    from hist import storage
+
+    h = Hist(axis.Regular(4, 0, 4), storage=storage.Int64()).fill([0.5, 1.5, 1.5, 2.5])
+    result = intervals.poisson_interval(h.values(), h.variances())
+    np.testing.assert_allclose(
+        result[:, :3], intervals.poisson_interval(h.values())[:, :3]
+    )
+    assert result[0, 3] == 0
+    assert np.isnan(result[1, 3])

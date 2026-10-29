@@ -531,6 +531,36 @@ def test_getitem_multiple_chunk_axes():
     assert dense[{"s": "a", "i": bh.loc(2), "x": bh.loc(0.6)}] == 1
 
 
+def test_getitem_keeps_declared_non_growing_categories():
+    h = ChunkedHist(
+        axis.Regular(10, 0, 1, name="x"),
+        axis.StrCategory(["a", "b", "c"], name="cat"),  # growth=False
+    )
+    h.fill(x=[0.2], cat="a")
+
+    selected = h[{"cat": ["a", "b"]}]
+    assert list(selected.to_hist().axes[1]) == ["a", "b"]
+    selected.fill(x=[0.4], cat="b")
+    assert selected.to_hist()[{"cat": "b", "x": bh.loc(0.4)}] == 1
+    with pytest.raises(ValueError, match="non-growing chunk axis"):
+        selected.fill(x=[0.4], cat="c")
+
+
+def test_getitem_other_axis_keeps_non_growing_categories():
+    h = ChunkedHist(
+        axis.Regular(10, 0, 1, name="x"),
+        axis.StrCategory(["a", "b"], name="s"),  # growth=False
+        axis.IntCategory([], growth=True, name="i"),
+    )
+    h.fill(x=[0.2], s="a", i=1)
+    h.fill(x=[0.4], s="a", i=2)
+
+    selected = h[{"i": 1}]
+    assert list(selected.to_hist().axes["s"]) == ["a", "b"]
+    selected.fill(x=[0.6], s="b", i=1)
+    assert selected.to_hist()[{"s": "b", "i": bh.loc(1), "x": bh.loc(0.6)}] == 1
+
+
 def test_getitem_numpy_scalar_selection():
     h = ChunkedHist(
         axis.Regular(10, 0, 1, name="x"),
@@ -636,6 +666,23 @@ def test_reset():
     h.reset()
     assert len(h) == 0
     assert ("a",) not in h
+
+
+def test_reset_keeps_non_growing_categories():
+    for cat_axis, keys in (
+        (axis.StrCategory(["a", "b"], name="cat"), ["a", "b"]),
+        (axis.IntCategory([1, 2], name="cat"), [1, 2]),
+    ):
+        h = ChunkedHist(axis.Regular(10, 0, 1, name="x"), cat_axis)
+        h.fill(x=[0.2], cat=keys[0])
+        h.reset()
+        assert len(h) == 0
+        assert list(h.to_hist().axes[1]) == keys
+
+        h.fill(x=[0.4], cat=keys[1])
+        dense = h.to_hist()
+        assert dense[{"cat": bh.loc(keys[0]), "x": bh.loc(0.2)}] == 0
+        assert dense[{"cat": bh.loc(keys[1]), "x": bh.loc(0.4)}] == 1
 
 
 def test_histogram_bytes():

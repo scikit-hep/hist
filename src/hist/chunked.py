@@ -169,6 +169,40 @@ class ChunkAxisSpec:
 
 @dataclass(slots=True, init=False)
 class ChunkedHist:
+    """container for :class:`hist.Hist` to avoid memory allocation issues surrounding categorical axes
+
+    When categorical axes (with ``growth=True``) are used and new categories are filled,
+    the entire bin-content array needs to be re-allocated. These re-allocations can sometimes
+    cause run-ending issues (especially in the case where the number of categories is large).
+    ``ChunkedHist`` avoids these re-allocations by keeping an internal dictionary of the categorical axes
+    and only creating ``boost_histogram`` axes when needed.
+
+    During construction and filling, ``ChunkedHist`` can be used in the same way as ``Hist``.
+
+    .. code-block:: python
+
+       import hist.chunked
+
+       h = hist.chunked.ChunkedHist.new.StrCategory([], growth=True).Reg(100, -5, 5).Double()
+       h.fill("one", np.random.normal(loc=+1.0, size=10_000))
+       h.fill("two", np.random.normal(loc=-1.0, size=10_000))
+       h.fill("red", np.random.normal(loc=+2.0, size=10_000))
+       h.fill("blue", np.random.normal(loc=-2.0, size=10_000))
+
+    However, the ``ChunkedHist`` does not support the same slicing and plotting mechanisms as
+    ``Hist``, but converting between them is pretty simple. After filling is complete, you
+    can do a single (potentially large) re-allocation in order to convert a ``ChunkedHist``
+    into its "dense" equivalent.
+
+    .. code-block:: python
+
+       # after filling is done, translate for slicing and plotting
+       h = h.to_hist()
+       # e.g. sum over all categories and plot
+       h[sum, :].plot()
+
+    """
+
     chunk_axes: list[ChunkAxisSpec]
     axes: tuple[tp.Any, ...]
     storage_type: type[tp.Any]
@@ -688,8 +722,17 @@ class ChunkedHist:
 
         result = self.empty_like()
         keys_by_axis = self._keys_by_axis(matching_keys)
-        for result_spec in result.chunk_axes:
-            result_spec.known_keys = keys_by_axis[result_spec.name]
+        for spec, result_spec in zip(self.chunk_axes, result.chunk_axes, strict=True):
+            if spec.growth:
+                result_spec.known_keys = keys_by_axis[spec.name]
+            else:
+                # The categories of a non-growing axis are the keys it accepts,
+                # so narrow them to the selection instead of rebuilding them
+                # from the chunks that happen to be filled.
+                allowed = selected.get(spec.name)
+                result_spec.known_keys = [
+                    key for key in spec.known_keys if allowed is None or key in allowed
+                ]
         for key in matching_keys:
             result._save_chunk_view(key, self._chunks[key])
         return result
@@ -800,6 +843,12 @@ class ChunkedHist:
         return result
 
     def reset(self) -> None:
+        """Remove all chunks.
+
+        Growing chunk axes forget their categories. Non-growing chunk axes
+        keep theirs, so the histogram can still be filled afterwards.
+        """
         self._chunks.clear()
         for spec in self.chunk_axes:
-            spec.known_keys.clear()
+            if spec.growth:
+                spec.known_keys.clear()
