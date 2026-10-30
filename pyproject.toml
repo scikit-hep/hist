@@ -21,7 +21,6 @@ classifiers = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
@@ -38,13 +37,12 @@ keywords = [
     "boost-histogram",
     "dask-histogram",
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dependencies = [
     "boost-histogram>=1.7,<1.9",
     "histoprint>=2.3.0",
-    'numpy>=1.21.3',
+    'numpy>=1.23.2',
     'packaging>=23',
-    'typing-extensions>=4;python_version<"3.11"',
 ]
 dynamic = ["version"]
 
@@ -69,8 +67,8 @@ plot = [
     "mplhep >=0.3.33",
 ]
 fit = [
-    "scipy >=1.7.0",
-    "iminuit >=2.9.0",
+    "scipy >=1.9.2",
+    "iminuit >=2.17.0",
 ]
 dask = [
     "dask[dataframe] >=2022,<2025.4.0",
@@ -84,8 +82,8 @@ plot = [
     "mplhep >=0.3.33",
 ]
 fit = [
-    "scipy >=1.7.0",
-    "iminuit >=2.9.0",
+    "scipy >=1.9.2",
+    "iminuit >=2.17.0",
 ]
 dask = [
     "dask[dataframe] >=2022,<2025.4.0",
@@ -96,10 +94,9 @@ test = [
     { include-group = "test-core" },
     { include-group = "fit" },
     "awkward>=2.0.7",
-    # tests/test_graphed.py; graphed requires Python 3.11+
-    'graphed[awkward,numpy]>=0.0.2;python_version>="3.11"',
-    'graphed-histogram>=0.0.2;python_version>="3.11"',
-    'graphed-executors>=0.0.2;python_version>="3.11"',
+    'graphed[awkward,numpy]>=0.0.2',
+    'graphed-histogram>=0.0.2',
+    'graphed-executors>=0.0.2',
 ]
 test-core = [
     "pytest >=8",
@@ -148,7 +145,7 @@ filterwarnings = [
 [tool.mypy]
 warn_unused_configs = true
 files = "src"
-python_version = "3.10"
+python_version = "3.11"
 strict = true
 enable_error_code = ["ignore-without-code", "truthy-bool", "redundant-expr"]
 warn_unreachable = true
@@ -168,7 +165,7 @@ ignore_missing_imports = true
 
 
 [tool.pylint]
-py-version = "3.10"
+py-version = "3.11"
 extension-pkg-allow-list = ["boost_histogram._core"]
 reports.output-format = "colorized"
 similarities.ignore-imports = "yes"
