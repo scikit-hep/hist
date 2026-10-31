@@ -4,6 +4,7 @@
 
 Fixes:
 
+* Include axis names and input shapes in incompatible-length errors from `.fill()`.
 * Raise `KeyError` for a missing exact category name in a list that also
   contains wildcards, instead of silently dropping it.
   [#738](https://github.com/scikit-hep/hist/pull/738)
