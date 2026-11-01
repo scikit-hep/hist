@@ -1,5 +1,12 @@
 # Changelog
 
+## In progress
+
+Fixes:
+
+* `Hist.from_columns` builds an `IntCategory` axis from NumPy integer arrays
+  instead of raising `TypeError`.
+
 ## Version 2.12.1
 
 Fixes:
