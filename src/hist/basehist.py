@@ -294,8 +294,7 @@ class BaseHist(_Histogram[S], Generic[S], metaclass=MetaConstructor, family=hist
                 if all(isinstance(a, str) for a in cats):
                     axes_list.append(hist.axis.StrCategory(sorted(cats), name=ax))  # type: ignore[arg-type]
                 elif all(isinstance(a, (int, np.integer)) for a in cats):
-                    int_cats = sorted(int(a) for a in cats)  # type: ignore[arg-type]
-                    axes_list.append(hist.axis.IntCategory(int_cats, name=ax))
+                    axes_list.append(hist.axis.IntCategory(sorted(cats), name=ax))  # type: ignore[arg-type]
                 else:
                     msg = f"{ax} must be all int or strings if axis not given"
                     raise TypeError(msg)
