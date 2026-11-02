@@ -967,8 +967,10 @@ class BaseHist(_Histogram[S], Generic[S], metaclass=MetaConstructor, family=hist
                 raise ValueError(msg)
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
+                # NamedHist refuses integer keys
                 index: dict[int | str, Any] = {
-                    i: bh.loc(c) for i, c in zip(cat_axes, cats, strict=True)
+                    self.axes[i].name or i: bh.loc(c)
+                    for i, c in zip(cat_axes, cats, strict=True)
                 }
                 h: Self = self[index]  # type: ignore[assignment]
             h.name = key
