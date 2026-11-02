@@ -48,6 +48,21 @@ class FillModeMixin:
             variation_axis=variation_axis,
         )
 
+    # BaseHist reads these under simplefilter("ignore"): reading first lets an un-run
+    # histogram's warning, or its error filter, reach the caller.
+    def sort(self, *args: Any, **kwargs: Any) -> Any:
+        self.view()  # type: ignore[attr-defined]
+        return super().sort(*args, **kwargs)  # type: ignore[misc]
+
+    def expand_cats(self, *args: Any, **kwargs: Any) -> Any:
+        self.view()  # type: ignore[attr-defined]
+        return super().expand_cats(*args, **kwargs)  # type: ignore[misc]
+
+    def integrate(self, name: Any, i_or_list: Any = None, j: Any = None) -> Any:
+        if isinstance(i_or_list, list):
+            self.view()  # type: ignore[attr-defined]
+        return super().integrate(name, i_or_list, j)  # type: ignore[misc]
+
 
 class Hist(FillModeMixin, HistInMemory[S], ghb.Histogram, Generic[S], family=hist):  # type: ignore[misc]
     """A `hist.Hist` whose fills are DEFERRED graphed computations: QuickConstruct

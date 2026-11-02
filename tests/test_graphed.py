@@ -6,7 +6,13 @@
 # in-memory.
 from __future__ import annotations
 
-__lazy_modules__ = {"graphed", "graphed.core", "graphed.core.execution", "hist"}
+__lazy_modules__ = {
+    "graphed",
+    "graphed.core",
+    "graphed.core.execution",
+    "hist",
+    "warnings",
+}
 
 import numpy as np
 import pytest
@@ -17,6 +23,7 @@ gh = pytest.importorskip("graphed_histogram")
 graphed = pytest.importorskip("graphed")
 hist_graphed = pytest.importorskip("hist.graphed")
 
+import warnings
 from dataclasses import dataclass, field
 
 from graphed import Session
@@ -306,3 +313,29 @@ def test_sibling_mode_is_unchanged_by_the_flag_passthrough():
         assert [ax.__class__.__name__ for ax in got.axes] == [
             "Regular"
         ]  # no variation axis
+
+
+@pytest.mark.parametrize(
+    ("cls", "read"),
+    [
+        (hist_graphed.Hist, lambda h: h.sort("cat")),
+        (hist_graphed.Hist, lambda h: h.expand_cats()),
+        (hist_graphed.Hist, lambda h: h.integrate("cat", ["a"])),
+        (hist_graphed.NamedHist, lambda h: h.sort("cat")),
+        (hist_graphed.NamedHist, lambda h: h.integrate("cat", ["a"])),
+    ],
+)
+def test_a_read_warning_escapes_hists_ignore_block(cls, read, monkeypatch):
+    h = cls(
+        hist.axis.StrCategory(["a", "b"], name="cat"),
+        hist.axis.Regular(2, 0, 1, name="x"),
+    )
+
+    def warned(self, *args, **kwargs):
+        warnings.warn("read", UserWarning, stacklevel=2)
+        return original(self, *args, **kwargs)
+
+    original = gh.boost.Histogram.view
+    monkeypatch.setattr(gh.boost.Histogram, "view", warned)
+    with pytest.warns(UserWarning, match="read"):
+        read(h)
