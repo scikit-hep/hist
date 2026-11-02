@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-__lazy_modules__ = {"boost_histogram", "ctypes", "hist", "math", "numpy"}
+__lazy_modules__ = {"boost_histogram", "ctypes", "hist", "math"}
 
 import ctypes
 import importlib.metadata
@@ -868,6 +868,19 @@ def test_from_columns(named_hist):
 
     with pytest.raises(TypeError):
         named_hist.from_columns(columns, (axis.Integer(1, 5), "y"), weight="data")
+
+
+@pytest.mark.parametrize("dtype", [np.int8, np.int32, np.int64, np.uint16])
+def test_from_columns_numpy_int(named_hist, dtype):
+    columns = {
+        "x": np.array([3, 1, 2, 1, 1], dtype=dtype),
+        "y": np.array(["a", "b", "a", "a", "b"]),
+    }
+
+    h = named_hist.from_columns(columns, ("x", "y"))
+    assert isinstance(h.axes["x"], axis.IntCategory)
+    assert list(h.axes["x"]) == [1, 2, 3]
+    assert h.values() == approx(np.array([[1, 2], [1, 0], [1, 0]]))
 
 
 def test_from_array(named_hist):
