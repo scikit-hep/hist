@@ -293,7 +293,7 @@ class BaseHist(_Histogram[S], Generic[S], metaclass=MetaConstructor, family=hist
                 cats = set(data[ax])  # type: ignore[arg-type]
                 if all(isinstance(a, str) for a in cats):
                     axes_list.append(hist.axis.StrCategory(sorted(cats), name=ax))  # type: ignore[arg-type]
-                elif all(isinstance(a, int) for a in cats):
+                elif all(isinstance(a, (int, np.integer)) for a in cats):
                     axes_list.append(hist.axis.IntCategory(sorted(cats), name=ax))  # type: ignore[arg-type]
                 else:
                     msg = f"{ax} must be all int or strings if axis not given"
@@ -989,8 +989,10 @@ class BaseHist(_Histogram[S], Generic[S], metaclass=MetaConstructor, family=hist
                 raise ValueError(msg)
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
+                # NamedHist refuses integer keys
                 index: dict[int | str, Any] = {
-                    i: bh.loc(c) for i, c in zip(cat_axes, cats, strict=True)
+                    self.axes[i].name or i: bh.loc(c)
+                    for i, c in zip(cat_axes, cats, strict=True)
                 }
                 h: Self = self[index]  # type: ignore[assignment]
             h.name = key

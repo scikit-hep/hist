@@ -6,7 +6,7 @@ import itertools
 
 import pytest
 
-from hist import Hist, axis, storage
+from hist import Hist, NamedHist, axis, storage
 
 
 def make_hist(first, second, counts):
@@ -183,3 +183,25 @@ def test_no_category_axes_still_raise():
     h = Hist(axis.Regular(1, 0, 1), axis.Boolean())
     with pytest.raises(ValueError, match="without categorical axes"):
         h.expand_cats()
+
+
+def test_namedhist_matches_hist():
+    axes = (
+        axis.StrCategory(["a", "b"], name="s"),
+        axis.IntCategory([1, 2], name="n"),
+        axis.Regular(2, 0, 1, name="x"),
+    )
+    named = NamedHist(*axes).fill(s=["a", "b"], n=[1, 2], x=[0.25, 0.75])
+    plain = Hist(*axes).fill(s=["a", "b"], n=[1, 2], x=[0.25, 0.75])
+
+    got = named.expand_cats()
+
+    assert got.keys() == plain.expand_cats().keys() == {"a_1", "a_2", "b_1", "b_2"}
+    assert all(isinstance(h, NamedHist) for h in got.values())
+    assert got["a_1"].values().tolist() == [1.0, 0.0]
+    assert got["b_2"].values().tolist() == [0.0, 1.0]
+
+
+def test_unnamed_axes_keep_positional_keys():
+    h = Hist(axis.StrCategory(["a"]), axis.Regular(2, 0, 1))
+    assert h.fill(["a"], [0.25]).expand_cats()["a"].values().tolist() == [1.0, 0.0]

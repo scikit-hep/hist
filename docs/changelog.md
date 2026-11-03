@@ -1,10 +1,17 @@
 # Changelog
 
-## Version 2.12.1
+## In progress
 
 Fixes:
 
 * Include axis names and input shapes in incompatible-length errors from `.fill()`.
+* `Hist.from_columns` builds an `IntCategory` axis from NumPy integer arrays
+  instead of raising `TypeError`.
+
+## Version 2.12.1
+
+Fixes:
+
 * Raise `KeyError` for a missing exact category name in a list that also
   contains wildcards, instead of silently dropping it.
   [#738](https://github.com/scikit-hep/hist/pull/738)
@@ -49,6 +56,7 @@ Documentation:
 
 Features:
 
+* Remove Python 3.10 support.
 * Support arbitrary mutable mappings for `ChunkedHist` chunk storage via
   `chunks=`; existing entries are adopted, and the store is exposed as `.chunks`.
   [#715](https://github.com/scikit-hep/hist/pull/715)
