@@ -4,6 +4,7 @@
 
 Fixes:
 
+* Include axis names and input shapes in incompatible-length errors from `.fill()`.
 * `Hist.from_columns` builds an `IntCategory` axis from NumPy integer arrays
   instead of raising `TypeError`.
 

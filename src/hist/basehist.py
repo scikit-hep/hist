@@ -365,7 +365,29 @@ class BaseHist(_Histogram[S], Generic[S], metaclass=MetaConstructor, family=hist
 
         data = (data_dict[i] for i in range(len(args), self.ndim))
 
-        return super().fill(*args, *data, weight=weight, sample=sample, threads=threads)
+        try:
+            return super().fill(
+                *args, *data, weight=weight, sample=sample, threads=threads
+            )
+        except ValueError as err:
+            if str(err) != "spans must have compatible lengths":
+                raise
+            values = (*args, *(data_dict[i] for i in range(len(args), self.ndim)))
+            shapes = [
+                f"axis {ax.name!r}: {np.shape(value)}"
+                if ax.name
+                else f"axis {i}: {np.shape(value)}"
+                for i, (ax, value) in enumerate(zip(self.axes, values, strict=True))
+            ]
+            if weight is not None:
+                shapes.append(f"weight: {np.shape(weight)}")
+            if sample is not None:
+                shapes.append(f"sample: {np.shape(sample)}")
+            msg = (
+                "All arrays passed to fill must have compatible lengths; "
+                f"input shapes are {', '.join(shapes)}"
+            )
+            raise ValueError(msg) from err
 
     def fill_flattened(
         self: Self,
