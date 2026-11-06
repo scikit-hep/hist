@@ -5,6 +5,28 @@ Indexing
 
 Hist implements the UHI and UHI+ indexing protocols. You can read more about them on the `Indexing <https://uhi.readthedocs.io/en/latest/indexing.html>`_ and `Indexing+ <https://uhi.readthedocs.io/en/latest/indexing%2B.html>`_ pages.
 
+See the UHI `slicing guide <https://uhi.readthedocs.io/en/latest/indexing.html#slicing>`_ for selecting bin ranges, rebinning, and projecting axes.
+
+
+Reusable slices
+---------------
+
+``hist.tag.Slicer()`` lets you write a slice outside a histogram's indexing brackets and store it for reuse. The resulting slice also works in named-axis selections:
+
+.. code-block:: python3
+
+    import hist
+
+    h = hist.Hist(hist.axis.Regular(4, 0, 4, name="x"))
+    h[...] = [1, 2, 3, 4]
+
+    s = hist.tag.Slicer()
+    middle = s[1:3]
+    selected = h[middle]  # Equivalent to h[1:3]
+    selected_by_name = h[{"x": middle}]
+
+Both selections contain the bin values ``[2, 3]``.
+
 
 Hist specific details
 --------------------------------
