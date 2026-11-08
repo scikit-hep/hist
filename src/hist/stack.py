@@ -1,6 +1,12 @@
 from __future__ import annotations
 
-__lazy_modules__ = {"copy", "histoprint", f"{__spec__.parent}.basehist"}
+__lazy_modules__ = {
+    "copy",
+    "histoprint",
+    f"{__spec__.parent}.axis",
+    f"{__spec__.parent}.basehist",
+    f"{__spec__.parent}.hist",
+}
 
 import copy
 import typing
