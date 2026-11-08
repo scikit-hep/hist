@@ -842,3 +842,20 @@ def test_named_axestuple():
     assert h.axes["A":"B"].size == (20,)
     assert h.axes[:"B"].size == (20,)
     assert h.axes["B":].size == (10, 15, 5)
+
+
+def test_named_T():
+    """
+    Test named T -- whether NamedHist can be transposed.
+    """
+
+    data = np.arange(24).reshape(2, 3, 4)
+    h = NamedHist(
+        axis.Regular(2, 0, 1, name="x"),
+        axis.Regular(3, 0, 1, name="y"),
+        axis.Regular(4, 0, 1, name="z"),
+        data=data,
+    )
+
+    assert h.T.axes.name == ("z", "y", "x")
+    assert np.array_equal(h.T.values(), data.T)

@@ -323,7 +323,10 @@ class BaseHist(_Histogram[S], Generic[S], metaclass=MetaConstructor, family=hist
 
     @property
     def T(self) -> Self:
-        return self.project(*reversed(range(self.ndim)))
+        # Use names when available, since NamedHist only projects by name
+        return self.project(
+            *(self.axes[i].name or i for i in reversed(range(self.ndim)))
+        )
 
     def fill(
         self,
