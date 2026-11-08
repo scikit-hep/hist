@@ -113,6 +113,102 @@ class BaseHist(_Histogram[S], Generic[S], metaclass=MetaConstructor, family=hist
     __slots__ = ()
 
     @typing.overload
+    def values(
+        self: BaseHist[bh.storage.Int64] | BaseHist[bh.storage.AtomicInt64],
+        flow: bool = ...,
+        *,
+        forceflow: bool = ...,
+    ) -> np.typing.NDArray[np.int64]: ...
+
+    @typing.overload
+    def values(
+        self: BaseHist[bh.storage.Double]
+        | BaseHist[bh.storage.Unlimited]
+        | BaseHist[bh.storage.Weight]
+        | BaseHist[bh.storage.Mean]
+        | BaseHist[bh.storage.WeightedMean]
+        | BaseHist[bh.storage.MultiCell],
+        flow: bool = ...,
+        *,
+        forceflow: bool = ...,
+    ) -> np.typing.NDArray[np.float64]: ...
+
+    @typing.overload
+    def values(
+        self, flow: bool = ..., *, forceflow: bool = ...
+    ) -> np.typing.NDArray[np.float64] | np.typing.NDArray[np.int64]: ...
+
+    def values(
+        self, flow: bool = False, *, forceflow: bool = False
+    ) -> np.typing.NDArray[Any]:
+        """Return values, optionally padding absent flow bins with zeros.
+
+        ``forceflow=True`` includes real flow bins and adds zero-filled positions
+        for absent underflow/overflow bins on every axis. It returns an independent
+        array. The default and ``flow=True`` retain their existing behavior.
+        The array dtype and axis order are preserved.
+        """
+        result = super().values(flow=flow or forceflow)
+        return self._pad_flow(result) if forceflow else result
+
+    @typing.overload
+    def variances(
+        self: BaseHist[bh.storage.AtomicInt64] | BaseHist[bh.storage.Int64],
+        flow: bool = ...,
+        *,
+        forceflow: bool = ...,
+    ) -> np.typing.NDArray[np.int64] | None: ...
+
+    @typing.overload
+    def variances(
+        self: BaseHist[bh.storage.Double]
+        | BaseHist[bh.storage.Unlimited]
+        | BaseHist[bh.storage.MultiCell],
+        flow: bool = ...,
+        *,
+        forceflow: bool = ...,
+    ) -> np.typing.NDArray[np.float64] | None: ...
+
+    @typing.overload
+    def variances(
+        self: BaseHist[bh.storage.Weight]
+        | BaseHist[bh.storage.Mean]
+        | BaseHist[bh.storage.WeightedMean],
+        flow: bool = ...,
+        *,
+        forceflow: bool = ...,
+    ) -> np.typing.NDArray[np.float64]: ...
+
+    @typing.overload
+    def variances(
+        self, flow: bool = False, *, forceflow: bool = ...
+    ) -> np.typing.NDArray[np.int64] | np.typing.NDArray[np.float64] | None: ...
+
+    def variances(
+        self, flow: bool = False, *, forceflow: bool = False
+    ) -> np.typing.NDArray[Any] | None:
+        """Return variances, optionally padding absent flow bins with zeros.
+
+        ``forceflow=True`` includes real flow bins and adds zero-filled positions
+        for absent underflow/overflow bins on every axis. It returns an independent
+        array. The default and ``flow=True`` retain their existing behavior.
+        Undefined variances remain None; undefined real-bin entries are preserved.
+        """
+        result = super().variances(flow=flow or forceflow)
+        if result is None:
+            return None
+        return self._pad_flow(result) if forceflow else result
+
+    def _pad_flow(self, array: np.typing.NDArray[Any]) -> np.typing.NDArray[Any]:
+        widths = [
+            (int(not ax.traits.underflow), int(not ax.traits.overflow))
+            for ax in self.axes
+        ]
+        # MultiCell storage has a trailing accumulator dimension, not an axis.
+        widths.extend([(0, 0)] * (array.ndim - self.ndim))
+        return np.pad(array, widths) if widths else array.copy()
+
+    @typing.overload
     def __init__(
         self,
         arg: dict[str, Any],
