@@ -209,3 +209,16 @@ As an complete example, let's say you wanted to compute and plot the density, wi
 .. image:: ../_images/ex_hist_density.png
    :alt: Density histogram output
    :align: center
+
+Converting a stack to a histogram
+--------------------------------
+
+Use ``Stack.to_hist()`` to turn histogram names into a leading category axis::
+
+    stack = hist.Stack.from_dict({"signal": signal, "background": background})
+    combined = stack.to_hist(name="process")
+    signal_copy = combined[{"process": "signal"}]
+
+The input histograms must have unique string names, matching axes, and the same
+storage type. The new axis name must not conflict with an existing axis name.
+The result copies the data, including flow bins and accumulator fields.
