@@ -441,7 +441,7 @@ def plot_ratio_array(
         the ratio values and their uncertainties.
 
     """
-    x_values = hist_.axes[0].edges[:-1]
+    x_values = hist_.axes[0].centers
     left_edge = hist_.axes.edges[0][0]
     right_edge = hist_.axes.edges[-1][-1]
 
