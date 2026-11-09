@@ -9,7 +9,7 @@ import boost_histogram as bh
 import numpy as np
 import pytest
 
-from hist import NamedHist, axis
+from hist import NamedHist, axis, storage
 
 # ToDo: specify what error is raised
 
@@ -842,3 +842,29 @@ def test_named_axestuple():
     assert h.axes["A":"B"].size == (20,)
     assert h.axes[:"B"].size == (20,)
     assert h.axes["B":].size == (10, 15, 5)
+
+
+def test_named_T():
+    """
+    Test named T -- whether NamedHist can be transposed.
+    """
+
+    h = NamedHist(
+        axis.Regular(2, 0, 1, name="x"),
+        axis.Regular(3, 0, 1, name="y"),
+        axis.Regular(4, 0, 1, name="z"),
+        storage=storage.Weight(),
+    )
+    rng = np.random.default_rng(42)
+    h.fill(
+        x=rng.uniform(-0.5, 1.5, 100),
+        y=rng.uniform(-0.5, 1.5, 100),
+        z=rng.uniform(-0.5, 1.5, 100),
+        weight=rng.uniform(0.5, 2, 100),
+    )
+
+    t = h.T
+    assert type(t) is NamedHist
+    assert t.axes.name == ("z", "y", "x")
+    assert np.array_equal(t.values(flow=True), h.values(flow=True).T)
+    assert np.array_equal(t.variances(flow=True), h.variances(flow=True).T)

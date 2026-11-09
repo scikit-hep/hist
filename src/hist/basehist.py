@@ -323,7 +323,8 @@ class BaseHist(_Histogram[S], Generic[S], metaclass=MetaConstructor, family=hist
 
     @property
     def T(self) -> Self:
-        return self.project(*reversed(range(self.ndim)))
+        # Skip subclass overrides, since NamedHist.project rejects indices
+        return BaseHist.project(self, *reversed(range(self.ndim)))
 
     def fill(
         self,
