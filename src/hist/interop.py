@@ -70,8 +70,8 @@ def destructure(obj: Any) -> dict[str, Any] | None:
     """
     for module in find_histogram_modules(obj):
         return module.unpack(obj)
-    msg = f"No histogram module found for {obj!r}"
-    raise TypeError(msg)
+    # Plain sequences and scalars have no module; they are not structured
+    return None
 
 
 def broadcast_and_flatten(
@@ -85,8 +85,10 @@ def broadcast_and_flatten(
     """
 
     non_strings = [x for x in args if not isinstance(x, str)]
-    for module in find_histogram_modules(*non_strings):
-        result = module.broadcast_and_flatten(non_strings)
+    # NumPy is the fallback for inputs no module claims (lists, tuples, scalars)
+    backends = [m.broadcast_and_flatten for m in find_histogram_modules(*non_strings)]
+    for backend in [*backends, _numpy_broadcast_and_flatten]:
+        result = backend(non_strings)
         if result is not NotImplemented:
             it = iter(result)
             return tuple(next(it) if not isinstance(x, str) else x for x in args)
