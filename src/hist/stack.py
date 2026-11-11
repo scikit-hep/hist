@@ -5,7 +5,6 @@ __lazy_modules__ = {
     "histoprint",
     f"{__spec__.parent}.axis",
     f"{__spec__.parent}.basehist",
-    f"{__spec__.parent}.hist",
 }
 
 import copy
@@ -15,9 +14,8 @@ from typing import Any, Generic, TypeVar
 import boost_histogram as bh
 import histoprint
 
-from .axis import StrCategory
+from .axis import IntCategory, StrCategory
 from .basehist import BaseHist
-from .hist import Hist
 
 if typing.TYPE_CHECKING:
     from collections.abc import Iterator
@@ -82,17 +80,30 @@ class Stack(Generic[S]):
 
         return cls(*new_dict.values())
 
-    def to_hist(self, *, name: str = "stack", label: str = "") -> Hist[S]:
-        """Copy the stack into a Hist with a leading categorical axis.
+    def to_hist(self, *, name: str = "stack", label: str = "") -> BaseHist[S]:
+        """Copy the stack into a histogram with a leading categorical axis.
 
         Histogram names become categories in stack order. Names must be unique
-        strings, and all histograms must use the same storage. The new axis name
-        must not collide with an existing axis name. Flow bins and accumulator
-        fields are copied; the result owns its data independently of the stack.
+        and either all strings (``StrCategory``) or all ints (``IntCategory``).
+        All histograms must use the same storage. The new axis name must not
+        collide with an existing axis name. The result has the class of the
+        first histogram. Flow bins and accumulator fields are copied; the
+        result owns its data and axes independently of the stack. The new
+        axis has no overflow bin, so entries that ``BaseHist.stack`` dropped
+        from a category overflow bin are not restored. If any histogram has
+        unknown variances, the result has unknown variances.
         """
-        names = [h.name for h in self]
-        if not all(isinstance(n, str) for n in names):
-            msg = "Stack histograms must have string names"
+        names: list[object] = [h.name for h in self]
+        if all(isinstance(n, str) for n in names):
+            stack_axis: StrCategory | IntCategory = StrCategory(
+                typing.cast("list[str]", names), name=name, label=label, overflow=False
+            )
+        elif all(isinstance(n, int) and not isinstance(n, bool) for n in names):
+            stack_axis = IntCategory(
+                typing.cast("list[int]", names), name=name, label=label, overflow=False
+            )
+        else:
+            msg = "Stack histograms must have all string or all int names"
             raise ValueError(msg)
         if len(set(names)) != len(names):
             msg = "Stack histogram names must be unique"
@@ -104,11 +115,9 @@ class Stack(Generic[S]):
             msg = "Stack histograms must have the same storage"
             raise ValueError(msg)
 
-        result = Hist(
-            StrCategory(
-                typing.cast("list[str]", names), name=name, label=label, overflow=False
-            ),
-            *self.axes,
+        result = type(self[0])(
+            stack_axis,
+            *(copy.deepcopy(ax) for ax in self.axes),
             storage=self[0].storage_type(),
         )
         for i, h in enumerate(self):

@@ -430,7 +430,7 @@ def test_to_hist_rejects_ambiguous_labels_and_storage():
     import hist
 
     h = Hist(axis.Regular(2, 0, 2, name="x"))
-    with pytest.raises(ValueError, match="string names"):
+    with pytest.raises(ValueError, match="string or all int names"):
         Stack(h).to_hist()
     with pytest.raises(ValueError, match="unique"):
         Stack(Hist(h, name="a"), Hist(h, name="a")).to_hist()
@@ -458,3 +458,29 @@ def test_to_hist_scalar():
     result = Stack(h).to_hist()
     assert result.shape == (1,)
     np.testing.assert_array_equal(result.values(), [0])
+
+
+def test_to_hist_copies_axes():
+    h = Hist(axis.Regular(2, 0, 2, name="x", label="Position"))
+    stack = Stack.from_dict({"a": h, "b": h})
+    result = stack.to_hist()
+    result.axes[1].label = "changed"
+    assert stack[0].axes[0].label == "Position"
+
+
+def test_to_hist_keeps_class():
+    h = NamedHist(axis.Regular(2, 0, 2, name="x"))
+    result = Stack.from_dict({"a": h}).to_hist()
+    assert type(result) is NamedHist
+
+
+def test_to_hist_int_category():
+    h = (
+        Hist.new.IntCat([1, 2], name="c")
+        .Reg(2, 0, 1, name="x")
+        .Double()
+        .fill(c=[1, 2, 2], x=[0.2, 0.2, 0.7])
+    )
+    result = h.stack("c").to_hist(name="c")
+    assert isinstance(result.axes[0], axis.IntCategory)
+    np.testing.assert_array_equal(result.values(), h.values())
