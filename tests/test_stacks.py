@@ -330,6 +330,20 @@ def test_stack_mul():
     assert (s * 2)[0].values() == approx(np.ones(10) * 4)
 
 
+def test_stack_div():
+    h = Hist.new.Regular(10, 0, 1).StrCategory(["one", "two"], name="str").Double()
+    s = h.stack(1)
+    s += 4
+    s /= 2
+
+    assert s[0].values() == approx(np.ones(10) * 2)
+    assert s[1].values() == approx(np.ones(10) * 2)
+
+    assert (s / 2)[0].values() == approx(np.ones(10))
+    assert (s / np.arange(1, 11))[0].values() == approx(2 / np.arange(1, 11))
+    assert s[0].values() == approx(np.ones(10) * 2)
+
+
 def test_stack_array_add():
     h = Hist.new.Regular(10, 0, 1).StrCategory(["one", "two"], name="str").Double()
     s = h.stack(1)

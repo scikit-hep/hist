@@ -183,6 +183,20 @@ class Stack(Generic[S]):
         """
         return self.__mul__(other)
 
+    def __truediv__(self, other: float | np.typing.NDArray[Any]) -> Self:
+        """
+        Divide the Stack by a scalar or array.
+        """
+        return self.__class__(*(h / other for h in self))
+
+    def __itruediv__(self, other: float | np.typing.NDArray[Any]) -> Self:
+        """
+        Divide each histogram in the Stack by a scalar or array.
+        """
+        for h in self:
+            h /= other  # noqa: PLW2901
+        return self
+
     def __add__(self, other: float | np.typing.NDArray[Any]) -> Self:
         """
         Add a scalar or array to the Stack.
