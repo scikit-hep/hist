@@ -140,6 +140,8 @@ required_plugins = ["pytest-mpl"]
 log_level = "DEBUG"
 filterwarnings = [
     "error",
+    # graphed-org/graphed-histogram#70
+    'ignore:graphed\.\w+ moved to graphed\.systematics:DeprecationWarning',
 ]
 
 [tool.mypy]
