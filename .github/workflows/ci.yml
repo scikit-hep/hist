@@ -40,6 +40,8 @@ jobs:
     name: Check Python ${{ matrix.python-version }}
     steps:
     - uses: actions/checkout@v7
+      with:
+        fetch-depth: 0
 
     - uses: actions/setup-python@v7
       with:
@@ -80,6 +82,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v7
+      with:
+        fetch-depth: 0
 
     - name: Setup uv
       uses: astral-sh/setup-uv@v10.3.3
@@ -95,6 +99,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v7
+      with:
+        fetch-depth: 0
 
     - uses: actions/setup-python@v7
       with:
