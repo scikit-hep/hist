@@ -6,8 +6,10 @@ Fixes:
 
 * `Hist.from_columns` builds an `IntCategory` axis from NumPy integer arrays
   instead of raising `TypeError`.
-* Ratio plots put the ratio points and uncertainty bars on the bin centers
-  again, aligned with the main histogram, instead of on the left bin edges.
+* Ratio and pull plots put the points and bars on the bin centers of the main
+  histogram, also for Integer axes, instead of on the left bin edges. Bars on
+  Variable axes use the bin widths. `plot_ratio_array` does not change the
+  `ratio` array that you give it.
 
 ## Version 2.12.1
 

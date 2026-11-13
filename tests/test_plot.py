@@ -918,55 +918,60 @@ def test_plot1d_legend_1d_histogram():
 
 
 @pytest.mark.parametrize(
-    "h",
+    "ax_",
     [
-        Hist(axis.Integer(0, 3, name="x")),
-        Hist(axis.Regular(3, 0, 3, name="x")),
-        Hist(axis.Variable([0, 1, 3, 4], name="x")),
+        axis.Integer(1, 6, name="x"),
+        axis.Regular(5, 1, 6, name="x"),
+        axis.Variable([1, 2, 4, 5, 6, 8], name="x"),
     ],
     ids=["int", "reg", "var"],
 )
-@pytest.mark.parametrize("uncert_draw_type", ["line", "bar"])
-def test_plot_ratio_misalignment(h, uncert_draw_type):
+@pytest.mark.parametrize("view", ["line", "bar", "pull"])
+def test_plot_ratio_alignment(ax_, view):
+    h1 = Hist(ax_, storage="weight")
+    h2 = Hist(ax_, storage="weight")
+    h1.view().value = h1.view().variance = [1, 2, 3, 4, 5]
+    h2.view().value = h2.view().variance = [2, 2, 2, 2, 2]
+
+    fig = plt.figure()
+    if view == "pull":
+        (main, _), sub = h1.plot_pull(h2)
+    else:
+        (main, _), sub = h1.plot_ratio(h2, rp_uncert_draw_type=view)
+
+    # Compare with the bins that mplhep draws in the main panel
+    edges = main[0].stairs.get_data().edges
+    centers = (edges[1:] + edges[:-1]) / 2
+    if view == "line":
+        x = sub.errorbar[0].get_xdata()
+    else:
+        if view == "bar":
+            assert np.allclose(sub.dots.get_offsets()[:, 0], centers)
+        bars = sub.bar
+        assert np.allclose([b.get_x() for b in bars], edges[:-1])
+        assert np.allclose([b.get_width() for b in bars], np.diff(edges))
+        x = [b.get_x() + b.get_width() / 2 for b in bars]
+    assert np.allclose(x, centers)
+
+    main_ax, sub_ax = fig.axes
+    assert main_ax.get_xlim() == pytest.approx((edges[0], edges[-1]))
+    assert sub_ax.get_xlim() == pytest.approx((edges[0], edges[-1]))
+    plt.close(fig)
+
+
+def test_plot_ratio_array_keeps_input():
     from hist.plot import plot_ratio_array
 
-    ratio = np.ones(3)
-    ratio_uncert = np.zeros((2, 3))
+    h = Hist(axis.Regular(3, 0, 3))
+    ratio = np.array([0.0, 1.0, np.inf])
+    ratio_uncert = np.ones((2, 3))
 
-    captured = {}
+    fig, ax = plt.subplots()
+    plot_ratio_array(h, ratio, ratio_uncert, ax=ax, uncert_draw_type="bar")
+    plt.close(fig)
 
-    class Artist:
-        def get_zorder(self):
-            return 2
-
-    def record_x(_self, x, *a, **k):
-        captured["x"] = np.asarray(x)
-        return Artist()
-
-    class Ax:
-        errorbar = record_x
-        bar = record_x
-        scatter = record_x
-
-        def axhline(self, *a, **k):
-            return None
-
-        def set_xlim(self, *a, **k):
-            return None
-
-        def set_ylim(self, *a, **K):
-            return None
-
-        def set_xlabel(self, *a, **k):
-            return None
-
-        def set_ylabel(self, *a, **K):
-            return None
-
-    plot_ratio_array(h, ratio, ratio_uncert, ax=Ax(), uncert_draw_type=uncert_draw_type)
-
-    # The ratio points sit on the bin centers, like the main histogram
-    assert np.allclose(captured["x"], h.axes[0].centers)
+    assert ratio.tolist() == [0.0, 1.0, np.inf]
+    assert ratio_uncert.tolist() == np.ones((2, 3)).tolist()
 
 
 def test_construct_gaussian_callable_sigma():

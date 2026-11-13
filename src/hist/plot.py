@@ -373,6 +373,21 @@ def _fit_callable_to_hist(
     return model_values, model_uncert, hist_uncert, (popt, pcov)
 
 
+def _plot_edges(
+    hist_: hist.BaseHist[Any], ax: matplotlib.axes.Axes
+) -> np.typing.NDArray[Any]:
+    """
+    Bin edges in the x coordinates that mplhep uses: discrete axes (like
+    Integer) are drawn at bin index, with the bin values as tick labels.
+    """
+    axis = hist_.axes[0]
+    if not axis.traits.discrete:
+        return np.asarray(axis.edges)
+    edges = np.arange(len(axis) + 1, dtype=float)
+    ax.set_xticks(edges[:-1] + 0.5, [str(v) for v in axis])
+    return edges
+
+
 def _plot_fit_result(
     hist_: hist.BaseHist[Any],
     model_values: np.typing.NDArray[Any],
@@ -385,7 +400,8 @@ def _plot_fit_result(
     """
     Plot fit of model to histogram data
     """
-    x_values = hist_.axes[0].centers
+    edges = _plot_edges(hist_, ax)
+    x_values = (edges[1:] + edges[:-1]) / 2
     variances = hist_.variances()
     if variances is None:
         msg = "Cannot compute from a variance-less histogram, try a Weight storage"
@@ -441,11 +457,11 @@ def plot_ratio_array(
         the ratio values and their uncertainties.
 
     """
-    x_values = hist_.axes[0].centers
-    left_edge = hist_.axes.edges[0][0]
-    right_edge = hist_.axes.edges[-1][-1]
+    edges = _plot_edges(hist_, ax)
+    x_values = (edges[1:] + edges[:-1]) / 2
 
     # Set 0 and inf to nan to hide during plotting
+    ratio = np.array(ratio, dtype=float)
     ratio[ratio == 0] = np.nan
     ratio[np.isinf(ratio)] = np.nan
 
@@ -469,8 +485,6 @@ def plot_ratio_array(
         )
         axis_artists = RatioErrorbarArtists(central_value_artist, errorbar_artists)
     elif uncert_draw_type == "bar":
-        bar_width = (right_edge - left_edge) / len(ratio)
-
         bar_top = ratio + ratio_uncert[1]
         bar_bottom = ratio - ratio_uncert[0]
         # bottom can't be nan
@@ -484,7 +498,7 @@ def plot_ratio_array(
         bar_artists = ax.bar(
             x_values,
             height=bar_height,
-            width=bar_width,
+            width=np.diff(edges),
             bottom=bar_bottom,
             fill=False,
             linewidth=0,
@@ -514,7 +528,7 @@ def plot_ratio_array(
         scaled_offset = max_delta + (max_delta / (_alpha * ratio_extrema))
         ratio_ylim = [central_value - scaled_offset, central_value + scaled_offset]
 
-    ax.set_xlim(left_edge, right_edge)
+    ax.set_xlim(edges[0], edges[-1])
     ax.set_ylim(bottom=ratio_ylim[0], top=ratio_ylim[1])
 
     ax.set_xlabel(hist_.axes[0].label)
@@ -533,17 +547,17 @@ def plot_pull_array(
     """
     Plot a pull plot on the given axes
     """
-    x_values = hist_.axes[0].centers
-    left_edge = hist_.axes.edges[0][0]
-    right_edge = hist_.axes.edges[-1][-1]
+    edges = _plot_edges(hist_, ax)
+    left_edge, right_edge = edges[0], edges[-1]
 
     # Pull: plot the pulls using Matplotlib bar method
-    width = (right_edge - left_edge) / len(pulls)
-    bar_artists = ax.bar(x_values, pulls, width=width, **bar_kwargs)
+    bar_artists = ax.bar(
+        edges[:-1], pulls, width=np.diff(edges), align="edge", **bar_kwargs
+    )
 
     pp_num = pp_kwargs.pop("num", 5)
     patch_height = max(np.abs(pulls)) / pp_num
-    patch_width = width * len(pulls)
+    patch_width = right_edge - left_edge
     patch_artists = []
     base_alpha = pp_kwargs.get("alpha", 0.5)
     for i in range(pp_num):
@@ -769,7 +783,8 @@ def _plot_ratiolike(
     # subplot. The subplot pins its own xlim; without this the two only stayed
     # aligned via sharex in the auto-created branch, leaving user-supplied
     # ax_dict axes misaligned (see #659).
-    main_ax.set_xlim(self.axes.edges[0][0], self.axes.edges[-1][-1])
+    edges = _plot_edges(self, main_ax)
+    main_ax.set_xlim(edges[0], edges[-1])
 
     if main_ax.get_legend_handles_labels()[0]:  # Don't plot an empty legend
         main_ax.legend(loc=rp_kwargs["legend_loc"])
