@@ -4,10 +4,11 @@ import numpy as np
 import pytest
 
 from hist import Hist, NamedHist, axis
-from hist.intervals import poisson_interval
 
 plt = pytest.importorskip("matplotlib.pyplot")
 pytest.importorskip("scipy")
+
+from hist.intervals import poisson_interval
 
 
 def test_general_plot1d():
