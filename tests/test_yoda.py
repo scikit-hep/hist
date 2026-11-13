@@ -152,8 +152,8 @@ END YODA_ESTIMATE1D_V3
 def test_read_legacy(yoda2, yoda1):
     for path in ("/h1", "/p1", "/c"):
         assert yoda1[path].storage_type is yoda2[path].storage_type
-        new = yoda2[path].view(flow=True)
-        old = yoda1[path].view(flow=True)
+        new = np.asarray(yoda2[path].view(flow=True))
+        old = np.asarray(yoda1[path].view(flow=True))
         for field in new.dtype.names:
             assert old[field] == approx(new[field]), f"{path} {field}"
 
@@ -218,7 +218,7 @@ def roundtrip(h, **kwargs):
 def test_roundtrip(axes, storage):
     rng = np.random.default_rng(42)
     h = hist.Hist(*axes, storage=storage)
-    view = h.view(flow=True)
+    view = np.asarray(h.view(flow=True))
     if view.dtype.names:
         view["value"] = rng.integers(0, 50, size=view.shape)
         view["variance"] = rng.integers(0, 50, size=view.shape)
@@ -227,8 +227,13 @@ def test_roundtrip(axes, storage):
 
     h2 = roundtrip(h)
     assert [list(ax) for ax in h2.axes] == [list(ax) for ax in h.axes]
-    assert h2.values(flow=True) == approx(h.values(flow=True))
-    assert h2.variances(flow=True) == approx(h.variances(flow=True))
+    # Plain arrays: field access on 0-D views fails in old boost-histogram
+    view2 = np.asarray(h2.view(flow=True))
+    values, variances = (
+        (view["value"], view["variance"]) if view.dtype.names else (view, view)
+    )
+    assert view2["value"] == approx(values)
+    assert view2["variance"] == approx(variances)
 
 
 @pytest.mark.parametrize("weighted", [False, True])
@@ -331,7 +336,7 @@ def moments(bins, name):
 
 
 def hist_moments(h):
-    view = h.view(flow=True)
+    view = np.asarray(h.view(flow=True))
     if h.storage_type is hist.storage.Mean:
         sumw = sumw2 = view["count"]
         deltas = view["_sum_of_deltas_squared"]

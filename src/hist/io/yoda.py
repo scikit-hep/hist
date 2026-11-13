@@ -229,14 +229,14 @@ def _to_hist(block: _Block) -> Hist[Any] | None:
         with np.errstate(divide="ignore", invalid="ignore"):
             mean = np.where(sumw != 0, sumwy / sumw, 0.0)
             deltas = np.where(sumw != 0, sumwy2 - sumwy * mean, 0.0)
-        view: Any = h.view(flow=True)
+        view: Any = np.asarray(h.view(flow=True))
         view["sum_of_weights"] = sumw
         view["sum_of_weights_squared"] = sumw2
         view["value"] = mean
         view["_sum_of_weighted_deltas_squared"] = np.maximum(deltas, 0.0)
     else:
         h = Hist(*axes, storage=storage.Weight())
-        view = h.view(flow=True)
+        view = np.asarray(h.view(flow=True))
         view["value"] = data[..., 0]
         view["variance"] = data[..., 1]
 
@@ -286,7 +286,8 @@ def _columns(
     """
     Return sumW, sumW2, numEntries, and for profiles the sample moments.
     """
-    view: Any = h.view(flow=True)
+    # Plain array: field access on 0-D views fails in old boost-histogram
+    view: Any = np.asarray(h.view(flow=True))
     sample = None
     if issubclass(h.storage_type, bh.storage.Mean):
         sumw = sumw2 = entries = np.asarray(view["count"], dtype=np.float64)
