@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-__lazy_modules__ = {"boost_histogram", "ctypes", "hist", "math", "numpy", "pytest"}
-
 import ctypes
 import math
 

@@ -63,4 +63,5 @@ repos:
   rev: v0.10.1
   hooks:
   - id: flake8-lazy
+    files: ^src
     args: [--apply=set, --strict-typing]

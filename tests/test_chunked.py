@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-__lazy_modules__ = {"boost_histogram", "hist", "hist.chunked", "numpy", "pytest"}
-
 import boost_histogram as bh
 import numpy as np
 import pytest
