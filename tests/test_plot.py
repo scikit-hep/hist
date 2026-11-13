@@ -8,6 +8,8 @@ from hist import Hist, NamedHist, axis
 plt = pytest.importorskip("matplotlib.pyplot")
 pytest.importorskip("scipy")
 
+from hist.intervals import poisson_interval
+
 
 def test_general_plot1d():
     """
@@ -760,6 +762,26 @@ def test_image_plot_ratio_hist():
     return fig
 
 
+def _make_plot_ratio_callable_test_figure(hist_axis, n_numbers):
+    """
+    Helper function to create a plot_ratio figure with a gaussian model.
+
+    The purpose is to create tests for histograms with different hist_axes, e.g.
+    regular and various variable binnings.
+    """
+    np.random.seed(42)
+    hist_1 = Hist(hist_axis).fill(np.random.normal(size=n_numbers))
+
+    def model(x, a=1 / np.sqrt(2 * np.pi), x0=0, sigma=1, offset=0):
+        return a * np.exp(-((x - x0) ** 2) / (2 * sigma**2)) + offset
+
+    fig = plt.figure()
+    assert hist_1.plot_ratio(
+        model, eb_color="black", fp_color="blue", ub_color="lightblue"
+    )
+    return fig
+
+
 @pytest.mark.mpl_image_compare(baseline_dir="baseline", savefig_kwargs={"dpi": 50})
 def test_image_plot_ratio_callable():
     """
@@ -767,24 +789,65 @@ def test_image_plot_ratio_callable():
     `pytest --mpl-generate-path=tests/baseline`
     """
 
-    np.random.seed(42)
-
-    hist_1 = Hist(
-        axis.Regular(
-            50, -5, 5, name="X", label="x [units]", underflow=False, overflow=False
-        )
-    ).fill(np.random.normal(size=1000))
-
-    def model(x, a=1 / np.sqrt(2 * np.pi), x0=0, sigma=1, offset=0):
-        return a * np.exp(-((x - x0) ** 2) / (2 * sigma**2)) + offset
-
-    fig = plt.figure()
-
-    assert hist_1.plot_ratio(
-        model, eb_color="black", fp_color="blue", ub_color="lightblue"
+    hist_axis = axis.Regular(
+        50, -5, 5, name="X", label="x [units]", underflow=False, overflow=False
     )
+    return _make_plot_ratio_callable_test_figure(hist_axis, 1000)
 
-    return fig
+
+@pytest.mark.mpl_image_compare(
+    baseline_dir="baseline",
+    filename="test_image_plot_ratio_callable.png",
+    savefig_kwargs={"dpi": 50},
+)
+def test_image_plot_ratio_variable_axis_with_regular_bins():
+    """
+    Test plot_pull with an ``axis.Variable`` that uses regular edges.
+
+    The resulting image should be the same as that from
+    ``test_image_plot_ratio_callable`` which uses an ``axis.Regular``.
+    """
+
+    hist_axis = axis.Variable(
+        np.linspace(-5, 5, 51),
+        name="X",
+        label="x [units]",
+        underflow=False,
+        overflow=False,
+    )
+    return _make_plot_ratio_callable_test_figure(hist_axis, 1000)
+
+
+@pytest.mark.mpl_image_compare(baseline_dir="baseline", savefig_kwargs={"dpi": 50})
+def test_image_plot_ratio_callable_bayesian_blocks_bins():
+    """
+    Test plot_pull with variable bin widths generated using bayesian blocks.
+
+
+    Mostly like ``test_image_plot_ratio_callable``, just using a variable
+    binning instead of a regular one.
+    """
+    # bin edges generated via hepstats.modeling.bayesian_blocks on 5k random-distributed numbers
+    bayesian_bin_edges = np.array(
+        [
+            -3.24126734,
+            -3.01357225,
+            -2.22544451,
+            -1.61651199,
+            -1.13075189,
+            -0.65398704,
+            0.72260413,
+            1.23926518,
+            1.67818774,
+            2.09883056,
+            2.63836271,
+            3.92623771,
+        ]
+    )
+    hist_axis = axis.Variable(
+        bayesian_bin_edges, name="X", label="x [units]", underflow=False, overflow=False
+    )
+    return _make_plot_ratio_callable_test_figure(hist_axis, 5000)
 
 
 @pytest.mark.mpl_image_compare(baseline_dir="baseline", savefig_kwargs={"dpi": 50})
@@ -954,6 +1017,125 @@ def test_plot_ratio_misalignment():
     plot_ratio_array(h, ratio, ratio_uncert, ax=Ax(), uncert_draw_type="line")
 
     assert np.allclose(captured["x"], h.axes[0].edges[:-1])
+
+
+def _alternating_width_hist(n=200_000):
+    # Bin widths alternate 0.025 and 0.1, so each bin is 0.4x or 1.6x the mean width
+    edges = np.cumsum(np.r_[-3.0, np.tile([0.025, 0.1], 48)])
+    rng = np.random.default_rng(42)
+    return Hist(axis.Variable(edges, underflow=False, overflow=False)).fill(
+        rng.normal(size=n)
+    )
+
+
+def _gauss_model(x, a=5000.0, x0=0.0, sigma=1.0):
+    return a * np.exp(-((x - x0) ** 2) / (2 * sigma**2))
+
+
+def _capture(monkeypatch, name):
+    import hist.plot
+
+    captured = {}
+    orig = getattr(hist.plot, name)
+
+    def wrapper(*args, **kwargs):
+        captured["args"] = args
+        return orig(*args, **kwargs)
+
+    monkeypatch.setattr(hist.plot, name, wrapper)
+    return captured
+
+
+def _check_unit_spread(residuals):
+    narrow = np.std(residuals[0::2])
+    wide = np.std(residuals[1::2])
+    assert 0.75 < narrow < 1.3
+    assert 0.75 < wide < 1.3
+
+
+@pytest.mark.parametrize("likelihood", [False, True])
+def test_plot_pull_callable_variable_bins(monkeypatch, likelihood):
+    pytest.importorskip("iminuit")
+    captured = _capture(monkeypatch, "plot_pull_array")
+    h = _alternating_width_hist()
+
+    h.plot_pull(_gauss_model, likelihood=likelihood)
+    plt.close("all")
+
+    _, pulls, *_ = captured["args"]
+    _check_unit_spread(pulls)
+
+
+def test_plot_ratio_callable_variable_bins(monkeypatch):
+    captured = _capture(monkeypatch, "plot_ratio_array")
+    h = _alternating_width_hist()
+
+    h.plot_ratio(_gauss_model)
+    plt.close("all")
+
+    _, ratios, ratio_uncert, *_ = captured["args"]
+    # Relative Poisson uncertainty depends only on the raw counts
+    n = h.values()
+    expected = np.abs(poisson_interval(n, n) - n) / n
+    np.testing.assert_allclose(ratio_uncert / ratios, expected)
+
+
+def test_plot_pull_hist_variable_bins(monkeypatch):
+    captured = _capture(monkeypatch, "plot_pull_array")
+    h1 = _alternating_width_hist()
+    h2 = h1.copy() * 0.9
+
+    h1.plot_pull(h2)
+    plt.close("all")
+
+    _, pulls, *_ = captured["args"]
+    expected = (h1.values() - h2.values()) / np.sqrt(h1.variances())
+    np.testing.assert_allclose(pulls, expected)
+
+
+@pytest.mark.parametrize("uncert_draw_type", ["line", "bar"])
+def test_plot_ratio_array_variable_bins_alignment(uncert_draw_type):
+    from hist.plot import plot_ratio_array
+
+    h = _alternating_width_hist(100)
+    n = h.axes[0].size
+    fig, ax = plt.subplots()
+    artists = plot_ratio_array(
+        h,
+        np.ones(n),
+        np.full((2, n), 0.1),
+        ax=ax,
+        uncert_draw_type=uncert_draw_type,
+    )
+    if uncert_draw_type == "line":
+        x = artists.errorbar[0].get_xdata()
+    else:
+        x = artists.dots.get_offsets()[:, 0]
+        bars = artists.bar.patches
+        np.testing.assert_allclose(
+            [b.get_x() + b.get_width() / 2 for b in bars], h.axes[0].centers
+        )
+        np.testing.assert_allclose([b.get_width() for b in bars], h.axes[0].widths)
+    plt.close(fig)
+
+    np.testing.assert_allclose(x, h.axes[0].centers)
+
+
+def test_plot_pull_array_variable_bins():
+    from hist.plot import plot_pull_array
+
+    h = _alternating_width_hist(100)
+    fig, ax = plt.subplots()
+    artists = plot_pull_array(
+        h, np.ones(h.axes[0].size), ax=ax, bar_kwargs={}, pp_kwargs={}
+    )
+    plt.close(fig)
+
+    bars = artists.bar.patches
+    np.testing.assert_allclose([b.get_width() for b in bars], h.axes[0].widths)
+    np.testing.assert_allclose(
+        [b.get_x() + b.get_width() / 2 for b in bars], h.axes[0].centers
+    )
 
 
 def test_construct_gaussian_callable_sigma():

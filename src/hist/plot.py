@@ -134,11 +134,15 @@ def _curve_fit_wrapper(
     ydata: np.typing.NDArray[Any],
     yerr: np.typing.NDArray[Any],
     likelihood: bool = False,
+    bin_scale: np.typing.NDArray[Any] | None = None,
 ) -> tuple[tuple[float, ...], np.typing.NDArray[Any]]:
     """
     Wrapper around `scipy.optimize.curve_fit`. Initial parameters (`p0`)
     can be set in the function definition with defaults for kwargs
     (e.g., `func = lambda x,a=1.,b=2.: x+a+b`, will feed `p0 = [1.,2.]` to `curve_fit`)
+
+    ``bin_scale`` is the factor that converts ``ydata`` back to raw counts,
+    used by the Poisson likelihood.
     """
     try:
         from scipy.optimize import curve_fit, minimize
@@ -169,12 +173,15 @@ def _curve_fit_wrapper(
             raise
         from scipy.special import gammaln
 
+        scale = np.ones_like(ydata) if bin_scale is None else bin_scale
+        counts = ydata * scale
+
         def fnll(v: Iterable[np.typing.NDArray[Any]]) -> float:
-            ypred = func(xdata, *v)
+            ypred = func(xdata, *v) * scale
             if (ypred <= 0.0).any():
                 return 1e6
             return (  # type: ignore[no-any-return]
-                ypred.sum() - (ydata * np.log(ypred)).sum() + gammaln(ydata + 1).sum()
+                ypred.sum() - (counts * np.log(ypred)).sum() + gammaln(counts + 1).sum()
             )
 
         # Seed likelihood fit with chi2 fit parameters
@@ -336,6 +343,15 @@ def _construct_gaussian_callable(
     return gauss
 
 
+def _bin_width_fractions(hist_: hist.BaseHist[Any]) -> np.typing.NDArray[Any]:
+    """
+    Bin widths relative to the mean bin width. Dividing values by this gives
+    counts per mean bin width, which is constant for a flat density.
+    """
+    widths = hist_.axes[0].widths
+    return widths / np.mean(widths)  # type: ignore[no-any-return]
+
+
 def _fit_callable_to_hist(
     model: Callable[[np.typing.NDArray[Any]], np.typing.NDArray[Any]],
     histogram: hist.BaseHist[Any],
@@ -348,17 +364,22 @@ def _fit_callable_to_hist(
 ]:
     """
     Fit a model, a callable function, to the histogram values.
+
+    Values and uncertainties are normalized to the mean bin width, so the
+    returned ``hist_uncert`` matches the values the model is fit to.
     """
     variances = histogram.variances()
     if variances is None:
         msg = "Cannot compute from a variance-less histogram, try a Weight storage"
         raise RuntimeError(msg)
-    hist_uncert = np.sqrt(variances)
+    scale = _bin_width_fractions(histogram)
+    hist_values = histogram.values() / scale
+    hist_uncert = np.sqrt(variances) / scale
 
     # Infer best fit model parameters and covariance matrix
     xdata = histogram.axes[0].centers
     popt, pcov = _curve_fit_wrapper(
-        model, xdata, histogram.values(), hist_uncert, likelihood=likelihood
+        model, xdata, hist_values, hist_uncert, likelihood=likelihood, bin_scale=scale
     )
     model_values = model(xdata, *popt)
 
@@ -390,9 +411,10 @@ def _plot_fit_result(
     if variances is None:
         msg = "Cannot compute from a variance-less histogram, try a Weight storage"
         raise RuntimeError(msg)
-    hist_uncert = np.sqrt(variances)
-
-    errorbars = ax.errorbar(x_values, hist_.values(), hist_uncert, **eb_kwargs)
+    scale = _bin_width_fractions(hist_)
+    errorbars = ax.errorbar(
+        x_values, hist_.values() / scale, np.sqrt(variances) / scale, **eb_kwargs
+    )
 
     # Ensure zorder draws data points above model
     line_zorder = errorbars[0].get_zorder() - 1
@@ -441,7 +463,12 @@ def plot_ratio_array(
         the ratio values and their uncertainties.
 
     """
-    x_values = hist_.axes[0].edges[:-1]
+    # Discrete axes are drawn with the bin at its lower edge (#655)
+    x_values = (
+        hist_.axes[0].edges[:-1]
+        if hist_.axes[0].traits.discrete
+        else hist_.axes[0].centers
+    )
     left_edge = hist_.axes.edges[0][0]
     right_edge = hist_.axes.edges[-1][-1]
 
@@ -469,7 +496,7 @@ def plot_ratio_array(
         )
         axis_artists = RatioErrorbarArtists(central_value_artist, errorbar_artists)
     elif uncert_draw_type == "bar":
-        bar_width = (right_edge - left_edge) / len(ratio)
+        bar_widths = hist_.axes[0].widths
 
         bar_top = ratio + ratio_uncert[1]
         bar_bottom = ratio - ratio_uncert[0]
@@ -484,7 +511,7 @@ def plot_ratio_array(
         bar_artists = ax.bar(
             x_values,
             height=bar_height,
-            width=bar_width,
+            width=bar_widths,
             bottom=bar_bottom,
             fill=False,
             linewidth=0,
@@ -538,12 +565,12 @@ def plot_pull_array(
     right_edge = hist_.axes.edges[-1][-1]
 
     # Pull: plot the pulls using Matplotlib bar method
-    width = (right_edge - left_edge) / len(pulls)
-    bar_artists = ax.bar(x_values, pulls, width=width, **bar_kwargs)
+    bin_widths = hist_.axes[0].widths
+    bar_artists = ax.bar(x_values, pulls, width=bin_widths, **bar_kwargs)
 
     pp_num = pp_kwargs.pop("num", 5)
     patch_height = max(np.abs(pulls)) / pp_num
-    patch_width = width * len(pulls)
+    patch_width = right_edge - left_edge
     patch_artists = []
     base_alpha = pp_kwargs.get("alpha", 0.5)
     for i in range(pp_num):
@@ -684,6 +711,8 @@ def _plot_ratiolike(
     # Computation and Fit
     hist_values = self.values()
     hist_values_uncert: np.typing.NDArray[Any] | None = None
+    # Converts raw counts to the values the comparison uses
+    scale = np.ones_like(hist_values)
 
     main_ax_artists: MainAxisArtists  # Type now due to control flow
     if callable(other) or isinstance(other, str):
@@ -699,6 +728,7 @@ def _plot_ratiolike(
             hist_values_uncert,
             bestfit_result,
         ) = _fit_callable_to_hist(other, self, likelihood)
+        scale = _bin_width_fractions(self)
 
         if fit_fmt is not None:
             parnames = list(inspect.signature(other).parameters)[1:]
@@ -739,10 +769,10 @@ def _plot_ratiolike(
     # Compute ratios: containing no INF values
     with np.errstate(divide="ignore", invalid="ignore"):
         if view == "ratio":
-            ratios = hist_values / compare_values
+            ratios = hist_values / scale / compare_values
             ratio_uncert = ratio_uncertainty(
                 num=hist_values,
-                denom=compare_values,
+                denom=compare_values * scale,
                 uncertainty_type=rp_kwargs["uncertainty_type"],
             )
             # ratio: plot the ratios using Matplotlib errorbar or bar
@@ -755,7 +785,7 @@ def _plot_ratiolike(
                 msg = "Cannot compute from a variance-less histogram, try a Weight storage"
                 raise RuntimeError(msg)
             pulls: np.typing.NDArray[Any] = (
-                hist_values - compare_values
+                hist_values / scale - compare_values
             ) / hist_values_uncert
 
             pulls[np.isnan(pulls) | np.isinf(pulls)] = 0
