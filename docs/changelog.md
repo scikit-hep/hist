@@ -9,6 +9,9 @@ Fixes:
 * `Stack` supports `/` and `/=` with a scalar or array, like `*` and `*=`.
 * `fill_flattened()` accepts plain lists, tuples, and scalars, like `fill()`,
   instead of raising `TypeError`.
+* `plot_pull` and `plot_ratio` normalize histogram values to the mean bin
+  width, so `axis.Variable` axes with irregular bins plot correctly.
+  [#369](https://github.com/scikit-hep/hist/pull/369)
 
 ## Version 2.12.1
 

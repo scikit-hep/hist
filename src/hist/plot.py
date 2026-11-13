@@ -483,7 +483,7 @@ def plot_ratio_array(
         )
         axis_artists = RatioErrorbarArtists(central_value_artist, errorbar_artists)
     elif uncert_draw_type == "bar":
-        bar_widths = __hist.axes[0].widths
+        bar_widths = hist_.axes[0].widths
 
         bar_top = ratio + ratio_uncert[1]
         bar_bottom = ratio - ratio_uncert[0]
@@ -552,7 +552,7 @@ def plot_pull_array(
     right_edge = hist_.axes.edges[-1][-1]
 
     # Pull: plot the pulls using Matplotlib bar method
-    bin_widths = __hist.axes[0].widths
+    bin_widths = hist_.axes[0].widths
     bar_artists = ax.bar(x_values, pulls, width=bin_widths, **bar_kwargs)
 
     pp_num = pp_kwargs.pop("num", 5)
