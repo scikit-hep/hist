@@ -6,6 +6,7 @@ Fixes:
 
 * `Hist.from_columns` builds an `IntCategory` axis from NumPy integer arrays
   instead of raising `TypeError`.
+* `Stack` supports `/` and `/=` with a scalar or array, like `*` and `*=`.
 
 ## Version 2.12.1
 
