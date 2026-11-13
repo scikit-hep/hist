@@ -191,10 +191,8 @@ def test_read_invalid(text):
         hist.io.yoda.loads(text)
 
 
-def roundtrip(h, **kwargs):
-    return hist.io.yoda.loads(hist.io.yoda.dumps({"/h": h}, precision=17, **kwargs))[
-        "/h"
-    ]
+def roundtrip(h):
+    return hist.io.yoda.loads(hist.io.yoda.dumps({"/h": h}, precision=17))["/h"]
 
 
 @pytest.mark.parametrize(
@@ -335,6 +333,13 @@ def moments(bins, name):
     ]
 
 
+def bin_array(bins, method, shape):
+    """
+    A YODA bin quantity in the hist layout. The first axis changes fastest.
+    """
+    return np.reshape([getattr(b, method)() for b in bins], shape, "F")
+
+
 def hist_moments(h):
     view = np.asarray(h.view(flow=True))
     if h.storage_type is hist.storage.Mean:
@@ -408,15 +413,16 @@ def test_yoda_reads_hist(yoda, tmp_path):
     for name in ("/h1", "/h2", "/h3"):
         bins = aos[name].bins(True)
         h = hists[name]
-        sumw = np.reshape([b.sumW() for b in bins], h.values(flow=True).shape, "F")
-        sumw2 = np.reshape([b.sumW2() for b in bins], sumw.shape, "F")
+        shape = h.values(flow=True).shape
+        sumw = bin_array(bins, "sumW", shape)
+        sumw2 = bin_array(bins, "sumW2", shape)
         assert sumw == approx(h.values(flow=True)), name
         assert sumw2 == approx(h.variances(flow=True)), name
     assert aos["/h1"].numEntries() == approx(50)
     assert aos["/h1"].xMean() == approx(0.5, abs=0.1)
 
     # Otherflow is first in YODA
-    sumw = np.reshape([b.sumW() for b in aos["/cat"].bins(True)], (3, 3), "F")
+    sumw = bin_array(aos["/cat"].bins(True), "sumW", (3, 3))
     assert sumw == approx(np.array([[1, 0, 0], [0, 0, 1], [0, 2, 0]]))
 
     for name in ("/p1", "/p2"):
@@ -450,8 +456,9 @@ def test_hist_reads_yoda(yoda, tmp_path):
     for name, ao in (("/h1", h1), ("/h2", h2)):
         h = hists[name]
         shape = h.values(flow=True).shape
-        sumw = np.reshape([b.sumW() for b in ao.bins(True)], shape, "F")
-        sumw2 = np.reshape([b.sumW2() for b in ao.bins(True)], shape, "F")
+        bins = ao.bins(True)
+        sumw = bin_array(bins, "sumW", shape)
+        sumw2 = bin_array(bins, "sumW2", shape)
         if name == "/h2":
             sumw, sumw2 = np.roll(sumw, -1, axis=0), np.roll(sumw2, -1, axis=0)
         assert h.values(flow=True) == approx(sumw, rel=1e-5), name

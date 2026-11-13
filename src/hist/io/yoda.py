@@ -143,25 +143,24 @@ def _parse_v3(
         elif line.startswith("ErrorLabels:"):
             labels = _unquote(line)
         elif not line.startswith("MaskedBins:"):
-            rows.append(line.split())
+            # "---" marks a missing estimate error
+            rows.append(line.replace("---", "nan").split())
 
     axes = [_make_axis(t, e) for t, e in zip(axis_types, edges, strict=True)]
 
+    table = np.array(rows, dtype=np.float64)
     if kind == "ESTIMATE":
-        values = np.array([float(row[0]) for row in rows])
-        tokens = np.array([row[1:] for row in rows], dtype=object)
-        tokens = tokens.reshape((len(rows), len(labels), 2))
-        missing = tokens[..., 0] == "---"
-        errors = np.where(missing[..., None], "0", tokens).astype(float)
+        errors = table[:, 1:].reshape((len(rows), len(labels), 2))
+        missing = np.isnan(errors[..., 0])
+        errors = np.where(np.isnan(errors), 0.0, errors)
         # The total is the "" source if a bin has it, else the quadrature sum
-        total = np.sqrt(np.sum(errors**2, axis=1))
         if "" in labels:
             k = labels.index("")
             quad = np.sqrt(np.sum(np.delete(errors, k, axis=1) ** 2, axis=1))
             total = np.where(missing[:, [k]], quad, np.abs(errors[:, k]))
-        table = np.stack([values, total.mean(axis=1) ** 2], axis=1)
-    else:
-        table = np.array(rows, dtype=np.float64)
+        else:
+            total = np.sqrt(np.sum(errors**2, axis=1))
+        table = np.stack([table[:, 0], total.mean(axis=1) ** 2], axis=1)
 
     # Rows are in global index order: the first axis changes fastest.
     shape = [len(ax) + (2 if ax.traits.continuous else 1) for ax in axes]
@@ -280,45 +279,47 @@ def read(file: str | os.PathLike[str], /) -> dict[str, Hist[Any]]:
     return loads(data.decode())
 
 
-def _columns(
-    h: bh.Histogram[Any],
-) -> tuple[Array, Array, Array, tuple[Array, Array] | None]:
+def _effective_entries(sumw: Array, sumw2: Array) -> Array:
+    with np.errstate(divide="ignore", invalid="ignore"):
+        return np.where(sumw2 > 0, sumw**2 / sumw2, 0.0)
+
+
+def _columns(h: bh.Histogram[Any]) -> tuple[Array, bool]:
     """
-    Return sumW, sumW2, numEntries, and for profiles the sample moments.
+    Return the ``flow=True`` columns sumW, sumW2, numEntries, and for profiles
+    the sample moments sumWY and sumWY2, stacked on the last axis. The bool is
+    True for profiles.
     """
     # Plain array: field access on 0-D views fails in old boost-histogram
     view: Any = np.asarray(h.view(flow=True))
-    sample = None
+
+    def field(name: str) -> Array:
+        return np.asarray(view[name], dtype=np.float64)
+
     if issubclass(h.storage_type, bh.storage.Mean):
-        sumw = sumw2 = entries = np.asarray(view["count"], dtype=np.float64)
-        mean = np.asarray(view["value"], dtype=np.float64)
-        deltas = np.asarray(view["_sum_of_deltas_squared"], dtype=np.float64)
-        sample = (sumw * mean, deltas + sumw * mean**2)
-    elif issubclass(h.storage_type, (bh.storage.Weight, bh.storage.WeightedMean)):
-        weighted = issubclass(h.storage_type, bh.storage.Weight)
-        sumw = np.asarray(
-            view["value" if weighted else "sum_of_weights"], dtype=np.float64
-        )
-        sumw2 = np.asarray(
-            view["variance" if weighted else "sum_of_weights_squared"], dtype=float
-        )
+        sumw = sumw2 = entries = field("count")
+        mean, deltas = field("value"), field("_sum_of_deltas_squared")
+    elif issubclass(h.storage_type, bh.storage.WeightedMean):
+        sumw, sumw2 = field("sum_of_weights"), field("sum_of_weights_squared")
         # The number of entries is not stored, use the effective number
-        with np.errstate(divide="ignore", invalid="ignore"):
-            entries = np.where(sumw2 > 0, sumw**2 / sumw2, 0.0)
-        if not weighted:
-            mean = np.asarray(view["value"], dtype=np.float64)
-            deltas = np.asarray(
-                view["_sum_of_weighted_deltas_squared"], dtype=np.float64
-            )
-            sample = (sumw * mean, deltas + sumw * mean**2)
+        entries = _effective_entries(sumw, sumw2)
+        mean, deltas = field("value"), field("_sum_of_weighted_deltas_squared")
+    elif issubclass(h.storage_type, bh.storage.Weight):
+        sumw, sumw2 = field("value"), field("variance")
+        entries = _effective_entries(sumw, sumw2)
+        return np.stack([sumw, sumw2, entries], axis=-1), False
     else:
-        sumw = sumw2 = entries = np.asarray(view, dtype=np.float64)
-    return sumw, sumw2, entries, sample
+        sumw = np.asarray(view, dtype=np.float64)
+        return np.stack([sumw, sumw, sumw], axis=-1), False
+
+    sample = [sumw * mean, deltas + sumw * mean**2]
+    return np.stack([sumw, sumw2, entries, *sample], axis=-1), True
 
 
 def _yoda_layout(data: Array, axes: Sequence[Any]) -> Array:
     """
-    Convert a ``flow=True`` array to the YODA bin layout.
+    Convert a ``flow=True`` array to the YODA bin layout. Trailing dimensions
+    past the axes are kept.
     """
     for i, ax in enumerate(axes):
         pad = [(0, 0)] * data.ndim
@@ -352,15 +353,15 @@ def _axis_info(ax: Any, precision: int) -> tuple[str, str, Array]:
 def _lines(path: str, h: bh.Histogram[Any], precision: int) -> Iterator[str]:
     axes = list(h.axes)
     ndim = len(axes)
-    sumw, sumw2, entries, sample = _columns(h)
+    data, profile = _columns(h)
     info = [_axis_info(ax, precision) for ax in axes]
     types = "".join(kind for kind, _, _ in info)
 
     # These are the types that YODA can read
-    base = "Histo" if sample is None else "Profile"
-    if sample is None and ndim == 0:
+    base = "Profile" if profile else "Histo"
+    if not profile and ndim == 0:
         name = "Counter"
-    elif ndim in {1, 2} or (sample is None and types == "ddd"):
+    elif ndim in {1, 2} or (not profile and types == "ddd"):
         continuous = set(types) <= {"d"}
         name = f"{base}{ndim}D" if continuous else f"Binned{base}<{','.join(types)}>"
     else:
@@ -383,42 +384,41 @@ def _lines(path: str, h: bh.Histogram[Any], precision: int) -> Iterator[str]:
         yield f"{key}: {annotations[key]}".rstrip()
     yield "---"
 
-    header = ["# sumW", "sumW2"]
-    columns = [sumw, sumw2]
-    if name != "Counter":
-        sumw, sumw2, entries = (_yoda_layout(a, axes) for a in (sumw, sumw2, entries))
-        # Moments are computed from the bin coordinates
-        coords: list[Array] = []
-        firsts: list[Array] = []
-        seconds: list[Array] = []
-        for i, (_, edges, coord) in enumerate(info):
-            yield f"Edges(A{i + 1}): [{edges}]"
-            x = coord.reshape([-1 if j == i else 1 for j in range(ndim)])
-            coords.append(x)
-            firsts.append(sumw * x)
-            seconds.append(sumw * x**2)
-        if sample is not None:
-            sumwy, sumwy2 = (_yoda_layout(a, axes) for a in sample)
-            firsts.append(sumwy)
-            seconds.append(sumwy2)
+    data = _yoda_layout(data, axes)
+    sumw = data[..., 0]
+    # Moments are computed from the bin coordinates
+    coords: list[Array] = []
+    firsts: list[Array] = []
+    seconds: list[Array] = []
+    for i, (_, edges, coord) in enumerate(info):
+        yield f"Edges(A{i + 1}): [{edges}]"
+        x = coord.reshape([-1 if j == i else 1 for j in range(ndim)])
+        coords.append(x)
+        firsts.append(sumw * x)
+        seconds.append(sumw * x**2)
+    if profile:
+        firsts.append(data[..., 3])
+        seconds.append(data[..., 4])
 
-        columns = [sumw, sumw2]
-        for i, (first, second) in enumerate(zip(firsts, seconds, strict=True)):
-            header += [f"sumW(A{i + 1})", f"sumW2(A{i + 1})"]
-            columns += [first, second]
-        for i, x in enumerate(coords):
-            for j in range(i + 1, len(firsts)):
-                header.append(f"sumW(A{i + 1},A{j + 1})")
-                columns.append(firsts[j] * x)
+    header = ["# sumW", "sumW2"]
+    columns = [sumw, data[..., 1]]
+    for i, (first, second) in enumerate(zip(firsts, seconds, strict=True)):
+        header += [f"sumW(A{i + 1})", f"sumW2(A{i + 1})"]
+        columns += [first, second]
+    for i, x in enumerate(coords):
+        for j in range(i + 1, len(firsts)):
+            header.append(f"sumW(A{i + 1},A{j + 1})")
+            columns.append(firsts[j] * x)
     header.append("numEntries")
-    columns.append(entries)
+    columns.append(data[..., 2])
 
     width = precision + 7
     yield "\t".join(item.ljust(width) for item in header).rstrip()
     # The first axis changes fastest
     table = np.stack([np.ravel(c, order="F") for c in columns], axis=1)
+    row_format = "\t".join([f"{{:<{width}.{precision}e}}"] * len(columns))
     for row in table:
-        yield "\t".join(f"{v:.{precision}e}".ljust(width) for v in row).rstrip()
+        yield row_format.format(*row).rstrip()
     yield f"END {tag}"
     yield ""
 
