@@ -59,9 +59,9 @@ jobs:
       run: uv pip install -e . --group test --group dask
 
     - name: Install package (core only)
-      # scipy, iminuit, awkward, dask, and matplotlib do not support 3.15 yet
+      # Only core and fit dependencies on 3.15 for now
       if: matrix.python-version == '3.15'
-      run: uv pip install -e . pytest packaging
+      run: uv pip install -e . pytest packaging --group fit
 
     - name: Test package
       # pytest-mpl needs matplotlib, so it can't be required on 3.15
