@@ -94,9 +94,9 @@ test = [
     { include-group = "test-core" },
     { include-group = "fit" },
     "awkward>=2.0.7",
-    'graphed[awkward,numpy]>=0.0.2',
-    'graphed-histogram>=0.0.2',
-    'graphed-executors>=0.0.2',
+    'graphed[awkward,numpy]>=0.0.11',
+    'graphed-histogram>=0.0.8',
+    'graphed-executors>=0.0.8',
 ]
 test-core = [
     "pytest >=8",
