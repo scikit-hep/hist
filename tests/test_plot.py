@@ -915,26 +915,36 @@ def test_plot1d_legend_1d_histogram():
     plt.close(fig)
 
 
-def test_plot_ratio_misalignment():
-    import numpy as np
-
-    import hist
+@pytest.mark.parametrize(
+    "h",
+    [
+        Hist(axis.Integer(0, 3, name="x")),
+        Hist(axis.Regular(3, 0, 3, name="x")),
+        Hist(axis.Variable([0, 1, 3, 4], name="x")),
+    ],
+    ids=["int", "reg", "var"],
+)
+@pytest.mark.parametrize("uncert_draw_type", ["line", "bar"])
+def test_plot_ratio_misalignment(h, uncert_draw_type):
     from hist.plot import plot_ratio_array
-
-    h = hist.new.Int(0, 3, name="x").Double()
-    h.fill([0, 1, 2])
 
     ratio = np.ones(3)
     ratio_uncert = np.zeros((2, 3))
 
     captured = {}
 
+    class Artist:
+        def get_zorder(self):
+            return 2
+
     def record_x(_self, x, *a, **k):
         captured["x"] = np.asarray(x)
+        return Artist()
 
     class Ax:
         errorbar = record_x
         bar = record_x
+        scatter = record_x
 
         def axhline(self, *a, **k):
             return None
@@ -951,9 +961,10 @@ def test_plot_ratio_misalignment():
         def set_ylabel(self, *a, **K):
             return None
 
-    plot_ratio_array(h, ratio, ratio_uncert, ax=Ax(), uncert_draw_type="line")
+    plot_ratio_array(h, ratio, ratio_uncert, ax=Ax(), uncert_draw_type=uncert_draw_type)
 
-    assert np.allclose(captured["x"], h.axes[0].edges[:-1])
+    # The ratio points sit on the bin centers, like the main histogram
+    assert np.allclose(captured["x"], h.axes[0].centers)
 
 
 def test_construct_gaussian_callable_sigma():
