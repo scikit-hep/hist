@@ -318,11 +318,21 @@ def test_sibling_mode_is_unchanged_by_the_flag_passthrough():
 @pytest.mark.parametrize(
     ("cls", "read"),
     [
-        (hist_graphed.Hist, lambda h: h.sort("cat")),
-        (hist_graphed.Hist, lambda h: h.expand_cats()),
-        (hist_graphed.Hist, lambda h: h.integrate("cat", ["a"])),
-        (hist_graphed.NamedHist, lambda h: h.sort("cat")),
-        (hist_graphed.NamedHist, lambda h: h.integrate("cat", ["a"])),
+        pytest.param(hist_graphed.Hist, lambda h: h.sort("cat"), id="Hist-sort"),
+        pytest.param(
+            hist_graphed.Hist, lambda h: h.expand_cats(), id="Hist-expand_cats"
+        ),
+        pytest.param(
+            hist_graphed.Hist, lambda h: h.integrate("cat", ["a"]), id="Hist-integrate"
+        ),
+        pytest.param(
+            hist_graphed.NamedHist, lambda h: h.sort("cat"), id="NamedHist-sort"
+        ),
+        pytest.param(
+            hist_graphed.NamedHist,
+            lambda h: h.integrate("cat", ["a"]),
+            id="NamedHist-integrate",
+        ),
     ],
 )
 def test_a_read_warning_escapes_hists_ignore_block(cls, read, monkeypatch):
