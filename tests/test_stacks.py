@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-__lazy_modules__ = {"unittest.mock"}
-
 from unittest.mock import MagicMock
 
 import numpy as np

@@ -5,8 +5,6 @@
 
 from __future__ import annotations
 
-__lazy_modules__ = {"argparse", "shutil"}
-
 import argparse
 import shutil
 import sys
