@@ -1,6 +1,11 @@
 from __future__ import annotations
 
-__lazy_modules__ = {"copy", "histoprint", f"{__spec__.parent}.basehist"}
+__lazy_modules__ = {
+    "copy",
+    "histoprint",
+    f"{__spec__.parent}.axis",
+    f"{__spec__.parent}.basehist",
+}
 
 import copy
 import typing
@@ -9,6 +14,7 @@ from typing import Any, Generic, TypeVar
 import boost_histogram as bh
 import histoprint
 
+from .axis import IntCategory, StrCategory
 from .basehist import BaseHist
 
 if typing.TYPE_CHECKING:
@@ -73,6 +79,52 @@ class Stack(Generic[S]):
             h.name = k
 
         return cls(*new_dict.values())
+
+    def to_hist(self, *, name: str = "stack", label: str = "") -> BaseHist[S]:
+        """Copy the stack into a histogram with a leading categorical axis.
+
+        Histogram names become categories in stack order. Names must be unique
+        and either all strings (``StrCategory``) or all ints (``IntCategory``).
+        All histograms must use the same storage. The new axis name must not
+        collide with an existing axis name. The result has the class of the
+        first histogram. Flow bins and accumulator fields are copied; the
+        result owns its data and axes independently of the stack. The new
+        axis has no overflow bin, so entries that ``BaseHist.stack`` dropped
+        from a category overflow bin are not restored. If any histogram has
+        unknown variances, the result has unknown variances.
+        """
+        names: list[object] = [h.name for h in self]
+        if all(isinstance(n, str) for n in names):
+            stack_axis: StrCategory | IntCategory = StrCategory(
+                typing.cast("list[str]", names), name=name, label=label, overflow=False
+            )
+        elif all(isinstance(n, int) and not isinstance(n, bool) for n in names):
+            stack_axis = IntCategory(
+                typing.cast("list[int]", names), name=name, label=label, overflow=False
+            )
+        else:
+            msg = "Stack histograms must have all string or all int names"
+            raise ValueError(msg)
+        if len(set(names)) != len(names):
+            msg = "Stack histogram names must be unique"
+            raise ValueError(msg)
+        if name and name in self.axes.name:
+            msg = "Stack axis name conflicts with an existing axis"
+            raise ValueError(msg)
+        first = self._stack[0]
+        if any(h.storage_type != first.storage_type for h in self):
+            msg = "Stack histograms must have the same storage"
+            raise ValueError(msg)
+
+        result = type(first)(
+            stack_axis,
+            *(copy.deepcopy(ax) for ax in self.axes),
+            storage=first.storage_type(),
+        )
+        for i, h in enumerate(self):
+            result.view(flow=True)[i, ...] = h.view(flow=True)
+        result._variance_known = all(h._variance_known for h in self)
+        return result
 
     def _get_index(self, name: str | int) -> int:
         "Returns the index associated with a name. Passes through ints"

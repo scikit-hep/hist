@@ -397,3 +397,90 @@ def test_set_item():
 
     with pytest.raises(ValueError):
         s[0] = Hist.new.Regular(11, 0, 1).Double()
+
+
+@pytest.mark.parametrize(
+    "storage_name", ["Double", "Int64", "Weight", "Mean", "WeightedMean"]
+)
+def test_to_hist_preserves_storage_and_flows(storage_name):
+    import hist
+
+    storage = getattr(hist.storage, storage_name)()
+    h = Hist(axis.Regular(2, 0, 2, name="x", label="Position"), storage=storage)
+    kwargs = {"sample": [2, 4, 6, 8]} if "Mean" in storage_name else {}
+    if storage_name in {"Weight", "WeightedMean"}:
+        kwargs["weight"] = [1, 2, 3, 4]
+    h.fill([-1, 0.5, 1.5, 3], **kwargs)
+    stack = Stack.from_dict({"first": h, "second": h + h})
+    result = stack.to_hist(name="source", label="Source")
+    assert list(result.axes[0]) == ["first", "second"]
+    assert result.axes[0].label == "Source"
+    assert result.axes[1] == h.axes[0]
+    assert result.storage_type == h.storage_type
+    for i, original in enumerate(stack):
+        np.testing.assert_array_equal(
+            result.view(flow=True)[i], original.view(flow=True)
+        )
+        assert result[{"source": original.name}] == original
+    result.reset()
+    np.testing.assert_array_equal(stack[0].view(flow=True), h.view(flow=True))
+
+
+def test_to_hist_rejects_ambiguous_labels_and_storage():
+    import hist
+
+    h = Hist(axis.Regular(2, 0, 2, name="x"))
+    with pytest.raises(ValueError, match="string or all int names"):
+        Stack(h).to_hist()
+    with pytest.raises(ValueError, match="unique"):
+        Stack(Hist(h, name="a"), Hist(h, name="a")).to_hist()
+    with pytest.raises(ValueError, match="conflicts"):
+        Stack.from_dict({"a": h}).to_hist(name="x")
+    weighted = Hist(*h.axes, storage=hist.storage.Weight(), name="b")
+    with pytest.raises(ValueError, match="same storage"):
+        Stack(Hist(h, name="a"), weighted).to_hist()
+
+
+@pytest.mark.parametrize("hist_class", [Hist, NamedHist])
+def test_to_hist_multidimensional_and_unknown_variance(hist_class):
+    h = hist_class(
+        axis.Regular(2, 0, 2, name="x", underflow=False),
+        axis.Boolean(name="flag"),
+    ).fill(x=[0.5, 3], flag=[True, False], weight=[2, 3])
+    result = Stack.from_dict({"a": h}).to_hist()
+    np.testing.assert_array_equal(result.values(flow=True)[0], h.values(flow=True))
+    assert result.variances() is None
+    assert h.variances() is None
+
+
+def test_to_hist_scalar():
+    h = Hist(name="scalar")
+    result = Stack(h).to_hist()
+    assert result.shape == (1,)
+    np.testing.assert_array_equal(result.values(), [0])
+
+
+def test_to_hist_copies_axes():
+    h = Hist(axis.Regular(2, 0, 2, name="x", label="Position"))
+    stack = Stack.from_dict({"a": h, "b": h})
+    result = stack.to_hist()
+    result.axes[1].label = "changed"
+    assert stack[0].axes[0].label == "Position"
+
+
+def test_to_hist_keeps_class():
+    h = NamedHist(axis.Regular(2, 0, 2, name="x"))
+    result = Stack.from_dict({"a": h}).to_hist()
+    assert type(result) is NamedHist
+
+
+def test_to_hist_int_category():
+    h = (
+        Hist.new.IntCat([1, 2], name="c")
+        .Reg(2, 0, 1, name="x")
+        .Double()
+        .fill(c=[1, 2, 2], x=[0.2, 0.2, 0.7])
+    )
+    result = h.stack("c").to_hist(name="c")
+    assert isinstance(result.axes[0], axis.IntCategory)
+    np.testing.assert_array_equal(result.values(), h.values())
