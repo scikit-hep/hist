@@ -111,14 +111,15 @@ class Stack(Generic[S]):
         if name and name in self.axes.name:
             msg = "Stack axis name conflicts with an existing axis"
             raise ValueError(msg)
-        if any(h.storage_type != self[0].storage_type for h in self):
+        first = self._stack[0]
+        if any(h.storage_type != first.storage_type for h in self):
             msg = "Stack histograms must have the same storage"
             raise ValueError(msg)
 
-        result = type(self[0])(
+        result = type(first)(
             stack_axis,
             *(copy.deepcopy(ax) for ax in self.axes),
-            storage=self[0].storage_type(),
+            storage=first.storage_type(),
         )
         for i, h in enumerate(self):
             result.view(flow=True)[i, ...] = h.view(flow=True)
