@@ -274,6 +274,17 @@ def test_round_trip():
         )
 
 
+def test_to_hist_adds_to_unlabeled_hist():
+    source = hist.Hist(
+        axis.Regular(10, 0, 1, name="x"),
+        axis.StrCategory(["a"], growth=True, name="cat"),
+    )
+    source.fill(x=[0.2, 0.4], cat=["a", "a"])
+    dense = ChunkedHist.from_hist(source).to_hist()
+    assert dense.axes == source.axes
+    assert (dense + source)[{"x": bh.loc(0.2), "cat": "a"}] == 2
+
+
 def test_from_hist_categorical_flow_content_raises():
     source = hist.Hist(
         axis.Regular(10, 0, 1, name="x"),

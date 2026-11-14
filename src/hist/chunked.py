@@ -270,7 +270,7 @@ class ChunkedHist:
                         index=index,
                         name=axis.name,
                         axis_type=type(axis),
-                        label=axis.label,
+                        label=axis._raw_metadata.get("label", ""),
                         metadata=axis.metadata,
                         growth=axis.traits.growth,
                         flow=axis.traits.overflow or axis.traits.underflow,
