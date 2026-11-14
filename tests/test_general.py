@@ -1151,3 +1151,46 @@ def test_integrate_wildcard_categories(axis_id, patterns, expected, weighted):
     )
     assert result.axes == h.project("feature").axes
     assert h == original
+
+
+@pytest.mark.parametrize(
+    ("underflow", "overflow"),
+    [(False, False), (False, True), (True, False), (True, True)],
+)
+@pytest.mark.parametrize(
+    "storage_name", ["Double", "Int64", "Weight", "Mean", "WeightedMean"]
+)
+def test_forceflow(underflow, overflow, storage_name):
+    import hist
+
+    h = hist.Hist(
+        hist.axis.Regular(2, 0, 2, underflow=underflow, overflow=overflow),
+        hist.axis.StrCategory(["a", "b"]),
+        storage=getattr(hist.storage, storage_name)(),
+    )
+    kwargs = {"sample": [2, 4, 6, 8]} if "Mean" in storage_name else {}
+    if storage_name in {"Weight", "WeightedMean"}:
+        kwargs["weight"] = [1, 2, 3, 4]
+    h.fill([-1, 0.5, 1.5, 3], ["a", "b", "a", "missing"], **kwargs)
+    for accessor in (h.values, h.variances):
+        original = accessor(flow=True).copy()
+        result = accessor(forceflow=True)
+        expected = np.pad(original, [(int(not underflow), int(not overflow)), (1, 0)])
+        np.testing.assert_array_equal(result, expected)
+        np.testing.assert_array_equal(accessor(flow=True, forceflow=True), expected)
+        assert result.shape == (4, 4)
+        assert result.dtype == original.dtype
+        result[...] = 99
+        np.testing.assert_array_equal(accessor(flow=True), original)
+        assert accessor().shape == (2, 2)
+
+
+def test_forceflow_unknown_variance_and_scalar():
+    import hist
+
+    h = hist.Hist(hist.axis.Boolean())
+    h.fill([True], weight=[2])
+    assert h.variances(forceflow=True) is None
+    np.testing.assert_array_equal(h.values(forceflow=True), [0, 0, 2, 0])
+    scalar = hist.Hist()
+    assert scalar.values(forceflow=True).shape == ()
