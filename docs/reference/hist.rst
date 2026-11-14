@@ -14,6 +14,7 @@ Subpackages
 
    hist.axis
    hist.dask
+   hist.io
 
 Submodules
 ----------
