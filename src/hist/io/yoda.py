@@ -152,7 +152,7 @@ def _parse_v3(
     if kind == "ESTIMATE":
         errors = table[:, 1:].reshape((len(rows), len(labels), 2))
         missing = np.isnan(errors[..., 0])
-        errors = np.where(np.isnan(errors), 0.0, errors)
+        errors[np.isnan(errors)] = 0.0
         # The total is the "" source if a bin has it, else the quadrature sum
         if "" in labels:
             k = labels.index("")
