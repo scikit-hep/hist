@@ -9,6 +9,8 @@ Fixes:
 * `Stack` supports `/` and `/=` with a scalar or array, like `*` and `*=`.
 * `fill_flattened()` accepts plain lists, tuples, and scalars, like `fill()`,
   instead of raising `TypeError`.
+* `ChunkedHist.to_hist()` keeps unset category axis labels empty, so the
+  result can be added to the `Hist` it came from.
 
 ## Version 2.12.1
 
