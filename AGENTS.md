@@ -16,6 +16,7 @@ Single `src/hist/` package, built with `hatchling` + `hatch-vcs`. Version is aut
 - **Dask support**: `hist.dask` is an optional subpackage requiring `dask_histogram`. Provides `dask.Hist` and `dask.NamedHist`.
 - **Interop / flattening**: `fill_flattened()` uses `interop.destructure()` and `interop.broadcast_and_flatten()` for Awkward Array support.
 - **Serialization**: `hist.serialization` wraps `boost_histogram.serialization` and injects a `hist` writer_info block into UHI dicts.
+- **YODA**: `hist.io.yoda` reads and writes the YODA text format without YODA. YODA is only on conda-forge; `tests/test_yoda.py` cross-checks with it when present.
 - **Entry points**: `from hist import Hist, NamedHist, Stack, BaseHist`; CLI `hist` points to `hist.classichist:main`.
 
 ## Key Commands
@@ -29,6 +30,7 @@ Single `src/hist/` package, built with `hatchling` + `hatch-vcs`. Version is aut
 | Run full test suite (incl. mpl) | `uv run pytest --mpl` |
 | Run single test file | `uv run pytest tests/test_plot.py --mpl` |
 | Test minimum deps | `nox -s minimums` |
+| Test with YODA (needs micromamba/conda) | `nox -s yoda` |
 | Build docs | `nox -s docs` |
 | Build package | `nox -s build` |
 
@@ -57,6 +59,6 @@ CI installs `test` + `dask`, then separately `plot` for the `--mpl` test job.
 
 ## CI / Workflow
 
-- `ci.yml` runs: pylint, Python 3.11–3.15 checks, minimum-dependency checks.
+- `ci.yml` runs: pylint, Python 3.11–3.15 checks, minimum-dependency checks, YODA checks (micromamba).
 - `cd.yml` runs on push to `main` and releases; builds via `hynek/build-and-inspect-python-package` and publishes on release.
 - Do not run `git commit` or `git push` unless explicitly asked.

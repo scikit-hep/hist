@@ -104,11 +104,40 @@ jobs:
     - name: Run nox
       run: nox -s minimums
 
+  yoda:
+    name: Check YODA
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -el {0}
+    steps:
+    - uses: actions/checkout@v7
+      with:
+        fetch-depth: 0
+
+    # YODA is not on PyPI
+    - uses: mamba-org/setup-micromamba@v3
+      with:
+        environment-name: yoda
+        create-args: >-
+          -c conda-forge
+          python=3.13
+          pip
+          yoda
+
+    - name: Install package
+      run: python -m pip install -e . --group test-core
+
+    - name: Check that YODA is present
+      run: python -c "import yoda; print(yoda.__version__)"
+
+    - name: Test YODA
+      run: python -m pytest tests/test_yoda.py
 
 
   pass:
     if: always()
-    needs: [pylint, checks, mypy, minimums]
+    needs: [pylint, checks, mypy, minimums, yoda]
     runs-on: ubuntu-slim
     timeout-minutes: 2
     steps:

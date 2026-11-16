@@ -2,6 +2,12 @@
 
 ## In progress
 
+Features:
+
+* Read and write the YODA text format with `hist.io.yoda`. Supports histograms,
+  profiles, counters, and discrete axes; estimates can be read.
+  [#541](https://github.com/scikit-hep/hist/pull/541)
+
 Fixes:
 
 * `Hist.from_columns` builds an `IntCategory` axis from NumPy integer arrays

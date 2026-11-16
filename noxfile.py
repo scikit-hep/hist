@@ -74,6 +74,16 @@ def minimums(session):
     session.run("pytest", *session.posargs)
 
 
+@nox.session(venv_backend="micromamba|mamba|conda", default=False)
+def yoda(session):
+    """
+    Run the YODA tests with YODA, which is only on conda-forge.
+    """
+    session.conda_install("yoda", channel="conda-forge")
+    session.install("-e.", "--group=test-core")
+    session.run("pytest", "tests/test_yoda.py", *session.posargs)
+
+
 @nox.session(default=False)
 def regenerate(session):
     """
