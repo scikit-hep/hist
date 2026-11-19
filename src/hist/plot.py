@@ -445,8 +445,9 @@ def plot_ratio_array(
     left_edge = hist_.axes.edges[0][0]
     right_edge = hist_.axes.edges[-1][-1]
 
-    # Set 0 and inf to nan to hide during plotting
-    ratio[ratio == 0] = np.nan
+    # A zero weighted sum can still have a nonzero uncertainty.
+    if kwargs.get("uncertainty_type") != "propagate":
+        ratio[ratio == 0] = np.nan
     ratio[np.isinf(ratio)] = np.nan
 
     central_value = kwargs.pop("central_value", 1.0)
@@ -495,6 +496,8 @@ def plot_ratio_array(
         axis_artists = RatioBarArtists(central_value_artist, _ratio_points, bar_artists)
 
     ratio_ylim = kwargs.pop("ylim", None)
+    if ratio_ylim is None and not np.any(np.isfinite(ratio)):
+        ratio_ylim = [central_value - 1, central_value + 1]
     if ratio_ylim is None:
         # plot centered around central value with a scaled view range
         # the value _with_ the uncertainty in view is important so base
@@ -686,6 +689,15 @@ def _plot_ratiolike(
     hist_values_uncert: np.typing.NDArray[Any] | None = None
 
     main_ax_artists: MainAxisArtists  # Type now due to control flow
+    num_variance = denom_variance = None
+    if view == "ratio" and rp_kwargs["uncertainty_type"] == "propagate":
+        if not isinstance(other, hist.BaseHist):
+            msg = "Propagated ratio uncertainties require two independent histograms"
+            raise ValueError(msg)
+        num_variance, denom_variance = self.variances(), other.variances()
+        if num_variance is None or denom_variance is None:
+            msg = "Both histograms must have bin variances to propagate ratio uncertainties"
+            raise ValueError(msg)
     if callable(other) or isinstance(other, str):
         if isinstance(other, str):
             if other in {"gauss", "gaus", "normal"}:
@@ -744,6 +756,8 @@ def _plot_ratiolike(
                 num=hist_values,
                 denom=compare_values,
                 uncertainty_type=rp_kwargs["uncertainty_type"],
+                num_variance=num_variance,
+                denom_variance=denom_variance,
             )
             # ratio: plot the ratios using Matplotlib errorbar or bar
             subplot_ax_artists = plot_ratio_array(
