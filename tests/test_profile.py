@@ -35,3 +35,23 @@ def test_example():
     assert hp.variances()[1:-1] == approx(
         np.array([2.66666667, 1.088, float("nan")]), nan_ok=True
     )
+
+
+def test_profile_empty_bins():
+    h = hist.Hist(
+        hist.axis.Regular(3, 0, 3, name="x"), hist.axis.Regular(4, 0, 4, name="y")
+    ).fill([0.5, 1.5], [1.5, 2.5])
+
+    hp = h.profile("y")
+    # An empty bin matches a Mean storage that was never filled
+    expected = hist.Hist(hist.axis.Regular(3, 0, 3, name="x"), storage="mean")
+    expected.fill([0.5, 1.5], sample=[1.5, 2.5])
+    assert hp == expected
+
+    # Filling an empty bin afterwards gives a finite mean
+    hp.fill(x=[2.5], sample=[3.0])
+    assert hp[2].count == 1
+    assert hp[2].value == approx(3.0)
+
+    # Profiling down to zero dimensions still works
+    assert hist.Hist(hist.axis.Regular(3, 0, 3)).profile(0).values() == 0
