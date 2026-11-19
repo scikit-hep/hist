@@ -635,6 +635,12 @@ class BaseHist(_Histogram[S], Generic[S], metaclass=MetaConstructor, family=hist
             new_values = num / count
             new_variances = (num_err / count) ** 2 - (den_err * num / count**2) ** 2
 
+        # Empty bins hold a zero mean, like a Mean storage that was never
+        # filled, so that later fills and additions are not stuck at NaN.
+        empty = count == 0
+        new_values = np.where(empty, 0.0, new_values)
+        new_variances = np.where(empty, 0.0, new_variances)
+
         retval = self.__class__(*axes, storage=hist.storage.Mean())
         retval[...] = np.stack([count, new_values, count * new_variances], axis=-1)
         return retval
