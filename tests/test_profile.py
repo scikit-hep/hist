@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-__lazy_modules__ = {"hist", "numpy", "pytest"}
-
 import numpy as np
 from pytest import approx
 

@@ -6,14 +6,6 @@
 # in-memory.
 from __future__ import annotations
 
-__lazy_modules__ = {
-    "graphed",
-    "graphed.core",
-    "graphed.core.execution",
-    "hist",
-    "warnings",
-}
-
 import numpy as np
 import pytest
 
@@ -172,7 +164,7 @@ def test_multiple_fills_and_process_executor():
     h = hist_graphed.Hist.new.Reg(16, 0, 10, name="v").Int64()
     h.fill(v=x).fill(v=abs(x) * 0.5)
     direct = SequentialRunner().run(h.plan(steps_per_file=3)).value
-    later = pexec.ProcessPoolExecutor(max_workers=2).run(h.plan(steps_per_file=3)).value
+    later = pexec.ProcessPoolExecutor(workers=2).run(h.plan(steps_per_file=3)).value
     eager = hist.Hist.new.Reg(16, 0, 10, name="v").Int64()
     eager.fill(v=DATA)
     eager.fill(v=np.abs(DATA) * 0.5)
@@ -307,8 +299,8 @@ def test_sibling_mode_is_unchanged_by_the_flag_passthrough():
     h.fill(
         met=x, weight=[graphed.vary(w, "wgt", up=w * 1.2, down=w * 0.8)]
     )  # default: siblings
-    slots = dict(SequentialRunner().run(ghist.plan({"h": h}, steps_per_file=4)).value)
-    assert {k[1] for k in slots} == {"nominal", "wgt_up", "wgt_down"}
+    slots = SequentialRunner().run(ghist.plan({"h": h}, steps_per_file=4)).value["h"]
+    assert set(slots) == {"nominal", "wgt_up", "wgt_down"}
     for got in slots.values():
         assert [ax.__class__.__name__ for ax in got.axes] == [
             "Regular"
@@ -318,11 +310,21 @@ def test_sibling_mode_is_unchanged_by_the_flag_passthrough():
 @pytest.mark.parametrize(
     ("cls", "read"),
     [
-        (hist_graphed.Hist, lambda h: h.sort("cat")),
-        (hist_graphed.Hist, lambda h: h.expand_cats()),
-        (hist_graphed.Hist, lambda h: h.integrate("cat", ["a"])),
-        (hist_graphed.NamedHist, lambda h: h.sort("cat")),
-        (hist_graphed.NamedHist, lambda h: h.integrate("cat", ["a"])),
+        pytest.param(hist_graphed.Hist, lambda h: h.sort("cat"), id="Hist-sort"),
+        pytest.param(
+            hist_graphed.Hist, lambda h: h.expand_cats(), id="Hist-expand_cats"
+        ),
+        pytest.param(
+            hist_graphed.Hist, lambda h: h.integrate("cat", ["a"]), id="Hist-integrate"
+        ),
+        pytest.param(
+            hist_graphed.NamedHist, lambda h: h.sort("cat"), id="NamedHist-sort"
+        ),
+        pytest.param(
+            hist_graphed.NamedHist,
+            lambda h: h.integrate("cat", ["a"]),
+            id="NamedHist-integrate",
+        ),
     ],
 )
 def test_a_read_warning_escapes_hists_ignore_block(cls, read, monkeypatch):

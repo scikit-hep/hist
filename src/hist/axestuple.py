@@ -51,21 +51,23 @@ class NamedAxesTuple(AxesTuple):
 
     @name.setter
     def name(self, values: Iterable[str]) -> None:
-        for ax, val in zip(self, values, strict=True):
-            ax._raw_metadata["name"] = val
+        axes_and_names = tuple(zip(self, values, strict=True))
 
         disallowed_names = {"weight", "sample", "threads"}
-        for ax in self:
-            if ax.name in disallowed_names:
+        for _, name in axes_and_names:
+            if name in disallowed_names:
                 disallowed_warning = (
-                    f"{ax.name} is a protected keyword and cannot be used as axis name"
+                    f"{name} is a protected keyword and cannot be used as axis name"
                 )
                 warnings.warn(disallowed_warning, stacklevel=2)
 
-        valid_names = [ax.name for ax in self if ax.name]
+        valid_names = [name for _, name in axes_and_names if name]
         if len(valid_names) != len(set(valid_names)):
             msg = f"{self.__class__.__name__} instance cannot contain axes with duplicated names"
             raise KeyError(msg)
+
+        for ax, name in axes_and_names:
+            ax._raw_metadata["name"] = name
 
     @property
     def label(self) -> tuple[str]:

@@ -7,6 +7,11 @@ Fixes:
 * Include axis names and input shapes in incompatible-length errors from `.fill()`.
 * `Hist.from_columns` builds an `IntCategory` axis from NumPy integer arrays
   instead of raising `TypeError`.
+* `Stack` supports `/` and `/=` with a scalar or array, like `*` and `*=`.
+* `fill_flattened()` accepts plain lists, tuples, and scalars, like `fill()`,
+  instead of raising `TypeError`.
+* `ChunkedHist.to_hist()` keeps unset category axis labels empty, so the
+  result can be added to the `Hist` it came from.
 
 ## Version 2.12.1
 

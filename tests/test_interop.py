@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-__lazy_modules__ = {"hist", "numpy", "pytest", "subprocess"}
-
 import subprocess
 import sys
 
@@ -394,6 +392,23 @@ def test_string_fill_flattened():
     ark = np.array([1, 2, 3, 4, 5])
     h = hist.new.Reg(10, 0, 10, name="x").StrCat([], growth=True, name="cat").Weight()
     h.fill_flattened(x=ark, cat="A")
+
+
+def test_plain_sequence_fill_flattened():
+    h = hist.new.Reg(5, 0, 5).Double().fill_flattened([1, 2, 2])
+    assert h.values().tolist() == [0.0, 1.0, 2.0, 0.0, 0.0]
+
+    h = hist.new.Reg(2, 0, 2, name="x").Reg(2, 0, 2, name="y").Double()
+    h.fill_flattened([0.5, 1.5], y=(1.5, 1.5))
+    assert h.values().tolist() == [[0.0, 1.0], [0.0, 1.0]]
+
+    h = hist.new.Reg(2, 0, 2, name="x").StrCat([], growth=True, name="cat").Double()
+    h.fill_flattened(x=[0.5, 1.5], cat="A")
+    assert h.values().tolist() == [[1.0], [1.0]]
+
+    h = hist.NamedHist.new.Reg(2, 0, 2, name="x").Double()
+    with pytest.raises(TypeError, match="could not be destructed"):
+        h.fill_flattened([0.5, 1.5])
 
 
 def test_ak_fill_flattened():

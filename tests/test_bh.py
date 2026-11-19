@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-__lazy_modules__ = {"boost_histogram", "hist"}
-
 import boost_histogram as bh
 
 import hist
