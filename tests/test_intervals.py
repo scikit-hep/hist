@@ -244,3 +244,21 @@ def test_poisson_interval_native_integer_histogram():
     )
     assert result[0, 3] == 0
     assert np.isnan(result[1, 3])
+
+
+def test_propagate_ratio_uncertainty():
+    num = np.array([0, -4, 3, 2])
+    den = np.array([2, 2, -2, 0])
+    vn = np.array([8, 16, 4, 1])
+    vd = np.array([4, 2, 1, 1])
+    errors = intervals.ratio_uncertainty(
+        num, den, "propagate", num_variance=vn, denom_variance=vd
+    )
+    expected = [np.sqrt(2), np.sqrt(6), 1.25, np.nan]
+    np.testing.assert_allclose(errors, [expected, expected])
+    with pytest.raises(ValueError, match="Both bin variances"):
+        intervals.ratio_uncertainty(num, den, "propagate", num_variance=vn)
+    with pytest.raises(ValueError, match="nonnegative"):
+        intervals.ratio_uncertainty(
+            num, den, "propagate", num_variance=vn, denom_variance=-vd
+        )

@@ -1036,3 +1036,31 @@ def test_plot_ratio_ax_dict_alignment(kind):
     # And the two branches agree with each other.
     assert auto_main_xlim == own_main_xlim
     assert np.allclose(auto_x, own_x)
+
+
+def test_plot_ratio_propagates_weighted_histograms():
+    num = Hist.new.Reg(2, 0, 2).Weight().fill([0, 0, 1], weight=[2, -2, 3])
+    den = Hist.new.Reg(2, 0, 2).Weight().fill([0, 1], weight=[2, 1])
+    _, artists = num.plot_ratio(den, rp_uncertainty_type="propagate")
+    segments = artists.errorbar.lines[2][0].get_segments()
+    np.testing.assert_allclose(segments[0][:, 1], [-np.sqrt(2), np.sqrt(2)])
+    np.testing.assert_allclose(segments[1][:, 1], [3 - np.sqrt(18), 3 + np.sqrt(18)])
+    plt.close("all")
+
+
+def test_plot_propagated_ratio_requires_histogram_variances():
+    num = Hist.new.Reg(2, 0, 2).Double().fill([0, 1], weight=[1.5, 2.5])
+    den = Hist.new.Reg(2, 0, 2).Weight().fill([0, 1])
+    with pytest.raises(ValueError, match="Both histograms must have bin variances"):
+        num.plot_ratio(den, rp_uncertainty_type="propagate")
+    with pytest.raises(ValueError, match="two independent histograms"):
+        den.plot_ratio("gauss", rp_uncertainty_type="propagate")
+    plt.close("all")
+
+
+def test_plot_propagated_ratio_empty_denominator():
+    num = Hist.new.Reg(2, 0, 2).Weight().fill([0, 1])
+    den = Hist.new.Reg(2, 0, 2).Weight()
+    _, artists = num.plot_ratio(den, rp_uncertainty_type="propagate")
+    assert np.isnan(artists.errorbar.lines[0].get_ydata()).all()
+    plt.close("all")

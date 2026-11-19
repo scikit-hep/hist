@@ -870,6 +870,10 @@ class BaseHist(_Histogram[S], Generic[S], metaclass=MetaConstructor, family=hist
             ``"ratio_ax"``, respectively. Both keys are required when passing a
             nonempty dictionary. If omitted or empty, both axes are created in
             the current figure.
+        rp_uncertainty_type : str, optional
+            Use ``"propagate"`` to propagate both histograms' bin variances to
+            first order, assuming independent samples. This uses the sum of
+            squared weights for Weight storage. The default is ``"poisson"``.
         """
 
         from hist import plot

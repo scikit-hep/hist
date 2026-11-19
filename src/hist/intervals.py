@@ -114,7 +114,12 @@ def clopper_pearson_interval(
 def ratio_uncertainty(
     num: np.typing.NDArray[Any],
     denom: np.typing.NDArray[Any],
-    uncertainty_type: Literal["poisson", "poisson-ratio", "efficiency"] = "poisson",
+    uncertainty_type: Literal[
+        "poisson", "poisson-ratio", "efficiency", "propagate"
+    ] = "poisson",
+    *,
+    num_variance: np.typing.NDArray[Any] | None = None,
+    denom_variance: np.typing.NDArray[Any] | None = None,
 ) -> Any:
     r"""
     Calculate the uncertainties for the values of the ratio ``num/denom`` using
@@ -139,6 +144,11 @@ def ratio_uncertainty(
            efficiency parameter.
            This is only valid if the entries contributing to ``num`` are a strict
            subset of those contributing to ``denom``.
+         * ``"propagate"`` gives symmetric, first-order standard errors for two
+           independent histograms. Signed bin contents are supported; a zero
+           denominator gives an undefined error.
+        num_variance: Numerator bin variances, required for ``"propagate"``.
+        denom_variance: Denominator bin variances, required for ``"propagate"``.
 
     Returns:
         The uncertainties for the ratio.
@@ -147,7 +157,20 @@ def ratio_uncertainty(
     with np.errstate(divide="ignore", invalid="ignore"):
         # Nota bene: x/0 = inf, 0/0 = nan
         ratio = num / denom
-    if uncertainty_type == "poisson":
+    if uncertainty_type == "propagate":
+        if num_variance is None or denom_variance is None:
+            msg = "Both bin variances are required to propagate ratio uncertainties"
+            raise ValueError(msg)
+        if np.any(num_variance < 0) or np.any(denom_variance < 0):
+            msg = "Bin variances must be nonnegative"
+            raise ValueError(msg)
+        with np.errstate(divide="ignore", invalid="ignore"):
+            error = np.abs(
+                np.hypot(np.sqrt(num_variance), ratio * np.sqrt(denom_variance)) / denom
+            )
+        error = np.where(denom == 0, np.nan, error)
+        ratio_uncert = np.stack((error, error))
+    elif uncertainty_type == "poisson":
         with np.errstate(divide="ignore", invalid="ignore"):
             ratio_variance = num * np.power(denom, -2.0)
         ratio_uncert = np.abs(poisson_interval(ratio, ratio_variance) - ratio)
