@@ -209,3 +209,15 @@ As an complete example, let's say you wanted to compute and plot the density, wi
 .. image:: ../_images/ex_hist_density.png
    :alt: Density histogram output
    :align: center
+
+Padding missing flow bins
+-------------------------
+
+``h.values(forceflow=True)`` returns an independent array with an underflow and
+an overflow position on every axis. Existing flow bins keep their contents;
+positions for missing flow bins contain zeros. Each histogram dimension therefore
+has ``len(axis) + 2`` positions, including categorical and Boolean axes.
+
+``h.variances(forceflow=True)`` follows the same layout. It still returns ``None``
+when variances are unknown, and preserves undefined variance entries in real bins.
+The default accessors and ``flow=True`` continue to return only existing bins.
