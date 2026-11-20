@@ -4,6 +4,9 @@
 
 Fixes:
 
+* `.density()` normalizes histograms whose weights sum to a negative
+  value, like `numpy.histogram(..., density=True)`, instead of returning the
+  raw values.
 * `Hist.from_columns` builds an `IntCategory` axis from NumPy integer arrays
   instead of raising `TypeError`.
 * `Stack` supports `/` and `/=` with a scalar or array, like `*` and `*=`.
