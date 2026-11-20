@@ -813,6 +813,19 @@ def test_weighted_density():
         assert pytest.approx(sum(h.density()), 2) == pytest.approx(10 / 6, 2)
 
 
+@pytest.mark.parametrize("weights", [[-1.0, -3.0], [1.0, -3.0], [2.0, 6.0]])
+def test_density_matches_numpy_for_any_weight_sign(weights):
+    x = [0.1, 0.6]
+    h = Hist(axis.Regular(2, 0, 1), storage="weight").fill(x, weight=weights)
+    expected, _ = np.histogram(x, bins=2, range=(0, 1), weights=weights, density=True)
+    assert h.density() == pytest.approx(expected)
+
+
+def test_density_of_empty_hist_is_zero():
+    h = Hist(axis.Regular(2, 0, 1))
+    assert h.density() == pytest.approx([0.0, 0.0])
+
+
 def test_general_axestuple():
     """
     Test general axes tuple -- whether Hist axes tuple work properly.

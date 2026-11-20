@@ -644,7 +644,9 @@ class BaseHist(_Histogram[S], Generic[S], metaclass=MetaConstructor, family=hist
         Density NumPy array.
         """
         total = np.sum(self.values()) * functools.reduce(operator.mul, self.axes.widths)
-        dens: np.typing.NDArray[Any] = self.values() / np.where(total > 0, total, 1)
+        # Only an empty total is guarded: a negative total (net negative weights)
+        # still normalizes, as in numpy.histogram(..., density=True)
+        dens: np.typing.NDArray[Any] = self.values() / np.where(total != 0, total, 1)
         return dens
 
     def show(self, **kwargs: Any) -> Any:
