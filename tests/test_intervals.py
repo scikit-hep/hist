@@ -8,6 +8,7 @@ from hist import Hist, axis
 
 pytest.importorskip("scipy")
 intervals = pytest.importorskip("hist.intervals")
+stats = pytest.importorskip("scipy.stats")
 
 
 @pytest.fixture(scope="session")
@@ -145,9 +146,9 @@ def test_ratio_uncertainty():
     assert approx(uncertainty_max, nan_ok=True) == np.array(
         [
             [np.nan, np.nan, np.nan, np.nan],
-            [np.nan, 2.29952656e00, 3.16275317e00, 2.36421589e01],
-            [np.nan, 5.74881640e-01, 7.90688293e-01, 5.91053972e00],
-            [np.nan, 4.49126281e-03, 6.17725229e-03, 4.61760915e-02],
+            [1.84102165e00, 2.29952656e00, 3.16275317e00, 2.36421589e01],
+            [4.60255411e-01, 5.74881640e-01, 7.90688293e-01, 5.91053972e00],
+            [3.59574540e-03, 4.49126281e-03, 6.17725229e-03, 4.61760915e-02],
         ]
     )
 
@@ -199,6 +200,20 @@ def test_ratio_uncertainty():
 
     with pytest.raises(TypeError):
         intervals.ratio_uncertainty(num, denom, uncertainty_type="fail")
+
+
+def test_ratio_uncertainty_poisson_zero_numerator():
+    # The upper limit of the Garwood interval for a count of 0 is
+    # chi2.ppf((1 + coverage) / 2, 2) / 2, scaled here by the denominator.
+    num = np.array([0, 0, 3])
+    denom = np.array([10, 4, 10])
+    _, uncertainty_max = intervals.ratio_uncertainty(num, denom, "poisson")
+    garwood_zero = (
+        stats.chi2.ppf((1 + (stats.norm.cdf(1) - stats.norm.cdf(-1))) / 2, 2) / 2
+    )
+    assert uncertainty_max[:2] == approx(garwood_zero / denom[:2])
+    expected = intervals.poisson_interval(np.array([3.0]))[1] / 10 - 0.3
+    assert uncertainty_max[2] == approx(expected[0])
 
 
 def test_valid_efficiency_ratio_uncertainty(hist_fixture):

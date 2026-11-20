@@ -148,9 +148,11 @@ def ratio_uncertainty(
         # Nota bene: x/0 = inf, 0/0 = nan
         ratio = num / denom
     if uncertainty_type == "poisson":
+        # Garwood interval of the numerator count, scaled by the denominator.
+        # Passing the ratio with a variance would use the weighted branch of
+        # poisson_interval, whose upper limit is NaN for a zero value.
         with np.errstate(divide="ignore", invalid="ignore"):
-            ratio_variance = num * np.power(denom, -2.0)
-        ratio_uncert = np.abs(poisson_interval(ratio, ratio_variance) - ratio)
+            ratio_uncert = np.abs(poisson_interval(num) / denom - ratio)
     elif uncertainty_type == "poisson-ratio":
         # Details: see https://github.com/scikit-hep/hist/issues/279
         p_lim = clopper_pearson_interval(num, num + denom)

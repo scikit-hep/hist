@@ -11,6 +11,8 @@ Fixes:
   instead of raising `TypeError`.
 * `ChunkedHist.to_hist()` keeps unset category axis labels empty, so the
   result can be added to the `Hist` it came from.
+* `ratio_uncertainty(..., "poisson")` gives the Garwood upper limit for a
+  numerator of zero, instead of `NaN`.
 
 ## Version 2.12.1
 
