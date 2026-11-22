@@ -870,6 +870,25 @@ class BaseHist(_Histogram[S], Generic[S], metaclass=MetaConstructor, family=hist
             ``"ratio_ax"``, respectively. Both keys are required when passing a
             nonempty dictionary. If omitted or empty, both axes are created in
             the current figure.
+        **kwargs : Any
+            Options grouped by prefix, as in :meth:`plot_pull`: ``eb_*`` for the
+            histogram error bars, ``fp_*`` and ``ub_*`` for the fitted curve and
+            its uncertainty band, ``rp_*`` for the ratio subplot, plus the
+            ``likelihood`` and ``fit_fmt`` options described in
+            :meth:`plot_pull`. An unrecognised keyword raises a `ValueError`.
+
+        Returns
+        -------
+        tuple
+            ``(main_ax_artists, subplot_ax_artists)``, with the main-axes artists
+            first and the ratio subplot artists second.
+
+        Notes
+        -----
+        When ``other`` is a model, it is fitted to the bin values as described
+        in :meth:`plot_pull`. The ratio subplot shows ``values / model``, or, for
+        ``rp_uncertainty_type="efficiency"``, the ratio with a binomial
+        uncertainty intended for efficiency plots.
         """
 
         from hist import plot
@@ -905,6 +924,78 @@ class BaseHist(_Histogram[S], Generic[S], metaclass=MetaConstructor, family=hist
             ``"pull_ax"``, respectively. Both keys are required when passing a
             nonempty dictionary. If omitted or empty, both axes are created in
             the current figure.
+        **kwargs : Any
+            Options grouped by prefix: ``eb_*`` for the histogram error bars
+            (forwarded to `matplotlib.axes.Axes.errorbar`), ``fp_*`` for the
+            fitted curve and ``ub_*`` for its uncertainty band, ``bar_*`` and
+            ``pp_*`` for the pull subplot, and ``rp_*`` for the ratio and pull
+            options shared with :meth:`plot_ratio` (for example
+            ``rp_ylim`` and ``rp_uncertainty_type``). An unrecognised keyword
+            raises a `ValueError`.
+
+        Returns
+        -------
+        tuple
+            ``(main_ax_artists, subplot_ax_artists)``, with the fit artists of
+            the main axes first and the pull artists of the subplot second.
+
+        Other Parameters
+        ----------------
+        likelihood : bool, default False
+            Minimise a Poisson likelihood with iminuit instead of
+            `scipy.optimize.curve_fit`. Requires the ``fit`` extra.
+        fit_fmt : str, optional
+            Format string used to label the fitted curve with the fitted
+            parameters, for example ``r"{name} = {value:.3g} $\\pm$ {error:.3g}"``,
+            where ``name``, ``value``, and ``error`` are filled in for each
+            model parameter.
+
+        Raises
+        ------
+        TypeError
+            If the histogram is not 1D; project it first.
+        ValueError
+            If a keyword argument is not one of the ``*_*`` groups above, if
+            ``ax_dict`` is missing a key, or if the fit receives no bins with a
+            non-zero uncertainty.
+
+        Notes
+        -----
+        The model is fitted to the bin values, weighted by the histogram's bin
+        uncertainties (``sqrt(histogram.variances())``, taken as absolute), with
+        `scipy.optimize.curve_fit`; bins with an uncertainty of zero are left
+        out of the fit. Passing ``likelihood=True`` instead minimises a Poisson
+        likelihood with `iminuit.Minuit`, seeded from that least-squares fit and
+        with the covariance matrix from `iminuit.Minuit.hesse`.
+
+        The initial values of the fit come from the keyword defaults of the
+        model, so ``lambda x, a=1.0, b=2.0: a * x + b`` starts at ``a=1.0`` and
+        ``b=2.0``, while parameters of a string expression start at 1. The
+        built-in ``"gauss"`` models instead seed their height, mean, and width
+        from the histogram.
+
+        The parameters of the fit are not returned by this method. Pass
+        ``fit_fmt`` to print them on the legend, or fit the same model yourself
+        with `scipy.optimize.curve_fit` to work with them directly.
+
+        Each pull is ``(value - model) / uncertainty``, and pulls that are not
+        finite are drawn as zero.
+
+        Examples
+        --------
+        Fit a Gaussian model with initial values of the height, mean, and
+        width given by the defaults, and label the fit with its parameters:
+
+        >>> import numpy as np
+        >>> import hist
+        >>> h = hist.new.Reg(50, -5, 5, name="x").Weight().fill(
+        ...     np.random.default_rng(42).normal(size=1000)
+        ... )
+        >>> def model(x, constant=350.0, mean=0.0, sigma=1.0):
+        ...     return constant * np.exp(-((x - mean) ** 2) / (2 * sigma**2))
+        >>> fit_artists, pull_artists = h.plot_pull(
+        ...     model, fit_fmt=r"{name} = {value:.3g} $\\pm$ {error:.3g}"
+        ... )
         """
 
         from hist import plot
